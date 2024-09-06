@@ -1,6 +1,6 @@
 FROM node:latest
 
-# 作業ディレクトリ
+# 作業ディレクトリ設定
 WORKDIR /var/www
 #COPY .env ../
 
