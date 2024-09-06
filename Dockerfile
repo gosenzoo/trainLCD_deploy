@@ -14,7 +14,7 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# Vimインストール
+# Vimをインストール
 RUN apt install -y vim
 
 # パッケージをインストール
