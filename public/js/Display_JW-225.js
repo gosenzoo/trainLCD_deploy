@@ -152,8 +152,12 @@ function draw(){
         innerSVG.setPolygon([0, 698.72, 1197.16+123.56, 698.72, 1197.16+123.56, 698.72+17.94, 1197.16+51.07, 744.55+17.94, 0, 744.55+17.94], {
             fill: "rgb(31, 31, 31)"
         });
+        let color;
+        if(settings.info.isLoop){ color = index.nowStationId == 0 ? stationList[stationList.length-1].lineColor : stationList[index.nowStationId-1].lineColor }
+        else { color = index.nowStationId == 0 ? 
+            index.dispStationList[0].lineColor : stationList[index.nowStationId < stationList.length - 7 ? index.nowStationId-1 : stationList.length - 7].lineColor }
         innerSVG.setRect(0, 652.89, 135.84, 91.66, {
-            fill: index.dispStationList[0].lineColor
+            fill: color
         });
         for(let i = 0; i < 7; i++){
             innerSVG.setRect(135.84 + 151.62 * i - 1, 652.89, 151.62 + 1, 91.66, {
@@ -295,6 +299,26 @@ function draw(){
         fontFamily: "BIZ UDGothic"
     });
 
+    //経由地
+    innerSVG.setText(389, 65, settings.info.direction, {
+        fill: "white",
+        textAnchor: "start",
+        dominantBaseline: "auto",
+        fontSize: "40px",
+        fontWeight: "bold",
+        fontFamily: "BIZ UDGothic"
+    });
+
+    //行き先
+    innerSVG.setText(settings.info.direction.length * 40 + 389 + (settings.info.direction.length ? 30 : 0), 65, settings.info.destination + "ゆき", {
+        fill: "white",
+        textAnchor: "start",
+        dominantBaseline: "auto",
+        fontSize: "57px",
+        fontWeight: "bold",
+        fontFamily: "BIZ UDGothic"
+    });
+
     //列車路線記号
     innerSVG.setRect(21, 29, 68.5, 68.5, {
         fill: settings.info.lineColor
@@ -305,6 +329,18 @@ function draw(){
         dominantBaseline: "middle",
         fontSize: "66px",
         fontFamily: "sans-serif"
+    });
+
+    //種別
+    innerSVG.setText(100, 80, settings.info.trainType, {
+        fill: "white",
+        textAnchor: "start",
+        dominantBaseline: "middle",
+        fontWeight: "bold",
+        fontStyle: "italic",
+        fontSize: "110px",
+        fontFamily: "BIZ UDGothic",
+        letterSpacing: "15"
     });
 
     //号車
