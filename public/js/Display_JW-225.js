@@ -423,8 +423,7 @@ window.onload = async function(){
     //変数初期化
     pixelRatio = 1;
     dispStationsId = 0;
-    isLoop = true;
-    index = await new IndexClass(stationList, isLoop)
+    index = await new IndexClass(stationList, settings.info.isLoop)
     console.log(index.dispStationList)
     runState = 0;
     langState = 0;
@@ -463,7 +462,7 @@ class IndexClass {
         this.dispStationList = [];
         this.drawPos = 0;
         // nowStationIdの値が変更されたときに、yの値も条件に応じて変更する
-        if (!this.isLoop) {
+        if (!this.isLoop) { //非環状運転時
             if(value < 0){ this._nowStationId = 0; }
             if(value >= stationList.length){ this._nowStationId = stationList.length - 1; }
             if(value < stationList.length - 7){
@@ -475,13 +474,13 @@ class IndexClass {
                 for(let i = 0; i < 8; i++){
                     this.dispStationList.push(stationList[stationList.length - 8 + i])
                 }
-                this.drawPos = value - (stationList.length - 8);
+                this.drawPos = this._nowStationId - (stationList.length - 8);
             }
-        } else {
+        } else { //環状運転時
             if(value < 0){ this._nowStationId = stationList.length - 1; }
             if(value >= stationList.length){ this._nowStationId = 0; }
             for(let i = 0; i < 8; i++){
-                this.dispStationList.push(this.getCircularItem(stationList, value + i))
+                this.dispStationList.push(this.getCircularItem(stationList, this._nowStationId + i))
             }
         }
 
