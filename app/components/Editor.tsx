@@ -14,6 +14,7 @@ const Editor = () => {
 
     return(
         <div>
+            うんこーーーーーー
             <EditorHead setting={setting} setSetting={setSetting}/>
             <br></br>
             <InfoForm setting={setting} setSetting={setSetting}/>
