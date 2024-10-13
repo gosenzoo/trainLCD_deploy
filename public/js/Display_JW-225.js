@@ -3,6 +3,7 @@ var display;
 var pixelRatio;
 var settings;
 var stationList;
+var existsPassStation;
 
 var originalWidth, originalHeight;
 
@@ -213,6 +214,13 @@ function draw(){
             innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber) - 1, 652.89, 151.62 + 1, 91.66, {
                 fill: index.dispStationList[i].lineColor
             });
+
+            //次駅との間に通過駅が存在すればマークを描画
+            if(existsPassStation[index.dispStationListStart + i]){
+                innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber + 1/2) - 1 - 31/2, 652.89 + 91.66/2 - 16/2, 31, 16, {
+                    fill: "white"
+                });
+            }
         }
         //路線前端
         innerSVG.setPolygon([1197.16 - 1, 652.89, 1197.16+51.07, 652.89, 1197.16+123.56, 698.72, 1197.16+51.07, 744.55, 1197.16 - 1, 744.55], {
@@ -266,7 +274,7 @@ function draw(){
             innerSVG.setImage(settings.iconDict[line.lineIconKey], 39, 450 + area * i + area / 2 - iconSize / 2, iconSize, iconSize);
 
             let textWidth = 62 * iconSize / 65 * line.name.length
-            let m = textWidth > 500 ? Snap.matrix().scale(500 / textWidth, 1, 139, 0) : null
+            let m = textWidth > 500 ? Snap.matrix().scale(500 / textWidth, 1, 139, 0) : Snap.matrix().scale(1, 1)
             innerSVG.setText(139, 451 + area * i + area / 2, line.name, {
                 fill: "black",
                 textAnchor: "start",
@@ -277,7 +285,7 @@ function draw(){
                 transform: m
             });
             textWidth = 30 * iconSize / 65 * line.eng.length
-            m = textWidth > 500 ? Snap.matrix().scale(500 / textWidth, 1, 675, 0) : null
+            m = textWidth > 500 ? Snap.matrix().scale(500 / textWidth, 1, 675, 0) : Snap.matrix().scale(1, 1)
             innerSVG.setText(675, 451 + area * i + area / 2, line.eng, {
                 fill: "black",
                 textAnchor: "start",
@@ -596,11 +604,14 @@ window.onload = async function(){
     //console.log(display);
 
     //JSON読み込み
-    //console.log("ローカルストレージ：");
-    //console.log(JSON.parse(localStorage.getItem('lcdStrage')));
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
-    stationList = settings.stationList;
+
+    //駅リストから停車駅と通過リストを取得
+    let obj = getStopStation(settings.stationList);
+    stationList = obj.stopStationList;
+    existsPassStation = obj.existsPassStation;
     console.log(settings);
+    console.log(getStopStation(settings.stationList));
     /*
     let responce = await fetch("http://192.168.3.13:5500/json/JR神戸線.json");
     settings = await responce.json();
@@ -644,6 +655,7 @@ class IndexClass {
     constructor(stationList, isLoop) {
         this._nowStationId = 0;  // 私的な変数（外部から直接アクセスしない）
         this.dispStationList = [];  // 監視されない普通のプロパティ
+        this.dispStationListStart = 0;
         this.drawPos = 0;
         this.isLoop= isLoop;
         this.dispStartNumber = stationList.length > 7 ? 0 : 8 - stationList.length
@@ -670,12 +682,14 @@ class IndexClass {
                 for(let i = 0; i < 8; i++){
                     this.dispStationList.push(stationList[this._nowStationId + i])
                 }
+                this.dispStationListStart = this._nowStationId;
             }
             else{ //終点近くの場合、stationListの末尾部分をdispに入れていき、drawPosを更新
                 for(let i = 0; i < 8 - this.dispStartNumber; i++){
                     this.dispStationList.push(stationList[stationList.length - 8 + this.dispStartNumber + i])
                 }
                 this.drawPos = this._nowStationId - (stationList.length - 8);
+                this.dispStationListStart = stationList.length - 8 + this.dispStartNumber;
             }
         } else { //環状運転時
             if(value < 0){ this._nowStationId = stationList.length - 1; }

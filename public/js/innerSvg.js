@@ -40,7 +40,6 @@ class InnerSVG{
 
     displaySVG(element){
         element.innerHTML = this.innerHtml;
-        console.log(this.innerHtml)
     }
 
     styleProcess(styleJson){
