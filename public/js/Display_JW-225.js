@@ -89,13 +89,13 @@ function draw(){
                             });
                         }
                         else{
-                            let textWidth = (12.5 * mag * settings.lineDict[transfersId[j]].eng.length);
-                            let m = textWidth > 140 - 12.5 * mag ? Snap.matrix().scale((140 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
+                            let textWidth = getCanvasTextSize(settings.lineDict[transfersId[j]].eng, `${25 * mag}px`, "sans-serif").width;
+                            let m = textWidth > 125 - 12.5 * mag ? Snap.matrix().scale((125 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
                             innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].eng, {
                                 fill: "black",
                                 textAnchor: "start",
                                 dominantBaseline: "middle",
-                                fontSize: `${23 * mag}px`,
+                                fontSize: `${25 * mag}px`,
                                 fontWeight: "Bold",
                                 fontFamily: "sans-serif",
                                 transform: m
