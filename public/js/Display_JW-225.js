@@ -58,158 +58,154 @@ function draw(){
 
     if(page == 0){ //路線表示
         //駅ユニット
-        if(settings.stationList.length >= 8){ //8駅以上の場合
-            for (let i = 0; i < 8; i++) { 
-                let isPassed = (runState == 0 && i < index.drawPos || runState != 0 && i < index.drawPos + 1)
-                //乗り換え案内
-                if (index.dispStationList[i].transfers.length != 0 && !isPassed) {
-                    //背景
-                    innerSVG.setRect(135.84 + 151.62 * i - 11.39/2, 634.86 - 1, 11.39, 155.42 + 1, {
-                        fill: "black"
-                    });
+        for (let i = 0; i < 8 - index.dispStartNumber; i++) { 
+            let iPos = i + index.dispStartNumber;
+            let isPassed = (runState == 0 && iPos < index.drawPos || runState != 0 && iPos < index.drawPos + 1)
+            //乗り換え案内
+            if (index.dispStationList[i].transfers.length != 0 && !isPassed) {
+                //背景
+                innerSVG.setRect(135.84 + 151.62 * iPos - 11.39/2, 634.86 - 1, 11.39, 155.42 + 1, {
+                    fill: "black"
+                });
 
-                    let transfersId = index.dispStationList[i].transfers.split(' ');
-                    let mag = 1;
-                    if(transfersId.length > 7) { mag = 188 / (27 * transfersId.length);}
-                    for(let j = 0; j < transfersId.length; j++) {
-                        innerSVG.setImage(settings.iconDict[settings.lineDict[transfersId[j]].lineIconKey],
-                            135.84 + 151.62 * i - 70, 792 + 27 * mag * j + 2.5, 24 * mag, 24 * mag);
+                let transfersId = index.dispStationList[i].transfers.split(' ');
+                let mag = 1;
+                if(transfersId.length > 7) { mag = 188 / (27 * transfersId.length);}
+                for(let j = 0; j < transfersId.length; j++) {
+                    innerSVG.setImage(settings.iconDict[settings.lineDict[transfersId[j]].lineIconKey],
+                        135.84 + 151.62 * iPos - 70, 792 + 27 * mag * j + 2.5, 24 * mag, 24 * mag);
 
-                        if(langState == 0 || langState == 1){
-                            let textWidth = (23 * mag * settings.lineDict[transfersId[j]].name.length);
-                            let m = textWidth > 140 - 23 * mag ? Snap.matrix().scale((140 - 23 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
-                            innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].name, {
-                                fill: "black",
-                                textAnchor: "start",
-                                dominantBaseline: "middle",
-                                fontSize: `${23 * mag}px`,
-                                fontWeight: "Bold",
-                                fontFamily: "BIZ UDGothic",
-                                transform: m
-                            });
-                        }
-                        else{
-                            let textWidth = getCanvasTextSize(settings.lineDict[transfersId[j]].eng, `${25 * mag}px`, "sans-serif").width;
-                            let m = textWidth > 125 - 12.5 * mag ? Snap.matrix().scale((125 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
-                            innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].eng, {
-                                fill: "black",
-                                textAnchor: "start",
-                                dominantBaseline: "middle",
-                                fontSize: `${25 * mag}px`,
-                                fontWeight: "Bold",
-                                fontFamily: "sans-serif",
-                                transform: m
-                            });
-                        }
-                    }
-                }
-                
-                //路線記号
-                if(index.dispStationList[i].number !== ""){
-                    innerSVG.setRect(135.84 + 151.62 * i - 76.51/2, 604.68, 76.51, 30.18, {
-                        fill: !isPassed ? index.dispStationList[i].lineColor : "gray"
-                    });
-                    innerSVG.setText(135.84 + 151.62 * i, 604.68+30.18/2+2, index.dispStationList[i].number.split(" ")[0] + index.dispStationList[i].number.split(" ")[1], {
-                        fill: "white",
-                        textAnchor: "middle",
-                        dominantBaseline: "middle",
-                        fontSize: "28px",
-                        fontWeight: "Bold",
-                        fontFamily: "sans-serif",
-                        letterSpacing: "0px"
-                    });
-                }
-                    
-                //駅名列挙
-                if(langState == 0 || langState == 1){
-                    if (index.dispStationList[i].name.length < 5) {
-                        let chars = ["", "", "", ""];
-                        if (index.dispStationList[i].name.length == 1) {
-                            chars[2] = index.dispStationList[i].name;
-                        }
-                        else if (index.dispStationList[i].name.length == 2) {
-                            chars[1] = index.dispStationList[i].name[0];
-                            chars[3] = index.dispStationList[i].name[1];
-                        }
-                        else if (index.dispStationList[i].name.length == 3) {
-                            chars[1] = index.dispStationList[i].name[0];
-                            chars[2] = index.dispStationList[i].name[1];
-                            chars[3] = index.dispStationList[i].name[2];
-                        }
-                        else if (index.dispStationList[i].name.length == 4) {
-                            chars[0] = index.dispStationList[i].name[0];
-                            chars[1] = index.dispStationList[i].name[1];
-                            chars[2] = index.dispStationList[i].name[2];
-                            chars[3] = index.dispStationList[i].name[3];
-                        }
-
-                        for (let j = 0; j < 4; j++) {
-                            innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, chars[3 - j], {
-                                fill: !isPassed ? "black" : "gray",
-                                textAnchor: "middle",
-                                dominantBaseline: "middle",
-                                fontSize: "57px",
-                                fontWeight: "Bold",
-                                fontFamily: "BIZ UDGothic"
-                            });
-                        }
+                    if(langState == 0 || langState == 1){
+                        let textWidth = (23 * mag * settings.lineDict[transfersId[j]].name.length);
+                        let m = textWidth > 140 - 23 * mag ? Snap.matrix().scale((140 - 23 * mag) / textWidth, 1, 135.84 + 151.62 * iPos - 70 + (24 + 2) * mag, 0) : Snap.matrix();
+                        innerSVG.setText(135.84 + 151.62 * iPos - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].name, {
+                            fill: "black",
+                            textAnchor: "start",
+                            dominantBaseline: "middle",
+                            fontSize: `${23 * mag}px`,
+                            fontWeight: "Bold",
+                            fontFamily: "BIZ UDGothic",
+                            transform: m
+                        });
                     }
                     else{
-                        let m = Snap.matrix().scale(1, 250 / (55.12 * index.dispStationList[i].name.length), 135.84, 547+55.12-5);
-                        for (let j = 0; j < index.dispStationList[i].name.length; j++) {
-                            innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, index.dispStationList[i].name[index.dispStationList[i].name.length - 1 - j], {
-                                fill: !isPassed ? "black" : "gray",
-                                textAnchor: "middle",
-                                dominantBaseline: "middle",
-                                fontSize: "57px",
-                                fontWeight: "Bold",
-                                fontFamily: "BIZ UDGothic",
-                                transform: m
-                            });
-                        }
+                        let textWidth = getCanvasTextSize(settings.lineDict[transfersId[j]].eng, `${25 * mag}px`, "sans-serif").width;
+                        let m = textWidth > 125 - 12.5 * mag ? Snap.matrix().scale((125 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * iPos - 70 + (24 + 2) * mag, 0) : Snap.matrix();
+                        innerSVG.setText(135.84 + 151.62 * iPos - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].eng, {
+                            fill: "black",
+                            textAnchor: "start",
+                            dominantBaseline: "middle",
+                            fontSize: `${25 * mag}px`,
+                            fontWeight: "Bold",
+                            fontFamily: "sans-serif",
+                            transform: m
+                        });
+                    }
+                }
+            }
+            
+            //路線記号
+            if(index.dispStationList[i].number !== ""){
+                innerSVG.setRect(135.84 + 151.62 * iPos - 76.51/2, 604.68, 76.51, 30.18, {
+                    fill: !isPassed ? index.dispStationList[i].lineColor : "gray"
+                });
+                innerSVG.setText(135.84 + 151.62 * iPos, 604.68+30.18/2+2, index.dispStationList[i].number.split(" ")[0] + index.dispStationList[i].number.split(" ")[1], {
+                    fill: "white",
+                    textAnchor: "middle",
+                    dominantBaseline: "middle",
+                    fontSize: "28px",
+                    fontWeight: "Bold",
+                    fontFamily: "sans-serif",
+                    letterSpacing: "0px"
+                });
+            }
+                
+            //駅名列挙
+            if(langState == 0 || langState == 1){
+                if (index.dispStationList[i].name.length < 5) {
+                    let chars = ["", "", "", ""];
+                    if (index.dispStationList[i].name.length == 1) {
+                        chars[2] = index.dispStationList[i].name;
+                    }
+                    else if (index.dispStationList[i].name.length == 2) {
+                        chars[1] = index.dispStationList[i].name[0];
+                        chars[3] = index.dispStationList[i].name[1];
+                    }
+                    else if (index.dispStationList[i].name.length == 3) {
+                        chars[1] = index.dispStationList[i].name[0];
+                        chars[2] = index.dispStationList[i].name[1];
+                        chars[3] = index.dispStationList[i].name[2];
+                    }
+                    else if (index.dispStationList[i].name.length == 4) {
+                        chars[0] = index.dispStationList[i].name[0];
+                        chars[1] = index.dispStationList[i].name[1];
+                        chars[2] = index.dispStationList[i].name[2];
+                        chars[3] = index.dispStationList[i].name[3];
+                    }
+
+                    for (let j = 0; j < 4; j++) {
+                        innerSVG.setText(135.84 + 151.62 * iPos, 547+55.12/2 - 55.12 * j, chars[3 - j], {
+                            fill: !isPassed ? "black" : "gray",
+                            textAnchor: "middle",
+                            dominantBaseline: "middle",
+                            fontSize: "57px",
+                            fontWeight: "Bold",
+                            fontFamily: "BIZ UDGothic"
+                        });
                     }
                 }
                 else{
-                    let textWidth = getCanvasTextSize(index.dispStationList[i].eng, "57px", "sans-serif").width
-                    let m = Snap.matrix().rotate(-60, 130 + 151.62 * i, 547+55.12+2)
-                    m = textWidth > 250 ? m.scale(250 / textWidth ,1 , 130 + 151.62 * i, 0) : m
-                    innerSVG.setText(130 + 151.62 * i, 547+55.12+2, index.dispStationList[i].eng, {
-                        fill: !isPassed ? "black" : "gray",
-                        textAnchor: "start",
-                        dominantBaseline: "auto",
-                        fontSize: "57px",
-                        fontWeight: "bold",
-                        fontFamily: "sans-serif",
-                        transform: m
-                    });
+                    let m = Snap.matrix().scale(1, 250 / (55.12 * index.dispStationList[i].name.length), 135.84, 547+55.12-5);
+                    for (let j = 0; j < index.dispStationList[i].name.length; j++) {
+                        innerSVG.setText(135.84 + 151.62 * iPos, 547+55.12/2 - 55.12 * j, index.dispStationList[i].name[index.dispStationList[i].name.length - 1 - j], {
+                            fill: !isPassed ? "black" : "gray",
+                            textAnchor: "middle",
+                            dominantBaseline: "middle",
+                            fontSize: "57px",
+                            fontWeight: "Bold",
+                            fontFamily: "BIZ UDGothic",
+                            transform: m
+                        });
+                    }
                 }
             }
-        }
-        else{ //8駅未満の場合
-
+            else{
+                let textWidth = getCanvasTextSize(index.dispStationList[i].eng, "57px", "sans-serif").width
+                let m = Snap.matrix().rotate(-60, 130 + 151.62 * iPos, 547+55.12+2)
+                m = textWidth > 250 ? m.scale(250 / textWidth ,1 , 130 + 151.62 * iPos, 0) : m
+                innerSVG.setText(130 + 151.62 * iPos, 547+55.12+2, index.dispStationList[i].eng, {
+                    fill: !isPassed ? "black" : "gray",
+                    textAnchor: "start",
+                    dominantBaseline: "auto",
+                    fontSize: "57px",
+                    fontWeight: "bold",
+                    fontFamily: "sans-serif",
+                    transform: m
+                });
+            }
         }
 
         //線
-        innerSVG.setPolygon([0, 698.72, 1197.16+123.56, 698.72, 1197.16+123.56, 698.72+17.94, 1197.16+51.07, 744.55+17.94, 0, 744.55+17.94], {
+        innerSVG.setPolygon([index.dispStartNumber * 151.62 + 1, 698.72, 1197.16+123.56, 698.72, 1197.16+123.56, 698.72+17.94, 1197.16+51.07, 744.55+17.94, index.dispStartNumber * 151.62 + 1, 744.55+17.94], {
             fill: "rgb(31, 31, 31)"
         });
         let color;
         if(settings.info.isLoop){ color = index.nowStationId == 0 ? stationList[stationList.length-1].lineColor : stationList[index.nowStationId-1].lineColor }
         else { color = index.nowStationId == 0 ? 
-            index.dispStationList[0].lineColor : stationList[index.nowStationId < stationList.length - 7 ? index.nowStationId-1 : stationList.length - 7].lineColor }
-        innerSVG.setRect(0, 652.89, 135.84, 91.66, {
+            index.dispStationList[0].lineColor : stationList[index.nowStationId < stationList.length - 7 ? index.nowStationId-1 : stationList.length - 7 + index.dispStartNumber].lineColor }
+        innerSVG.setRect(index.dispStartNumber * 151.62, 652.89, 135.84, 91.66, {
             fill: color
         });
-        for(let i = 0; i < 7; i++){
-            innerSVG.setRect(135.84 + 151.62 * i - 1, 652.89, 151.62 + 1, 91.66, {
+        for(let i = 0; i < 7 - index.dispStartNumber; i++){
+            innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber) - 1, 652.89, 151.62 + 1, 91.66, {
                 fill: index.dispStationList[i].lineColor
             });
         }
         innerSVG.setPolygon([1197.16 - 1, 652.89, 1197.16+51.07, 652.89, 1197.16+123.56, 698.72, 1197.16+51.07, 744.55, 1197.16 - 1, 744.55], {
-            fill: index.dispStationList[7].lineColor
+            fill: index.dispStationList[7 - index.dispStartNumber].lineColor
         });
-        for (let i = 0; i < 8; i++) {
-            innerSVG.setCircle(135.84 + 151.62 * i, 698.72, 38.9, {
+        for (let i = 0; i < 8 - index.dispStartNumber; i++) {
+            innerSVG.setCircle(135.84 + 151.62 * (i + index.dispStartNumber), 698.72, 38.9, {
                 fill: "white"
             });
         }
@@ -221,7 +217,7 @@ function draw(){
                 fill: "red"
             });
 
-            for(let i = 0; i < index.drawPos; i++){
+            for(let i = index.dispStartNumber; i < index.drawPos; i++){
                 innerSVG.setCircle(135.84 + 151.62 * i, 698.72, 71.82/2, {
                     fill: "gray"
                 });
@@ -235,7 +231,7 @@ function draw(){
                 strokeWidth: "3"
             });
 
-            for(let i = 0; i < index.drawPos + 1; i++){
+            for(let i = index.dispStartNumber; i < index.drawPos + 1; i++){
                 innerSVG.setCircle(135.84 + 151.62 * i, 698.72, 71.82/2, {
                     fill: "gray"
                 })
@@ -610,6 +606,7 @@ window.onload = async function(){
     pixelRatio = 1;
     dispStationsId = 0;
     index = await new IndexClass(stationList, settings.info.isLoop)
+    index.nowStationId = 0;
     console.log(index.dispStationList)
     runState = 0;
     langState = 0;
@@ -633,8 +630,8 @@ class IndexClass {
         this.dispStationList = [];  // 監視されない普通のプロパティ
         this.drawPos = 0;
         this.isLoop= isLoop;
-        this.dispNumber = stationList.length > 7 ? 8 : stationList.length
-        for(let i = 0; i < 8; i++){
+        this.dispStartNumber = stationList.length > 7 ? 0 : 8 - stationList.length
+        for(let i = 0; i < 8 - this.dispStartNumber; i++){
             this.dispStationList.push(stationList[i])
         }
         this.stationList = stationList;
@@ -653,14 +650,14 @@ class IndexClass {
             if(value < 0){ this._nowStationId = 0; }
             if(value >= stationList.length){ this._nowStationId = stationList.length - 1; }
             if(value >= stationList.length - 1 && runState != 0){ this._nowStationId = stationList.length - 2; }
-            if(value < stationList.length - 7){
+            if(value < stationList.length - 7){ //終点近くでない場合、nowStationId対応をdispに入れていく
                 for(let i = 0; i < 8; i++){
                     this.dispStationList.push(stationList[this._nowStationId + i])
                 }
             }
-            else{
-                for(let i = 0; i < 8; i++){
-                    this.dispStationList.push(stationList[stationList.length - 8 + i])
+            else{ //終点近くの場合、stationListの末尾部分をdispに入れていき、drawPosを更新
+                for(let i = 0; i < 8 - this.dispStartNumber; i++){
+                    this.dispStationList.push(stationList[stationList.length - 8 + this.dispStartNumber + i])
                 }
                 this.drawPos = this._nowStationId - (stationList.length - 8);
             }
