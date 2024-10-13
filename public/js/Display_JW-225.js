@@ -58,128 +58,135 @@ function draw(){
 
     if(page == 0){ //路線表示
         //駅ユニット
-        for (let i = 0; i < 8; i++) {
-            let isPassed = (runState == 0 && i < index.drawPos || runState != 0 && i < index.drawPos + 1)
-            //乗り換え案内
-            if (index.dispStationList[i].transfers.length != 0 && !isPassed) {
-                //背景
-                innerSVG.setRect(135.84 + 151.62 * i - 11.39/2, 634.86 - 1, 11.39, 155.42 + 1, {
-                    fill: "black"
-                });
+        if(settings.stationList.length >= 8){ //8駅以上の場合
+            for (let i = 0; i < 8; i++) { 
+                let isPassed = (runState == 0 && i < index.drawPos || runState != 0 && i < index.drawPos + 1)
+                //乗り換え案内
+                if (index.dispStationList[i].transfers.length != 0 && !isPassed) {
+                    //背景
+                    innerSVG.setRect(135.84 + 151.62 * i - 11.39/2, 634.86 - 1, 11.39, 155.42 + 1, {
+                        fill: "black"
+                    });
 
-                let transfersId = index.dispStationList[i].transfers.split(' ');
-                let mag = 1;
-                if(transfersId.length > 7) { mag = 188 / (27 * transfersId.length);}
-                for(let j = 0; j < transfersId.length; j ++) {
-                    innerSVG.setImage(settings.iconDict[settings.lineDict[transfersId[j]].lineIconKey],
-                        135.84 + 151.62 * i - 70, 792 + 27 * mag * j + 2.5, 24 * mag, 24 * mag);
+                    let transfersId = index.dispStationList[i].transfers.split(' ');
+                    let mag = 1;
+                    if(transfersId.length > 7) { mag = 188 / (27 * transfersId.length);}
+                    for(let j = 0; j < transfersId.length; j ++) {
+                        innerSVG.setImage(settings.iconDict[settings.lineDict[transfersId[j]].lineIconKey],
+                            135.84 + 151.62 * i - 70, 792 + 27 * mag * j + 2.5, 24 * mag, 24 * mag);
 
-                    if(langState == 0 || langState == 1){
-                        let textWidth = (23 * mag * settings.lineDict[transfersId[j]].name.length);
-                        let m = textWidth > 140 - 23 * mag ? Snap.matrix().scale((140 - 23 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
-                        innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].name, {
-                            fill: "black",
-                            textAnchor: "start",
-                            dominantBaseline: "middle",
-                            fontSize: `${23 * mag}px`,
-                            fontWeight: "Bold",
-                            fontFamily: "BIZ UDGothic",
-                            transform: m
-                        });
-                    }
-                    else{
-                        let textWidth = (12.5 * mag * settings.lineDict[transfersId[j]].eng.length);
-                        let m = textWidth > 140 - 12.5 * mag ? Snap.matrix().scale((140 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
-                        innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].eng, {
-                            fill: "black",
-                            textAnchor: "start",
-                            dominantBaseline: "middle",
-                            fontSize: `${23 * mag}px`,
-                            fontWeight: "Bold",
-                            fontFamily: "BIZ UDGothic",
-                            transform: m
-                        });
+                        if(langState == 0 || langState == 1){
+                            let textWidth = (23 * mag * settings.lineDict[transfersId[j]].name.length);
+                            let m = textWidth > 140 - 23 * mag ? Snap.matrix().scale((140 - 23 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
+                            innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].name, {
+                                fill: "black",
+                                textAnchor: "start",
+                                dominantBaseline: "middle",
+                                fontSize: `${23 * mag}px`,
+                                fontWeight: "Bold",
+                                fontFamily: "BIZ UDGothic",
+                                transform: m
+                            });
+                        }
+                        else{
+                            let textWidth = (12.5 * mag * settings.lineDict[transfersId[j]].eng.length);
+                            let m = textWidth > 140 - 12.5 * mag ? Snap.matrix().scale((140 - 12.5 * mag) / textWidth, 1, 135.84 + 151.62 * i - 70 + (24 + 2) * mag, 0) : null;
+                            innerSVG.setText(135.84 + 151.62 * i - 70 + (24 + 2) * mag, 792 + 3 + 13 * mag + 27 * mag * j, settings.lineDict[transfersId[j]].eng, {
+                                fill: "black",
+                                textAnchor: "start",
+                                dominantBaseline: "middle",
+                                fontSize: `${23 * mag}px`,
+                                fontWeight: "Bold",
+                                fontFamily: "BIZ UDGothic",
+                                transform: m
+                            });
+                        }
                     }
                 }
-            }
-            
-            //路線記号
-            innerSVG.setRect(135.84 + 151.62 * i - 76.51/2, 604.68, 76.51, 30.18, {
-                fill: !isPassed ? index.dispStationList[i].lineColor : "gray"
-            });
-            innerSVG.setText(135.84 + 151.62 * i, 604.68+30.18/2+2, index.dispStationList[i].number, {
-                fill: "white",
-                textAnchor: "middle",
-                dominantBaseline: "middle",
-                fontSize: "28px",
-                fontWeight: "Bold",
-                fontFamily: "sans-serif",
-                letterSpacing: "0px"
-            });
-        
-            //駅名列挙
-            if(langState == 0 || langState == 1){
-                if (index.dispStationList[i].name.length < 5) {
-                    let chars = ["", "", "", ""];
-                    if (index.dispStationList[i].name.length == 1) {
-                        chars[2] = index.dispStationList[i].name;
-                    }
-                    else if (index.dispStationList[i].name.length == 2) {
-                        chars[1] = index.dispStationList[i].name[0];
-                        chars[3] = index.dispStationList[i].name[1];
-                    }
-                    else if (index.dispStationList[i].name.length == 3) {
-                        chars[1] = index.dispStationList[i].name[0];
-                        chars[2] = index.dispStationList[i].name[1];
-                        chars[3] = index.dispStationList[i].name[2];
-                    }
-                    else if (index.dispStationList[i].name.length == 4) {
-                        chars[0] = index.dispStationList[i].name[0];
-                        chars[1] = index.dispStationList[i].name[1];
-                        chars[2] = index.dispStationList[i].name[2];
-                        chars[3] = index.dispStationList[i].name[3];
-                    }
+                
+                //路線記号
+                if(index.dispStationList[i].number !== ""){
+                    innerSVG.setRect(135.84 + 151.62 * i - 76.51/2, 604.68, 76.51, 30.18, {
+                        fill: !isPassed ? index.dispStationList[i].lineColor : "gray"
+                    });
+                    innerSVG.setText(135.84 + 151.62 * i, 604.68+30.18/2+2, index.dispStationList[i].number.split(" ")[0] + index.dispStationList[i].number.split(" ")[1], {
+                        fill: "white",
+                        textAnchor: "middle",
+                        dominantBaseline: "middle",
+                        fontSize: "28px",
+                        fontWeight: "Bold",
+                        fontFamily: "sans-serif",
+                        letterSpacing: "0px"
+                    });
+                }
+                    
+                //駅名列挙
+                if(langState == 0 || langState == 1){
+                    if (index.dispStationList[i].name.length < 5) {
+                        let chars = ["", "", "", ""];
+                        if (index.dispStationList[i].name.length == 1) {
+                            chars[2] = index.dispStationList[i].name;
+                        }
+                        else if (index.dispStationList[i].name.length == 2) {
+                            chars[1] = index.dispStationList[i].name[0];
+                            chars[3] = index.dispStationList[i].name[1];
+                        }
+                        else if (index.dispStationList[i].name.length == 3) {
+                            chars[1] = index.dispStationList[i].name[0];
+                            chars[2] = index.dispStationList[i].name[1];
+                            chars[3] = index.dispStationList[i].name[2];
+                        }
+                        else if (index.dispStationList[i].name.length == 4) {
+                            chars[0] = index.dispStationList[i].name[0];
+                            chars[1] = index.dispStationList[i].name[1];
+                            chars[2] = index.dispStationList[i].name[2];
+                            chars[3] = index.dispStationList[i].name[3];
+                        }
 
-                    for (let j = 0; j < 4; j++) {
-                        innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, chars[3 - j], {
-                            fill: !isPassed ? "black" : "gray",
-                            textAnchor: "middle",
-                            dominantBaseline: "middle",
-                            fontSize: "57px",
-                            fontWeight: "Bold",
-                            fontFamily: "BIZ UDGothic"
-                        });
+                        for (let j = 0; j < 4; j++) {
+                            innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, chars[3 - j], {
+                                fill: !isPassed ? "black" : "gray",
+                                textAnchor: "middle",
+                                dominantBaseline: "middle",
+                                fontSize: "57px",
+                                fontWeight: "Bold",
+                                fontFamily: "BIZ UDGothic"
+                            });
+                        }
+                    }
+                    else{
+                        let m = Snap.matrix().scale(1, 250 / (55.12 * index.dispStationList[i].name.length), 135.84, 547+55.12-5);
+                        for (let j = 0; j < index.dispStationList[i].name.length; j++) {
+                            innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, index.dispStationList[i].name[index.dispStationList[i].name.length - 1 - j], {
+                                fill: !isPassed ? "black" : "gray",
+                                textAnchor: "middle",
+                                dominantBaseline: "middle",
+                                fontSize: "57px",
+                                fontWeight: "Bold",
+                                fontFamily: "BIZ UDGothic",
+                                transform: m
+                            });
+                        }
                     }
                 }
                 else{
-                    let m = Snap.matrix().scale(1, 250 / (55.12 * index.dispStationList[i].name.length), 135.84, 547+55.12-5);
-                    for (let j = 0; j < index.dispStationList[i].name.length; j++) {
-                        innerSVG.setText(135.84 + 151.62 * i, 547+55.12/2 - 55.12 * j, index.dispStationList[i].name[index.dispStationList[i].name.length - 1 - j], {
-                            fill: !isPassed ? "black" : "gray",
-                            textAnchor: "middle",
-                            dominantBaseline: "middle",
-                            fontSize: "57px",
-                            fontWeight: "Bold",
-                            fontFamily: "BIZ UDGothic",
-                            transform: m
-                        });
-                    }
+                    let textWidth = getCanvasTextSize(index.dispStationList[i].eng, "57px", "sans-serif").width
+                    let m = Snap.matrix().rotate(-60, 130 + 151.62 * i, 547+55.12+2)
+                    m = textWidth > 250 ? m.scale(250 / textWidth ,1 , 130 + 151.62 * i, 0) : m
+                    innerSVG.setText(130 + 151.62 * i, 547+55.12+2, index.dispStationList[i].eng, {
+                        fill: !isPassed ? "black" : "gray",
+                        textAnchor: "start",
+                        dominantBaseline: "auto",
+                        fontSize: "57px",
+                        fontWeight: "bold",
+                        fontFamily: "sans-serif",
+                        transform: m
+                    });
                 }
             }
-            else{
-                let textWidth = getCanvasTextSize(index.dispStationList[i].eng, "57px", "sans-serif").width
-                let m = Snap.matrix().rotate(-60, 130 + 151.62 * i, 547+55.12+2)
-                m = textWidth > 250 ? m.scale(250 / textWidth ,1 , 130 + 151.62 * i, 0) : m
-                innerSVG.setText(130 + 151.62 * i, 547+55.12+2, index.dispStationList[i].eng, {
-                    fill: !isPassed ? "black" : "gray",
-                    textAnchor: "start",
-                    dominantBaseline: "auto",
-                    fontSize: "57px",
-                    fontWeight: "bold",
-                    fontFamily: "sans-serif",
-                    transform: m
-                });
-            }
+        }
+        else{ //8駅未満の場合
+
         }
 
         //線
@@ -274,25 +281,27 @@ function draw(){
 
 
     //現在駅路線記号
-    innerSVG.setRect(378.04, 164.01, 125.87, 125.87, {
-        fill: nowStation.lineColor
-    });
-    innerSVG.setText(378.04+125.87/2, 164.01+35, nowStation.number.substr(0, 1), {
-        fill: "white",
-        textAnchor: "middle",
-        dominantBaseline: "middle",
-        fontSize: "50px",
-        fontWeight: "bold",
-        fontFamily: "sans-serif",
-    });
-    innerSVG.setText(378.04+125.87/2, 164.01+93, nowStation.number.substr(1, 2), {
-        fill: "white",
-        textAnchor: "middle",
-        dominantBaseline: "middle",
-        fontSize: "60px",
-        fontWeight: "bold",
-        fontFamily: "sans-serif",
-    });
+    if(nowStation.number !== ""){
+        innerSVG.setRect(378.04, 164.01, 125.87, 125.87, {
+            fill: nowStation.lineColor
+        });
+        innerSVG.setText(378.04+125.87/2, 164.01+35, nowStation.number.split(" ")[0], {
+            fill: "white",
+            textAnchor: "middle",
+            dominantBaseline: "middle",
+            fontSize: "50px",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+        });
+        innerSVG.setText(378.04+125.87/2, 164.01+93, nowStation.number.split(" ")[1], {
+            fill: "white",
+            textAnchor: "middle",
+            dominantBaseline: "middle",
+            fontSize: "60px",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+        });
+    }
 
     //現在駅名
     let m = Snap.matrix();
@@ -624,6 +633,7 @@ class IndexClass {
         this.dispStationList = [];  // 監視されない普通のプロパティ
         this.drawPos = 0;
         this.isLoop= isLoop;
+        this.dispNumber = stationList.length > 7 ? 8 : stationList.length
         for(let i = 0; i < 8; i++){
             this.dispStationList.push(stationList[i])
         }

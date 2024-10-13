@@ -10,6 +10,7 @@ type stationListProps = {
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
+    const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
 
     const indexClicked = (e: any) => {
         if (!isMultiSelect) {
@@ -31,29 +32,43 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             return
         }
         const _setting: settingType = structuredClone(setting)
+
+        //参照するインデックスの設定
+        let _index = _setting.stationList.length //最後尾に追加する設定
+        if(selectedIndexes.length > 0){ //選択されている場合、選択の最後尾に追加する設定
+            _index = selectedIndexes[selectedIndexes.length - 1]
+        }
+
+        //ナンバリング、色連番
+        let _number: string  = ""
         let _color: string = ""
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
+                _number = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].number
+                let nextNumber = String(Number(_number.split(" ")[1]) + (isNumberDescending ? -1 : 1))
+                nextNumber = nextNumber.length === 1 ? "0" + nextNumber : nextNumber
+                _number = (_number.includes(" ") ? _number.split(" ")[0] : _number) + ((nextNumber === "NaN") ? "" : " " + nextNumber)
+
                 _color = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineColor
             }
             else{
+                _number = _setting.stationList[_setting.stationList.length - 1].number
+
                 _color = _setting.stationList[_setting.stationList.length - 1].lineColor
             }
-        }
-        let _index = _setting.stationList.length
-        if(selectedIndexes.length > 0){
-            _index = selectedIndexes[selectedIndexes.length - 1]
         }
         _setting.stationList.splice(_index, 0, {
             name: "",
             kana: "",
             eng: "",
-            number: "",
+            number: _number,
             lineColor: _color,
             transfers: "",
             isPass: false
         })
         setSetting(_setting)
+
+        setSelectedIndexes([selectedIndexes[selectedIndexes.length - 1] + 1])
     }
     const deleteStation = () => {
         const _setting = structuredClone(setting)
@@ -62,8 +77,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             _setting.stationList.splice(ind - 1, 1)
         });
 
-        setSelectedIndexes([])
         setSetting(_setting)
+        setSelectedIndexes(isMultiSelect ? [] : [selectedIndexes[selectedIndexes.length - 1]])
     }
     const multiSelectCheckboxClicked = (e: any) => {
         setIsMultiSelect(e.target.checked)
@@ -102,7 +117,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
             //かなに変更があった場合、ローマ字も更新
             if(field === "kana"){
-                _setting.stationList[ind - 1].eng = kanaToAlphabet(e.target.value)
+                _setting.stationList[ind - 1].eng = kanaToAlphabet(e.target.value, 0)
             }
         })
         
@@ -192,6 +207,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             複数選択
             <input type="checkbox" onChange={multiSelectCheckboxClicked}></input>
             <button onClick={allSelectButtonClicked}>全選択/解除</button>
+            ナンバリング補完降順
+            <input type="checkbox" onChange={(e) => {setIsNumberDescending(e.target.checked)}}></input>
 
             <div>
                 <label>駅名</label>

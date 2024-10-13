@@ -1,4 +1,4 @@
-const kanaToAlphabet = (kana: string) => {
+const kanaToAlphabet = (kana: string, type: number) => {
     const kanaToAlpDict: {[key: string]: string} = {
         "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
         "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
@@ -57,7 +57,16 @@ const kanaToAlphabet = (kana: string) => {
         if (Object.keys(kanaToAlpDict).includes(kana.substring(i, i + Math.min(2, kana.length - i))) && kana.length - i > 1) {
             alp += kanaToAlpDict[kana.substring(i, i + 2)]
             i += 2
-        } else {
+        } 
+        else if(kana.substring(i, i + 1) === "っ"){
+            let nextAlp = (i + 1) < kana.length ? kanaToAlpDict[kana.substring(i + 1, i + 2)] : ""
+            alp += nextAlp.substring(0, 1) + nextAlp
+
+            if(i === 0){ alp += "tu" }
+
+            i += 2
+        }
+        else {
             alp += kanaToAlpDict[kana.substring(i, i + 1)]
             i++
         }
@@ -78,10 +87,24 @@ const kanaToAlphabet = (kana: string) => {
     alp = alp.replace(/oo/g, "ō")
     alp = alp.replace(/ou/g, "ō")
 
+
+
     // 1文字目を大文字に
     if (/^[A-Za-z\u00C0-\u00FF\u0100-\u024F]+$/.test(alp[0])) {
         let first = alp[0]
         alp = first.toUpperCase() + alp.substring(1)
+    }
+
+    if(type === 1){ //路線名の場合、「○○線」を○○ Lineに変換
+        if (kana.substring(kana.length - 2, kana.length) === "せん" 
+                && alp.substring(alp.length - 3, alp.length) === "sen"){
+            if(!(kana.substring(kana.length -6, kana.length) === "しんかんせん")){
+                alp = alp.substring(0, alp.length - 3) + " Line"
+            }
+            else{
+                alp = alp.substring(0, alp.length - 10) + " Shinkansen"
+            }
+        }
     }
 
     return alp

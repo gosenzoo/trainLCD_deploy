@@ -57,7 +57,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
 
             //かなに変更があった場合、ローマ字も更新
             if(field === "kana"){
-                _setting.lineDict[key].eng = kanaToAlphabet(e.target.value)
+                _setting.lineDict[key].eng = kanaToAlphabet(e.target.value, 1)
             }
         })
 
