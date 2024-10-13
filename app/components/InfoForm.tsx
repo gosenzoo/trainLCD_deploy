@@ -60,10 +60,10 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>号車</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'carNumber')}} value={setting.info.carNumber}></input>
             <br></br>
-            <label>設置位置</label>
-            <select onChange={(e) => {formUpdated(e, 'place')}}>
-                { setting.info.place === 'left' ? <option value={'left'} selected>左ドア上</option> : <option value={'left'}>左ドア上</option> }
-                { setting.info.place === 'right' ? <option value={'right'} selected>右ドア上</option> : <option value={'right'}>右ドア上</option> }
+            <label>進行方向</label>
+            <select onChange={(e) => {formUpdated(e, 'leftOrRight')}}>
+                { setting.info.leftOrRight === 'right' ? <option value={'right'} selected>右</option> : <option value={'right'}>右</option> }
+                { setting.info.leftOrRight === 'left' ? <option value={'left'} selected>左</option> : <option value={'left'}>左</option> }
             </select>
             <br></br>
             環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>

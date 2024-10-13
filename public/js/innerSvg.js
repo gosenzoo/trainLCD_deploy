@@ -3,6 +3,15 @@ class InnerSVG{
         this.innerHtml = ``;
     }
 
+    startGroup(styleJson={}){
+        let additionalText = this.styleProcess(styleJson);
+
+        this.innerHtml += `<g${additionalText}>`;
+    }
+    endGroup(){
+        this.innerHtml += `</g>`;
+    }
+
     setImage(src, x, y, width, height, styleJson={}){
         let additionalText = this.styleProcess(styleJson);
 
@@ -31,6 +40,7 @@ class InnerSVG{
 
     displaySVG(element){
         element.innerHTML = this.innerHtml;
+        console.log(this.innerHtml)
     }
 
     styleProcess(styleJson){

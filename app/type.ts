@@ -16,7 +16,7 @@ type infoType = {
     lineLogo: string,
     lineColor: string,
     carNumber: string,
-    place: 'left' | 'right',
+    leftOrRight: 'left' | 'right',
     isLoop: boolean
 }
 
@@ -41,4 +41,4 @@ type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transf
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng'
 
-type infoMembers = 'settingName' | 'destination' | 'direction' | 'directionEng' | 'trainType' | 'trainTypeEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 'carNumber' | 'place' | 'isLoop'
+type infoMembers = 'settingName' | 'destination' | 'direction' | 'directionEng' | 'trainType' | 'trainTypeEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 'carNumber' | 'leftOrRight' | 'isLoop'

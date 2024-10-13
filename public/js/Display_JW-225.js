@@ -56,11 +56,17 @@ function draw(){
         innerSVG.setImage(transferTextJEImage, -1, -1, 1334, 1001);
     }
 
-    if(page == 0){ //路線表示
+    if(page == 0){ //路線表示ページ
         //駅ユニット
         for (let i = 0; i < 8 - index.dispStartNumber; i++) { 
+            //ユニット描画位置変数（左向きの場合、反転）
             let iPos = i + index.dispStartNumber;
-            let isPassed = (runState == 0 && iPos < index.drawPos || runState != 0 && iPos < index.drawPos + 1)
+            iPos = (settings.info.leftOrRight === "right") ? iPos : 7 - iPos
+            let currentPos = (settings.info.leftOrRight === "right") ? index.drawPos : 7 - index.drawPos
+
+            let isPassed = (settings.info.leftOrRight === "right") ? 
+                (runState == 0 && iPos < currentPos || runState != 0 && iPos < currentPos + 1)
+                : (runState == 0 && iPos > currentPos || runState != 0 && iPos + 1 > currentPos)
             //乗り換え案内
             if (index.dispStationList[i].transfers.length != 0 && !isPassed) {
                 //背景
@@ -185,10 +191,16 @@ function draw(){
             }
         }
 
-        //線
+        //路線ユニット
+        innerSVG.startGroup({
+            transform: (settings.info.leftOrRight == "right") ? Snap.matrix().scale(1, 1) : Snap.matrix().scale(-1, 1, 1333 / 2, 0)
+        });
+
+        //影
         innerSVG.setPolygon([index.dispStartNumber * 151.62 + 1, 698.72, 1197.16+123.56, 698.72, 1197.16+123.56, 698.72+17.94, 1197.16+51.07, 744.55+17.94, index.dispStartNumber * 151.62 + 1, 744.55+17.94], {
             fill: "rgb(31, 31, 31)"
         });
+        //路線後ろ端
         let color;
         if(settings.info.isLoop){ color = index.nowStationId == 0 ? stationList[stationList.length-1].lineColor : stationList[index.nowStationId-1].lineColor }
         else { color = index.nowStationId == 0 ? 
@@ -196,23 +208,25 @@ function draw(){
         innerSVG.setRect(index.dispStartNumber * 151.62, 652.89, 135.84, 91.66, {
             fill: color
         });
+        //路線駅間
         for(let i = 0; i < 7 - index.dispStartNumber; i++){
             innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber) - 1, 652.89, 151.62 + 1, 91.66, {
                 fill: index.dispStationList[i].lineColor
             });
         }
+        //路線前端
         innerSVG.setPolygon([1197.16 - 1, 652.89, 1197.16+51.07, 652.89, 1197.16+123.56, 698.72, 1197.16+51.07, 744.55, 1197.16 - 1, 744.55], {
             fill: index.dispStationList[7 - index.dispStartNumber].lineColor
         });
+        //駅白丸
         for (let i = 0; i < 8 - index.dispStartNumber; i++) {
             innerSVG.setCircle(135.84 + 151.62 * (i + index.dispStartNumber), 698.72, 38.9, {
                 fill: "white"
             });
         }
-
-        //駅
+        //現在位置
         if(index.drawPos < 0){ index.drawPos = 0; }
-        if(runState == 0){
+        if(runState == 0){ //停車中の位置描画
             innerSVG.setCircle(135.84 + 151.62 * index.drawPos, 698.72, 71.82/2, {
                 fill: "red"
             });
@@ -223,7 +237,7 @@ function draw(){
                 });
             }
         }
-        else {
+        else { //走行中の位置描画
             innerSVG.setPolygon([189.44 + 151.62 * index.drawPos, 700.32 + 27.87, 189.44 + 46.69 + 151.62 * index.drawPos, 700.32,
                 189.44 + 151.62 * index.drawPos, 700.32 - 27.87], {
                 fill: "red",
@@ -237,8 +251,10 @@ function draw(){
                 })
             }
         }
+
+        innerSVG.endGroup()
     }
-    else if(page == 1){ //乗換案内表示
+    else if(page == 1){ //乗換案内表示ページ
         let transfersId = nowStation.transfers.split(' ');
         for (let i = 0; i < transfersId.length; i++){ //乗り換え表示
             let area = (911 - 450) / transfersId.length;
@@ -584,11 +600,11 @@ window.onload = async function(){
     //console.log(JSON.parse(localStorage.getItem('lcdStrage')));
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
     stationList = settings.stationList;
+    console.log(settings);
     /*
     let responce = await fetch("http://192.168.3.13:5500/json/JR神戸線.json");
     settings = await responce.json();
     console.log("デフォルト設定");
-    console.log(settings);
     */
 
     //背景画像読み込み
@@ -669,8 +685,8 @@ class IndexClass {
             }
         }
 
-        console.log(this._nowStationId)
-        console.log(this.dispStationList)
+        //console.log(this._nowStationId)
+        //console.log(this.dispStationList)
     }
 
     getCircularItem(arr, index) {
