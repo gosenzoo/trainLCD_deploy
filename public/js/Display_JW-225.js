@@ -71,7 +71,7 @@ function draw(){
                     let transfersId = index.dispStationList[i].transfers.split(' ');
                     let mag = 1;
                     if(transfersId.length > 7) { mag = 188 / (27 * transfersId.length);}
-                    for(let j = 0; j < transfersId.length; j ++) {
+                    for(let j = 0; j < transfersId.length; j++) {
                         innerSVG.setImage(settings.iconDict[settings.lineDict[transfersId[j]].lineIconKey],
                             135.84 + 151.62 * i - 70, 792 + 27 * mag * j + 2.5, 24 * mag, 24 * mag);
 
