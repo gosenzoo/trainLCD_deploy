@@ -50,7 +50,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             eng: "",
             number: "",
             lineColor: _color,
-            transfers: ""
+            transfers: "",
+            isPass: false
         })
         setSetting(_setting)
     }
@@ -118,6 +119,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
         e.target.selectedIndex = 0
     }
+    const passBoxChanged = (e: any, index:number) => {
+        const _setting = structuredClone(setting)
+        _setting.stationList[index].isPass = e.target.checked
+        setSetting(_setting)
+    }
 
     return(
         <div>
@@ -139,7 +145,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                             setting?.stationList.map((station, index) => (
                                 <tr key={index}>
                                     <th>
-                                        <input type="checkbox"></input>
+                                        <input type="checkbox" onChange={(e) => passBoxChanged(e, index)} checked={station.isPass}></input>
                                     </th>
                                     <th className={ selectedIndexes.includes(index + 1) ? 'selected' : '' } onClick={indexClicked}>
                                         {station?.name}

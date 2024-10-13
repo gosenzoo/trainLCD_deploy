@@ -1,7 +1,7 @@
 import "./type"
 
 const initSettingObject: settingType = {
-    info: {settingName: "", destination: "", direction: "", trainType: "", lineLogo: "", lineColor: "", carNumber: "", place: 'left', isLoop: false},
+    info: {settingName: "", destination: "", direction: "", directionEng: "", trainType: "", trainTypeEng: "", trainTypeColor: "", lineLogo: "", lineColor: "", carNumber: "", place: 'left', isLoop: false},
     stationList: [],
     lineDict: {},
     iconDict: {}

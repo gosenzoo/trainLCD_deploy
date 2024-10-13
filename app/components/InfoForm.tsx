@@ -39,8 +39,17 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>経由等</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'direction')}} value={setting.info.direction}></input>
             <br></br>
+            <label>行き先・経由等(英語)</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'directionEng')}} value={setting.info.directionEng}></input>
+            <br></br>
             <label>種別</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'trainType')}} value={setting.info.trainType}></input>
+            <br></br>
+            <label>種別(英語)</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'trainTypeEng')}} value={setting.info.trainTypeEng}></input>
+            <br></br>
+            <label>種別文字色</label>
+            <input type="color" onChange={(e) => {formUpdated(e, 'trainTypeColor')}} value={setting.info.trainTypeColor}></input>
             <br></br>
             <label>列車路線記号</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'lineLogo')}} value={setting.info.lineLogo}></input>
