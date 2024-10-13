@@ -97,7 +97,7 @@ function draw(){
                                 dominantBaseline: "middle",
                                 fontSize: `${23 * mag}px`,
                                 fontWeight: "Bold",
-                                fontFamily: "BIZ UDGothic",
+                                fontFamily: "sans-serif",
                                 transform: m
                             });
                         }
