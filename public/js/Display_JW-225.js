@@ -49,7 +49,7 @@ function draw(){
     else{ upStationId = (index.nowStationId + 1) % stationList.length }
     nowStation = stationList[upStationId];
 
-    let isTerminal = upStationId === stationList.length - 1; //終点前かどうか
+    let isTerminal = (upStationId === stationList.length - 1) && !settings.info.isLoop; //終点前かどうか
 
     let innerSVG = new InnerSVG();
 
@@ -221,7 +221,7 @@ function draw(){
                 });
     
                 //次駅との間に通過駅が存在すれば通過駅マークを描画
-                if(existsPassStation[index.dispStationListStart + i] && !(runState !== 0 && i + index.dispStartNumber === index.drawPos)){
+                if(existsPassStation[(index.dispStationListStart + i) % stationList.length] && !(runState !== 0 && i + index.dispStartNumber === index.drawPos)){
                     innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber + 1/2) - 1 - 31/2, 652.89 + 91.66/2 - 16/2, 31, 16, {
                         fill: "white"
                     });
@@ -653,11 +653,10 @@ window.onload = async function(){
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
 
     //駅リストから停車駅と通過リストを取得
-    let obj = getStopStation(settings.stationList);
+    let obj = getStopStation(settings.stationList, settings.info.isLoop);
     stationList = obj.stopStationList;
     existsPassStation = obj.existsPassStation;
     console.log(settings);
-    console.log(getStopStation(settings.stationList));
     /*
     let responce = await fetch("http://192.168.3.13:5500/json/JR神戸線.json");
     settings = await responce.json();

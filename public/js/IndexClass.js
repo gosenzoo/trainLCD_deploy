@@ -49,6 +49,8 @@ class IndexClass {
             for(let i = 0; i < 8; i++){
                 this.dispStationList.push(this.getCircularItem(stationList, this._nowStationId + i))
             }
+            this.drawPos = this.drawPos + this.dispStartNumber
+            this.dispStationListStart = this._nowStationId
         }
     }
 

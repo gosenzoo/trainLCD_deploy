@@ -7,9 +7,9 @@ function getCanvasTextSize(textContent, fontSize, fontFamily) {
     return { width: width, height: parseInt(fontSize) };
 }
 
-function getStopStation(allStations){
+function getStopStation(allStations, isLoop){
     //次駅との間に通過駅が存在するかの配列
-    let existsPassStation = hasPassStationBetweenStops(allStations); 
+    let existsPassStation = hasPassStationBetweenStops(allStations, isLoop); 
     
     //停車駅リスト
     let stopStationList = allStations.filter((station, index) => {
@@ -22,10 +22,10 @@ function getStopStation(allStations){
 }
 
 // 停車駅から次の停車駅までに通過駅があるかを判定する関数
-function hasPassStationBetweenStops(stations) {
+function hasPassStationBetweenStops(stations, isLoop) {
     const result = [];
     
-    for (let i = 0; i < stations.length - 1; i++) {
+    for (let i = 0; i < stations.length; i++) {
       if (!stations[i].isPass) {
         // 停車駅を見つけた場合のみ、次の停車駅までの区間を調べる
         let existsPassStation = false;
@@ -40,6 +40,14 @@ function hasPassStationBetweenStops(stations) {
         }
         result.push(existsPassStation);
       }
+    }
+
+    //環状運転時、リスト左端の通過駅も最後の駅の次の通過駅と設定
+    if(isLoop){
+        console.log(stations[0].isPass)
+        if(stations[0].isPass){
+            result[result.length - 1] = true
+        }
     }
     
     return result;
