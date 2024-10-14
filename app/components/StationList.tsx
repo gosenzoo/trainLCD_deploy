@@ -17,14 +17,17 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             setSelectedIndexes([e.target.parentNode.rowIndex])
         }
         else {
+            let _selectedIndexes: number[] = [...selectedIndexes]
+
             if(selectedIndexes.includes(e.target.parentNode.rowIndex)){
-                setSelectedIndexes([...selectedIndexes].filter(item => item !== e.target.parentNode.rowIndex))
+                _selectedIndexes = _selectedIndexes.filter(item => item !== e.target.parentNode.rowIndex)
             }
             else{
-                const _selectedIndexes: number[] = [...selectedIndexes]
                 _selectedIndexes.push(e.target.parentNode.rowIndex)
-                setSelectedIndexes(_selectedIndexes)
             }
+
+            _selectedIndexes.sort((a, b) => b - a)
+            setSelectedIndexes(_selectedIndexes)
         }
     }
     const addStation = () => {
@@ -98,6 +101,21 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             }
             setSelectedIndexes(_selectedIndexes)
         }
+    }
+    const reverseButtonClilcked = () => {
+        const _setting = structuredClone(setting)
+
+        //選択状態の駅のリストを取得
+        let selectedStatons = selectedIndexes.map(index => _setting.stationList[index - 1]);
+
+        selectedStatons.reverse() //順序反転
+
+        //反転した駅リストをもとの場所に格納
+        selectedIndexes.forEach((index, i) => {
+            _setting.stationList[index - 1] = selectedStatons[i]
+        })
+
+        setSetting(_setting)
     }
     const formUpdated = (e:any, field: stationMembers) => {
         if(!setting){
@@ -207,6 +225,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             複数選択
             <input type="checkbox" onChange={multiSelectCheckboxClicked}></input>
             <button onClick={allSelectButtonClicked}>全選択/解除</button>
+            <button onClick={reverseButtonClilcked}>反転</button>
             ナンバリング補完降順
             <input type="checkbox" onChange={(e) => {setIsNumberDescending(e.target.checked)}}></input>
 
