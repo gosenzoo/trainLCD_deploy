@@ -688,6 +688,9 @@ window.onload = async function(){
 
     langTimerController();
 
+    //座標による駅移動を起動
+    if(settings.info.isMoveByCoord){ monitorLocation(); }
+
     //初期化の最後に実行
     await window.addEventListener("resize", resizeCanvas);
     await window.addEventListener("keydown", keyDown);

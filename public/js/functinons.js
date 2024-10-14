@@ -52,3 +52,51 @@ function hasPassStationBetweenStops(stations, isLoop) {
     
     return result;
 }
+
+
+// 現在地の監視
+function monitorLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(success, error);
+    } else {
+        console.log("Geolocation APIはサポートされていません");
+    }
+}
+// 現在地が取得できた場合の処理
+function success(position) {
+    const currentLat = position.coords.latitude;
+    const currentLng = position.coords.longitude;
+
+    console.log(position.coords.latitude, position.coords.longitude)
+    
+    for(let i = 0; i < stationList.length; i++){
+        if(!stationList[i].coordinate[0] || !stationList[i].coordinate[1]){ continue }
+        let distance = calculateDistance(currentLat, currentLng, stationList[i].coordinate[0], stationList[i].coordinate[1])
+        console.log(distance)
+
+        if (distance <= 200) {
+            index.nowStationId = i;
+            runState = 0;
+        }
+    }
+}
+// 現在地が取得できなかった場合のエラーハンドリング
+function error() {
+    console.log('現在地が取得できませんでした');
+}
+
+// ハバーシンの公式で距離を計算する関数
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371e3; // 地球の半径（メートル）
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // 距離（メートル）
+}

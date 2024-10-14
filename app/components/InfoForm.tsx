@@ -17,7 +17,7 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
 
         const _setting: settingType = structuredClone(setting)
 
-        if(field != "isLoop"){
+        if(field !== "isLoop" && field !== "isMoveByCoord"){
             _setting.info[field] = e.target.value
         }
         else{
@@ -67,6 +67,8 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             </select>
             <br></br>
             環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
+            <br></br>
+            座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
         </div>
     )
 }
