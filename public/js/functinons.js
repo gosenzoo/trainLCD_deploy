@@ -92,6 +92,8 @@ function success(position) {
     if(nearList.length <= 0){ 
         //直前の座標取得が駅付近であれば、駅を出発したとみなす
         if(isNearStation){
+            console.log("駅から離れました")
+
             isNearStation = false;
             if(index.nowStationId !== stationList.length-1){ 
                 runState = 1;
@@ -108,8 +110,10 @@ function success(position) {
         runState = beforeStaId < 0 && !isLoop ? 0 : 2;
 
         if(!isNearStation){
+            console.log("駅に近づきました")
+
             isNearStation = true;
-            
+
             langTimerController(); //言語切り替えタイマーリセット
             pageTimerController(); //ページ切り替えタイマーリセット
         }
