@@ -93,7 +93,10 @@ function success(position) {
         //直前の座標取得が駅付近であれば、駅を出発したとみなす
         if(isNearStation){
             isNearStation = false;
-            if(index.nowStationId !== stationList.length-1){ runState = 1 };
+            if(index.nowStationId !== stationList.length-1){ 
+                runState = 1;
+                index.nowStationId += 1;
+             };
         }
     } 
     else{ //駅付近であれば、nowStationIndexを移動
