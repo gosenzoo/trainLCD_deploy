@@ -96,6 +96,9 @@ function success(position) {
             if(index.nowStationId !== stationList.length-1){ 
                 runState = 1;
                 index.nowStationId += 1;
+
+                langTimerController(); //言語切り替えタイマーリセット
+                pageTimerController(); //ページ切り替えタイマーリセット
              };
         }
     } 
@@ -104,7 +107,12 @@ function success(position) {
         index.nowStationId = beforeStaId;
         runState = beforeStaId < 0 && !isLoop ? 0 : 2;
 
-        isNearStation = true;
+        if(!isNearStation){
+            isNearStation = true;
+            
+            langTimerController(); //言語切り替えタイマーリセット
+            pageTimerController(); //ページ切り替えタイマーリセット
+        }
     }
 }
 // 現在地が取得できなかった場合のエラーハンドリング
