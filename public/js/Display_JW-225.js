@@ -215,8 +215,8 @@ function draw(){
                 fill: index.dispStationList[i].lineColor
             });
 
-            //次駅との間に通過駅が存在すればマークを描画
-            if(existsPassStation[index.dispStationListStart + i]){
+            //次駅との間に通過駅が存在すれば通過駅マークを描画
+            if(existsPassStation[index.dispStationListStart + i] && !(runState !== 0 && i + index.dispStartNumber === index.drawPos)){
                 innerSVG.setRect(135.84 + 151.62 * (i + index.dispStartNumber + 1/2) - 1 - 31/2, 652.89 + 91.66/2 - 16/2, 31, 16, {
                     fill: "white"
                 });
@@ -363,7 +363,7 @@ function draw(){
     innerSVG.setText(834.03+25, 227.61+10, stname, style);
 
     //つぎは・まもなく・ただいま
-    let nextText, font;
+    let nextText;
     if(langState == 0 || langState == 1){
         if (runState == 0) { nextText = "ただいま"; }
         else if (runState == 1) { nextText = "つぎは"; }
@@ -658,61 +658,3 @@ window.onload = async function(){
     await resizeCanvas();
 }
 
-class IndexClass {
-    constructor(stationList, isLoop) {
-        this._nowStationId = 0;  // 私的な変数（外部から直接アクセスしない）
-        this.dispStationList = [];  // 監視されない普通のプロパティ
-        this.dispStationListStart = 0;
-        this.drawPos = 0;
-        this.isLoop= isLoop;
-        this.dispStartNumber = stationList.length > 7 ? 0 : 8 - stationList.length
-        for(let i = 0; i < 8 - this.dispStartNumber; i++){
-            this.dispStationList.push(stationList[i])
-        }
-        this.stationList = stationList;
-    }
-
-    get nowStationId() {
-        return this._nowStationId;
-    }
-
-    set nowStationId(value) {
-        this._nowStationId = value;
-        this.dispStationList = [];
-        this.drawPos = 0;
-        // nowStationIdの値が変更されたときに、yの値も条件に応じて変更する
-        if (!this.isLoop) { //非環状運転時
-            if(value < 0){ this._nowStationId = 0; }
-            if(value >= stationList.length){ this._nowStationId = stationList.length - 1; }
-            if(value >= stationList.length - 1 && runState != 0){ this._nowStationId = stationList.length - 2; }
-            if(value < stationList.length - 7){ //終点近くでない場合、nowStationId対応をdispに入れていく
-                for(let i = 0; i < 8; i++){
-                    this.dispStationList.push(stationList[this._nowStationId + i])
-                }
-                this.dispStationListStart = this._nowStationId;
-            }
-            else{ //終点近くの場合、stationListの末尾部分をdispに入れていき、drawPosを更新
-                for(let i = 0; i < 8 - this.dispStartNumber; i++){
-                    this.dispStationList.push(stationList[stationList.length - 8 + this.dispStartNumber + i])
-                }
-                this.drawPos = this._nowStationId - (stationList.length - 8);
-                this.dispStationListStart = stationList.length - 8 + this.dispStartNumber;
-            }
-        } else { //環状運転時
-            if(value < 0){ this._nowStationId = stationList.length - 1; }
-            if(value >= stationList.length){ this._nowStationId = 0; }
-            for(let i = 0; i < 8; i++){
-                this.dispStationList.push(this.getCircularItem(stationList, this._nowStationId + i))
-            }
-        }
-
-        //console.log(this._nowStationId)
-        //console.log(this.dispStationList)
-    }
-
-    getCircularItem(arr, index) {
-        // 配列の長さで割った剰余を計算することでインデックスを配列の範囲内に収める
-        const circularIndex = ((index % arr.length) + arr.length) % arr.length;
-        return arr[circularIndex];
-      }
-}
