@@ -1,8 +1,9 @@
 class IndexClass {
     constructor(stationList, isLoop) {
         this.stationList = stationList; //停車駅リスト
-        this._nowStationId = 0;  //stationList中での現在駅id（外部から直接アクセスしない）
-        this.dispStationList = [];  //路線図に表示する駅のリスト
+        this._nowStationId = 0; //stationList中での現在駅id（外部から直接アクセスしない）
+        //this.upStationId = 0; //上部に表示される駅のid
+        this.dispStationList = []; //路線図に表示する駅のリスト
         this.dispStationListStart = 0; //表示駅リスト左端の駅の、stationList上でのid
         this.drawPos = 0; //画面上での現在位置id
         this.isLoop= isLoop; //環状運転するか
@@ -49,9 +50,6 @@ class IndexClass {
                 this.dispStationList.push(this.getCircularItem(stationList, this._nowStationId + i))
             }
         }
-
-        //console.log(this._nowStationId)
-        //console.log(this.dispStationList)
     }
 
     getCircularItem(arr, index) {
