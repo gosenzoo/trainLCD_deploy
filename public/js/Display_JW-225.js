@@ -15,6 +15,8 @@ var bizUDBold = 'BIZUD-Gothic-Bold';
 
 var index;
 var isLoop;
+var isNearStation;
+
 var langState; //０：漢字、１：かな、２：英語
 var runState; //０：停車中、１：走行中、２：到着前
 var page; //０：路線描画、１：乗換案内
@@ -326,7 +328,7 @@ function draw(){
     }
     
 
-
+    console.log(index.nowStationId)
     //上部案内表示
     //現在駅路線記号
     if(nowStation.number !== ""){
@@ -683,6 +685,7 @@ window.onload = async function(){
     runState = 0;
     langState = 0;
     page = 0;
+    isNearStation = false;
 
     console.log("変数初期化完了");
 

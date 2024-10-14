@@ -64,27 +64,44 @@ function monitorLocation() {
 }
 // 現在地が取得できた場合の処理
 function success(position) {
+    //端末の座標を取得
     const currentLat = position.coords.latitude;
     const currentLng = position.coords.longitude;
 
     console.log(position.coords.latitude, position.coords.longitude)
     
+    //端末の座標から、付近に駅があるか探索
+    let nearList = []
+    let nearDistances = []
     for(let i = 0; i < stationList.length; i++){
         if(!stationList[i].coordinate[0] || !stationList[i].coordinate[1]){ continue }
         let distance = calculateDistance(currentLat, currentLng, stationList[i].coordinate[0], stationList[i].coordinate[1])
         console.log(distance)
 
-        let nearList = []
-        let nearDistances = []
         if (distance <= 500) {
             nearList.push(i)
             nearDistances.push(distance)
         }
+    }
 
-        if(nearList.length <= 0){ continue } //駅付近でなければスキップ
+    console.log(nearList)
+    console.log(nearDistances)
+    console.log([...nearDistances])
+    console.log(nearList[nearDistances.indexOf(Math.min(...nearDistances))] - 1)
+    //駅付近でない場合
+    if(nearList.length <= 0){ 
+        //直前の座標取得が駅付近であれば、駅を出発したとみなす
+        if(isNearStation){
+            isNearStation = false;
+            if(index.nowStationId !== stationList.length-1){ runState = 1 };
+        }
+    } 
+    else{ //駅付近であれば、nowStationIndexを移動
+        let beforeStaId = nearList[nearDistances.indexOf(Math.min(...nearDistances))] - 1;
+        index.nowStationId = beforeStaId;
+        runState = beforeStaId < 0 && !isLoop ? 0 : 2;
 
-        index.nowStationId = nearList[nearDistances.indexOf(Math.min([...nearDistances]))] - 1;
-        runState = index.nowStationId === 0 && !isLoop ? 0 : 1;
+        isNearStation = true;
     }
 }
 // 現在地が取得できなかった場合のエラーハンドリング
