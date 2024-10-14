@@ -74,10 +74,17 @@ function success(position) {
         let distance = calculateDistance(currentLat, currentLng, stationList[i].coordinate[0], stationList[i].coordinate[1])
         console.log(distance)
 
-        if (distance <= 200) {
-            index.nowStationId = i;
-            runState = 0;
+        let nearList = []
+        let nearDistances = []
+        if (distance <= 500) {
+            nearList.push(i)
+            nearDistances.push(distance)
         }
+
+        if(nearList.length <= 0){ continue } //駅付近でなければスキップ
+
+        index.nowStationId = nearList[nearDistances.indexOf(Math.min([...nearDistances]))] - 1;
+        runState = index.nowStationId === 0 && !isLoop ? 0 : 1;
     }
 }
 // 現在地が取得できなかった場合のエラーハンドリング
