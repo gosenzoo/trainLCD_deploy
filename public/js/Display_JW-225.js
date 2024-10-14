@@ -515,7 +515,6 @@ function shiftLangState(){
     if(langState >= 3){ langState = 0; }
     draw();
 }
-
 function shiftPage(){
     page++;
     if(page > 1){ page = 0; }
@@ -542,19 +541,27 @@ function moveState(beforeOrNext){
         }
     }
 
-    //ページ切り替えタイマー設定
-    pageTimerController();
+    langTimerController(); //言語切り替えタイマーリセット
+    pageTimerController(); //ページ切り替えタイマーリセット
 }
-
 function moveStation(step){
     index.nowStationId += step;
-    pageTimerController();
+
+    langTimerController(); //言語切り替えタイマーリセット
+    pageTimerController(); //ページ切り替えタイマーリセット
 }
 
+function langTimerController(){
+    langState = 0;
+
+    clearInterval(langTimer);
+    langTimer = setInterval(shiftLangState, 4000);
+}
 function pageTimerController(){
     page = 0;
     clearInterval(pageTimer);
     if(runState == 2 && stationList[(index.nowStationId + 1) % stationList.length]["transfers"].length != 0){
+        page = 1;
         pageTimer = setInterval(shiftPage, 8000);
     }
 }
@@ -641,7 +648,7 @@ window.onload = async function(){
 
     console.log("変数初期化完了");
 
-    langTimer = setInterval(shiftLangState, 4000);
+    langTimerController();
 
     //初期化の最後に実行
     await window.addEventListener("resize", resizeCanvas);
