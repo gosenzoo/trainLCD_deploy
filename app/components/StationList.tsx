@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import "../type"
+import "./MapComponent"
 import kanaToAlphabet from "../modules/KanaConverter"
+import MapComponent from './MapComponent'
 
 type stationListProps = {
     setting: settingType,
@@ -67,7 +69,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             number: _number,
             lineColor: _color,
             transfers: "",
-            isPass: false
+            isPass: false,
+            coordinate: [null, null]
         })
         setSetting(_setting)
 
@@ -171,6 +174,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                             <th>駅名英語</th>
                             <th>ナンバリング</th>
                             <th>乗換路線</th>
+                            <th>緯度</th>
+                            <th>経度</th>
                         </tr>
                     </thead>
                     <tbody id="stationsTableBody">
@@ -211,6 +216,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 )
                                             })
                                         }
+                                    </td>
+                                    <td>
+                                        {station?.coordinate[0]}
+                                    </td>
+                                    <td>
+                                        {station?.coordinate[1]}
                                     </td>
                                 </tr>
                             ))
@@ -271,6 +282,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                         })
                     }
                 </select>
+
+                <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>
             </div>
         </div>
     )

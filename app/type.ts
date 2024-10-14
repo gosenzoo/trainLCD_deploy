@@ -27,7 +27,8 @@ type stationType = {
     number: string,
     lineColor: string,
     transfers: string,
-    isPass: boolean
+    isPass: boolean,
+    coordinate: [number | null, number | null]
 }
 
 type lineType = {
