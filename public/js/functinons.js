@@ -95,7 +95,8 @@ function success(position) {
             console.log("駅から離れました")
 
             isNearStation = false;
-            if(index.nowStationId !== stationList.length-1){ 
+            //直前の駅が終点駅でなければ
+            if(index.nowStationId < stationList.length - 1){ 
                 runState = 1;
                 index.nowStationId += 1;
 
@@ -105,18 +106,21 @@ function success(position) {
         }
     } 
     else{ //駅付近であれば、nowStationIndexを移動
+        console.log("駅付近にいます")
+
         let beforeStaId = nearList[nearDistances.indexOf(Math.min(...nearDistances))] - 1;
-        index.nowStationId = beforeStaId;
-        runState = beforeStaId < 0 && !isLoop ? 0 : 2;
+        let _nowStationId = beforeStaId < 0 ? 0 : beforeStaId;
+        let _runState = beforeStaId < 0 && !isLoop ? 0 : 2;
 
-        if(!isNearStation){
-            console.log("駅に近づきました")
-
-            isNearStation = true;
+        if(!(index.nowStationId === _nowStationId && runState === _runState)){
+            index.nowStationId = _nowStationId;
+            runState = _runState;
 
             langTimerController(); //言語切り替えタイマーリセット
             pageTimerController(); //ページ切り替えタイマーリセット
         }
+
+        isNearStation = true;
     }
 
     draw();
