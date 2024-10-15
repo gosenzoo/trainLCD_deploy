@@ -616,7 +616,6 @@ function keyDown(e){
 
     draw();
 }
-
 function windowTouched(e){
     let touches = e.changedTouches[0];
 

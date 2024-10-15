@@ -118,6 +118,8 @@ function success(position) {
             pageTimerController(); //ページ切り替えタイマーリセット
         }
     }
+
+    draw();
 }
 // 現在地が取得できなかった場合のエラーハンドリング
 function error() {
