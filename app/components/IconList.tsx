@@ -10,14 +10,24 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [newIconName, setNewIconName] = useState<string>("")
     const [newIconImage, setNewIconImage] = useState<string>("")
+    const [iconPresetType, setIconPresetType] = useState<string>("JR_east")
+    const [iconPresetSymbol, setIconPresetSymbol] = useState<string>("")
+    const [iconPresetColor, setIconPresetColor] = useState<string>("")
+
+    const toBase64Utf8 = (str: string) => {
+        return btoa(
+            new TextEncoder().encode(str)
+            .reduce((acc, byte) => acc + String.fromCharCode(byte), '')
+        );
+    }
 
     const indexClicked = (e: any) => {
         setSelectedIndexes([e.target.innerHTML])
     }
-    const iconAddButtonClicked = () => {
+    const iconAddButtonClicked = (method: String) => {
         const _setting: settingType = structuredClone(setting)
-        if(newIconName === '' || newIconImage === ''){
-            alert("アイコン名または画像データが設定されていません")
+        if(newIconName === ''){
+            alert("アイコン名が設定されていません")
             return
         }
         if(Object.keys(_setting.iconDict).includes(newIconName)){
@@ -25,8 +35,36 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             return
         }
 
-        _setting.iconDict[newIconName] = newIconImage
-        setSetting(_setting)
+        if(method === 'img'){
+            if(newIconImage === ''){
+                alert("アイコン画像が設定されていません")
+                return
+            }
+            _setting.iconDict[newIconName] = newIconImage
+
+            setSetting(_setting)
+        }
+        if(method === 'preset'){
+            fetch(`/presetIcons/${iconPresetType}.svg`)
+                .then((res) => res.text())
+                .then((data) => {
+                    const parser = new DOMParser();
+                    const iconDOM = parser.parseFromString(data, 'image/svg+xml');
+
+                    const lineElement = iconDOM.getElementById('lineColor');
+                    if (lineElement) {
+                        lineElement.setAttribute('fill', iconPresetColor);
+                    }
+
+                    const serializer = new XMLSerializer();
+                    const svgIconText = serializer.serializeToString(iconDOM.documentElement);
+                    //svgIconTextをdata URIに変換
+                    const iconBase64 = toBase64Utf8(svgIconText);
+                    _setting.iconDict[newIconName] = 'data:image/svg+xml;base64,' + iconBase64;
+
+                    setSetting(_setting)
+                });
+        }
     }
     const iconDeleteButtonClicked = () => {
         const _setting = structuredClone(setting)
@@ -57,6 +95,18 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
 
             reader.readAsDataURL(file);
         }
+    }
+    const iconPresetSelectChanged = (e:any) => {
+        setIconPresetType(e.target.value)
+        console.log("typechanged")
+    }
+    const iconPresetSymbolInputChanged = (e: any) => {
+        setIconPresetSymbol(e.target.value)
+        console.log("symbolchanged")
+    }
+    const iconPresetColorInputChanged = (e: any) => {
+        setIconPresetColor(e.target.value)
+        console.log("colorchanged")
     }
 
     return(
@@ -95,13 +145,31 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             </div>
             <button onClick={iconDeleteButtonClicked}>削除</button>
             <br></br>
-            <label>名前</label>
-            <input type="text" id="iconNameTextBox" onChange={iconNameTextboxChanged}></input>
+            <label>登録する名前</label>
+            <input type="text" id="iconNameTextBox" onChange={iconNameTextboxChanged} placeholder="例：jt"></input>
+            <br></br>
             <br></br>
             <label>画像アップロード</label>
             <input type="file" id="iconImgInput" onChange={iconImageInputChanged}></input>
             <br></br>
-            <button onClick={iconAddButtonClicked}>アイコン追加</button>
+            <button onClick={() => {iconAddButtonClicked('img')}}>アイコン追加</button>
+            <br></br>
+            <br></br>
+            プリセットから登録<br></br>
+            <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
+                <option value="JR_east">JR東日本</option>
+                <option value="tokyo_subway">東京地下鉄</option>
+                <option value="train_normal">地上路線汎用</option>
+                <option value="train_subway">地下路線汎用</option>
+            </select>
+            <br></br>
+            アイコンの路線記号
+            <input type="text" id="iconPresetLineSymbolInput" onChange={iconPresetSymbolInputChanged} placeholder='例：JT'></input>
+            <br></br>
+            路線カラー
+            <input type="color" id="iconPresetLineColorInput" onChange={iconPresetColorInputChanged}></input>
+            <br></br>
+            <button onClick={() => { iconAddButtonClicked('preset') }}>アイコン追加</button>
         </div>
     )
 }
