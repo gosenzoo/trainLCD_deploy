@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import "../type"
-import "./MapComponent"
-import kanaToAlphabet from "../modules/KanaConverter"
+import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
 
 type stationListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
 }
+type TabType = 'stationParam' | 'mapComponent';
 
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
     const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
+    const [activeTab, setActiveTab] = useState<TabType>('stationParam');
 
     const indexClicked = (e: any) => {
         if (!isMultiSelect) {
@@ -120,46 +121,22 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
         setSetting(_setting)
     }
-    const formUpdated = (e:any, field: stationMembers) => {
-        if(!setting){
-            return
-        }
-
-        const _setting: settingType = structuredClone(setting)
-
-        selectedIndexes.forEach(ind => {
-            if(!_setting.stationList[ind - 1]){
-                return
-            }
-            if(!(field in _setting.stationList[ind - 1])){
-                return
-            }
-            _setting.stationList[ind - 1][field] = e.target.value
-
-            //かなに変更があった場合、ローマ字も更新
-            if(field === "kana"){
-                _setting.stationList[ind - 1].eng = kanaToAlphabet(e.target.value, 0)
-            }
-        })
-        
-        setSetting(_setting)
-    }
-    const lineSelectChanged = (e: any) => {
-        const _setting = structuredClone(setting)
-        selectedIndexes.map((ind, index) => {
-            let c = ''
-            if(_setting.stationList[ind - 1].transfers !== ''){ c = ' ' }
-            _setting.stationList[ind - 1].transfers += c + e.target.value
-        })
-        setSetting(_setting)
-
-        e.target.selectedIndex = 0
-    }
     const passBoxChanged = (e: any, index:number) => {
         const _setting = structuredClone(setting)
         _setting.stationList[index].isPass = e.target.checked
         setSetting(_setting)
     }
+
+    const renderContent = () => {
+        switch (activeTab) {
+        case 'stationParam':
+            return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>;
+        case 'mapComponent':
+            return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>;
+        default:
+            return null;
+        }
+    };
 
     return(
         <div>
@@ -239,52 +216,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             <button onClick={reverseButtonClilcked}>反転</button>
             ナンバリング補完降順
             <input type="checkbox" onChange={(e) => {setIsNumberDescending(e.target.checked)}}></input>
-
-            <div>
-                <label>駅名</label>
-                <input type="text" id="nameInput" onChange={(e) => formUpdated(e, 'name')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.name : ''}
-                ></input>
-                <br></br>
-                <label>駅名かな</label>
-                <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.kana : ''}
-                ></input>
-                <br></br>
-                <label>駅名英語</label>
-                <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.eng : ''}
-                ></input>
-                <br></br>
-                <label>駅ナンバリング</label>
-                <input type="text" id="numberInput" onChange={(e) => formUpdated(e, 'number')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.number : ''}
-                ></input>
-                <br></br>
-                <label>路線カラー</label>
-                <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'lineColor')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.lineColor : ''}
-                ></input>
-                <br></br>
-                <label>乗換路線</label>
-                <input type="text" id="transfersInput" onChange={(e) => formUpdated(e, 'transfers')}
-                    value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.transfers : ''}
-                ></input>
-                <select onChange={lineSelectChanged}>
-                    <option>接続路線を追加</option>
-                    {
-                        Object.keys(setting.lineDict).map((key, index) => {
-                            return(
-                                <option key={index} value={key}>
-                                    {setting.lineDict[key].name}
-                                </option>
-                            )
-                        })
-                    }
-                </select>
-
-                <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>
-            </div>
+            <br></br>
+            <button onClick={() => setActiveTab('stationParam')}>駅パラメータ</button>
+            <button onClick={() => setActiveTab('mapComponent')}>マップ</button>
+            <br></br>
+            {renderContent()}
         </div>
     )
 }

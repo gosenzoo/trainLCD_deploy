@@ -157,8 +157,9 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
                 <option value="JR_east">JR東日本</option>
                 <option value="tokyo_subway">東京地下鉄</option>
-                <option value="train_normal">地上路線汎用</option>
-                <option value="train_subway">地下路線汎用</option>
+                <option value="train_normal1">地上路線汎用１</option>
+                <option value="train_normal2">地上路線汎用２</option>
+                <option value="train_subway1">地下路線汎用</option>
             </select>
             <br></br>
             アイコンの路線記号
