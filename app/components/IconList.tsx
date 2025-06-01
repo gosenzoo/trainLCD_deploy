@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { presetIconMaker } from "../modules/presetIconMaker";
 import "../type"
 
 type iconListProps = {
@@ -49,12 +50,9 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                 .then((res) => res.text())
                 .then((data) => {
                     const parser = new DOMParser();
-                    const iconDOM = parser.parseFromString(data, 'image/svg+xml');
+                    const _iconDOM = parser.parseFromString(data, 'image/svg+xml');
 
-                    const lineElement = iconDOM.getElementById('lineColor');
-                    if (lineElement) {
-                        lineElement.setAttribute('fill', iconPresetColor);
-                    }
+                    const iconDOM = presetIconMaker(_iconDOM, iconPresetColor, iconPresetSymbol)
 
                     const serializer = new XMLSerializer();
                     const svgIconText = serializer.serializeToString(iconDOM.documentElement);

@@ -63,7 +63,7 @@ class InnerSVG{
         }
         if ("xlen" in styleJson) {
             additionalText += ` transform="${styleJson.strokeWidth}"`;
-            delete styleJson.strokeWidth;
+            delete styleJson.xlen;
         }
         let styleText = "";
         for (let key in styleJson) {
