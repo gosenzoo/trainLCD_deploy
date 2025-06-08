@@ -1,0 +1,89 @@
+<svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs id="defs">
+    <linearGradient id="tokyuBackGradient" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0.00%" stop-color="rgb(74, 75, 86)" />
+      <stop offset="47.31%" stop-color="rgb(37, 37, 41)" />
+      <stop offset="47.92%" stop-color="rgb(6, 6, 8)" />
+      <stop offset="52.06%" stop-color="rgb(7, 7, 7)" />
+      <stop offset="92.70%" stop-color="rgb(75, 74, 81)" />
+      <stop offset="93.05%" stop-color="rgb(166, 167, 172)" />
+      <stop offset="94.63%" stop-color="rgb(21, 21, 21)" />
+      <stop offset="95.16%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="96.73%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="96.99%" stop-color="rgb(255, 0, 0)" />
+      <stop offset="99.68%" stop-color="rgb(255, 0, 0)" />
+      <stop offset="100.00%" stop-color="rgb(255, 30, 30)" />
+    </linearGradient>
+    <linearGradient id="innerGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="51%" stop-color="rgb(220, 220, 220)" />
+      <stop offset="51.11%" stop-color="rgb(158, 158, 158)" />
+      <stop offset="81.11%" stop-color="rgb(201, 201, 201)" />
+      <stop offset="100%" stop-color="rgb(228, 228, 228)" />
+    </linearGradient>
+    <linearGradient id="outerGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="17.78%" stop-color="rgb(228, 228, 228)" />
+      <stop offset="48.89%" stop-color="rgb(182, 182, 182)" />
+      <stop offset="51.11%" stop-color="rgb(158, 158, 158)" />
+      <stop offset="81.11%" stop-color="rgb(201, 201, 201)" />
+      <stop offset="100%" stop-color="rgb(228, 228, 228)" />
+    </linearGradient>
+    <linearGradient id="outlineGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(44, 44, 44)" />
+      <stop offset="100%" stop-color="rgb(211, 211, 211)" />
+    </linearGradient>
+
+    <filter id="outline">
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="1" />
+      <feFlood flood-color="black" result="BLACK"/>
+      <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
+      <feMerge>
+        <feMergeNode in="OUTLINE"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- 背景 -->
+  <rect x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+  <rect x="0" y="0" width="1920" height="350" fill="url(#tokyuBackGradient)" filter="url(#dropShadow)" />
+  <!-- 号車表示 -->
+  <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+  <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
+  <!-- 種別表示 -->
+  <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+  <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
+  <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" 
+    style="mix-blend-mode: multiply;" />
+
+  <g filter="url(#outline)" style="isolation: isolate;">
+    <!-- 路線ベース左端（始点） -->
+    <rect id="lineLeft" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
+    <!-- 路線ベース右端（終点） -->
+    <polygon id="lineRight" points="1694,721 1840,721 1882,765 1840,808 1694,808"
+             fill="rgb(221, 221, 221)" />
+    <!-- 路線ベース1影 -->
+    <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+             fill="url(#innerGradient)"
+             style="mix-blend-mode: multiply;" />
+    <!-- 路線ベース駅アイコン左端 -->
+    <rect id="stationLeft" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+    <!-- 路線ベース駅アイコン右端 -->
+    <rect id="stationRight" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+    <!-- 路線ベース2影 -->
+    <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+             fill="url(#outerGradient)"
+             style="mix-blend-mode: multiply;" />
+  </g>
+
+  <rect x="1640" y="686" width="108" height="31" fill="#999999" />
+  <rect x="1594" y="813" width="200" height="250" fill="#999999" />
+  <rect x="1656.5" y="604" width="75" height="75" fill="#99999950" />
+  <rect x="1656.5" y="359" width="75" height="320" fill="#99999950" />
+  <rect x="1723" y="39" width="78" height="78" fill="#99999950" />
+
+  <image href="./displaySvg/tokyu/tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.1" />
+</svg>

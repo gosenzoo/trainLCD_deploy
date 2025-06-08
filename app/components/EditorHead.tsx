@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
 
@@ -9,6 +10,7 @@ type editorHeadType = {
 
 const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
     const [displayType, setDisplayType] = useState<string>("JW-225")
+    const router = useRouter()
 
     const inputToSetting = (e: any) => {
         try{
@@ -52,8 +54,14 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
         setDisplayType(e.target.value)
     }
     const openDisplay = () => {
-        localStorage.setItem('lcdStrage', JSON.stringify(setting))
-        if(displayType === "JW-225"){ window.open('./Display_JW-225.html') }
+        if(displayType === "JW-225"){ 
+            localStorage.setItem('lcdStrage', JSON.stringify(setting))
+            window.open('./Display_JW-225.html')
+        }
+        if(displayType === "tokyu"){ 
+            localStorage.setItem('lcdStrage', JSON.stringify(setting))
+            window.open(`./display.html`, '_blank', 'noopener')
+        }
         if(displayType === "JE-E131"){ console.log("ないです") }
     }
     const deleteSetting = () => {
@@ -72,6 +80,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <br></br>
             <select onChange={displayTypeSelectChanged}>
                 <option value="JW-225">JR西日本 225系</option>
+                <option value="tokyu">東急</option>
                 <option value="JE-E131">JR東日本 E131系</option>
             </select>
             <button onClick={openDisplay}>表示</button>
