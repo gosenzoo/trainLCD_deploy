@@ -48,18 +48,27 @@
     </filter>
   </defs>
   <!-- 背景 -->
-  <rect x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
-  <rect x="0" y="0" width="1920" height="350" fill="url(#tokyuBackGradient)" filter="url(#dropShadow)" />
-  <!-- 号車表示 -->
-  <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
-  <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
-  <!-- 種別表示 -->
-  <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
-  <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
-  <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" 
-    style="mix-blend-mode: multiply;" />
+  <rect id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+  <!-- ヘッダー -->
+  <g id="header" visibility="visible">
+    <!-- ヘッダー背景 -->
+    <rect id="header-back" x="0" y="0" width="1920" height="350" fill="url(#tokyuBackGradient)" filter="url(#dropShadow)" />
+    <!-- 号車表示 -->
+    <g id="header-carNum">
+      <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+      <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
+      <rect x="1723" y="39" width="78" height="78" fill="#99999950" />
+    </g>
+    <!-- 種別表示 -->
+    <g>
+      <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+      <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
+      <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
+    </g>
+  </g>
 
-  <g filter="url(#outline)" style="isolation: isolate;">
+  <!-- 標準路線図ボディ -->
+  <g id="body" filter="url(#outline)" style="isolation: isolate;" visibility="hidden">
     <!-- 路線ベース左端（始点） -->
     <rect id="lineLeft" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
     <!-- 路線ベース右端（終点） -->
@@ -77,13 +86,12 @@
     <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
              fill="url(#outerGradient)"
              style="mix-blend-mode: multiply;" />
+    
+    <rect x="1640" y="686" width="108" height="31" fill="#999999" />
+    <rect x="1594" y="813" width="200" height="250" fill="#999999" />
+    <rect x="1656.5" y="604" width="75" height="75" fill="#99999950" />
+    <rect x="1656.5" y="359" width="75" height="320" fill="#99999950" />
   </g>
 
-  <rect x="1640" y="686" width="108" height="31" fill="#999999" />
-  <rect x="1594" y="813" width="200" height="250" fill="#999999" />
-  <rect x="1656.5" y="604" width="75" height="75" fill="#99999950" />
-  <rect x="1656.5" y="359" width="75" height="320" fill="#99999950" />
-  <rect x="1723" y="39" width="78" height="78" fill="#99999950" />
-
-  <image href="./displaySvg/tokyu/tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.1" />
+  <!-- <image href="./displaySvg/tokyu/tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.1" /> -->
 </svg>

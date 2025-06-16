@@ -1,3 +1,27 @@
+//URLからSVGをelementとして取得する関数
+async function getSVGElementFromUrl(url) {
+    const response = await fetch(url);
+    const svgText = await response.text();
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+    return svgDoc.documentElement;
+}
+
+//描画対象のサイズをウィンドウサイズに合わせる
+function resizeCanvas(dom, width, height) {
+    let originalWidth, originalHeight;
+    if (window.innerWidth < width / height * window.innerHeight){
+        originalWidth = Math.floor(window.innerWidth);
+        originalHeight = Math.floor(window.innerWidth * height / width);
+    }   
+    else{
+        originalWidth = Math.floor(window.innerHeight * width / height);
+        originalHeight = Math.floor(window.innerHeight);
+    }
+    dom.style.width = originalWidth;
+    dom.style.height = originalHeight;
+}
+
 function getCanvasTextSize(textContent, fontSize, fontFamily) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
@@ -44,7 +68,7 @@ function hasPassStationBetweenStops(stations, isLoop) {
 
     //環状運転時、リスト左端の通過駅も最後の駅の次の通過駅と設定
     if(isLoop){
-        console.log(stations[0].isPass)
+        //console.log(stations[0].isPass)
         if(stations[0].isPass){
             result[result.length - 1] = true
         }
@@ -144,4 +168,20 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c; // 距離（メートル）
+}
+
+
+
+function toBase64Url(url, callback){
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        callback(reader.result);
+      }
+      reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
 }
