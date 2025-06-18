@@ -68,20 +68,20 @@
   </g>
 
   <!-- 標準路線図ボディ -->
-  <g id="body" filter="url(#outline)" style="isolation: isolate;" visibility="hidden">
+  <g id="body-defaultLine" filter="url(#outline)" style="isolation: isolate;" visibility="visible">
     <!-- 路線ベース左端（始点） -->
-    <rect id="lineLeft" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
+    <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
     <!-- 路線ベース右端（終点） -->
-    <polygon id="lineRight" points="1694,721 1840,721 1882,765 1840,808 1694,808"
+    <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
              fill="rgb(221, 221, 221)" />
     <!-- 路線ベース1影 -->
     <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
              fill="url(#innerGradient)"
              style="mix-blend-mode: multiply;" />
     <!-- 路線ベース駅アイコン左端 -->
-    <rect id="stationLeft" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+    <rect id="stationStart" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
     <!-- 路線ベース駅アイコン右端 -->
-    <rect id="stationRight" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+    <rect id="stationEnd" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
     <!-- 路線ベース2影 -->
     <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
              fill="url(#outerGradient)"

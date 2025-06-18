@@ -58,5 +58,5 @@ class IndexClass {
         // 配列の長さで割った剰余を計算することでインデックスを配列の範囲内に収める
         const circularIndex = ((index % arr.length) + arr.length) % arr.length;
         return arr[circularIndex];
-      }
+    }
 }

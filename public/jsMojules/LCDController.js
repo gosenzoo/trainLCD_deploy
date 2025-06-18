@@ -1,5 +1,6 @@
 class LCDController{
     constructor(setting, mapSVG, displaySVG){
+        console.log(setting);
         this.setting = setting; //設定を保存
         this.mapSVG = mapSVG; //フォーマットSVG
         this.displaySVG = displaySVG; //描画先SVG
@@ -14,9 +15,9 @@ class LCDController{
         /* //コントローラー辞書を初期化
         this.bodyControllerDict = {
             //"defaultLine": new DefaultLineController(displayType)
-        };
+        };*/
         
-        this.bodyController = null; //使用するボディコントローラーを初期化 */
+        this.bodyController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict)); //使用するボディコントローラーを初期化 */
 
         this.setLCDToDisplay()
     }
@@ -47,7 +48,8 @@ class LCDController{
         tempSVG.appendChild(mapSVG.getElementById("defs").cloneNode(true))
         tempSVG.appendChild(mapSVG.getElementById("background").cloneNode(true));
 
-        //ヘッダーを組み立てて追加
+        //LCD要素を組み立てて追加
+        tempSVG.appendChild(this.bodyController.createAll(this.progressController.progressParams));
         tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
 
         return tempSVG;

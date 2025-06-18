@@ -22,6 +22,43 @@ function resizeCanvas(dom, width, height) {
     dom.style.height = originalHeight;
 }
 
+function getCircularItem(arr, index) {
+    // 配列の長さで割った剰余を計算することでインデックスを配列の範囲内に収める
+    const circularIndex = ((index % arr.length) + arr.length) % arr.length;
+    return arr[circularIndex];
+}
+
+function movePolygonTo(polygonElem, targetX, targetY) { //polygon要素を指定の位置に移動
+    const pointsStr = polygonElem.getAttribute("points").trim();
+    const points = pointsStr.split(/\s+/).map(pair => {
+        const [x, y] = pair.split(',').map(Number);
+        return { x, y };
+    });
+
+    if (points.length === 0) return null;
+
+    const dx = targetX - points[0].x;
+    const dy = targetY - points[0].y;
+
+    const newPointsStr = points
+        .map(p => `${p.x + dx},${p.y + dy}`)
+        .join(' ');
+
+    // 新しい polygon 要素を作成
+    const newPolygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    newPolygon.setAttribute("points", newPointsStr);
+
+    // 必要なら元の属性をコピー
+    for (let i = 0; i < polygonElem.attributes.length; i++) {
+        const attr = polygonElem.attributes[i];
+        if (attr.name !== "points") {
+            newPolygon.setAttribute(attr.name, attr.value);
+        }
+    }
+
+    return newPolygon;
+}
+
 function getCanvasTextSize(textContent, fontSize, fontFamily) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
