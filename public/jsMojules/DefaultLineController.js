@@ -15,24 +15,30 @@ class DefaultLineController{
         if(progressParams.posState === 2) { startInd = progressParams.currentStationInd; }
         else{ startInd = progressParams.currentStationInd - 1; }
         let dispStationList = []
+        let currentStationOnDisp;
         if(!this.setting.info.isLoop){ //環状運転でない場合
             if(startInd < this.setting.stationList.length - (stationFrameNum - 1)){ //終点近くでない場合、現在駅対応をdispに入れていく
                 for(let i = startInd; i < startInd + stationFrameNum; i++){
                     dispStationList.push(this.setting.stationList[i])
                 }
+                currentStationOnDisp = 0; //終点近くでない場合は常に根本端に位置する
+                if(progressParams.posState === 0 || progressParams.posState === 1){ currentStationOnDisp += 0.5; } //駅間にいる場合は半駅分進める
             }
-            else{ //終点近くの場合、残りを入れていく(未完成)
+            else{ //終点近くの場合、残りを入れていく
                 console.log("終点近くです")
                 for(let i = this.setting.stationList.length - stationFrameNum; i < this.setting.stationList.length; i++){
-                    dispStationList.push(this.setting.stationList[i])
+                    dispStationList.push(this.setting.stationList[i]);
                 }
-                //this.drawPos = this._nowStationId - (stationList.length - 8);
+                currentStationOnDisp = progressParams.currentStationInd - (this.setting.stationList.length - stationFrameNum);
+                if(progressParams.posState === 0 || progressParams.posState === 1){ currentStationOnDisp -= 0.5; } //駅間にいる場合は半駅分戻る
             }
         }
         else{ //環状運転の場合
             for(let i = 0; i < stationFrameNum; i++){
                 dispStationList.push(getCircularItem(this.setting.stationList, startInd + i))
             }
+            currentStationOnDisp = 0; //環状運転では常に根本端に位置する
+            if(progressParams.posState === 0 || progressParams.posState === 1){ currentStationOnDisp += 0.5; } //駅間にいる場合は半駅分進める
         }
         console.log("dispStationList", dispStationList);
 
@@ -46,10 +52,15 @@ class DefaultLineController{
             colorList.push(dispStationList[i].lineColor);
         }
 
+        let passStationList = dispStationList.map(station => {
+            return station.isPass;
+        });
+
         return {
             stationFrameNum: stationFrameNum,
             colorList: colorList,
-            passStationList: [0, 0, 0, 0, 0, 0, 0, 0]
+            passStationList: passStationList,
+            hereDrawPos: currentStationOnDisp
         }
     }
 

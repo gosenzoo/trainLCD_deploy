@@ -68,24 +68,42 @@
   </g>
 
   <!-- 標準路線図ボディ -->
-  <g id="body-defaultLine" filter="url(#outline)" style="isolation: isolate;" visibility="visible">
-    <!-- 路線ベース左端（始点） -->
-    <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
-    <!-- 路線ベース右端（終点） -->
-    <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
-             fill="rgb(221, 221, 221)" />
-    <!-- 路線ベース1影 -->
-    <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
-             fill="url(#innerGradient)"
-             style="mix-blend-mode: multiply;" />
-    <!-- 路線ベース駅アイコン左端 -->
-    <rect id="stationStart" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
-    <!-- 路線ベース駅アイコン右端 -->
-    <rect id="stationEnd" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
-    <!-- 路線ベース2影 -->
-    <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
-             fill="url(#outerGradient)"
-             style="mix-blend-mode: multiply;" />
+  <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
+    <g filter="url(#outline)">
+      <!-- 路線ベース左端（始点） -->
+      <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
+      <!-- 路線ベース右端（終点） -->
+      <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
+              data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベース1影 -->
+      <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+              fill="url(#innerGradient)"
+              style="mix-blend-mode: multiply;" />
+      <!-- 路線ベース駅アイコン左端 -->
+      <rect id="stationStart" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース駅アイコン右端 -->
+      <rect id="stationEnd" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース通過駅アイコン -->
+      <polygon id="passStation" points="1256,738 1267,738 1296,764.5 1267,791 1256,791 1285,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース2影 -->
+      <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+              fill="url(#outerGradient)"
+              style="mix-blend-mode: multiply;" />
+    </g>
+    <g id="hereIcon" data-basePoint="228,721">
+      <polygon points="172,719 232,719 276,764.5 233,809 173,809 216,764.5" fill="white" />
+      <polygon points="180,721 228,721 270,764.5 227,809 179,809 222,764.5">
+        <animate 
+        attributeName="fill"
+        values="red;blue"
+        dur="2s"
+        repeatCount="indefinite"
+        calcMode="discrete" />
+      </polygon>
+      <polygon points="180,721 228,721 270,764.5 227,809 179,809 222,764.5"
+              fill="url(#innerGradient)"
+              style="mix-blend-mode: multiply;" />
+    </g>
     
     <rect x="1640" y="686" width="108" height="31" fill="#999999" />
     <rect x="1594" y="813" width="200" height="250" fill="#999999" />

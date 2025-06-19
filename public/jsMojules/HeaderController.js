@@ -14,8 +14,14 @@ class HeaderController{
 
     //進行パラメータから描画用パラメータを抽出
     extractDrawParams(progressParams){
+        let arrivingTextType;
+        if(progressParams.posState === 1){ arrivingTextType = 1; } //停車駅駅手前状態は、まもなく
+        else if(progressParams.runState === 1){ arrivingTextType = 2; } //停車中は、ただいま
+        else{ arrivingTextType = 0; } //それ以外は、つぎは
+
         return {
             dispStation: this.setting.stationList[progressParams.currentStationInd],
+            arrivingTextType: arrivingTextType
         }
     }
 

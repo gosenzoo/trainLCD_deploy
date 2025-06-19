@@ -3,6 +3,11 @@ class DefaultLineDrawer{
         this.mapSVG = mapSVG
         this.iconDict = iconDict;
 
+        this.lineX = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("x"));
+        this.lineY = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("y"));
+        this.stationStartX = this.lineX + parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("width"));
+        this.lenStartToEnd = parseFloat(this.mapSVG.querySelector("#stationEnd").getAttribute("x")) - parseFloat(this.mapSVG.querySelector("#stationStart").getAttribute("x"));
+
         console.log("DefaultLineDrawer初期化完了");
     }
 
@@ -10,6 +15,9 @@ class DefaultLineDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList)) //線
+
+        let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
+        group.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
 
         return group;
     }
@@ -25,6 +33,7 @@ class DefaultLineDrawer{
         const lineEnd = (this.mapSVG).querySelector("#lineEnd"); //線先端
         const stationStart = (this.mapSVG).querySelector("#stationStart"); //根本駅
         const stationEnd = (this.mapSVG).querySelector("#stationEnd"); //先端駅
+        const passStation = (this.mapSVG).querySelector("#passStation"); //通過駅
 
         const sectionNum = colorList.length; //描画する区間数（両端含む）を取得
         const sectionWidth = (parseInt(stationEnd.getAttribute("x")) - parseInt(stationStart.getAttribute("x"))) / (stationFrameNum - 1);
@@ -78,13 +87,19 @@ class DefaultLineDrawer{
         line.appendChild(lineShadow1);
 
         //駅アイコン描画
-        let stationStartX = parseInt(stationStart.getAttribute("x"));
+        let stationStartX = parseFloat(stationStart.getAttribute("x"));
         for(let i = 0; i < passStationList.length; i++){
-            const stationObj = stationStart.cloneNode(true);
-            stationObj.setAttribute("x", `${stationStartX + i * sectionWidth}`);
-            line.appendChild(stationObj);
+            if(!passStationList[i]){
+                let stationObj = stationStart.cloneNode(true);
+                stationObj.setAttribute("x", `${stationStartX + i * sectionWidth}`);
+                line.appendChild(stationObj);
+            }
+            else{
+                let stationObj = passStation.cloneNode(true);
+                stationObj = movePolygonTo(stationObj, stationStartX + i * sectionWidth + parseFloat(stationStart.getAttribute("width")) / 2, parseFloat(lineStart.getAttribute("y")) + parseFloat(lineStart.getAttribute("height")) / 2);
+                line.appendChild(stationObj);
+            }
         }
-
         //2影組み立て、追加
         const lineShadow2 = lineShadowShape.cloneNode(true);
         lineShadow2.setAttribute("fill", "url(#outerGradient)");
@@ -92,6 +107,15 @@ class DefaultLineDrawer{
         line.appendChild(lineShadow2);
 
         line.setAttribute("filter", "url(#outline)"); //線全体のアウトライン設定
+
         return line;
+    }
+    createHereIcon(x, y){ //現在地アイコン描画
+        const here = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+
+        let hereIcon = this.mapSVG.querySelector("#hereIcon").cloneNode(true);
+        hereIcon = moveSvgElementByBasePoint(hereIcon, x, y);
+        here.appendChild(hereIcon);
+        return here;
     }
 }

@@ -24,13 +24,24 @@ class HeaderDrawer{
         group.appendChild(this.createTrainType()) //種別
         group.appendChild(this.createCarNum()) //号車
 
+        //駅名（デバッグ用）
         let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.textContent = drawParams.dispStation.name;
-        text.setAttribute("x", "300");
-        text.setAttribute("y", "200");
-        text.setAttribute("font-size", "70px");
+        text.setAttribute("x", "600");
+        text.setAttribute("y", "280");
+        text.setAttribute("font-size", "180px");
         text.setAttribute("fill", "rgb(255, 255, 255)");
         group.appendChild(text);
+        //つぎは、まもなく、ただいま（デバッグ用）
+        let text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        if(drawParams.arrivingTextType === 0){ text2.textContent = "つぎは"; }
+        else if(drawParams.arrivingTextType === 1){ text2.textContent = "まもなく"; }
+        else if(drawParams.arrivingTextType === 2){ text2.textContent = "ただいま"; }
+        text2.setAttribute("x", "300");
+        text2.setAttribute("y", "300");
+        text2.setAttribute("font-size", "70px");
+        text2.setAttribute("fill", "rgb(255, 255, 255)");
+        group.appendChild(text2);
 
         return group;
     }

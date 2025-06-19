@@ -28,6 +28,30 @@ function getCircularItem(arr, index) {
     return arr[circularIndex];
 }
 
+function moveSvgElementByBasePoint(svgElement, targetX, targetY) { //指定したsvg要素に、data-basePointを基準としてtransformを付与する
+    const basePointStr = svgElement.getAttribute("data-basePoint");
+    if (!basePointStr) {
+        console.error("data-basePoint属性が存在しません");
+        return svgElement;
+    }
+
+    const [baseX, baseY] = basePointStr.split(',').map(Number);
+    if (isNaN(baseX) || isNaN(baseY)) {
+        console.error("data-basePointの値が不正です:", basePointStr);
+        return svgElement;
+    }
+
+    const dx = targetX - baseX;
+    const dy = targetY - baseY;
+
+    // 既存のtransformを考慮して追記
+    const currentTransform = svgElement.getAttribute("transform") || "";
+    const newTransform = `${currentTransform} translate(${dx}, ${dy})`.trim();
+    svgElement.setAttribute("transform", newTransform);
+
+    return svgElement;
+}
+
 function movePolygonTo(polygonElem, targetX, targetY) { //polygon要素を指定の位置に移動
     const pointsStr = polygonElem.getAttribute("points").trim();
     const points = pointsStr.split(/\s+/).map(pair => {
@@ -37,8 +61,9 @@ function movePolygonTo(polygonElem, targetX, targetY) { //polygon要素を指定
 
     if (points.length === 0) return null;
 
-    const dx = targetX - points[0].x;
-    const dy = targetY - points[0].y;
+    const [baseX, baseY] = polygonElem.getAttribute("data-basePoint").split(',').map(Number);
+    const dx = targetX - baseX;
+    const dy = targetY - baseY;
 
     const newPointsStr = points
         .map(p => `${p.x + dx},${p.y + dy}`)
