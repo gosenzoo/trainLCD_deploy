@@ -57,6 +57,7 @@ class DefaultLineController{
         });
 
         return {
+            dispStationList: dispStationList,
             stationFrameNum: stationFrameNum,
             colorList: colorList,
             passStationList: passStationList,

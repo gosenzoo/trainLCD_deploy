@@ -2,6 +2,7 @@ class HeaderDrawer{
     constructor(mapSVG, iconDict) {
         this.mapSVG = mapSVG;
         this.iconDict = iconDict;
+        this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを生成
         /*
         //headerSVGから、idをもとに各SVG要素を取得
         this.backSVG = headerSVG.queryselector("#header-back");
@@ -54,6 +55,8 @@ class HeaderDrawer{
         return trainType;
     }
     createStationNameText(name){ //表示駅の駅名を描画
+        const stationNameText = (this.mapSVG).querySelector("#header-stationNameText").cloneNode(true); //駅名テキストを複製
+
         return 
     }
     createNumbering(){ //表示駅のナンバリングを描画
@@ -68,25 +71,5 @@ class HeaderDrawer{
     }
     createRunstateText(){ //つぎは、まもなく、ただいまを描画
 
-    }
-
-
-    setLangTimer(interval){ //言語切り替えタイマーを設定
-        clearInterval(this.langTimer); //既存のタイマーをクリア
-        this.langTimer = setInterval(() => {
-            this.langState++;
-        }, interval);
-    }
-    set langState(state){
-        if(state < 0){
-            state = 2
-        }
-        else if(2 < state){
-            state = 0
-        }
-        this._langState = state;
-    }
-    get langState(){
-        return this._langState;
     }
 }

@@ -2,6 +2,7 @@ class DefaultLineDrawer{
     constructor(mapSVG, iconDict){
         this.mapSVG = mapSVG
         this.iconDict = iconDict;
+        this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを作成
 
         this.lineX = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("x"));
         this.lineY = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("y"));
@@ -14,15 +15,37 @@ class DefaultLineDrawer{
     createAll(drawParams, size){
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
+        // 駅関連の文字
+        for(let i = 0; i < drawParams.dispStationList.length; i++){
+            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY));
+        }
+
+        // 線
         group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList)) //線
 
+        // 現在地アイコン
         let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
         group.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
 
         return group;
     }
-    createStationParts(){
+    // 駅関連の文字を組み立て
+    createStationParts(station, x, y){
+        let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+        const stationTextBase = this.mapSVG.querySelector("#body-defaultLine-stationText").getAttribute("data-basePoint");
+        stationParts.setAttribute("data-basePoint", stationTextBase); //ベースポイントを設定
 
+        // ナンバリング
+        const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
+        //stationParts.appendChild(numRect);
+        stationParts.appendChild(this.textDrawer.createByRectObj(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect, "en")); //ナンバリングを追加
+
+        // 駅名
+        const stationNameMojiRect = this.mapSVG.querySelector("#body-defaultLine-stationNameMoji").cloneNode(true); //駅名テキスト
+        stationParts.appendChild(this.textDrawer.createByRectObj(station.name[0], stationNameMojiRect, "ja")); //駅名を追加
+
+        stationParts = moveSvgElementByBasePoint(stationParts, x, y);
+        return stationParts;
     }
     // 線組み立て
     createLine(stationFrameNum, colorList, passStationList){
