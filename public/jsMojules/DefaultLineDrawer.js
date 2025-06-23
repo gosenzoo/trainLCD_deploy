@@ -41,8 +41,15 @@ class DefaultLineDrawer{
         stationParts.appendChild(this.textDrawer.createByRectObj(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect, "en")); //ナンバリングを追加
 
         // 駅名
-        const stationNameMojiRect = this.mapSVG.querySelector("#body-defaultLine-stationNameMoji").cloneNode(true); //駅名テキスト
-        stationParts.appendChild(this.textDrawer.createByRectObj(station.name[0], stationNameMojiRect, "ja")); //駅名を追加
+        let nameText = station.name;
+        if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
+        else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
+        const stationNameMojiRect = this.mapSVG.querySelector("#body-defaultLine-stationNameMoji"); //駅名テキストrect
+        for(let i = 0; i < nameText.length; i++){
+            let mojiRect = stationNameMojiRect.cloneNode(true); //駅名テキスト用矩形をコピー
+            mojiRect.setAttribute("y", `${parseInt(mojiRect.getAttribute("y")) - i * parseInt(mojiRect.getAttribute("height"))}`); //y座標を調整
+            stationParts.appendChild(this.textDrawer.createByRectObj(nameText[nameText.length-1 - i], mojiRect, "ja")); //駅名を追加
+        }
 
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
         return stationParts;
