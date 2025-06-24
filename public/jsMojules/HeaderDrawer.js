@@ -25,24 +25,19 @@ class HeaderDrawer{
         group.appendChild(this.createTrainType()) //種別
         group.appendChild(this.createCarNum()) //号車
 
-        //駅名（デバッグ用）
-        let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.textContent = drawParams.dispStation.name;
-        text.setAttribute("x", "600");
-        text.setAttribute("y", "280");
-        text.setAttribute("font-size", "180px");
-        text.setAttribute("fill", "rgb(255, 255, 255)");
-        group.appendChild(text);
         //つぎは、まもなく、ただいま（デバッグ用）
         let text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
         if(drawParams.arrivingTextType === 0){ text2.textContent = "つぎは"; }
         else if(drawParams.arrivingTextType === 1){ text2.textContent = "まもなく"; }
         else if(drawParams.arrivingTextType === 2){ text2.textContent = "ただいま"; }
-        text2.setAttribute("x", "300");
+        text2.setAttribute("x", "180");
         text2.setAttribute("y", "300");
         text2.setAttribute("font-size", "70px");
         text2.setAttribute("fill", "rgb(255, 255, 255)");
         group.appendChild(text2);
+
+        group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
+        group.appendChild(this.createNumbering()); //ナンバリング
 
         return group;
     }
@@ -54,13 +49,26 @@ class HeaderDrawer{
         const trainType = (this.mapSVG).querySelector("#header-trainType").cloneNode(true); //種別SVGを複製
         return trainType;
     }
-    createStationNameText(name){ //表示駅の駅名を描画
-        const stationNameText = (this.mapSVG).querySelector("#header-stationNameText").cloneNode(true); //駅名テキストを複製
+    createStationNameText(station){ //表示駅の駅名を描画
+        const stationNameTextRect = (this.mapSVG).querySelector("#header-stationNameText"); //駅名テキストを複製
+        const kuruTop = parseFloat(stationNameTextRect.getAttribute("y")); //くるくるアニメーションの上端
+        const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")); //くるくるアニメーションの下端
 
-        return 
+        // アニメーション付き駅名テキスト組み立て
+        const stationNameText = this.textDrawer.createKurukuruSvg([
+            this.textDrawer.createByRectObj(station.name, stationNameTextRect, "ja"),
+            this.textDrawer.createByRectObj(station.kana, stationNameTextRect, "ja"),
+            this.textDrawer.createByRectObj(station.eng, stationNameTextRect, "ja")
+        ], kuruTop, kuruBottom, 4000, 500, 0);
+
+        //stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加
+        //stationNameText.appendChild(this.textDrawer.createByRectObj("国分寺", stationNameTextRect, "ja")); //IDを設定
+        return stationNameText;
     }
     createNumbering(){ //表示駅のナンバリングを描画
+        const numbering = (this.mapSVG).querySelector("#header-numbering").cloneNode(true); //ナンバリングSVGを複製
 
+        return numbering;
     }
     createCarNum(){ //号車を描画
         const carNum = (this.mapSVG).querySelector("#header-carNum").cloneNode(true); //種別SVGを複製

@@ -23,7 +23,7 @@ class TextDrawer{
         const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
         const fontSize = height / capHeightRatio;
         let yOffset = height; 
-        if(lang === "ja"){ yOffset -= fontSize * 0.15 }// ←この 0.15 は経験的に調整（フォント依存）
+        if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
 
         const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
         textElem.textContent = text;
@@ -41,8 +41,59 @@ class TextDrawer{
     createTextWithIcon(){
 
     }
-    createAnimationText(){
-    
+    createKurukuruSvg(svgList, kuruTop, kuruBottom, dispTime, transTime, gapTime){
+        const kuruGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+        //1周期の時間[s]
+        let periodTime = (dispTime + transTime + gapTime) * svgList.length / 1000;
+
+        let keyTimeText, scaleInValuesText, scaleOutValuesText, opacityValuesText;
+        for(let i = 0; i < svgList.length; i++){
+            keyTimeText = this.getKeyTime(dispTime, transTime, gapTime, i, svgList.length);
+            scaleInValuesText = this.getInScaleValues(i, svgList.length);
+            scaleOutValuesText = this.getOutScaleValues(i, svgList.length);
+            opacityValuesText = this.getOpacityValues(i, svgList.length);
+
+            let kurukuruSvgInnerText = `
+                <!-- 上端からスケールアップ -->
+                <animateTransform attributeName="transform"
+                                type="scale"
+                                additive="sum"
+                                values="${scaleInValuesText}"
+                                keyTimes="${keyTimeText}"
+                                dur="${periodTime}s"
+                                repeatCount="indefinite" />
+
+                <!-- fill-opacity アニメーション（透明度） -->
+                <animate attributeName="fill-opacity"
+                        values="${opacityValuesText}"
+                        keyTimes="${keyTimeText}"
+                        dur="${periodTime}s"
+                        repeatCount="indefinite" />`;
+
+            svgList[i].innerHTML += kurukuruSvgInnerText;
+            svgList[i].setAttribute("y", `${parseFloat(svgList[i].getAttribute("y")) - kuruTop}`); //y座標を調整
+
+            let kurukuruSvgOuterText = `
+                <!-- フェードアウト -->
+                <g transform="translate(0,${kuruBottom})">
+                    <!-- フェードイン -->
+                    <g transform="translate(0,${kuruTop - kuruBottom})">
+                        ${svgList[i].outerHTML}
+                    </g>
+
+                    <!-- 下端でスケールダウン -->
+                    <animateTransform attributeName="transform"
+                                    type="scale"
+                                    additive="sum"
+                                    values="${scaleOutValuesText}"
+                                    keyTimes="${keyTimeText}"
+                                    dur="${periodTime}s"
+                                    repeatCount="indefinite" />
+                </g>`;
+            kuruGroup.innerHTML += kurukuruSvgOuterText;
+        }
+        return kuruGroup;
     }
     measureCapHeightRatio(fontFamily, lang){
         // Canvas 要素を作成（DOMに追加しない）
@@ -61,7 +112,7 @@ class TextDrawer{
             ctx.fillText('H', 50, 50);
         }
         else if(lang === "ja"){
-            ctx.fillText('国', 50, 50);
+            ctx.fillText('寺', 50, 50);
         }
         else{
             ctx.fillText('H', 50, 50); // デフォルトは英語のH
@@ -88,5 +139,110 @@ class TextDrawer{
             return (bottom - top + 1) / fontSize;
         }
         return null; // 何も描画されていなかった場合
+    }
+
+    getKeyTime(dispTime, transTime, gapTime, textInd, textNum){
+        let periodTime = (dispTime + transTime + gapTime) * textNum;
+        let keyTimeText = "0";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        for(let i = 0; i < textNum; i++){
+            let now = i * (dispTime + transTime + gapTime);
+            if(i === inInd){
+            //フェードイン開始
+            now += dispTime + gapTime;
+            keyTimeText += `;${now / periodTime}`;
+            //フェードイン終了
+            now += transTime;
+            keyTimeText += `;${now / periodTime}`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            now += dispTime;
+            keyTimeText += `;${now / periodTime}`;
+            //フェードアウト終了
+            now += transTime;
+            keyTimeText += `;${now / periodTime}`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ keyTimeText += `;1`; } //最後の要素は1で終わる
+        return keyTimeText;
+    }
+    getOpacityValues(textInd, textNum){
+        let valueText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ valueText += "1"; }
+        else{ valueText += "0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            valueText += `;0`;
+            //フェードイン終了
+            valueText += `;1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            valueText += `;1`;
+            //フェードアウト終了
+            valueText += `;0`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ valueText += `;0`; } //最後の要素は1で終わる
+        return valueText;
+    }
+    getInScaleValues(textInd, textNum){
+        let scaleText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ scaleText += "1,1"; }
+        else{ scaleText += "1,0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            scaleText += `;1,0`;
+            //フェードイン終了
+            scaleText += `;1,1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            scaleText += `;1,1`;
+            //フェードアウト終了
+            scaleText += `;1,1`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ scaleText += `;1,1`; }
+        return scaleText;
+    }
+    getOutScaleValues(textInd, textNum){
+        let scaleText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ scaleText += "1,1"; }
+        else{ scaleText += "1,0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            scaleText += `;1,1`;
+            //フェードイン終了
+            scaleText += `;1,1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            scaleText += `;1,1`;
+            //フェードアウト終了
+            scaleText += `;1,0`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ scaleText += `;1,1`; }
+        return scaleText;
     }
 }

@@ -65,6 +65,10 @@
       <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
       <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
     </g>
+    <!-- ナンバリング -->
+    <rect id="header-numbering" x="479" y="149" width="168" height="168" fill="rgb(255, 255, 255)" />
+    <!-- 駅名 -->
+    <rect id="header-stationNameText" x="690" y="140" width="1040" height="176" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" data-color="rgb(255, 255, 255)" />
   </g>
 
   <!-- 標準路線図ボディ -->
@@ -107,10 +111,10 @@
     <g id="body-defaultLine-stationText" data-basePoint="1694,721">
       <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#999999" data-color="rgb(0, 0, 0)" data-fontFamily="sans-serif" data-fontWeight="bold" data-textAnchor="middle" />
       <rect x="1594" y="813" width="200" height="250" fill="#999999" />
-      <rect id="body-defaultLine-stationNameMoji" x="1656.5" y="604" width="75" height="75" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="medium" />
+      <rect id="body-defaultLine-stationNameMoji" x="1656.5" y="604" width="75" height="75" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" />
       <rect x="1656.5" y="359" width="75" height="320" fill="#99999950" />
     </g>
   </g>
 
-  <!-- <image href="./displaySvg/tokyu/tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.1" /> -->
+  <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" />
 </svg>

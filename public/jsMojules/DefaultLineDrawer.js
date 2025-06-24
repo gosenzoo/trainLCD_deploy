@@ -47,7 +47,7 @@ class DefaultLineDrawer{
         const stationNameMojiRect = this.mapSVG.querySelector("#body-defaultLine-stationNameMoji"); //駅名テキストrect
         for(let i = 0; i < nameText.length; i++){
             let mojiRect = stationNameMojiRect.cloneNode(true); //駅名テキスト用矩形をコピー
-            mojiRect.setAttribute("y", `${parseInt(mojiRect.getAttribute("y")) - i * parseInt(mojiRect.getAttribute("height"))}`); //y座標を調整
+            mojiRect.setAttribute("y", `${parseInt(mojiRect.getAttribute("y")) - i * parseInt(mojiRect.getAttribute("height")) - ((i === 0) ? 0 : (i-1) * 5)}`); //y座標を調整
             stationParts.appendChild(this.textDrawer.createByRectObj(nameText[nameText.length-1 - i], mojiRect, "ja")); //駅名を追加
         }
 
