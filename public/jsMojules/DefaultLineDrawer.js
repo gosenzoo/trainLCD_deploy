@@ -17,7 +17,7 @@ class DefaultLineDrawer{
 
         // 駅関連の文字
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY));
+            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict));
         }
 
         // 線
@@ -30,7 +30,7 @@ class DefaultLineDrawer{
         return group;
     }
     // 駅関連の文字を組み立て
-    createStationParts(station, x, y){
+    createStationParts(station, x, y, lineDict){
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         const stationTextBase = this.mapSVG.querySelector("#body-defaultLine-stationText").getAttribute("data-basePoint");
         stationParts.setAttribute("data-basePoint", stationTextBase); //ベースポイントを設定
@@ -62,8 +62,39 @@ class DefaultLineDrawer{
             const scale = maxHeight / stationNameHeight; //圧縮率を計算
             stationName.setAttribute("transform", ` translate(0,${statinoNameBottomY}) scale(1,${scale}) translate(0,${-statinoNameBottomY})`); //駅名を圧縮
         }
-
         stationParts.appendChild(stationName);
+
+        //乗換路線
+        if(station.transfers.length > 0){
+            const transferTextList = station.transfers.split(" ");
+            const transferCnt = transferTextList.length; //乗換路線の数を取得
+            const transferArea = (this.mapSVG).querySelector("#body-defaultLine-transferArea"); //乗換路線用矩形
+            const transferLine = (this.mapSVG).querySelector("#body-defaultLine-transferLine"); //乗換路線用線
+
+            const left = parseFloat(transferArea.getAttribute("x"));
+            const top = parseFloat(transferArea.getAttribute("y"));
+            const width = parseFloat(transferArea.getAttribute("width"));
+            const areaHeight = parseFloat(transferArea.getAttribute("height"));
+            const lineHeight = parseFloat(transferLine.getAttribute("height"));
+            const lineSpan = 3; //行間[px]
+
+            let height = lineHeight;
+            //乗換路線の表示が下端を超える場合、圧縮
+            if(transferCnt * (lineHeight + lineSpan) > areaHeight){
+                const scale = areaHeight / (transferCnt * (lineHeight + lineSpan)); //圧縮率を計算
+                height = lineHeight * scale; //乗換路線の高さを圧縮
+            }
+
+            const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+            let y = top;
+            for(let i = 0; i < transferCnt; i++){
+                let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
+                transferTexts.appendChild(this.textDrawer.createTextWithIcon(text, left, y, width, height, "rgb(0,0,0)", "BIZ UDGothic", "midium"));
+                y += height + lineSpan; //次の行のY座標を計算
+            }
+            stationParts.appendChild(transferTexts); //乗換路線を追加
+        }
+
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
         return stationParts;
     }

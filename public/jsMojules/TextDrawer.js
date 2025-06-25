@@ -22,6 +22,7 @@ class TextDrawer{
     createByRect(text, x, y, width, height, color, fontFamily, fontWeight, textAnchor="middle", lang="ja", spacing=0){
         const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
         const fontSize = height / capHeightRatio;
+        
         let yOffset = height; 
         if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
 
@@ -52,8 +53,53 @@ class TextDrawer{
 
         return textElem;
     }
-    createTextWithIcon(){
+    createTextWithIcon(text, x, y, width, height, color, fontFamily, fontWeight){
+        const textList = text.split(":"); //テキストと、絵文字IDに分割
+        if(textList.length % 2 === 0){ //:での分割数が偶数の場合、:が奇数となる。つまり構文エラーなのでnullを返す
+            return null; 
+        }
 
+        //空文字を除いたテキスト、絵文字IDの数をそれぞれ計算
+        let textCnt = 0;
+        let iconCnt = 0;
+        for(let i = 0; i < textList.length; i++){
+            if(textList[i] === ""){ continue; } //空文字ならスキップ
+            if(i % 2 === 0){ //テキストなら
+                textCnt++;
+            }
+            else{ //アイコンなら
+                iconCnt++;
+            }
+        }
+        //テキストに割り振れる幅を計算
+        const allTextWidth = width - height * iconCnt;
+        if(allTextWidth < 0){ return null; } //アイコンの幅がテキストの幅を超える場合、nullを返す
+        let textWidth = allTextWidth / textCnt; //アイコンを除いたテキストの幅を計算
+
+        const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        let nowX = x; //現在のx座標
+        for(let i = 0; i < textList.length; i++){
+            if(i % 2 === 0){ //テキストなら
+                if(textList[i] === ""){ continue; } //空文字ならスキップ
+                const textElem = this.createByRect(
+                    textList[i], nowX, y, textWidth, height, color, fontFamily, fontWeight, "start"
+                );
+                iconTextElem.appendChild(textElem);
+                nowX += textWidth; //次のテキストのx座標を更新
+            }
+            else{ //アイコンなら
+                if(textList[i] === ""){ continue; } //空文字ならスキップ
+                const iconElem = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                iconElem.setAttribute("href", this.iconDict[textList[i]]); //アイコンのURLを設定
+                iconElem.setAttribute("x", String(nowX));
+                iconElem.setAttribute("y", String(y));
+                iconElem.setAttribute("width", String(height));
+                iconElem.setAttribute("height", String(height));
+                iconTextElem.appendChild(iconElem);
+                nowX += height; //次のアイコンのx座標を更新
+            }
+        }
+        return iconTextElem;
     }
     createKurukuruSvg(svgList, kuruTop, kuruBottom, dispTime, transTime, gapTime){
         const kuruGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -159,7 +205,8 @@ class TextDrawer{
         const ctx = canvas.getContext('2d');
 
         // フォントスタイルを正確に組み立て
-        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        ctx.font = `${fontSize}px '${fontFamily}'`; // フォントファミリーを 'sans-serif' に設定
+        //if(text === "湘南新宿ライン"){ console.log(ctx.font); }
 
         const metrics = ctx.measureText(text);
         return metrics.width;

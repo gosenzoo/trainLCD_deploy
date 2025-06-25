@@ -29,6 +29,8 @@ class HeaderDrawer{
         group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
         group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
 
+        //group.appendChild(this.textDrawer.createTextWithIcon(":jk::js:JR線", 300, 500, 300, 50, "rgb(0,0,0)", "sans-serif", "bold"));
+
         return group;
     }
     createBack(){ //背景を組み立て

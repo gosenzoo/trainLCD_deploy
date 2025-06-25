@@ -61,7 +61,8 @@ class DefaultLineController{
             stationFrameNum: stationFrameNum,
             colorList: colorList,
             passStationList: passStationList,
-            hereDrawPos: currentStationOnDisp
+            hereDrawPos: currentStationOnDisp,
+            lineDict: this.setting.lineDict
         }
     }
 
