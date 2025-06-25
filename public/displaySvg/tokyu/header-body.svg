@@ -57,7 +57,7 @@
     <g id="header-carNum">
       <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
       <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
-      <rect x="1723" y="39" width="78" height="78" fill="#99999950" />
+      <rect id="carNumText" x="1723" y="39" width="78" height="78" fill="#99999950" data-fontWeight="bold" data-fontFamily="sans-serif" data-textAnchor="middle" />
     </g>
     <!-- 種別表示 -->
     <g id="header-trainType">
@@ -66,9 +66,17 @@
       <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
     </g>
     <!-- ナンバリング -->
-    <rect id="header-numbering" x="479" y="149" width="168" height="168" fill="rgb(255, 255, 255)" />
+    <!-- <rect id="header-numbering-rect" x="479" y="149" width="168" height="168" fill="rgb(255, 255, 255)" /> -->
+    <g id="header-numbering">
+      <rect x="477" y="147" rx="30" ry="30" width="172" height="172" fill="rgb(255, 255, 255)" />
+      <rect id="icon-lineColor" x="482" y="152" rx="25" ry="25" width="162" height="162" fill="#ff0000" />
+      <rect id="icon-symbol" x="500" y="167" width="126" height="45" fill="#99999950" data-color="rgb(255, 255, 255)" data-fontWeight="bold" data-fontFamily="sans-serif" data-textAnchor="middle" />
+      <rect id="icon-number" x="500" y="228" width="126" height="70" fill="#99999950" data-color="rgb(255, 255, 255)" data-fontWeight="bold" data-fontFamily="sans-serif" data-textAnchor="middle" />
+    </g>
     <!-- 駅名 -->
-    <rect id="header-stationNameText" x="690" y="140" width="1040" height="176" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" data-color="rgb(255, 255, 255)" />
+    <rect id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-fontFamily="TBUDGoStd, BIZ UDGothic" data-fontWeight="bold" data-color="rgb(255, 255, 255)" data-letterSpacings='{"2":110,"3":30, "4":20}' data-textAnchor="middle" />
+    <!-- つぎは、まもなく、ただいま -->
+    <rect id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-fontFamily="TBUDGoStd, BIZ UDGothic" data-fontWeight="bold" data-color="rgb(255, 255, 255)" data-textAnchor="end" />
   </g>
 
   <!-- 標準路線図ボディ -->
@@ -111,8 +119,8 @@
     <g id="body-defaultLine-stationText" data-basePoint="1694,721">
       <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#999999" data-color="rgb(0, 0, 0)" data-fontFamily="sans-serif" data-fontWeight="bold" data-textAnchor="middle" />
       <rect x="1594" y="813" width="200" height="250" fill="#999999" />
-      <rect id="body-defaultLine-stationNameMoji" x="1656.5" y="604" width="75" height="75" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" />
-      <rect x="1656.5" y="359" width="75" height="320" fill="#99999950" />
+      <rect id="body-defaultLine-stationNameMoji" x="1656.5" y="604" width="75" height="75" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" data-textAnchor="middle" />
+      <rect id="body-defaultLine-stationName" x="1656.5" y="359" width="75" height="320" fill="#99999950" data-fontFamily="BIZ UDGothic" data-fontWeight="bold" data-textAnchor="middle" />
     </g>
   </g>
 

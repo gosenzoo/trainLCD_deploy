@@ -41,16 +41,29 @@ class DefaultLineDrawer{
         stationParts.appendChild(this.textDrawer.createByRectObj(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect, "en")); //ナンバリングを追加
 
         // 駅名
+        let spacing = 5; //文字間隔
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-        const stationNameMojiRect = this.mapSVG.querySelector("#body-defaultLine-stationNameMoji"); //駅名テキストrect
+        const stationNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName"); //駅名テキストrect
+        const stationName = document.createElementNS("http://www.w3.org/2000/svg", "g"); //駅名テキスト用グループ
+        const stationNameMojiRect = stationNameRect.cloneNode(true); //駅名テキスト用矩形をコピー
+        const statinoNameBottomY = parseFloat(stationNameRect.getAttribute("y")) + parseFloat(stationNameRect.getAttribute("height")); //駅名矩形の下端Y座標を取得
+        stationNameMojiRect.setAttribute("y", `${statinoNameBottomY - parseFloat(stationNameMojiRect.getAttribute("width"))}`); //x座標を調整
+        stationNameMojiRect.setAttribute("height", stationNameMojiRect.getAttribute("width")); //x座標を調整
         for(let i = 0; i < nameText.length; i++){
-            let mojiRect = stationNameMojiRect.cloneNode(true); //駅名テキスト用矩形をコピー
-            mojiRect.setAttribute("y", `${parseInt(mojiRect.getAttribute("y")) - i * parseInt(mojiRect.getAttribute("height")) - ((i === 0) ? 0 : (i-1) * 5)}`); //y座標を調整
-            stationParts.appendChild(this.textDrawer.createByRectObj(nameText[nameText.length-1 - i], mojiRect, "ja")); //駅名を追加
+            stationNameMojiRect.setAttribute("y", `${parseInt(stationNameMojiRect.getAttribute("y")) - ((i === 0) ? 0 : parseInt(stationNameMojiRect.getAttribute("height")) + spacing)}`); //y座標を調整
+            stationName.appendChild(this.textDrawer.createByRectObj(nameText[nameText.length-1 - i], stationNameMojiRect, "ja")); //駅名を追加
+        }
+        //駅名の高さが矩形の高さを超える場合、圧縮
+        const stationNameHeight = nameText.length * stationNameMojiRect.getAttribute("width") + (nameText.length-1) * spacing; //駅名の高さを計算
+        const maxHeight = parseFloat(stationNameRect.getAttribute("height")); //矩形の高さを取得
+        if(stationNameHeight > maxHeight){
+            const scale = maxHeight / stationNameHeight; //圧縮率を計算
+            stationName.setAttribute("transform", ` translate(0,${statinoNameBottomY}) scale(1,${scale}) translate(0,${-statinoNameBottomY})`); //駅名を圧縮
         }
 
+        stationParts.appendChild(stationName);
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
         return stationParts;
     }

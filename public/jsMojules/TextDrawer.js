@@ -3,7 +3,7 @@ class TextDrawer{
         this.iconDict = iconDict; //アイコン辞書を保存
     }
 
-    createByRectObj(text, rectObj, lang){
+    createByRectObj(text, rectObj, lang, spacing=0){
         const x = parseFloat(rectObj.getAttribute("x"));
         const y = parseFloat(rectObj.getAttribute("y"));
         const width = parseFloat(rectObj.getAttribute("width"));
@@ -14,12 +14,12 @@ class TextDrawer{
         const textAnchor = rectObj.getAttribute("data-textAnchor"); //テキストアンカーを取得
 
         const textObj = this.createByRect(
-            text, x, y, width, height, color, fontFamily, fontWeight, textAnchor, lang //フォント設定
+            text, x, y, width, height, color, fontFamily, fontWeight, textAnchor, lang, spacing
         );
 
         return textObj;
     }
-    createByRect(text, x, y, width, height, color, fontFamily, fontWeight, textAlign, lang){
+    createByRect(text, x, y, width, height, color, fontFamily, fontWeight, textAnchor="middle", lang="ja", spacing=0){
         const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
         const fontSize = height / capHeightRatio;
         let yOffset = height; 
@@ -27,14 +27,28 @@ class TextDrawer{
 
         const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
         textElem.textContent = text;
-        textElem.setAttribute("x", String(x + width / 2));
+        if(textAnchor === "middle"){
+            textElem.setAttribute("x", String(x + width / 2));
+        }
+        else if(textAnchor === "start"){
+            textElem.setAttribute("x", String(x));
+        }
+        else if(textAnchor === "end"){
+            textElem.setAttribute("x", String(x + width));
+        }
         textElem.setAttribute("y", String(y + yOffset));
         textElem.setAttribute("fill", color);
         textElem.setAttribute("font-family", fontFamily);
         textElem.setAttribute("font-size", fontSize.toString());
         textElem.setAttribute("font-weight", fontWeight);
-        textElem.setAttribute("text-anchor", "middle");
+        textElem.setAttribute("text-anchor", textAnchor);
         textElem.setAttribute("dominant-baseline", "alphabetic");
+        textElem.setAttribute("letter-spacing", `${spacing}px`); //文字間隔を設定
+        
+        if(this.measureTextWidth(textElem.textContent, fontSize, fontFamily, fontWeight) > width){
+            textElem.setAttribute("textLength", `${width}px`); //テキストの長さを設定
+            textElem.setAttribute("lengthAdjust", "spacingAndGlyphs"); //文字間隔とグリフの調整を有効にする
+        }
 
         return textElem;
     }
@@ -139,6 +153,16 @@ class TextDrawer{
             return (bottom - top + 1) / fontSize;
         }
         return null; // 何も描画されていなかった場合
+    }
+    measureTextWidth(text, fontSize, fontFamily, fontWeight) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // フォントスタイルを正確に組み立て
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+        const metrics = ctx.measureText(text);
+        return metrics.width;
     }
 
     getKeyTime(dispTime, transTime, gapTime, textInd, textNum){

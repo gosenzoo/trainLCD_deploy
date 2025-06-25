@@ -21,7 +21,8 @@ class HeaderController{
 
         return {
             dispStation: this.setting.stationList[progressParams.currentStationInd],
-            arrivingTextType: arrivingTextType
+            arrivingTextType: arrivingTextType,
+            dispCarNum: this.setting.info.carNumber
         }
     }
 

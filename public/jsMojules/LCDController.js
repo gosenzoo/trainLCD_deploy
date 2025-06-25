@@ -38,7 +38,8 @@ class LCDController{
     //描画先に仮描画先の内容を反映（レンダリング）
     setTempToDisplay(tempSVG){
         this.displaySVG.innerHTML = ""; // 既存の内容をクリア
-        this.displaySVG.appendChild(tempSVG);
+        this.displaySVG.innerHTML = tempSVG.outerHTML;
+        this.restartAnimations(this.displaySVG); //アニメーションを再起動
     }
     //tempSVGに、現在状態を反映したLCDを描画
     createLCD(){
@@ -53,5 +54,20 @@ class LCDController{
         tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
 
         return tempSVG;
+    }
+
+    //指定したSVG親要素内のすべてのアニメーション要素に対して beginElement() を適用する関数
+    restartAnimations(parentNode) {
+        const animTags = ["animate", "animateTransform", "animateMotion"];
+        animTags.forEach(tag => {
+            const animElements = parentNode.querySelectorAll(tag);
+            animElements.forEach(el => {
+                try {
+                    el.beginElement();
+                } catch (e) {
+                    console.warn(`beginElement failed on`, el, e);
+                }
+            });
+        });
     }
 }
