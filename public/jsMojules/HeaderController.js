@@ -22,7 +22,10 @@ class HeaderController{
         return {
             dispStation: this.setting.stationList[progressParams.currentStationInd],
             arrivingTextType: arrivingTextType,
-            dispCarNum: this.setting.info.carNumber
+            dispCarNum: this.setting.info.carNumber,
+            destinationText: this.setting.info.destination,
+            viaText: this.setting.info.direction,
+            trainType: {text: this.setting.info.trainType, color: this.setting.info.trainTypeColor},
         }
     }
 

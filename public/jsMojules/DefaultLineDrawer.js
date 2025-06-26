@@ -89,7 +89,7 @@ class DefaultLineDrawer{
             let y = top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
-                transferTexts.appendChild(this.textDrawer.createTextWithIcon(text, left, y, width, height, "rgb(0,0,0)", "BIZ UDGothic", "midium"));
+                transferTexts.appendChild(this.textDrawer.createTextWithIcon(text, left, y, width, height, "rgb(0,0,0)", "BIZ UDGothic", "bold"));
                 y += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加

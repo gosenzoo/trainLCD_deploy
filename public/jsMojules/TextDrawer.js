@@ -59,6 +59,8 @@ class TextDrawer{
             return null; 
         }
 
+        const spacing = 1;
+
         //空文字を除いたテキスト、絵文字IDの数をそれぞれ計算
         let textCnt = 0;
         let iconCnt = 0;
@@ -72,7 +74,7 @@ class TextDrawer{
             }
         }
         //テキストに割り振れる幅を計算
-        const allTextWidth = width - height * iconCnt;
+        const allTextWidth = width - (height + spacing) * iconCnt;
         if(allTextWidth < 0){ return null; } //アイコンの幅がテキストの幅を超える場合、nullを返す
         let textWidth = allTextWidth / textCnt; //アイコンを除いたテキストの幅を計算
 
@@ -96,7 +98,7 @@ class TextDrawer{
                 iconElem.setAttribute("width", String(height));
                 iconElem.setAttribute("height", String(height));
                 iconTextElem.appendChild(iconElem);
-                nowX += height; //次のアイコンのx座標を更新
+                nowX += height + spacing; //次のアイコンのx座標を更新
             }
         }
         return iconTextElem;
