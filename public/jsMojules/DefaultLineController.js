@@ -25,7 +25,7 @@ class DefaultLineController{
                 if(progressParams.posState === 0 || progressParams.posState === 1){ currentStationOnDisp += 0.5; } //駅間にいる場合は半駅分進める
             }
             else{ //終点近くの場合、残りを入れていく
-                console.log("終点近くです")
+                //console.log("終点近くです")
                 for(let i = this.setting.stationList.length - stationFrameNum; i < this.setting.stationList.length; i++){
                     dispStationList.push(this.setting.stationList[i]);
                 }
@@ -40,7 +40,7 @@ class DefaultLineController{
             currentStationOnDisp = 0; //環状運転では常に根本端に位置する
             if(progressParams.posState === 0 || progressParams.posState === 1){ currentStationOnDisp += 0.5; } //駅間にいる場合は半駅分進める
         }
-        console.log("dispStationList", dispStationList);
+        //console.log("dispStationList", dispStationList);
 
         //線色を、現在駅番号から駅枠数+1個取得
         let colorList = [];

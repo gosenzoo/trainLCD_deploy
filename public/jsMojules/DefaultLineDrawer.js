@@ -38,31 +38,16 @@ class DefaultLineDrawer{
         // ナンバリング
         const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
         //stationParts.appendChild(numRect);
-        stationParts.appendChild(this.textDrawer.createByRectObj(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect, "en")); //ナンバリングを追加
+        stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
 
         // 駅名
-        let spacing = 5; //文字間隔
+        const stationNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName"); //駅名テキストrect
+
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-        const stationNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName"); //駅名テキストrect
-        const stationName = document.createElementNS("http://www.w3.org/2000/svg", "g"); //駅名テキスト用グループ
-        const stationNameMojiRect = stationNameRect.cloneNode(true); //駅名テキスト用矩形をコピー
-        const statinoNameBottomY = parseFloat(stationNameRect.getAttribute("y")) + parseFloat(stationNameRect.getAttribute("height")); //駅名矩形の下端Y座標を取得
-        stationNameMojiRect.setAttribute("y", `${statinoNameBottomY - parseFloat(stationNameMojiRect.getAttribute("width"))}`); //x座標を調整
-        stationNameMojiRect.setAttribute("height", stationNameMojiRect.getAttribute("width")); //x座標を調整
-        for(let i = 0; i < nameText.length; i++){
-            stationNameMojiRect.setAttribute("y", `${parseInt(stationNameMojiRect.getAttribute("y")) - ((i === 0) ? 0 : parseInt(stationNameMojiRect.getAttribute("height")) + spacing)}`); //y座標を調整
-            stationName.appendChild(this.textDrawer.createByRectObj(nameText[nameText.length-1 - i], stationNameMojiRect, "ja")); //駅名を追加
-        }
-        //駅名の高さが矩形の高さを超える場合、圧縮
-        const stationNameHeight = nameText.length * stationNameMojiRect.getAttribute("width") + (nameText.length-1) * spacing; //駅名の高さを計算
-        const maxHeight = parseFloat(stationNameRect.getAttribute("height")); //矩形の高さを取得
-        if(stationNameHeight > maxHeight){
-            const scale = maxHeight / stationNameHeight; //圧縮率を計算
-            stationName.setAttribute("transform", ` translate(0,${statinoNameBottomY}) scale(1,${scale}) translate(0,${-statinoNameBottomY})`); //駅名を圧縮
-        }
-        stationParts.appendChild(stationName);
+
+        stationParts.appendChild(this.textDrawer.createByAreaEl(nameText, stationNameRect).element);
 
         //乗換路線
         if(station.transfers.length > 0){
@@ -70,6 +55,8 @@ class DefaultLineDrawer{
             const transferCnt = transferTextList.length; //乗換路線の数を取得
             const transferArea = (this.mapSVG).querySelector("#body-defaultLine-transferArea"); //乗換路線用矩形
             const transferLine = (this.mapSVG).querySelector("#body-defaultLine-transferLine"); //乗換路線用線
+            const styleJson = JSON.parse(transferLine.getAttribute("data-style"));
+            const textHeightRatio = parseFloat(transferLine.getAttribute("data-textHeightRatio"));
 
             const left = parseFloat(transferArea.getAttribute("x"));
             const top = parseFloat(transferArea.getAttribute("y"));
@@ -89,7 +76,7 @@ class DefaultLineDrawer{
             let y = top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
-                transferTexts.appendChild(this.textDrawer.createTextWithIcon(text, left, y, width, height, "rgb(0,0,0)", "BIZ UDGothic", "bold"));
+                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, left, y, width, height, styleJson, "ja", textHeightRatio));
                 y += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加

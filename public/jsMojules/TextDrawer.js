@@ -3,57 +3,88 @@ class TextDrawer{
         this.iconDict = iconDict; //アイコン辞書を保存
     }
 
-    createByRectObj(text, rectObj, lang, spacing=0){
-        const x = parseFloat(rectObj.getAttribute("x"));
-        const y = parseFloat(rectObj.getAttribute("y"));
-        const width = parseFloat(rectObj.getAttribute("width"));
-        const height = parseFloat(rectObj.getAttribute("height"));
-        const color = rectObj.getAttribute("data-color"); //色を取得
-        const fontFamily = rectObj.getAttribute("data-fontFamily"); //フォントファミリーを取得
-        const fontWeight = rectObj.getAttribute("data-fontWeight"); //フォントウェイトを取得
-        const textAnchor = rectObj.getAttribute("data-textAnchor"); //テキストアンカーを取得
+    //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
+    createByAreaEl(text, areaEl){
+        const x = parseFloat(areaEl.getAttribute("x"));
+        const y = parseFloat(areaEl.getAttribute("y"));
+        const width = parseFloat(areaEl.getAttribute("width"));
+        const height = parseFloat(areaEl.getAttribute("height"));
+        const styleJson = JSON.parse(areaEl.getAttribute("data-style"));
+        const lang = areaEl.getAttribute("lang");
+        const axis = areaEl.getAttribute("axis");
 
-        const textObj = this.createByRect(
-            text, x, y, width, height, color, fontFamily, fontWeight, textAnchor, lang, spacing
-        );
-
-        return textObj;
+        let textEl;
+        if(axis === "vertical"){
+            textEl = this.createByAreaVertical(text, x, y, width, height, styleJson, parseFloat(areaEl.getAttribute("spacing")), areaEl.getAttribute("base"));
+        }
+        else{
+            textEl = this.createByArea(text, x, y, width, height, styleJson, lang);
+        }
+        return textEl;
     }
-    createByRect(text, x, y, width, height, color, fontFamily, fontWeight, textAnchor="middle", lang="ja", spacing=0){
-        const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
-        const fontSize = height / capHeightRatio;
-        
-        let yOffset = height; 
-        if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
+    //矩形領域にフィットするよう文字を配置（領域はパラメータで定める）
+    createByArea(text, x, y, maxWidth, height, styleJson, lang='ja'){
+        if(lang === null){ lang = "ja"; }
+
+        //文字間隔がJSONなら、適する値を取り出す
+        if(this.isObject(styleJson.letterSpacing)){
+            if(Object.keys(styleJson.letterSpacing).includes(`${text.length}`)){
+                styleJson.letterSpacing = styleJson.letterSpacing[text.length];
+            }
+            else{
+                styleJson.letterSpacing = "0px";
+            }
+        }
 
         const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        textElem.textContent = text;
-        if(textAnchor === "middle"){
-            textElem.setAttribute("x", String(x + width / 2));
-        }
-        else if(textAnchor === "start"){
-            textElem.setAttribute("x", String(x));
-        }
-        else if(textAnchor === "end"){
-            textElem.setAttribute("x", String(x + width));
-        }
-        textElem.setAttribute("y", String(y + yOffset));
-        textElem.setAttribute("fill", color);
-        textElem.setAttribute("font-family", fontFamily);
-        textElem.setAttribute("font-size", fontSize.toString());
-        textElem.setAttribute("font-weight", fontWeight);
-        textElem.setAttribute("text-anchor", textAnchor);
-        textElem.setAttribute("dominant-baseline", "alphabetic");
-        textElem.setAttribute("letter-spacing", `${spacing}px`); //文字間隔を設定
-        
-        if(this.measureTextWidth(textElem.textContent, fontSize, fontFamily, fontWeight) > width){
-            textElem.setAttribute("textLength", `${width}px`); //テキストの長さを設定
-            textElem.setAttribute("lengthAdjust", "spacingAndGlyphs"); //文字間隔とグリフの調整を有効にする
-        }
+        const fontSize = this.getFontSize(height, styleJson.fontFamily, lang);
 
-        return textElem;
+        let textWidth = this.getTextWidth(text, fontSize, styleJson);
+        if(textWidth > maxWidth){ //テキスト描画時の長さがmaxSizeを超えていたら、圧縮
+            textElem.setAttribute("textLength", `${maxWidth}px`); //テキストの長さを設定
+            textElem.setAttribute("lengthAdjust", "spacingAndGlyphs"); //文字間隔とグリフの調整を有効にする
+            textWidth = maxWidth;
+        }
+        //各パラメータを設定
+        textElem.textContent = text;
+        if(styleJson.textAnchor === "middle"){ textElem.setAttribute("x", String(x + maxWidth / 2)); }
+        else if(styleJson.textAnchor === "start"){ textElem.setAttribute("x", String(x)); }
+        else if(styleJson.textAnchor === "end"){ textElem.setAttribute("x", String(x + maxWidth)); }
+
+        let yOffset = height; 
+        if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
+        textElem.setAttribute("y", String(y + yOffset));
+        textElem.setAttribute("font-size", fontSize.toString());
+        textElem.setAttribute("style", this.styleTextFromJson(styleJson));
+
+        return {element: textElem, width: textWidth};
     }
-    createTextWithIcon(text, x, y, width, height, color, fontFamily, fontWeight){
+    createByAreaVertical(text, x, y, width, height, styleJson, spacing=5, base="bottom"){
+        if(spacing === null){ spacing = 5; }
+        if(base === null){ base = "bottom"; }
+
+        const stationName = document.createElementNS("http://www.w3.org/2000/svg", "g"); //駅名テキスト用グループ
+
+        const areaBottomY = y + height; //駅名矩形の下端Y座標を取得
+        let mojiX = x;
+        let mojiY = areaBottomY - width;
+        for(let i = 0; i < text.length; i++){ //1文字ずつ設置
+            stationName.appendChild(this.createByArea(text[text.length-1 - i], mojiX, mojiY, width, width, styleJson, "ja").element);
+            mojiY -= width + spacing;
+        }
+        //駅名の高さが矩形の高さを超える場合、圧縮
+        const stationNameHeight = text.length * width + (text.length-1) * spacing; //駅名の高さを計算
+        const maxHeight = height; //矩形の高さを取得
+        if(stationNameHeight > maxHeight){
+            const scale = maxHeight / stationNameHeight; //圧縮率を計算
+            stationName.setAttribute("transform", ` translate(0,${areaBottomY}) scale(1,${scale}) translate(0,${-areaBottomY})`); //駅名を圧縮
+        }
+        return {element: stationName};
+    }
+    createIconTextByArea(text, x, y, width, height, styleJson, lang='ja', textHeightRatio=1){
+        if(lang == null){ lang = 'ja'; }
+        if(textHeightRatio == null){ textHeightRatio = 1; }
+
         const textList = text.split(":"); //テキストと、絵文字IDに分割
         if(textList.length % 2 === 0){ //:での分割数が偶数の場合、:が奇数となる。つまり構文エラーなのでnullを返す
             return null; 
@@ -83,11 +114,11 @@ class TextDrawer{
         for(let i = 0; i < textList.length; i++){
             if(i % 2 === 0){ //テキストなら
                 if(textList[i] === ""){ continue; } //空文字ならスキップ
-                const textElem = this.createByRect(
-                    textList[i], nowX, y, textWidth, height, color, fontFamily, fontWeight, "start"
+                const textObj = this.createByArea(
+                    textList[i], nowX, y + (height * (1 - textHeightRatio) / 2), textWidth, height * textHeightRatio, styleJson, lang
                 );
-                iconTextElem.appendChild(textElem);
-                nowX += textWidth; //次のテキストのx座標を更新
+                iconTextElem.appendChild(textObj.element);
+                nowX += textObj.width; //次のテキストのx座標を更新
             }
             else{ //アイコンなら
                 if(textList[i] === ""){ continue; } //空文字ならスキップ
@@ -103,6 +134,44 @@ class TextDrawer{
         }
         return iconTextElem;
     }
+
+    getTextWidth(text, fontSize, styleJson){
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // フォントスタイルを正確に組み立て
+        ctx.font = `${fontSize}px '${styleJson.fontFamily}'`;
+        //if(text === "湘南新宿ライン"){ console.log(ctx.font); }
+
+        const metrics = ctx.measureText(text);
+        let width;
+        if(styleJson.letterSpacing != null){
+            width = metrics.width + (text.length - 1) * parseInt(styleJson.letterSpacing);
+        }
+        else{
+            width = metrics.width;
+        }
+        //console.log(metrics.width)
+        return width;
+    }
+    styleTextFromJson(styleJson){
+        let styleText = "";
+        for (let key in styleJson) {
+            let keyCss = this.toSnake(key);
+            styleText += `${keyCss}:${styleJson[key]};`
+        }
+        return styleText;
+    }
+    toSnake(str){
+        return str.replace(/([A-Z])/g, (s) => {return '-' + s.charAt(0).toLowerCase();})
+    }
+    isObject(value) {
+        return value !== null && typeof value === 'object';
+    }
+
+
+
+
     createKurukuruSvg(svgList, kuruTop, kuruBottom, dispTime, transTime, gapTime){
         const kuruGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
@@ -156,6 +225,11 @@ class TextDrawer{
             kuruGroup.innerHTML += kurukuruSvgOuterText;
         }
         return kuruGroup;
+    }
+    getFontSize(height, fontFamily, lang){
+        const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
+        const fontSize = height / capHeightRatio;
+        return fontSize;
     }
     measureCapHeightRatio(fontFamily, lang){
         // Canvas 要素を作成（DOMに追加しない）
