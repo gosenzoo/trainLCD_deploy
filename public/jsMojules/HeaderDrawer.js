@@ -14,7 +14,7 @@ class HeaderDrawer{
         group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color)) //種別
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
         group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
-        //group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
+        group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
         group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
         group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText)); //行先・経由地
 
@@ -40,11 +40,12 @@ class HeaderDrawer{
         const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")); //くるくるアニメーションの下端
 
         // アニメーション付き駅名テキスト組み立て
-        const stationNameText = this.textDrawer.createKurukuruSvg([
+        /*const stationNameText = this.textDrawer.createKurukuruSvg([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.eng, stationNameTextRect).element
-        ], kuruTop, kuruBottom, 4000, 500, 0);
+        ], kuruTop, kuruBottom, 4000, 500, 0);*/
+        const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
 
         stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加
         return stationNameText;

@@ -46,6 +46,9 @@
     <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
     </filter>
+    <filter id="grayscale">
+      <fecolormatrix type="matrix" values="0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0 0 0 1 0"></fecolormatrix>
+    </filter>
   </defs>
   <!-- 背景 -->
   <rect id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
@@ -88,7 +91,7 @@
   <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
     <g filter="url(#outline)">
       <!-- 路線ベース左端（始点） -->
-      <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(0, 161, 129)" />
+      <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(221, 221, 221)" />
       <!-- 路線ベース右端（終点） -->
       <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
               data-basePoint="1694,721" fill="rgb(221, 221, 221)" />

@@ -19,8 +19,15 @@ class HeaderController{
         else if(progressParams.runState === 1){ arrivingTextType = 2; } //停車中は、ただいま
         else{ arrivingTextType = 0; } //それ以外は、つぎは
 
+        let dispStation;
+        let i = 0;
+        do{
+            dispStation = this.setting.stationList[progressParams.currentStationInd + i];
+            i++;
+        }while(dispStation.isPass);
+
         return {
-            dispStation: this.setting.stationList[progressParams.currentStationInd],
+            dispStation: dispStation,
             arrivingTextType: arrivingTextType,
             dispCarNum: this.setting.info.carNumber,
             destinationText: this.setting.info.destination,

@@ -17,11 +17,11 @@ class DefaultLineDrawer{
 
         // 駅関連の文字
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict));
+            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i]));
         }
 
         // 線
-        group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList)) //線
+        group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList)) //線
 
         // 現在地アイコン
         let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
@@ -30,7 +30,7 @@ class DefaultLineDrawer{
         return group;
     }
     // 駅関連の文字を組み立て
-    createStationParts(station, x, y, lineDict){
+    createStationParts(station, x, y, lineDict, isPass){
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         const stationTextBase = this.mapSVG.querySelector("#body-defaultLine-stationText").getAttribute("data-basePoint");
         stationParts.setAttribute("data-basePoint", stationTextBase); //ベースポイントを設定
@@ -83,10 +83,17 @@ class DefaultLineDrawer{
         }
 
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
+
+        //通過ならすべてを灰色に
+        if(isPass){
+            stationParts.setAttribute("filter", "url(#grayscale)");
+        }
+
         return stationParts;
     }
     // 線組み立て
-    createLine(stationFrameNum, colorList, passStationList){
+    createLine(stationFrameNum, colorList, passStationList, hereDrawPos, lineLeapPosList){
+        console.log(lineLeapPosList)
         const line = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         line.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "defs"));
 
@@ -123,6 +130,11 @@ class DefaultLineDrawer{
                 line.appendChild(sectionObj);
             }
         }
+        //現在地より前を灰色に
+        const grayLine = lineStart.cloneNode(true);
+        grayLine.setAttribute("width", `${parseFloat(lineStart.getAttribute("width")) + hereDrawPos * sectionWidth}`);
+        line.appendChild(grayLine);
+
         //線の形が確定したら、乗算影用の要素を作成
         //マスク作成
         const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
