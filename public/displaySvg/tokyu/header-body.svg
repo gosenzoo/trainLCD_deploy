@@ -35,7 +35,7 @@
     </linearGradient>
 
     <filter id="outline">
-      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2" />
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="1" />
       <feFlood flood-color="black" result="BLACK"/>
       <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
       <feMerge>
@@ -95,6 +95,11 @@
       <!-- 路線ベース右端（終点） -->
       <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
               data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベースはしょり -->
+      <path id="lineLeap1" d=" M 1484 721 L 1582 721 Q 1566 742.75, 1582 766.5 Q 1606 788.25, 1582 808 L 1486 808 Z "
+        fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+      <path id="lineLeap2" d=" M 1694 721 L 1602 721 Q 1578 740, 1600 764.5 Q 1615 780, 1602 808 L 1694 808 Z "
+        fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
       <!-- 路線ベース1影 -->
       <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
               fill="url(#innerGradient)"
@@ -133,4 +138,5 @@
   </g>
 
   <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+  <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
 </svg>
