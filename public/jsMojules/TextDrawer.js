@@ -460,7 +460,7 @@ class TextDrawer{
                 }\n`;
             }
         }
-        if(0 < textInd && textInd < textNum - 1){ keyframesText += 
+        if(0 < textInd){ keyframesText += 
             `100% {
                 opacity: 0;
                 transform-origin: 0px ${kuruBottom}px;
