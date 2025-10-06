@@ -171,7 +171,6 @@ class TextDrawer{
 
 
 
-
     createKurukuruSvg(svgList, kuruTop, kuruBottom, dispTime, transTime, gapTime){
         const kuruGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
@@ -224,6 +223,32 @@ class TextDrawer{
                 </g>`;
             kuruGroup.innerHTML += kurukuruSvgOuterText;
         }
+        return kuruGroup;
+    }
+
+    createKurukuruSvg2(svgList, kuruTop, kuruBottom, dispTime, transTime, gapTime){
+        const kuruGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+        //1周期の時間[s]
+        let periodTime = (dispTime + transTime + gapTime) * svgList.length / 1000;
+
+        let styleText = "";
+        for(let i = 0; i < svgList.length; i++){
+            styleText +=  `
+                .kuru${i} { animation-name: kuru${i}Cycle; animation-duration:${periodTime}s; animation-iteration-count: infinite; }
+                @keyframes kuru${i}Cycle {
+                    ${this.getKeyframeText(dispTime, transTime, gapTime, i, svgList.length, kuruTop, kuruBottom)}
+                }
+            `;
+            
+            let elem = svgList[i].cloneNode(true);
+            //elem.setAttribute("id", `kuru${i}`);
+            elem.classList.add(`kuru${i}`);
+            kuruGroup.appendChild(elem);
+        }
+        let styleDom = document.createElement("style");
+        styleDom.innerHTML = styleText;
+        kuruGroup.appendChild(styleDom);
         return kuruGroup;
     }
     getFontSize(height, fontFamily, lang){
@@ -368,6 +393,133 @@ class TextDrawer{
         return scaleText;
     }
     getOutScaleValues(textInd, textNum){
+        let scaleText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ scaleText += "1,1"; }
+        else{ scaleText += "1,0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            scaleText += `;1,1`;
+            //フェードイン終了
+            scaleText += `;1,1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            scaleText += `;1,1`;
+            //フェードアウト終了
+            scaleText += `;1,0`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ scaleText += `;1,1`; }
+        return scaleText;
+    }
+
+    getKeyframeText(dispTime, transTime, gapTime, textInd, textNum, kuruTop, kuruBottom){
+        let periodTime = (dispTime + transTime + gapTime) * textNum;
+        let keyframesText = "0%, ";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        for(let i = 0; i < textNum; i++){
+            let now = i * (dispTime + transTime + gapTime);
+            if(i === inInd){
+                //フェードイン開始
+                now += dispTime + gapTime;
+                keyframesText += `${(now / periodTime) * 100}% {
+                    opacity: 0;
+                    transform-origin: 0px ${kuruTop}px;
+                    transform: scaleY(0);
+                }\n`;
+                //フェードイン終了
+                now += transTime;
+                keyframesText += `${(now / periodTime) * 100}% {
+                    opacity: 1;
+                    transform-origin: 0px ${kuruTop}px;
+                    transform: scaleY(1);
+                }\n`;;
+            }
+            else if(i === outInd){
+                //フェードアウト開始
+                now += dispTime;
+                keyframesText += `${(now / periodTime) * 100}% {
+                    opacity: 1;
+                    transform-origin: 0px ${kuruBottom}px;
+                    transform: scaleY(1);
+                }\n`;
+                //フェードアウト終了
+                now += transTime;
+                keyframesText += `${(now / periodTime) * 100}% {
+                    opacity: 0;
+                    transform-origin: 0px ${kuruBottom}px;
+                    transform: scaleY(0);
+                }\n`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ keyframesText += 
+            `100% {
+                opacity: 0;
+                transform-origin: 0px ${kuruBottom}px;
+                transform: scaleY(0);
+            }\n`;
+        } //最後の要素は1で終わる
+        return keyframesText;
+    }
+    getOpacityValues2(textInd, textNum){
+        let valueText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ valueText += "1"; }
+        else{ valueText += "0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            valueText += `;0`;
+            //フェードイン終了
+            valueText += `;1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            valueText += `;1`;
+            //フェードアウト終了
+            valueText += `;0`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ valueText += `;0`; } //最後の要素は1で終わる
+        return valueText;
+    }
+    getInScaleValues2(textInd, textNum){
+        let scaleText = "";
+        let inInd = textInd - 1;
+        if(inInd < 0){ inInd = textNum - 1; }
+        let outInd = textInd;
+
+        if(textInd === 0){ scaleText += "1,1"; }
+        else{ scaleText += "1,0"; }
+        for(let i = 0; i < textNum; i++){
+            if(i === inInd){
+            //フェードイン開始
+            scaleText += `;1,0`;
+            //フェードイン終了
+            scaleText += `;1,1`;
+            }
+            else if(i === outInd){
+            //フェードアウト開始
+            scaleText += `;1,1`;
+            //フェードアウト終了
+            scaleText += `;1,1`;
+            }
+        }
+        if(0 < textInd && textInd < textNum - 1){ scaleText += `;1,1`; }
+        return scaleText;
+    }
+    getOutScaleValues2(textInd, textNum){
         let scaleText = "";
         let inInd = textInd - 1;
         if(inInd < 0){ inInd = textNum - 1; }

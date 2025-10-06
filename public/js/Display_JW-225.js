@@ -46,6 +46,8 @@ function scalerY(num){
 }
 
 function draw(){
+    let start = performance.now();
+
     let upStationId;
     if(runState == 0){ upStationId = index.nowStationId }
     else{ upStationId = (index.nowStationId + 1) % stationList.length }
@@ -328,7 +330,7 @@ function draw(){
     }
     
 
-    console.log(index.nowStationId)
+    //console.log(index.nowStationId)
     //上部案内表示
     //現在駅路線記号
     if(nowStation.number !== ""){
@@ -549,6 +551,9 @@ function draw(){
 
 
     innerSVG.displaySVG(displayDom);
+
+    let end = performance.now();
+    console.log(`${end - start}ms`);
 }
 
 function shiftLangState(){

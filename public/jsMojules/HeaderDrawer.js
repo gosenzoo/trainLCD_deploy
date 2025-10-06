@@ -40,14 +40,14 @@ class HeaderDrawer{
         const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")); //くるくるアニメーションの下端
 
         // アニメーション付き駅名テキスト組み立て
-        /*const stationNameText = this.textDrawer.createKurukuruSvg([
+        const stationNameText = this.textDrawer.createKurukuruSvg2([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.eng, stationNameTextRect).element
-        ], kuruTop, kuruBottom, 4000, 500, 0);*/
-        const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
+        ], kuruTop, kuruBottom, 4000, 800, 100);
+        //const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
 
-        stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加
+        //stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加
         return stationNameText;
     }
     createNumbering(station){ //表示駅のナンバリングを描画
