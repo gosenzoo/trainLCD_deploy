@@ -50,7 +50,8 @@ class TextDrawer{
             }
         }
 
-        const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        //const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        const textElem = new TextSVG("text");
         const fontSize = this.getFontSize(height, styleJson.fontFamily, lang);
 
         let textWidth = this.getTextWidth(text, fontSize, styleJson);
@@ -60,7 +61,7 @@ class TextDrawer{
             textWidth = maxWidth;
         }
         //各パラメータを設定
-        textElem.textContent = text;
+        textElem.setInnerText(text);
         if(styleJson.textAnchor === "middle"){ textElem.setAttribute("x", String(x + maxWidth / 2)); }
         else if(styleJson.textAnchor === "start"){ textElem.setAttribute("x", String(x)); }
         else if(styleJson.textAnchor === "end"){ textElem.setAttribute("x", String(x + maxWidth)); }
@@ -71,19 +72,20 @@ class TextDrawer{
         textElem.setAttribute("font-size", fontSize.toString());
         textElem.setAttribute("style", this.styleTextFromJson(styleJson));
 
-        return {element: textElem, width: textWidth};
+        console.log(textElem.getAllText())
+        return {element: textElem.getAllText(), width: textWidth};
     }
     createByAreaVertical(text, x, y, width, height, styleJson, spacing=5, base="bottom"){
         if(spacing === null){ spacing = 5; }
         if(base === null){ base = "bottom"; }
 
-        const stationName = document.createElementNS("http://www.w3.org/2000/svg", "g"); //駅名テキスト用グループ
+        const stationName = new TextSVG("g"); //駅名テキスト用グループ
 
         const areaBottomY = y + height; //駅名矩形の下端Y座標を取得
         let mojiX = x;
         let mojiY = areaBottomY - width;
         for(let i = 0; i < text.length; i++){ //1文字ずつ設置
-            stationName.appendChild(this.createByArea(text[text.length-1 - i], mojiX, mojiY, width, width, styleJson, "ja").element);
+            stationName.setInnerText(this.createByArea(text[text.length-1 - i], mojiX, mojiY, width, width, styleJson, "ja").element);
             mojiY -= width + spacing;
         }
         //駅名の高さが矩形の高さを超える場合、圧縮
@@ -93,7 +95,7 @@ class TextDrawer{
             const scale = maxHeight / stationNameHeight; //圧縮率を計算
             stationName.setAttribute("transform", ` translate(0,${areaBottomY}) scale(1,${scale}) translate(0,${-areaBottomY})`); //駅名を圧縮
         }
-        return {element: stationName};
+        return {element: stationName.getAllText()};
     }
     createIconTextByArea(text, x, y, width, height, styleJson, lang='ja', textHeightRatio=1){
         if(lang == null){ lang = 'ja'; }

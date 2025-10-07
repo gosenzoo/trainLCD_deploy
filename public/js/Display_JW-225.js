@@ -55,7 +55,7 @@ function draw(){
 
     let isTerminal = (upStationId === stationList.length - 1) && !settings.info.isLoop; //終点前かどうか
 
-    let innerSVG = new InnerSVG();
+    let innerSVG = new TextSVG();
 
     //背景画像
     if(page == 0){ innerSVG.setImage(backImage0, -1, -1, 1334, 1001); }

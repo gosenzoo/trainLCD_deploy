@@ -64,17 +64,17 @@ class DefaultLineDrawer{
     }
     // 駅関連の文字を組み立て
     createStationParts(station, x, y, lineDict, isPass){
-        let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+        let stationParts = new TextSVG("g"); //組み立て用ツリー
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
         // ナンバリング
-        stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        stationParts.setInnerText(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
 
         //駅名
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-        stationParts.appendChild(this.textDrawer.createByAreaEl2(nameText, this.stationNameParams).element);
+        stationParts.setInnerText(this.textDrawer.createByAreaEl2(nameText, this.stationNameParams).element);
 
         //乗換路線
         if(station.transfers.length > 0){
@@ -89,24 +89,26 @@ class DefaultLineDrawer{
                 height = this.params.lineHeight * scale; //乗換路線の高さを圧縮
             }
 
-            const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+            const transferTexts = new TextSVG("g"); //組み立て用ツリー
             let y1 = this.params.top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
+                //transferTexts.setInnerText(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
-            stationParts.appendChild(transferTexts); //乗換路線を追加
+            stationParts.setInnerText(transferTexts.getAllText()); //乗換路線を追加
         }
 
-        stationParts = moveSvgElementByBasePoint(stationParts, x, y);
+        //stationParts = moveSvgElementByBasePoint(stationParts, x, y);
 
         //通過ならすべてを灰色に
         if(isPass){
             stationParts.setAttribute("filter", "url(#grayscale)");
         }
 
-        return stationParts;
+        const ret = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        ret.innerHTML = stationParts.getAllText();
+        return ret;
     }
     // 線組み立て
     createLine(stationFrameNum, colorList, passStationList, hereDrawPos, lineLeapPosList){
