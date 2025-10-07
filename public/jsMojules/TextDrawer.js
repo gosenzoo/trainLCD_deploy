@@ -4,6 +4,18 @@ class TextDrawer{
     }
 
     //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
+    createByAreaEl2(text, areaParams){
+        let textEl;
+        if(areaParams.axis === "vertical"){
+            textEl = this.createByAreaVertical(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.spacing, areaParams.base);
+        }
+        else{
+            textEl = this.createByArea(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.lang);
+        }
+        return textEl;
+    }
+
+    //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
     createByAreaEl(text, areaEl){
         const x = parseFloat(areaEl.getAttribute("x"));
         const y = parseFloat(areaEl.getAttribute("y"));
@@ -12,10 +24,12 @@ class TextDrawer{
         const styleJson = JSON.parse(areaEl.getAttribute("data-style"));
         const lang = areaEl.getAttribute("lang");
         const axis = areaEl.getAttribute("axis");
+        const spacing = parseFloat(areaEl.getAttribute("spacing"));
+        const base = areaEl.getAttribute("base");
 
         let textEl;
         if(axis === "vertical"){
-            textEl = this.createByAreaVertical(text, x, y, width, height, styleJson, parseFloat(areaEl.getAttribute("spacing")), areaEl.getAttribute("base"));
+            textEl = this.createByAreaVertical(text, x, y, width, height, styleJson, spacing, base);
         }
         else{
             textEl = this.createByArea(text, x, y, width, height, styleJson, lang);
@@ -235,7 +249,12 @@ class TextDrawer{
         let styleText = "";
         for(let i = 0; i < svgList.length; i++){
             styleText +=  `
-                .kuru${i} { animation-name: kuru${i}Cycle; animation-duration:${periodTime}s; animation-iteration-count: infinite; }
+                .kuru${i} { 
+                    animation-name: kuru${i}Cycle;
+                    animation-duration:${periodTime}s;
+                    animation-iteration-count: infinite;
+                    animation-timing-function: linear;    
+                }
                 @keyframes kuru${i}Cycle {
                     ${this.getKeyframeText(dispTime, transTime, gapTime, i, svgList.length, kuruTop, kuruBottom)}
                 }

@@ -8,6 +8,7 @@ class HeaderDrawer{
     }
 
     createAll(drawParams, size){ //全てのヘッダー要素を組み立て
+        let t0 = performance.now();
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         group.appendChild(this.createBack()) //背景
@@ -18,6 +19,8 @@ class HeaderDrawer{
         group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
         group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText)); //行先・経由地
 
+        let t1 = performance.now();
+        console.log(`HeaderDrawer.createAll: ${t1 - t0} ms`);
         return group;
     }
     createBack(){ //背景を組み立て
@@ -37,14 +40,14 @@ class HeaderDrawer{
         const stationNameTextRect = (this.mapSVG).querySelector("#header-stationNameText"); //駅名テキストを複製
 
         const kuruTop = parseFloat(stationNameTextRect.getAttribute("y")); //くるくるアニメーションの上端
-        const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")); //くるくるアニメーションの下端
+        const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")) + 10; //くるくるアニメーションの下端
 
         // アニメーション付き駅名テキスト組み立て
         const stationNameText = this.textDrawer.createKurukuruSvg2([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.eng, stationNameTextRect).element
-        ], kuruTop, kuruBottom, 4000, 800, 100);
+        ], kuruTop, kuruBottom, 4000, 500, 10);
         //const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
 
         //stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加

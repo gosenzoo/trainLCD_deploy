@@ -4,15 +4,46 @@ class DefaultLineDrawer{
         this.iconDict = iconDict;
         this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを作成
 
-        this.lineX = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("x"));
-        this.lineY = parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("y"));
-        this.stationStartX = this.lineX + parseFloat(this.mapSVG.querySelector("#lineStart").getAttribute("width"));
-        this.lenStartToEnd = parseFloat(this.mapSVG.querySelector("#stationEnd").getAttribute("x")) - parseFloat(this.mapSVG.querySelector("#stationStart").getAttribute("x"));
+        this.lineX = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("x"));
+        this.lineY = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("y"));
+        this.stationStartX = this.lineX + parseFloat(mapSVG.querySelector("#lineStart").getAttribute("width"));
+        this.lenStartToEnd = parseFloat(mapSVG.querySelector("#stationEnd").getAttribute("x")) - parseFloat(mapSVG.querySelector("#stationStart").getAttribute("x"));
 
         console.log("DefaultLineDrawer初期化完了");
+
+        this.stationTextBase = mapSVG.querySelector("#body-defaultLine-stationText").getAttribute("data-basePoint");
+        
+        // 駅名
+        const stationNameRect = mapSVG.querySelector("#body-defaultLine-stationName"); //駅名テキストrect
+        this.stationNameParams = getObjByRectEL(stationNameRect);
+
+        // ナンバリング
+        const numRect = mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
+        this.numParams = getObjByRectEL(numRect);
+
+        //乗換路線
+        this.params = this.getParams(mapSVG); //パラメータを取得
+    }
+
+    getParams(mapSVG){
+        const transferArea = (mapSVG).querySelector("#body-defaultLine-transferArea"); //乗換路線用矩形
+        const transferLine = (mapSVG).querySelector("#body-defaultLine-transferLine"); //乗換路線用線
+
+        const params = {
+            styleJson: JSON.parse(transferLine.getAttribute("data-style")),
+            ctextHeightRatio: parseFloat(transferLine.getAttribute("data-textHeightRatio")),
+            left: parseFloat(transferArea.getAttribute("x")),
+            top: parseFloat(transferArea.getAttribute("y")),
+            width: parseFloat(transferArea.getAttribute("width")),
+            areaHeight: parseFloat(transferArea.getAttribute("height")),
+            lineHeight: parseFloat(transferLine.getAttribute("height")),
+        };
+
+        return params;
     }
 
     createAll(drawParams, size){
+        let t0 = performance.now();
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         // 駅関連の文字
@@ -27,57 +58,43 @@ class DefaultLineDrawer{
         let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
         group.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
 
+        let t1 = performance.now();
+        console.log(`DefaultLineDrawer.createAll: ${t1 - t0} ms`);
         return group;
     }
     // 駅関連の文字を組み立て
     createStationParts(station, x, y, lineDict, isPass){
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
-        const stationTextBase = this.mapSVG.querySelector("#body-defaultLine-stationText").getAttribute("data-basePoint");
-        stationParts.setAttribute("data-basePoint", stationTextBase); //ベースポイントを設定
+        stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
         // ナンバリング
-        const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
-        //stationParts.appendChild(numRect);
-        stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+        stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
 
-        // 駅名
-        const stationNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName"); //駅名テキストrect
-
+        //駅名
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-
-        stationParts.appendChild(this.textDrawer.createByAreaEl(nameText, stationNameRect).element);
+        stationParts.appendChild(this.textDrawer.createByAreaEl2(nameText, this.stationNameParams).element);
 
         //乗換路線
         if(station.transfers.length > 0){
             const transferTextList = station.transfers.split(" ");
             const transferCnt = transferTextList.length; //乗換路線の数を取得
-            const transferArea = (this.mapSVG).querySelector("#body-defaultLine-transferArea"); //乗換路線用矩形
-            const transferLine = (this.mapSVG).querySelector("#body-defaultLine-transferLine"); //乗換路線用線
-            const styleJson = JSON.parse(transferLine.getAttribute("data-style"));
-            const textHeightRatio = parseFloat(transferLine.getAttribute("data-textHeightRatio"));
-
-            const left = parseFloat(transferArea.getAttribute("x"));
-            const top = parseFloat(transferArea.getAttribute("y"));
-            const width = parseFloat(transferArea.getAttribute("width"));
-            const areaHeight = parseFloat(transferArea.getAttribute("height"));
-            const lineHeight = parseFloat(transferLine.getAttribute("height"));
             const lineSpan = 3; //行間[px]
 
-            let height = lineHeight;
+            let height = this.params.lineHeight;
             //乗換路線の表示が下端を超える場合、圧縮
-            if(transferCnt * (lineHeight + lineSpan) > areaHeight){
-                const scale = areaHeight / (transferCnt * (lineHeight + lineSpan)); //圧縮率を計算
-                height = lineHeight * scale; //乗換路線の高さを圧縮
+            if(transferCnt * (this.params.lineHeight + lineSpan) > this.params.areaHeight){
+                const scale = this.params.areaHeight / (transferCnt * (this.params.lineHeight + lineSpan)); //圧縮率を計算
+                height = this.params.lineHeight * scale; //乗換路線の高さを圧縮
             }
 
             const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
-            let y = top;
+            let y1 = this.params.top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, left, y, width, height, styleJson, "ja", textHeightRatio));
-                y += height + lineSpan; //次の行のY座標を計算
+                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
+                y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加
         }
