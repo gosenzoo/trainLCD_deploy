@@ -1,6 +1,7 @@
 class TextDrawer{
     constructor(iconDict){
         this.iconDict = iconDict; //アイコン辞書を保存
+        this.capRatioCache = {};
     }
 
     //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
@@ -38,6 +39,7 @@ class TextDrawer{
     }
     //矩形領域にフィットするよう文字を配置（領域はパラメータで定める）
     createByArea(text, x, y, maxWidth, height, styleJson, lang='ja'){
+        //return { element: document.createElementNS("http://www.w3.org/2000/svg", "text"), width: 100 }; //ダミー
         if(lang === null){ lang = "ja"; }
 
         //文字間隔がJSONなら、適する値を取り出す
@@ -150,6 +152,7 @@ class TextDrawer{
     }
 
     getTextWidth(text, fontSize, styleJson){
+        //return 100;
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
@@ -271,11 +274,16 @@ class TextDrawer{
         return kuruGroup;
     }
     getFontSize(height, fontFamily, lang){
+        //return 100;
         const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
         const fontSize = height / capHeightRatio;
         return fontSize;
     }
     measureCapHeightRatio(fontFamily, lang){
+        //キャッシュを確認
+        const key = `${fontFamily}-${lang}`;
+        if (this.capRatioCache[key]) return this.capRatioCache[key];
+
         // Canvas 要素を作成（DOMに追加しない）
         const canvas = document.createElement('canvas');
         canvas.width = 200;
@@ -316,7 +324,9 @@ class TextDrawer{
         }
 
         if (top !== null && bottom !== null) {
-            return (bottom - top + 1) / fontSize;
+            const ratio = (bottom - top + 1) / fontSize;
+            this.capRatioCache[key] = ratio; // キャッシュに保存
+            return ratio;
         }
         return null; // 何も描画されていなかった場合
     }
