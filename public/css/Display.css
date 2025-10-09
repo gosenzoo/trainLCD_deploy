@@ -15,6 +15,14 @@
     src: url("../fonts/BIZUDGothic-Bold.woff") format('woff');
 }
 
+@font-face {
+    font-family: "Overused Grotesk";
+    src: url("../fonts/OverusedGrotesk-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     height: 100%;
     margin: 0;

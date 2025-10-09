@@ -1,5 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=M+PLUS+1:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
+@font-face {
+    font-family: "Overused Grotesk";
+    src: url("/fonts/OverusedGrotesk-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
 h1 {
   font-family: 'BIZ UDGothic';
   font-weight: 'bold';

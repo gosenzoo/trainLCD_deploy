@@ -18,7 +18,7 @@ export function presetIconMaker(
   const width = parseFloat(symbolRect.getAttribute("width") || "0");
   const height = parseFloat(symbolRect.getAttribute("height") || "0");
   const fontFamily = `${symbolRect.getAttribute("data-font-family")}, sans-serif` || "sans-serif";
-  const fontWeight = symbolRect.getAttribute("data-font-weight") || "500";
+  const fontWeight = symbolRect.getAttribute("data-font-weight") || "SemiBold" || "500";
 
   const textElem = svgDoc.createElementNS("http://www.w3.org/2000/svg", "text");
 
