@@ -74,6 +74,7 @@
       <rect id="trainTypeBackColor" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
       <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
       <rect id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
+      <rect id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
     </g>
     <!-- ナンバリング -->
     <!-- <rect id="header-numbering-rect" x="479" y="149" width="168" height="168" fill="rgb(255, 255, 255)" /> -->

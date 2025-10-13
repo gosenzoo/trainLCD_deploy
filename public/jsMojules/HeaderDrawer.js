@@ -33,11 +33,13 @@ class HeaderDrawer{
         const back = trainType.querySelector("#trainTypeBackColor");
         back.setAttribute("fill", trainTypeColor); //種別背景色を設定
         const trainTypeTextRect = trainType.querySelector("#trainTypeText"); //種別テキストを取得
+        const trainTypeTextRectEng = trainType.querySelector("#trainTypeTextEng");
         trainType.appendChild(this.animator.createFadeSVG([
             this.textDrawer.createByAreaEl(trainTypeText, trainTypeTextRect).element,
-            this.textDrawer.createByAreaEl(trainTypeEng, trainTypeTextRect).element
+            this.textDrawer.createByAreaEl(trainTypeEng, trainTypeTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]])); //種別テキストを追加
         trainTypeTextRect.remove(); //種別テキスト矩形を削除
+        trainTypeTextRectEng.remove();
         return trainType;
     }
     createStationNameText(station){ //表示駅の駅名を描画
