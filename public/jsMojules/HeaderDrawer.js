@@ -1,8 +1,9 @@
 class HeaderDrawer{
-    constructor(mapSVG, iconDict) {
+    constructor(mapSVG, iconDict, animator){
         this.mapSVG = mapSVG;
         this.iconDict = iconDict;
         this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを生成
+        this.animator = animator;
 
         console.log("HeaderDrawer初期化完了");
     }
@@ -44,14 +45,12 @@ class HeaderDrawer{
         const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")) + 10; //くるくるアニメーションの下端
 
         // アニメーション付き駅名テキスト組み立て
-        const stationNameText = this.textDrawer.createKurukuruSvg2([
+        const stationNameText = this.animator.createKurukuruSvg([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.eng, stationNameTextEngRect).element
         ], kuruTop, kuruBottom, 4000, 500, 10);
-        //const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
 
-        //stationNameText.appendChild(stationNameTextRect.cloneNode(true)); //駅名テキストの矩形を追加
         return stationNameText;
     }
     createNumbering(station){ //表示駅のナンバリングを描画
@@ -76,8 +75,14 @@ class HeaderDrawer{
         carNumText.remove(); //号車テキスト矩形を削除
 
         const carText = carNum.querySelector("#carText");
-        carNum.appendChild(this.textDrawer.createByAreaEl("号車", carText).element); //「号車」テキストを追加
+        const carTextEng = carNum.querySelector("#carTextEng");
+        const carTexts = this.animator.createKurukuruSvg([
+            this.textDrawer.createByAreaEl("号車", carText).element,
+            this.textDrawer.createByAreaEl("Car No.", carTextEng).element
+        ], 0, 200, 4000, 500, 10);
+        carNum.appendChild(carTexts); //「号車」テキストを追加
         carText.remove(); //「号車」テキスト矩形を削除
+        carTextEng.remove(); //Car No.テキスト矩形を削除
 
         return carNum;
     }

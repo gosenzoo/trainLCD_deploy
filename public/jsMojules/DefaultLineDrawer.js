@@ -1,8 +1,9 @@
 class DefaultLineDrawer{
-    constructor(mapSVG, iconDict){
+    constructor(mapSVG, iconDict, animator){
         this.mapSVG = mapSVG
         this.iconDict = iconDict;
         this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを作成
+        this.animator = animator;
 
         this.lineX = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("x"));
         this.lineY = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("y"));

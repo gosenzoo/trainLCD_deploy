@@ -4,6 +4,7 @@ class LCDController{
         this.setting = setting; //設定を保存
         this.mapSVG = mapSVG; //フォーマットSVG
         this.displaySVG = displaySVG; //描画先SVG
+        this.animator = new Animator(); //アニメーターを初期化
 
         this.stopStationList = getStopStation(this.setting.stationList, this.setting.info.isLoop); //停車駅リストを保存
         this.dispPageList = [["defaultLine"], ["defaultLine"], ["defaultLine"]]; //表示ページリストを初期化
@@ -11,13 +12,13 @@ class LCDController{
         //stopList決め打ち（要修正）
         this.progressController = new ProgressController(this.setting.stationList.map(station => station.isPass), this.setting.info.isLoop);
         //ヘッダーコントローラーを初期化
-        this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict)); //ヘッダーコントローラーを初期化
+        this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator)); //ヘッダーコントローラーを初期化
         /* //コントローラー辞書を初期化
         this.bodyControllerDict = {
             //"defaultLine": new DefaultLineController(displayType)
         };*/
         
-        this.bodyController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict)); //使用するボディコントローラーを初期化 */
+        this.bodyController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator)); //使用するボディコントローラーを初期化 */
 
         this.setLCDToDisplay()
     }
@@ -59,6 +60,7 @@ class LCDController{
         tempSVG.appendChild(mapSVG.getElementById("background").cloneNode(true));
 
         //LCD要素を組み立てて追加
+        this.animator.resetNum(); //アニメーターの番号をリセット
         tempSVG.appendChild(this.bodyController.createAll(this.progressController.progressParams));
         tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
 
