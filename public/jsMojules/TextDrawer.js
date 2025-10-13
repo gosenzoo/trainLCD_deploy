@@ -7,9 +7,11 @@ class TextDrawer{
     //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
     createByAreaEl2(text, areaParams){
         let textEl;
+        //縦書きなら
         if(areaParams.axis === "vertical"){
             textEl = this.createByAreaVertical(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.spacing, areaParams.base);
         }
+        //横書きなら
         else{
             textEl = this.createByArea(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.lang);
         }
@@ -125,6 +127,7 @@ class TextDrawer{
         if(allTextWidth < 0){ return null; } //アイコンの幅がテキストの幅を超える場合、nullを返す
         let textWidth = allTextWidth / textCnt; //アイコンを除いたテキストの幅を計算
 
+        //テキスト描画
         const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
         let nowX = x; //現在のx座標
         for(let i = 0; i < textList.length; i++){

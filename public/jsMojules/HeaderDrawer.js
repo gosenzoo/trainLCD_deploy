@@ -38,6 +38,7 @@ class HeaderDrawer{
     }
     createStationNameText(station){ //表示駅の駅名を描画
         const stationNameTextRect = (this.mapSVG).querySelector("#header-stationNameText"); //駅名テキストを複製
+        const stationNameTextEngRect = (this.mapSVG).querySelector("#header-stationNameTextEng");
 
         const kuruTop = parseFloat(stationNameTextRect.getAttribute("y")); //くるくるアニメーションの上端
         const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")) + 10; //くるくるアニメーションの下端
@@ -46,7 +47,7 @@ class HeaderDrawer{
         const stationNameText = this.textDrawer.createKurukuruSvg2([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
-            this.textDrawer.createByAreaEl(station.eng, stationNameTextRect).element
+            this.textDrawer.createByAreaEl(station.eng, stationNameTextEngRect).element
         ], kuruTop, kuruBottom, 4000, 500, 10);
         //const stationNameText = this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element;
 
