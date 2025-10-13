@@ -13,12 +13,12 @@ class HeaderDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         group.appendChild(this.createBack()) //背景
-        group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color)) //種別
+        group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng)) //種別
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
         group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
         group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
         group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
-        group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText)); //行先・経由地
+        group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText, drawParams.destinationEng)); //行先・経由地
 
         let t1 = performance.now();
         console.log(`HeaderDrawer.createAll: ${t1 - t0} ms`);
@@ -28,12 +28,15 @@ class HeaderDrawer{
         const back = (this.mapSVG).querySelector("#header-back").cloneNode(true); //背景SVGを複製
         return back;
     }
-    createTrainType(trainTypeText, trainTypeColor){ //列車種別を組み立て
+    createTrainType(trainTypeText, trainTypeColor, trainTypeEng){ //列車種別を組み立て
         const trainType = (this.mapSVG).querySelector("#header-trainType").cloneNode(true); //種別SVGを複製
         const back = trainType.querySelector("#trainTypeBackColor");
         back.setAttribute("fill", trainTypeColor); //種別背景色を設定
         const trainTypeTextRect = trainType.querySelector("#trainTypeText"); //種別テキストを取得
-        trainType.appendChild(this.textDrawer.createByAreaEl(trainTypeText, trainTypeTextRect).element);
+        trainType.appendChild(this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl(trainTypeText, trainTypeTextRect).element,
+            this.textDrawer.createByAreaEl(trainTypeEng, trainTypeTextRect).element
+        ], [[8510, 500, 10], [4000, 500, 10]])); //種別テキストを追加
         trainTypeTextRect.remove(); //種別テキスト矩形を削除
         return trainType;
     }
@@ -45,11 +48,11 @@ class HeaderDrawer{
         const kuruBottom = kuruTop + parseFloat(stationNameTextRect.getAttribute("height")) + 10; //くるくるアニメーションの下端
 
         // アニメーション付き駅名テキスト組み立て
-        const stationNameText = this.animator.createKurukuruSvg([
+        const stationNameText = this.animator.createKurukuruSVG([
             this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
             this.textDrawer.createByAreaEl(station.eng, stationNameTextEngRect).element
-        ], kuruTop, kuruBottom, 4000, 500, 10);
+        ], kuruTop, kuruBottom, [[4000, 500, 10]]);
 
         return stationNameText;
     }
@@ -76,17 +79,17 @@ class HeaderDrawer{
 
         const carText = carNum.querySelector("#carText");
         const carTextEng = carNum.querySelector("#carTextEng");
-        const carTexts = this.animator.createKurukuruSvg([
+        const carTexts = this.animator.createFadeSVG([
             this.textDrawer.createByAreaEl("号車", carText).element,
             this.textDrawer.createByAreaEl("Car No.", carTextEng).element
-        ], 0, 200, 4000, 500, 10);
+        ], [[8510, 500, 10], [4000, 500, 10]]);
         carNum.appendChild(carTexts); //「号車」テキストを追加
         carText.remove(); //「号車」テキスト矩形を削除
         carTextEng.remove(); //Car No.テキスト矩形を削除
 
         return carNum;
     }
-    createDestination(destinationText, viaText){ //行先・方面を描画
+    createDestination(destinationText, viaText, destinationEng){ //行先・方面を描画
         if(destinationText == null || destinationText == ""){ return null; }
 
         const destination = document.createElementNS("http://www.w3.org/2000/svg", "g"); //行先・方面地グループを作成
@@ -141,17 +144,29 @@ class HeaderDrawer{
         }
         //「ゆき」テキストを描画
         destination.appendChild(this.textDrawer.createByArea("ゆき", x, desY, yukiWidth, desTextHeight, desStyle, "ja").element);
-        //destination.appendChild(destinationTextRect)
+        
+        const destinationEngRect = (this.mapSVG).querySelector("#header-destinationTextEng"); //行先英語テキストrectを取得
+        const eng = this.textDrawer.createByAreaEl(destinationEng, destinationEngRect).element;
 
-        return destination;
+        const ret = this.animator.createFadeSVG([
+            destination,
+            eng
+        ], [[8510, 500, 10], [4000, 500, 10]]);
+
+        return ret;
     }
     createRunstateText(type){ //つぎは、まもなく、ただいまを描画
         const runStateTextRect = (this.mapSVG).querySelector("#header-runStateText"); //状態テキストを複製
+        const runStateTextRectEng = (this.mapSVG).querySelector("#header-runStateTextEng");
         let text;
-        if(type === 0){ text = "つぎは"; }
-        else if(type === 1){ text = "まもなく"; }
-        else if(type === 2){ text = "ただいま"; }
-        const runStateText = this.textDrawer.createByAreaEl(text, runStateTextRect).element; //状態テキストを追加
+        let eng;
+        if(type === 0){ text = "つぎは"; eng = "Next";}
+        else if(type === 1){ text = "まもなく"; eng = "Next";}
+        else if(type === 2){ text = "ただいま"; eng = "";}
+        const runStateText = this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl(text, runStateTextRect).element,
+            this.textDrawer.createByAreaEl(eng, runStateTextRectEng).element
+        ], [[8510, 500, 10], [4000, 500, 10]]);
 
         return runStateText;
     }

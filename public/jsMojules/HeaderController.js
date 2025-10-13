@@ -32,7 +32,9 @@ class HeaderController{
             dispCarNum: this.setting.info.carNumber,
             destinationText: this.setting.info.destination,
             viaText: this.setting.info.direction,
+            destinationEng: this.setting.info.directionEng,
             trainType: {text: this.setting.info.trainType, color: this.setting.info.trainTypeColor},
+            trainTypeEng: this.setting.info.trainTypeEng,
         }
     }
 
