@@ -23,12 +23,15 @@ class DefaultLineDrawer{
         this.numParams = getObjByRectEL(numRect);
 
         //乗換路線
-        this.params = this.getParams(mapSVG); //パラメータを取得
+        const re = this.getParams(mapSVG);
+        this.params = re.params;
+        this.paramsEng = re.paramsEng; //パラメータを取得
     }
 
     getParams(mapSVG){
         const transferArea = (mapSVG).querySelector("#body-defaultLine-transferArea"); //乗換路線用矩形
         const transferLine = (mapSVG).querySelector("#body-defaultLine-transferLine"); //乗換路線用線
+        const transferLineEng = (mapSVG).querySelector("#body-defaultLine-transferLineEng"); //乗換路線用線(英語)
 
         const params = {
             styleJson: JSON.parse(transferLine.getAttribute("data-style")),
@@ -40,7 +43,17 @@ class DefaultLineDrawer{
             lineHeight: parseFloat(transferLine.getAttribute("height")),
         };
 
-        return params;
+        const paramsEng = {
+            styleJson: JSON.parse(transferLineEng.getAttribute("data-style")),
+            ctextHeightRatio: parseFloat(transferLineEng.getAttribute("data-textHeightRatio")),
+            left: parseFloat(transferArea.getAttribute("x")),
+            top: parseFloat(transferArea.getAttribute("y")),
+            width: parseFloat(transferArea.getAttribute("width")),
+            areaHeight: parseFloat(transferArea.getAttribute("height")),
+            lineHeight: parseFloat(transferLineEng.getAttribute("height")),
+        }
+
+        return {params: params, paramsEng: paramsEng};
     }
 
     createAll(drawParams, size){
@@ -134,18 +147,18 @@ class DefaultLineDrawer{
             const transferCnt = transferTextList.length; //乗換路線の数を取得
             const lineSpan = 3; //行間[px]
 
-            let height = this.params.lineHeight;
+            let height = this.paramsEng.lineHeight;
             //乗換路線の表示が下端を超える場合、圧縮
-            if(transferCnt * (this.params.lineHeight + lineSpan) > this.params.areaHeight){
-                const scale = this.params.areaHeight / (transferCnt * (this.params.lineHeight + lineSpan)); //圧縮率を計算
-                height = this.params.lineHeight * scale; //乗換路線の高さを圧縮
+            if(transferCnt * (this.paramsEng.lineHeight + lineSpan) > this.paramsEng.areaHeight){
+                const scale = this.paramsEng.areaHeight / (transferCnt * (this.paramsEng.lineHeight + lineSpan)); //圧縮率を計算
+                height = this.paramsEng.lineHeight * scale; //乗換路線の高さを圧縮
             }
 
             const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
-            let y1 = this.params.top;
+            let y1 = this.paramsEng.top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].eng}`;
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
+                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.paramsEng.left, y1, this.paramsEng.width, height, this.paramsEng.styleJson, "ja", this.paramsEng.textHeightRatio));
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加

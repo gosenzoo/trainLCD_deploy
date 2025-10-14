@@ -141,8 +141,9 @@
       <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
       <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="250" fill="#99999950" />
       <rect id="body-defaultLine-transferLine" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.9" />
+      <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.9" />
       <rect id="body-defaultLine-stationName" x="1656.5" y="359" width="75" height="320" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
-      <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="340" height="70" fill="#99999950" transform="translate(1628, 650) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "left"}' lang="en" />
+      <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="340" height="70" fill="#99999950" transform="translate(1628, 650) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
     </g>
   </g>
 
