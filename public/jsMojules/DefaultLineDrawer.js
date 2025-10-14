@@ -48,9 +48,17 @@ class DefaultLineDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         // 駅関連の文字
+        const jps = document.createElementNS("http://www.w3.org/2000/svg", "g");
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            group.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i]));
+            jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i]));
         }
+        // 駅関連の英語文字
+        const engs = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        for(let i = 0; i < drawParams.dispStationList.length; i++){
+            engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i]));
+        }
+
+        group.appendChild(this.animator.createStepSVG([jps, engs], [9020, 4510])); //日本語駅名
 
         // 線
         group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList)) //線
@@ -94,6 +102,49 @@ class DefaultLineDrawer{
             let y1 = this.params.top;
             for(let i = 0; i < transferCnt; i++){
                 let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].name}`;
+                transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
+                y1 += height + lineSpan; //次の行のY座標を計算
+            }
+            stationParts.appendChild(transferTexts); //乗換路線を追加
+        }
+
+        stationParts = moveSvgElementByBasePoint(stationParts, x, y);
+
+        //通過ならすべてを灰色に
+        if(isPass){
+            stationParts.setAttribute("filter", "url(#grayscale)");
+        }
+
+        return stationParts;
+    }
+    createStationPartsEng(station, x, y, lineDict, isPass){
+        let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+        stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
+
+        // ナンバリング
+        stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+
+        //駅名
+        const stationNameEngRect = this.mapSVG.querySelector("#body-defaultLine-stationNameEng"); //駅名テキストrect
+        stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);
+
+        //乗換路線
+        if(station.transfers.length > 0){
+            const transferTextList = station.transfers.split(" ");
+            const transferCnt = transferTextList.length; //乗換路線の数を取得
+            const lineSpan = 3; //行間[px]
+
+            let height = this.params.lineHeight;
+            //乗換路線の表示が下端を超える場合、圧縮
+            if(transferCnt * (this.params.lineHeight + lineSpan) > this.params.areaHeight){
+                const scale = this.params.areaHeight / (transferCnt * (this.params.lineHeight + lineSpan)); //圧縮率を計算
+                height = this.params.lineHeight * scale; //乗換路線の高さを圧縮
+            }
+
+            const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+            let y1 = this.params.top;
+            for(let i = 0; i < transferCnt; i++){
+                let text = `:${lineDict[transferTextList[i]].lineIconKey}:${lineDict[transferTextList[i]].eng}`;
                 transferTexts.appendChild(this.textDrawer.createIconTextByArea(text, this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
                 y1 += height + lineSpan; //次の行のY座標を計算
             }

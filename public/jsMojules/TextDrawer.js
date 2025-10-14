@@ -29,18 +29,19 @@ class TextDrawer{
         const axis = areaEl.getAttribute("axis");
         const spacing = parseFloat(areaEl.getAttribute("spacing"));
         const base = areaEl.getAttribute("base");
+        const transform = areaEl.getAttribute("transform");
 
         let textEl;
         if(axis === "vertical"){
             textEl = this.createByAreaVertical(text, x, y, width, height, styleJson, spacing, base);
         }
         else{
-            textEl = this.createByArea(text, x, y, width, height, styleJson, lang);
+            textEl = this.createByArea(text, x, y, width, height, styleJson, lang, transform);
         }
         return textEl;
     }
     //矩形領域にフィットするよう文字を配置（領域はパラメータで定める）
-    createByArea(text, x, y, maxWidth, height, styleJson, lang='ja'){
+    createByArea(text, x, y, maxWidth, height, styleJson, lang='ja', transform=null){
         //return { element: document.createElementNS("http://www.w3.org/2000/svg", "text"), width: 100 }; //ダミー
         if(lang === null){ lang = "ja"; }
 
@@ -74,6 +75,9 @@ class TextDrawer{
         textElem.setAttribute("y", String(y + yOffset));
         textElem.setAttribute("font-size", fontSize.toString());
         textElem.setAttribute("style", this.styleTextFromJson(styleJson));
+        if(transform != null){
+            textElem.setAttribute("transform", transform);
+        }
 
         return {element: textElem, width: textWidth};
     }
