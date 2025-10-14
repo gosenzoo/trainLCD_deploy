@@ -13,7 +13,7 @@ class HeaderDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         group.appendChild(this.createBack()) //背景
-        group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng)) //種別
+        group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
         group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
         group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
@@ -28,7 +28,7 @@ class HeaderDrawer{
         const back = (this.mapSVG).querySelector("#header-back").cloneNode(true); //背景SVGを複製
         return back;
     }
-    createTrainType(trainTypeText, trainTypeColor, trainTypeEng){ //列車種別を組み立て
+    createTrainType(trainTypeText, trainTypeColor, trainTypeEng, trainTypeSub, trainTypeSubEng){ //列車種別を組み立て
         const trainType = (this.mapSVG).querySelector("#header-trainType").cloneNode(true); //種別SVGを複製
         const back = trainType.querySelector("#trainTypeBackColor");
         back.setAttribute("fill", trainTypeColor); //種別背景色を設定
@@ -40,6 +40,23 @@ class HeaderDrawer{
         ], [[8510, 500, 10], [4000, 500, 10]])); //種別テキストを追加
         trainTypeTextRect.remove(); //種別テキスト矩形を削除
         trainTypeTextRectEng.remove();
+
+        //種別補足表示
+        if(trainTypeSub === null){
+            trainTypeSub = "";
+        }
+        if(trainTypeSubEng === null){
+            trainTypeSubEng = "";
+        }
+        const trainTypeSubTextRect = trainType.querySelector("#trainTypeSubText"); //種別補足テキストを取得
+        const trainTypeSubTextRectEng = trainType.querySelector("#trainTypeSubTextEng");
+        trainType.appendChild(this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl(trainTypeSub, trainTypeSubTextRect).element,
+            this.textDrawer.createByAreaEl(trainTypeSubEng, trainTypeSubTextRectEng).element
+        ], [[8510, 500, 10], [4000, 500, 10]]));
+        trainTypeSubTextRect.remove(); //種別補足テキスト矩形を削除
+        trainTypeSubTextRectEng.remove();
+
         return trainType;
     }
     createStationNameText(station){ //表示駅の駅名を描画

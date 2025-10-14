@@ -35,6 +35,8 @@ class HeaderController{
             destinationEng: this.setting.info.directionEng,
             trainType: {text: this.setting.info.trainType, color: this.setting.info.trainTypeColor},
             trainTypeEng: this.setting.info.trainTypeEng,
+            trainTypeSub: this.setting.info.trainTypeSub,
+            trainTypeSubEng: this.setting.info.trainTypeSubEng
         }
     }
 

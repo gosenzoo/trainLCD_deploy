@@ -48,6 +48,12 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>種別(英語)</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'trainTypeEng')}} value={setting.info.trainTypeEng}></input>
             <br></br>
+            <label>種別補足</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'trainTypeSub')}} value={setting.info.trainTypeSub}></input>
+            <br></br>
+            <label>種別補足(英語)</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'trainTypeSubEng')}} value={setting.info.trainTypeSubEng}></input>
+            <br></br>
             <label>種別文字色</label>
             <input type="color" onChange={(e) => {formUpdated(e, 'trainTypeColor')}} value={setting.info.trainTypeColor}></input>
             <br></br>
