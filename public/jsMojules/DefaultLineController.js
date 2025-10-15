@@ -95,6 +95,10 @@ class DefaultLineController{
             else{ leftStationList.push(0); }
         }
 
+        //始点端・終点端かどうか
+        const isStart = (!this.setting.info.isLoop) && (dispStationListStartInd === 0);
+        const isEnd = (!this.setting.info.isLoop) && (dispStationListStartInd + stationFrameNum === this.setting.stationList.length);
+
         return {
             dispStationList: dispStationList,
             stationFrameNum: stationFrameNum,
@@ -103,7 +107,9 @@ class DefaultLineController{
             leftStationList: leftStationList,
             hereDrawPos: hereDrawPos,
             lineDict: this.setting.lineDict,
-            lineLeapPosList: lineLeapPosList
+            lineLeapPosList: lineLeapPosList,
+            isStart: isStart,
+            isEnd: isEnd
         }
     }
 

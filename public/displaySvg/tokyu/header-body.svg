@@ -100,9 +100,13 @@
     <g filter="url(#outline)">
       <!-- 路線ベース左端（始点） -->
       <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(221, 221, 221)" />
+      <path id="lineStartEdge" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgb(221, 221, 221)" />
       <!-- 路線ベース右端（終点） -->
       <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
               data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <path id="lineEndEdge" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベース中 -->
+      <rect id="lineBase" x="226" y="721" width="1468" height="87" fill="rgb(221, 221, 221)" />
       <!-- 路線ベースはしょり -->
       <path id="lineLeap1" d=" M 1484 721 L 1582 721 Q 1566 742.75, 1582 766.5 Q 1606 788.25, 1582 808 L 1486 808 Z "
         fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
