@@ -68,6 +68,10 @@
     <rect id="header-viaText" x="431" y="51" width="275" height="62" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
     <rect id="header-destinationText" x="737" y="34" width="830" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
     <rect id="header-destinationTextEng" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-viaTextStop" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-viaTextStopEng" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-stopYukiText" x="1750" y="224" width="150" height="86" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-stopYukiTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
     <!-- 種別表示 -->
     <g id="header-trainType">
       <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
@@ -93,6 +97,8 @@
     <!-- つぎは、まもなく、ただいま -->
     <rect id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
     <rect id="header-runStateTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+    <rect id="header-runStateTerminalText" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
+    <rect id="header-runStateTerminalTextEng" x="45" y="200" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
   </g>
 
   <!-- 標準路線図ボディ -->

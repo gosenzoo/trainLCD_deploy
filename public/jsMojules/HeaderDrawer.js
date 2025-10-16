@@ -13,12 +13,24 @@ class HeaderDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         group.appendChild(this.createBack()) //背景
-        group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
-        group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
-        group.appendChild(this.createStationNameText(drawParams.dispStation)); //駅名
         group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
-        group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText, drawParams.destinationEng)); //行先・経由地
+
+        if(drawParams.isTerminal){ //終点なら
+            group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
+            group.appendChild(this.createTerminalText(drawParams.arrivingTextType)); //終着駅テキスト
+        }
+        else if(drawParams.isLongStop){ //長時間停車中なら
+            group.appendChild(this.createStationNameText(drawParams.destinationText, drawParams.destinationKana, drawParams.destinationEng)); //駅名
+            group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
+            group.appendChild(this.createLongStopText(drawParams)); //長時間停車テキスト
+        }
+        else{ //通常
+            group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
+            group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
+            group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
+            group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText, drawParams.destinationEng)); //行先・経由地
+        }
 
         let t1 = performance.now();
         console.log(`HeaderDrawer.createAll: ${t1 - t0} ms`);
@@ -59,7 +71,7 @@ class HeaderDrawer{
 
         return trainType;
     }
-    createStationNameText(station){ //表示駅の駅名を描画
+    createStationNameText(name, kana, eng){ //表示駅の駅名を描画
         const stationNameTextRect = (this.mapSVG).querySelector("#header-stationNameText"); //駅名テキストを複製
         const stationNameTextEngRect = (this.mapSVG).querySelector("#header-stationNameTextEng");
 
@@ -68,9 +80,9 @@ class HeaderDrawer{
 
         // アニメーション付き駅名テキスト組み立て
         const stationNameText = this.animator.createKurukuruSVG([
-            this.textDrawer.createByAreaEl(station.name, stationNameTextRect).element,
-            this.textDrawer.createByAreaEl(station.kana, stationNameTextRect).element,
-            this.textDrawer.createByAreaEl(station.eng, stationNameTextEngRect).element
+            this.textDrawer.createByAreaEl(name, stationNameTextRect).element,
+            this.textDrawer.createByAreaEl(kana, stationNameTextRect).element,
+            this.textDrawer.createByAreaEl(eng, stationNameTextEngRect).element
         ], kuruTop, kuruBottom, [[4000, 500, 10]]);
 
         return stationNameText;
@@ -165,7 +177,7 @@ class HeaderDrawer{
         destination.appendChild(this.textDrawer.createByArea("ゆき", x, desY, yukiWidth, desTextHeight, desStyle, "ja").element);
         
         const destinationEngRect = (this.mapSVG).querySelector("#header-destinationTextEng"); //行先英語テキストrectを取得
-        const eng = this.textDrawer.createByAreaEl(destinationEng, destinationEngRect).element;
+        const eng = this.textDrawer.createByAreaEl(`for ${destinationEng}`, destinationEngRect).element;
 
         const ret = this.animator.createFadeSVG([
             destination,
@@ -188,5 +200,42 @@ class HeaderDrawer{
         ], [[8510, 500, 10], [4000, 500, 10]]);
 
         return runStateText;
+    }
+    createLongStopText(drawParams){
+        const longStopText = document.createElementNS("http://www.w3.org/2000/svg", "g"); //長時間停車テキストグループを作成
+
+        const stopYukiTextRect = (this.mapSVG).querySelector("#header-stopYukiText"); //長時間停車テキストを複製
+        const stopYukiTextRectEng = (this.mapSVG).querySelector("#header-stopYukiTextEng");
+        longStopText.appendChild(this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl("ゆき", stopYukiTextRect).element,
+            this.textDrawer.createByAreaEl("for", stopYukiTextRectEng).element
+        ], [[8510, 500, 10], [4000, 500, 10]]));
+
+        const viaTextStopRect = (this.mapSVG).querySelector("#header-viaTextStop"); //方面テキストrectを取得
+        const viaTextStopEngRect = (this.mapSVG).querySelector("#header-viaTextStopEng");
+        longStopText.appendChild(this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl(drawParams.viaText, viaTextStopRect).element,
+            this.textDrawer.createByAreaEl("", viaTextStopEngRect).element
+        ], [[8510, 500, 10], [4000, 500, 10]])); //長時間停車中テキストを追加
+
+        return longStopText;
+    }
+    createTerminalText(type){
+        const terminalText = document.createElementNS("http://www.w3.org/2000/svg", "g"); //終着駅テキストグループを作成
+
+        const runStateTerminalTextRect = (this.mapSVG).querySelector("#header-runStateTerminalText"); //終着駅テキストを複製
+        const runStateTerminalTextRectEng = (this.mapSVG).querySelector("#header-runStateTerminalTextEng");
+
+        let text, eng;
+        if(type === 0){ text = "つぎは終点"; eng = "Next Last Stop";}
+        else if(type === 1){ text = "まもなく終点"; eng = "Next Last Stop";}
+        else if(type === 2){ text = "終点"; eng = "";}
+
+        terminalText.appendChild(this.animator.createFadeSVG([
+            this.textDrawer.createByAreaEl(text, runStateTerminalTextRect).element,
+            this.textDrawer.createByAreaEl(eng, runStateTerminalTextRectEng).element
+        ], [[8510, 500, 10], [4000, 500, 10]]));
+
+        return terminalText;
     }
 }

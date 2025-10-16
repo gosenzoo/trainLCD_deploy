@@ -36,6 +36,9 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>行き先</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'destination')}} value={setting.info.destination}></input>
             <br></br>
+            <label>行き先かな</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'destinationKana')}} value={setting.info.destinationKana}></input>
+            <br></br>
             <label>経由等</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'direction')}} value={setting.info.direction}></input>
             <br></br>

@@ -6,6 +6,12 @@ class ProgressController{
         this.statesPerStation = 3; //1駅あたりの状態数
         this.stateIndNum = this.statesPerStation * this.stationNum; //全状態数(1駅あたりの状態数 * 駅数)
 
+        this.onLongStop = null; //長時間停車イベント時に呼び出す関数
+        this.isLongStop = false; //長時間停車中かどうか
+
+        this.stopTimerId = null; //停車時間計測用タイマー
+        this.stopTimeLimit = 30000; //長時間停車とみなすまでの停車時間(ミリ秒)
+
         if(!this.isLoop){ //非環状運転時の状態インデックスの範囲を設定
             this.stationIndMin = this.statesPerStation - 1; //最小値
             this.stationIndMax = 3 * this.stationNum - 1; //最大値
@@ -15,9 +21,19 @@ class ProgressController{
             this.stationIndMax = 3 * this.stationNum - 1; //最大値
         }
         this._stateInd = this.statesPerStation - 1; //状態インデックス(状態数-1(1駅目の停車状態)で初期化)
+        this.stateInd = this._stateInd; //セッターを通して初期化
+    }
+
+    set onLongStop(func){
+        this._onLongStop = func; //長時間停車イベント時に呼び出す関数を設定
     }
 
     set stateInd(ind){
+        //長時間停車タイマーリセット
+        this.isLongStop = false;
+        if(this.stopTimerId){ clearTimeout(this.stopTimerId); }
+        this.stopTimer = null;
+
         if(!this.isLoop){ //環状運転でない場合、範囲外は端の値に設定
             if(ind < this.stationIndMin){ ind = this.stationIndMin; }
             if(this.stationIndMax < ind){ ind = this.stationIndMax; }
@@ -33,6 +49,18 @@ class ProgressController{
         }
 
         this._stateInd = ind; //状態インデックスを設定
+
+        //変更後の状態が終点以外に停車中の場合、長時間停車タイマーを開始
+        if((this.runState === 1) && !this.isTerminal){
+            this.stopTimerId = setTimeout(() => {
+                this.isLongStop = true;
+                if(this._onLongStop){ 
+                    this._onLongStop(); //長時間停車イベントを発火
+                }
+                clearTimeout(this.stopTimerId);
+                this.stopTimer = null;
+            }, this.stopTimeLimit);
+        }
     }
     get stateInd(){
         return this._stateInd; //状態インデックスを取得
@@ -49,7 +77,9 @@ class ProgressController{
             currentStationInd: this.currentStationInd,
             posState: this.posState,
             runState: this.runState,
-            isCurrentStationPass: this.isCurrentStationPass
+            isCurrentStationPass: this.isCurrentStationPass,
+            isLongStop: this.isLongStop,
+            isTerminal: this.isTerminal //終着駅かどうか
         }
     }
     get currentStationInd(){
@@ -68,5 +98,12 @@ class ProgressController{
     }
     get isCurrentStationPass(){
         return this.passList[this.currentStationInd];
+    }
+    get isTerminal(){ //終着駅かどうか
+        if(!this.isLoop){
+            if(this.currentStationInd === this.stationNum - 1){ return true; }
+            else{ return false; }
+        }
+        else{ return false; }
     }
 }

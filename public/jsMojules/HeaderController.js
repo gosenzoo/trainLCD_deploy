@@ -2,14 +2,8 @@ class HeaderController{
     constructor(setting, headerDrawer){
         this.setting = setting;
         this.headerDrawer = headerDrawer;
-        /*
-        this.trainTypeObject = null; //列車種別オブジェクト
-        this.destinationText = null; //行先・経由地のテキスト
-        this.viaText = null; //経由地のテキスト
-        this.carNumText = null; //号車のテキスト
-        this.headerStation = null; //ヘッダーの駅オブジェクト
-        */
-       console.log("HeaderController初期化完了");
+
+        console.log("HeaderController初期化完了");
     }
 
     //進行パラメータから描画用パラメータを抽出
@@ -31,12 +25,15 @@ class HeaderController{
             arrivingTextType: arrivingTextType,
             dispCarNum: this.setting.info.carNumber,
             destinationText: this.setting.info.destination,
+            destinationKana: this.setting.info.destinationKana,
             viaText: this.setting.info.direction,
             destinationEng: this.setting.info.directionEng,
             trainType: {text: this.setting.info.trainType, color: this.setting.info.trainTypeColor},
             trainTypeEng: this.setting.info.trainTypeEng,
             trainTypeSub: this.setting.info.trainTypeSub,
-            trainTypeSubEng: this.setting.info.trainTypeSubEng
+            trainTypeSubEng: this.setting.info.trainTypeSubEng,
+            isLongStop: progressParams.isLongStop, //長時間停車中かどうか
+            isTerminal: progressParams.isTerminal, //終着駅かどうか（終着駅表示を出すかどうか）
         }
     }
 

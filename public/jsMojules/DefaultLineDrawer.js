@@ -235,9 +235,9 @@ class DefaultLineDrawer{
         line.appendChild(grayStart);
         
         const grayLine = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        grayLine.setAttribute("x", `${parseInt(lineBase.getAttribute("x"))}`);
+        grayLine.setAttribute("x", `${parseInt(lineBase.getAttribute("x")) - buf}`);
         grayLine.setAttribute("y", lineBase.getAttribute("y"));
-        grayLine.setAttribute("width", `${hereDrawPos * sectionWidth}`);
+        grayLine.setAttribute("width", `${hereDrawPos * sectionWidth + buf}`);
         grayLine.setAttribute("height", lineBase.getAttribute("height"));
         grayLine.setAttribute("fill", lineBase.getAttribute("fill"));
         line.appendChild(grayLine);
@@ -276,7 +276,7 @@ class DefaultLineDrawer{
             }
             else{
                 let stationObj = passStation.cloneNode(true);
-                stationObj = movePolygonTo(stationObj, stationStartX + i * sectionWidth + parseFloat(stationStart.getAttribute("width")) / 2, parseFloat(lineStart.getAttribute("y")) + parseFloat(lineStart.getAttribute("height")) / 2);
+                stationObj = movePolygonTo(stationObj, stationStartX + i * sectionWidth + parseFloat(stationStart.getAttribute("width")) / 2, parseFloat(lineBase.getAttribute("y")) + parseFloat(lineBase.getAttribute("height")) / 2);
                 line.appendChild(stationObj);
             }
         }

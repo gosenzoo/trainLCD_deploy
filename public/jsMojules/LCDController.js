@@ -9,8 +9,8 @@ class LCDController{
         this.stopStationList = getStopStation(this.setting.stationList, this.setting.info.isLoop); //停車駅リストを保存
         this.dispPageList = [["defaultLine"], ["defaultLine"], ["defaultLine"]]; //表示ページリストを初期化
         //進行状況コントローラーを初期化
-        //stopList決め打ち（要修正）
         this.progressController = new ProgressController(this.setting.stationList.map(station => station.isPass), this.setting.info.isLoop);
+        this.progressController.onLongStop = () => { this.setLCDToDisplay(); console.log("長時間停車!") }; //長時間停車イベント時にLCDを更新
         //ヘッダーコントローラーを初期化
         this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator)); //ヘッダーコントローラーを初期化
         /* //コントローラー辞書を初期化
