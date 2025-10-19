@@ -62,23 +62,29 @@ class DefaultLineDrawer{
 
         // 駅関連の文字
         const jps = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        console.log(drawParams.leftOrRight);
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i]));
+            if(drawParams.leftOrRight === "right"){ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
+            else{ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
         }
         // 駅関連の英語文字
         const engs = document.createElementNS("http://www.w3.org/2000/svg", "g");
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i]));
+            if(drawParams.leftOrRight === "right"){ engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
+            else{ engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
         }
+        group.appendChild(this.animator.createStepSVG([jps, engs], [9020, 4510]));
 
-        group.appendChild(this.animator.createStepSVG([jps, engs], [9020, 4510])); //日本語駅名
-
+        // 線と現在地アイコン
+        const lineObj = document.createElementNS("http://www.w3.org/2000/svg", "g");
         // 線
-        group.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
-
+        lineObj.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
         // 現在地アイコン
         let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
-        group.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
+        lineObj.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
+        if(drawParams.leftOrRight === "left"){ lineObj.setAttribute("transform", "scale(-1, 1)"); }
+        lineObj.setAttribute("transform-origin", `${this.stationStartX + (this.lenStartToEnd) / 2} 0`);
+        group.appendChild(lineObj);
 
         let t1 = performance.now();
         console.log(`DefaultLineDrawer.createAll: ${t1 - t0} ms`);
@@ -207,8 +213,8 @@ class DefaultLineDrawer{
 
                     lineLeapObj1.setAttribute("fill", colorList[i]);
                     lineLeapObj2.setAttribute("fill", colorList[i]);
-                    moveSvgElementByBasePoint(lineLeapObj1, startX + sectionWidth * (i-1) + parseInt(lineStart.getAttribute("width")) - buf, lineStart.getAttribute("y"));
-                    moveSvgElementByBasePoint(lineLeapObj2, startX + sectionWidth * (i-1) + parseInt(lineStart.getAttribute("width")) + buf, lineStart.getAttribute("y"));
+                    moveSvgElementByBasePoint(lineLeapObj1, startX + sectionWidth * (i-1) + parseInt(lineBase.getAttribute("x")) - buf, lineBase.getAttribute("y"));
+                    moveSvgElementByBasePoint(lineLeapObj2, startX + sectionWidth * (i-1) + parseInt(lineBase.getAttribute("x")) + buf, lineBase.getAttribute("y"));
                     line.appendChild(lineLeapObj1);
                     line.appendChild(lineLeapObj2);
                 }

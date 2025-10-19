@@ -109,7 +109,8 @@ class DefaultLineController{
             lineDict: this.setting.lineDict,
             lineLeapPosList: lineLeapPosList,
             isStart: isStart,
-            isEnd: isEnd
+            isEnd: isEnd,
+            leftOrRight: this.setting.info.leftOrRight
         }
     }
 
