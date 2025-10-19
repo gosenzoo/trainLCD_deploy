@@ -9,7 +9,7 @@ type editorHeadType = {
 }
 
 const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
-    const [displayType, setDisplayType] = useState<string>("JW-225")
+    const [displayType, setDisplayType] = useState<string>("tokyu")
     const router = useRouter()
 
     const inputToSetting = (e: any) => {
@@ -79,8 +79,8 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <button onClick={downloadFromSettings}>設定をダウンロード</button>
             <br></br>
             <select onChange={displayTypeSelectChanged}>
-                <option value="JW-225">JR西日本 225系</option>
                 <option value="tokyu">東急</option>
+                <option value="JW-225">JR西日本 225系</option>
                 <option value="JE-E131">JR東日本 E131系</option>
             </select>
             <button onClick={openDisplay}>表示</button>

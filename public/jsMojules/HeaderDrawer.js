@@ -14,18 +14,20 @@ class HeaderDrawer{
 
         group.appendChild(this.createBack()) //背景
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
-        group.appendChild(this.createNumbering(drawParams.dispStation)); //ナンバリング
 
         if(drawParams.isTerminal){ //終点なら
+            group.appendChild(this.createNumbering(drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTerminalText(drawParams.arrivingTextType)); //終着駅テキスト
         }
         else if(drawParams.isLongStop){ //長時間停車中なら
+            group.appendChild(this.createNumbering(drawParams.destinationColor, drawParams.destinationNum)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.destinationText, drawParams.destinationKana, drawParams.destinationEng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createLongStopText(drawParams)); //長時間停車テキスト
         }
         else{ //通常
+            group.appendChild(this.createNumbering(drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
@@ -87,15 +89,15 @@ class HeaderDrawer{
 
         return stationNameText;
     }
-    createNumbering(station){ //表示駅のナンバリングを描画
+    createNumbering(color, number){ //表示駅のナンバリングを描画
         const numbering = (this.mapSVG).querySelector("#header-numbering").cloneNode(true); //ナンバリングSVGを複製
         const lineColorRect = numbering.querySelector("#icon-lineColor");
         const symbolRect = numbering.querySelector("#icon-symbol");
         const numberRect = numbering.querySelector("#icon-number");
 
-        lineColorRect.setAttribute("fill", station.lineColor); //線色を設定
-        numbering.appendChild(this.textDrawer.createByAreaEl(station.number.split(" ")[0], symbolRect).element); //路線記号テキストを追加
-        numbering.appendChild(this.textDrawer.createByAreaEl(station.number.split(" ")[1], numberRect).element); //ナンバリングテキストを追加
+        lineColorRect.setAttribute("fill", color); //線色を設定
+        numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[0], symbolRect).element); //路線記号テキストを追加
+        numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[1], numberRect).element); //ナンバリングテキストを追加
         symbolRect.remove(); //記号矩形を削除
         numberRect.remove(); //ナンバリング矩形を削除
 

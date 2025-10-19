@@ -8,7 +8,6 @@ class ProgressController{
 
         this.onLongStop = null; //長時間停車イベント時に呼び出す関数
         this.isLongStop = false; //長時間停車中かどうか
-
         this.stopTimerId = null; //停車時間計測用タイマー
         this.stopTimeLimit = 30000; //長時間停車とみなすまでの停車時間(ミリ秒)
 
@@ -100,6 +99,18 @@ class ProgressController{
         return this.passList[this.currentStationInd];
     }
     get isTerminal(){ //終着駅かどうか
+        if(!this.isLoop){
+            let hereId = this.currentStationInd;
+            while(hereId <= this.stationNum - 1){
+                if(!this.passList[hereId]){ break; } //停車駅が見つかったら終了
+                hereId++;
+            }
+            if(hereId === this.stationNum - 1){ return true; }
+            else{ return false; }
+        }
+        else{ return false; }
+    }
+    get isFinalSection(){
         if(!this.isLoop){
             if(this.currentStationInd === this.stationNum - 1){ return true; }
             else{ return false; }

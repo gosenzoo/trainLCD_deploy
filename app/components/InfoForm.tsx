@@ -18,9 +18,11 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
         const _setting: settingType = structuredClone(setting)
 
         if(field !== "isLoop" && field !== "isMoveByCoord"){
+            //テキストボックス入力の場合
             _setting.info[field] = e.target.value
         }
         else{
+            //チェックボックス入力の場合
             _setting.info[field] = e.target.checked
         }
 
@@ -39,11 +41,17 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>行き先かな</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'destinationKana')}} value={setting.info.destinationKana}></input>
             <br></br>
+            <label>行き先(英語)</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'destinationEng')}} value={setting.info.destinationEng}></input>
+            <br></br>
+            <label>行き先ナンバリング</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'destinationNum')}} value={setting.info.destinationNum}></input>
+            <br></br>
+            <label>行き先色</label>
+            <input type="color" onChange={(e) => {formUpdated(e, 'destinationColor')}} value={setting.info.destinationColor}></input>
+            <br></br>
             <label>経由等</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'direction')}} value={setting.info.direction}></input>
-            <br></br>
-            <label>行き先・経由等(英語)</label>
-            <input type="text" onChange={(e) => {formUpdated(e, 'directionEng')}} value={setting.info.directionEng}></input>
             <br></br>
             <label>種別</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'trainType')}} value={setting.info.trainType}></input>
