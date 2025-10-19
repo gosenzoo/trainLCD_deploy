@@ -62,7 +62,7 @@ class DefaultLineDrawer{
 
         // 駅関連の文字
         const jps = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        console.log(drawParams.leftOrRight);
+        //console.log(drawParams.leftOrRight);
         for(let i = 0; i < drawParams.dispStationList.length; i++){
             if(drawParams.leftOrRight === "right"){ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
             else{ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
@@ -87,7 +87,7 @@ class DefaultLineDrawer{
         group.appendChild(lineObj);
 
         let t1 = performance.now();
-        console.log(`DefaultLineDrawer.createAll: ${t1 - t0} ms`);
+        //console.log(`DefaultLineDrawer.createAll: ${t1 - t0} ms`);
         return group;
     }
     // 駅関連の文字を組み立て
@@ -181,6 +181,8 @@ class DefaultLineDrawer{
     }
     // 線組み立て
     createLine(stationFrameNum, colorList, passStationList, hereDrawPos, lineLeapPosList, isStart, isEnd){
+        console.log(hereDrawPos);
+
         const line = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         line.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "defs"));
 
@@ -199,54 +201,57 @@ class DefaultLineDrawer{
         const sectionNum = colorList.length; //描画する区間数（両端含む）を取得
         const sectionWidth = (parseInt(stationEnd.getAttribute("x")) - parseInt(stationStart.getAttribute("x"))) / (stationFrameNum - 1);
         const startX = 0; //根本のx座標
-        const buf = 1; //区間間の隙間を埋めるための拡張ピクセル数
+        const buf = 2; //区間間の隙間を埋めるための拡張ピクセル数
+        let drawWidth = 0; //一度に描画する区間の長さ
+        let drawX = 0;
         for(let i = 0; i < sectionNum; i++){
+            let section = 1+Math.floor((i-1)/2);
             if(i === 0){ //最初は、線根本をコピー、設定して追加
                 let sectionObj = lineStart.cloneNode(true);
                 sectionObj.setAttribute("fill", colorList[i]);
                 line.appendChild(sectionObj); //線根本
             }
-            else if(0 < i && i < sectionNum-1){ //中間は、各区間に区間の長さ分のrectを設定し追加
-                if(lineLeapPosList.includes(i)){ //その区間が端折られていたら
-                    let lineLeapObj1 = (this.mapSVG).querySelector("#lineLeap1").cloneNode(true);
-                    let lineLeapObj2 = (this.mapSVG).querySelector("#lineLeap2").cloneNode(true);
-
-                    lineLeapObj1.setAttribute("fill", colorList[i]);
-                    lineLeapObj2.setAttribute("fill", colorList[i]);
-                    moveSvgElementByBasePoint(lineLeapObj1, startX + sectionWidth * (i-1) + parseInt(lineBase.getAttribute("x")) - buf, lineBase.getAttribute("y"));
-                    moveSvgElementByBasePoint(lineLeapObj2, startX + sectionWidth * (i-1) + parseInt(lineBase.getAttribute("x")) + buf, lineBase.getAttribute("y"));
-                    line.appendChild(lineLeapObj1);
-                    line.appendChild(lineLeapObj2);
+            else if(i < sectionNum-1){ //中間は、各区間に区間の長さ分のrectを設定し追加
+                if(lineLeapPosList.includes(section)){ //その区間が端折られていたら
+                    if(i % 2 == 1){ //左のほう
+                        let lineLeapObj1 = (this.mapSVG).querySelector("#lineLeap1").cloneNode(true);
+                        lineLeapObj1.setAttribute("fill", colorList[i]);
+                        moveSvgElementByBasePoint(lineLeapObj1, startX + sectionWidth * (section-1) + parseInt(lineBase.getAttribute("x")) - buf, lineBase.getAttribute("y"));
+                        line.appendChild(lineLeapObj1);
+                    }
+                    else{
+                        let lineLeapObj2 = (this.mapSVG).querySelector("#lineLeap2").cloneNode(true);
+                        lineLeapObj2.setAttribute("fill", colorList[i]);
+                        moveSvgElementByBasePoint(lineLeapObj2, startX + sectionWidth * (section-1) + parseInt(lineBase.getAttribute("x")) + buf, lineBase.getAttribute("y"));
+                        line.appendChild(lineLeapObj2);
+                    }
                 }
                 else{
+                    drawWidth += sectionWidth / 2;
+                    //次も同じ色&次が右端じゃない&次が端折られていないなら、後で描画
+                    if((colorList[i] === colorList[i+1]) && (i < sectionNum - 2) && (!(lineLeapPosList.includes(section + 1) && (i % 2 == 0)))){
+                        continue;
+                    }
+
                     let sectionObj = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    sectionObj.setAttribute("x", `${sectionWidth * (i-1) + parseInt(lineBase.getAttribute("x")) - buf}`);
+                    sectionObj.setAttribute("x", `${drawX + parseInt(lineBase.getAttribute("x")) - buf}`);
                     sectionObj.setAttribute("y", lineBase.getAttribute("y"));
-                    sectionObj.setAttribute("width", `${sectionWidth + 2*buf}`);
+                    sectionObj.setAttribute("width", `${drawWidth + 2*buf}`);
                     sectionObj.setAttribute("height", lineBase.getAttribute("height"));
                     sectionObj.setAttribute("fill", colorList[i]);
                     line.appendChild(sectionObj);
+
+                    drawX += drawWidth;
+                    drawWidth = 0;
                 }
             }
             else{ //最後は、線先端をコピー、設定して追加
                 let sectionObj = lineEnd.cloneNode(true);
-                sectionObj = moveSvgElementByBasePoint(sectionObj, parseInt(lineBase.getAttribute("x")) + sectionWidth * (sectionNum-2), parseInt(lineBase.getAttribute("y")));
+                sectionObj = moveSvgElementByBasePoint(sectionObj, parseInt(lineBase.getAttribute("x")) + sectionWidth * (section - 1), parseInt(lineBase.getAttribute("y")));
                 sectionObj.setAttribute("fill", colorList[i]);
                 line.appendChild(sectionObj);
             }
         }
-        //現在地より前を灰色に
-        const grayStart = lineStart.cloneNode(true);
-        grayStart.setAttribute("fill", lineBase.getAttribute("fill"));
-        line.appendChild(grayStart);
-        
-        const grayLine = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        grayLine.setAttribute("x", `${parseInt(lineBase.getAttribute("x")) - buf}`);
-        grayLine.setAttribute("y", lineBase.getAttribute("y"));
-        grayLine.setAttribute("width", `${hereDrawPos * sectionWidth + buf}`);
-        grayLine.setAttribute("height", lineBase.getAttribute("height"));
-        grayLine.setAttribute("fill", lineBase.getAttribute("fill"));
-        line.appendChild(grayLine);
 
         //線の形が確定したら、乗算影用の要素を作成
         //マスク作成

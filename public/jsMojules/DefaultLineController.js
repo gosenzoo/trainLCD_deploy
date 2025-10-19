@@ -15,6 +15,7 @@ class DefaultLineController{
         if(progressParams.posState === 2) { startInd = progressParams.currentStationInd; }
         else{ startInd = progressParams.currentStationInd - 1; }
         let dispStationList = []
+        let dispStationIndList = []
         let dispStationListStartInd; //表示駅リスト左端駅の、全体リスト上でのインデックス
         let hereDrawPos;
         if(!this.setting.info.isLoop){ //環状運転でない場合
@@ -22,6 +23,7 @@ class DefaultLineController{
                 dispStationListStartInd = startInd;
                 for(let i = startInd; i < startInd + stationFrameNum; i++){
                     dispStationList.push(this.setting.stationList[i])
+                    dispStationIndList.push(i)
                 }
                 hereDrawPos = 0; //終点近くでない場合は現在地が常に根本端に位置する
                 if(progressParams.posState === 0 || progressParams.posState === 1){ hereDrawPos += 0.5; } //駅間にいる場合は半駅分進める
@@ -31,6 +33,7 @@ class DefaultLineController{
                 dispStationListStartInd = this.setting.stationList.length - stationFrameNum;
                 for(let i = this.setting.stationList.length - stationFrameNum; i < this.setting.stationList.length; i++){
                     dispStationList.push(this.setting.stationList[i]);
+                    dispStationIndList.push(i)
                 }
                 //現在地アイコンの位置を決める
                 hereDrawPos = progressParams.currentStationInd - (this.setting.stationList.length - stationFrameNum);
@@ -40,6 +43,7 @@ class DefaultLineController{
         else{ //環状運転の場合
             for(let i = 0; i < stationFrameNum; i++){
                 dispStationList.push(getCircularItem(this.setting.stationList, startInd + i))
+                dispStationIndList.push(getCircularItem(this.setting.stationList, startInd + i))
             }
             hereDrawPos = 0; //環状運転では常に根本端に位置する
             if(progressParams.posState === 0 || progressParams.posState === 1){ hereDrawPos += 0.5; } //駅間にいる場合は半駅分進める
@@ -58,6 +62,7 @@ class DefaultLineController{
         while(stopCnt < minVisibleNum){
             dispStationList[ind] = null;
             dispStationList[ind] = this.setting.stationList[listInd];
+            dispStationIndList[ind] = listInd;
             //もともと停車駅ならカウントアップ
             if(!dispStationList[ind].isPass){ stopCnt++; }
 
@@ -67,6 +72,7 @@ class DefaultLineController{
                     listInd++;
                 }
                 dispStationList[ind] = this.setting.stationList[listInd];
+                dispStationIndList[ind] = listInd;
                 stopCnt++;
             }
             ind++;
@@ -74,15 +80,29 @@ class DefaultLineController{
             listInd++;
         }
 
+        console.log(dispStationIndList)
+
         //線色を、現在駅番号から駅枠数+1個取得
         let colorList = [];
-        for(let i = 0; i < stationFrameNum + 1; i++){
-            if(i === stationFrameNum){ //最後なら
-                colorList.push(dispStationList[i-1].lineColor);
+        //最初の端の色
+        colorList.push("rgb(221, 221, 221)");
+        for(let i = 0; i < (stationFrameNum - 1) * 2; i++){
+            //通り過ぎていたらグレー
+            if(i < hereDrawPos * 2){
+                colorList.push("rgb(221, 221, 221)");
                 continue;
             }
-            colorList.push(dispStationList[i].lineColor);
+            //中間左半分
+            if(i % 2 === 0){
+                colorList.push(dispStationList[Math.floor(i/2)].lineColor);
+            }
+            //中間右半分
+            else{
+                colorList.push(this.setting.stationList[dispStationIndList[Math.floor(i/2) + 1] - 1].lineColor);
+            }
         }
+        //最後の端の色
+        colorList.push(dispStationList[dispStationList.length-1].lineColor);
 
         //通過駅リストを抽出
         let passStationList = dispStationList.map(station => {

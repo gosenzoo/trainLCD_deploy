@@ -38,11 +38,11 @@ class LCDController{
         let t0 = performance.now();
         this.setTempToDisplay(this.createLCD());
         let t1 = performance.now();
-        console.log(`setLCDToDisplay(createLCD+setTempToDisplay): ${t1 - t0} ms`);
+        //console.log(`setLCDToDisplay(createLCD+setTempToDisplay): ${t1 - t0} ms`);
         void this.displaySVG.offsetWidth; // reflowを強制
         requestAnimationFrame(() => {
             let end = performance.now();
-            console.log(`setLCDToDisplay(render): ${end - start} ms`);
+            //console.log(`setLCDToDisplay(render): ${end - start} ms`);
         })
     }
     //描画先に仮描画先の内容を反映（レンダリング）

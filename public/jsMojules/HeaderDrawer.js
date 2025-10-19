@@ -35,7 +35,7 @@ class HeaderDrawer{
         }
 
         let t1 = performance.now();
-        console.log(`HeaderDrawer.createAll: ${t1 - t0} ms`);
+        //console.log(`HeaderDrawer.createAll: ${t1 - t0} ms`);
         return group;
     }
     createBack(){ //背景を組み立て
