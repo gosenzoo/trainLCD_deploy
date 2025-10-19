@@ -96,8 +96,13 @@ class DefaultLineDrawer{
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
         // ナンバリング
-        stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
-
+        if(station.number === ""){
+            
+        }
+        else{
+            stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        }
+        
         //駅名
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
@@ -141,8 +146,13 @@ class DefaultLineDrawer{
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
         // ナンバリング
-        stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        if(station.number === ""){
 
+        }
+        else{
+            stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        }
+        
         //駅名
         const stationNameEngRect = this.mapSVG.querySelector("#body-defaultLine-stationNameEng"); //駅名テキストrect
         stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);

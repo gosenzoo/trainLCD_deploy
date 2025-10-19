@@ -43,7 +43,7 @@ class DefaultLineController{
         else{ //環状運転の場合
             for(let i = 0; i < stationFrameNum; i++){
                 dispStationList.push(getCircularItem(this.setting.stationList, startInd + i))
-                dispStationIndList.push(getCircularItem(this.setting.stationList, startInd + i))
+                dispStationIndList.push((startInd + i) % this.setting.stationList.length);
             }
             hereDrawPos = 0; //環状運転では常に根本端に位置する
             if(progressParams.posState === 0 || progressParams.posState === 1){ hereDrawPos += 0.5; } //駅間にいる場合は半駅分進める

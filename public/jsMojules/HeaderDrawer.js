@@ -90,6 +90,8 @@ class HeaderDrawer{
         return stationNameText;
     }
     createNumbering(color, number){ //表示駅のナンバリングを描画
+        if(number === ""){ return document.createElementNS("http://www.w3.org/2000/svg", "g"); }
+
         const numbering = (this.mapSVG).querySelector("#header-numbering").cloneNode(true); //ナンバリングSVGを複製
         const lineColorRect = numbering.querySelector("#icon-lineColor");
         const symbolRect = numbering.querySelector("#icon-symbol");
