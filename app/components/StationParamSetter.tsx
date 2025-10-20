@@ -49,32 +49,32 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         <div>
             <label>駅名</label>
             <input type="text" id="nameInput" onChange={(e) => formUpdated(e, 'name')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.name : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.name}
             ></input>
             <br></br>
             <label>駅名かな</label>
             <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.kana : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.kana}
             ></input>
             <br></br>
             <label>駅名英語</label>
             <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.eng : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.eng}
             ></input>
             <br></br>
             <label>駅ナンバリング</label>
             <input type="text" id="numberInput" onChange={(e) => formUpdated(e, 'number')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.number : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.number}
             ></input>
             <br></br>
             <label>路線カラー</label>
             <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'lineColor')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.lineColor : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.lineColor}
             ></input>
             <br></br>
             <label>乗換路線</label>
             <input type="text" id="transfersInput" onChange={(e) => formUpdated(e, 'transfers')}
-                value={ setting && selectedIndexes.length > 0 ? setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.transfers : ''}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.transfers}
             ></input>
             <select onChange={lineSelectChanged}>
                 <option>接続路線を追加</option>
@@ -88,6 +88,16 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     })
                 }
             </select>
+            <br></br>
+            <label>次区間所要時間(分)</label>
+            <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.sectionTime}
+            ></input>
+            <br></br>
+            <label>次区間路線ID</label>
+            <input type="text" id="lineIdInput" onChange={(e) => formUpdated(e, 'lineId')}
+                value={ setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]?.lineId}
+            ></input>
         </div>
     )
 }

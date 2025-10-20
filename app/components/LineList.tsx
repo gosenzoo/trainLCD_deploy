@@ -26,7 +26,8 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             lineIconKey: "",
             name: "",
             kana: "",
-            eng: ""
+            eng: "",
+            color: ""
         }
         setSetting(_setting)
     }
@@ -76,6 +77,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                             <th>路線名</th>
                             <th>路線名かな</th>
                             <th>路線名英語</th>
+                            <th>路線カラー</th>
                         </tr>
                     </thead>
                     <tbody id="linesTableBody">
@@ -87,12 +89,16 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                             {key}
                                         </th>
                                         <td>
-                                            <img
-                                                src={(setting.iconDict[setting.lineDict[key].lineIconKey] as string) || ""}
-                                                alt=""
-                                                width="30px"
-                                                height="30px"
-                                            />
+                                            {
+                                                (setting.iconDict[setting.lineDict[key].lineIconKey] as string) ?
+                                                <img
+                                                    src={(setting.iconDict[setting.lineDict[key].lineIconKey] as string)}
+                                                    alt=""
+                                                    width="30px"
+                                                    height="30px"
+                                                />
+                                                : ""
+                                            }
                                         </td>
                                         <td>
                                             {setting.lineDict[key].name}
@@ -102,6 +108,9 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                         </td>
                                         <td>
                                             {setting.lineDict[key].eng}
+                                        </td>
+                                        <td style={{backgroundColor: setting.lineDict[key]?.color}}>
+                                            
                                         </td>
                                     </tr>
                                 )
@@ -131,6 +140,11 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             <label>路線名英語</label>
             <input type="text" id="lineEngInput" onChange={(e) => formUpdated(e, 'eng')}
                 value={ setting && selectedIndexes.length > 0 ? setting.lineDict[selectedIndexes[selectedIndexes.length - 1]]?.eng : ''}
+            ></input>
+            <br></br>
+            <label>路線カラー</label>
+            <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'color')}
+                value={ setting && selectedIndexes.length > 0 ? setting.lineDict[selectedIndexes[selectedIndexes.length - 1]]?.color : ''}
             ></input>
             <br></br>
         </div>

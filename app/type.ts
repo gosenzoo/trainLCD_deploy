@@ -34,6 +34,8 @@ type stationType = {
     lineColor: string,
     transfers: string,
     isPass: boolean,
+    sectionTime: string,
+    lineId: string,
     coordinate: [number | null, number | null]
 }
 
@@ -41,11 +43,12 @@ type lineType = {
     lineIconKey: string,
     name: string,
     kana: string,
-    eng: string
+    eng: string,
+    color: string,
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers'
+type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId'
 
-type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng'
+type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 
 type infoMembers = 'settingName' | 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 'carNumber' | 'leftOrRight' | 'isLoop' | 'isMoveByCoord'

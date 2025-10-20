@@ -1,5 +1,8 @@
 class LCDController{
     constructor(setting, mapSVG, displaySVG){
+        for(let i = 0; i < setting.stationList.length; i++){
+            setting.stationList[i]._id = i;
+        }
         console.log(setting);
         this.setting = setting; //設定を保存
         this.mapSVG = mapSVG; //フォーマットSVG

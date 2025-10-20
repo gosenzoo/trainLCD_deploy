@@ -60,6 +60,17 @@ class DefaultLineDrawer{
         let t0 = performance.now();
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
+        // 線と現在地アイコン
+        const lineObj = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        // 線
+        lineObj.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
+        // 現在地アイコン
+        let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
+        lineObj.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
+        if(drawParams.leftOrRight === "left"){ lineObj.setAttribute("transform", "scale(-1, 1)"); }
+        lineObj.setAttribute("transform-origin", `${this.stationStartX + (this.lenStartToEnd) / 2} 0`);
+        group.appendChild(lineObj);
+
         // 駅関連の文字
         const jps = document.createElementNS("http://www.w3.org/2000/svg", "g");
         //console.log(drawParams.leftOrRight);
@@ -74,17 +85,6 @@ class DefaultLineDrawer{
             else{ engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
         }
         group.appendChild(this.animator.createStepSVG([jps, engs], [9020, 4510]));
-
-        // 線と現在地アイコン
-        const lineObj = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        // 線
-        lineObj.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
-        // 現在地アイコン
-        let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
-        lineObj.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
-        if(drawParams.leftOrRight === "left"){ lineObj.setAttribute("transform", "scale(-1, 1)"); }
-        lineObj.setAttribute("transform-origin", `${this.stationStartX + (this.lenStartToEnd) / 2} 0`);
-        group.appendChild(lineObj);
 
         let t1 = performance.now();
         //console.log(`DefaultLineDrawer.createAll: ${t1 - t0} ms`);
@@ -132,6 +132,13 @@ class DefaultLineDrawer{
             stationParts.appendChild(transferTexts); //乗換路線を追加
         }
 
+        //所要時間
+        if(!isPass && !(station._dispTime < 0)){
+            const timeTextRect = (mapSVG).querySelector("#body-defaultLine-timeText");
+            stationParts.appendChild(this.textDrawer.createByAreaEl(station._dispTime, timeTextRect).element);
+        }
+
+        //指定位置に移動
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
 
         //通過ならすべてを灰色に
@@ -178,6 +185,12 @@ class DefaultLineDrawer{
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加
+        }
+
+        //所要時間
+        if(!isPass && !(station._dispTime < 0)){
+            const timeTextRect = (mapSVG).querySelector("#body-defaultLine-timeText");
+            stationParts.appendChild(this.textDrawer.createByAreaEl(station._dispTime, timeTextRect).element);
         }
 
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);

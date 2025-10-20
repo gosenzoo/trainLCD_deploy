@@ -48,6 +48,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         //ナンバリング、色連番
         let _number: string  = ""
         let _color: string = ""
+        let _lineId: string = ""
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
                 _number = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].number
@@ -56,11 +57,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 _number = (_number.includes(" ") ? _number.split(" ")[0] : _number) + ((nextNumber === "NaN") ? "" : " " + nextNumber)
 
                 _color = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineColor
+                _lineId = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineId
             }
             else{
                 _number = _setting.stationList[_setting.stationList.length - 1].number
 
                 _color = _setting.stationList[_setting.stationList.length - 1].lineColor
+                _lineId = _setting.stationList[_setting.stationList.length - 1].lineId
             }
         }
         _setting.stationList.splice(_index, 0, {
@@ -71,6 +74,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             lineColor: _color,
             transfers: "",
             isPass: false,
+            sectionTime: "",
+            lineId: _lineId,
             coordinate: [null, null]
         })
         setSetting(_setting)
@@ -151,6 +156,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                             <th>駅名英語</th>
                             <th>ナンバリング</th>
                             <th>乗換路線</th>
+                            <th>次区間路線名</th>
+                            <th>次区間所要時間</th>
                             <th>緯度</th>
                             <th>経度</th>
                         </tr>
@@ -193,6 +200,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 )
                                             })
                                         }
+                                    </td>
+                                    <td style={{backgroundColor: setting.lineDict[station?.lineId]?.color}}>
+                                        {setting.lineDict[station?.lineId]?.name}
+                                    </td>
+                                    <td>
+                                        {station?.sectionTime}
                                     </td>
                                     <td>
                                         {station?.coordinate[0]}
