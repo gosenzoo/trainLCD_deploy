@@ -26,7 +26,7 @@ class HeaderController{
             dispCarNum: this.setting.info.carNumber,
             destinationText: this.setting.info.destination,
             destinationKana: this.setting.info.destinationKana,
-            destinationEng: this.setting.info.directionEng,
+            destinationEng: this.setting.info.destinationEng,
             destinationNum: this.setting.info.destinationNum,
             destinationColor: this.setting.info.destinationColor,
             viaText: this.setting.info.direction,
