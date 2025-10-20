@@ -122,7 +122,8 @@ class DefaultLineController{
             buf += parseInt(this.setting.stationList[i].sectionTime);
             i++;
             if(dispStationList[nowInd+1]._id === i){ //見ている駅がdispに入っていたら
-                timeList.push(buf);
+                if(!Number.isNaN(buf)){ timeList.push(buf); }
+                else{ timeList.push(-1); }
                 nowInd++;
             }
         }
