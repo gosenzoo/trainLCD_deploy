@@ -11,6 +11,7 @@ type editorHeadType = {
 const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
     const [displayType, setDisplayType] = useState<string>("tokyu")
     const router = useRouter()
+    let readData: settingType;
 
     const inputToSetting = (e: any) => {
         try{
@@ -20,7 +21,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
                 const reader = new FileReader()
                 reader.onload = (ee: any) => {
                     try {
-                        setSetting(JSON.parse(ee.target.result))
+                        readData = JSON.parse(ee.target.result)
                     }
                     catch (err) {
                         alert('設定ファイル読み込み時にエラーが発生')
@@ -76,7 +77,38 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <label>設定ファイル入力</label>
             <input id="settingInput" type="file" onChange={inputToSetting}></input>
             <br></br>
+            <button onClick={() => {
+                let _setting = setting;
+                _setting.info = readData.info;
+                setSetting(_setting);
+            }}>info読み込み</button>
+            <br></br>
+            <button onClick={() => {
+                let _setting = setting;
+                _setting.stationList = readData.stationList;
+                setSetting(_setting);
+            }}>駅読み込み</button>
+            <br></br>
+            <button onClick={() => {
+                let _setting = setting;
+                _setting.lineDict = readData.lineDict;
+                setSetting(_setting);
+            }}>路線読み込み</button>
+            <br></br>
+            <button onClick={() => {
+                let _setting = setting;
+                _setting.iconDict = structuredClone(readData.iconDict);
+                console.log(_setting)
+                setSetting(_setting);
+            }}>アイコン読み込み</button>
+            <br></br>
+            <button onClick={() => {
+                setSetting(readData);
+            }}>すべて読み込み</button>
+            <br></br>
+            <br></br>
             <button onClick={downloadFromSettings}>設定をダウンロード</button>
+            <br></br>
             <br></br>
             <select onChange={displayTypeSelectChanged}>
                 <option value="tokyu">東急</option>

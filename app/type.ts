@@ -36,7 +36,9 @@ type stationType = {
     isPass: boolean,
     sectionTime: string,
     lineId: string,
-    coordinate: [number | null, number | null]
+    coordinate: [number | null, number | null],
+    transferText: string,
+    transferTextEng: string
 }
 
 type lineType = {
@@ -47,7 +49,7 @@ type lineType = {
     color: string,
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId'
+type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 

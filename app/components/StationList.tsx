@@ -76,7 +76,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             isPass: false,
             sectionTime: "",
             lineId: _lineId,
-            coordinate: [null, null]
+            coordinate: [null, null],
+            transferText: "",
+            transferTextEng: ""
         })
         setSetting(_setting)
 
