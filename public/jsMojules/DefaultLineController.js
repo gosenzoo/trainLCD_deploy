@@ -135,14 +135,36 @@ class DefaultLineController{
 
         //路線名
         const lineNameList = []
-        for(let i = 0; i < stationFrameNum + 2; i++){
-
+        let lineIdBuf = dispStationList[0].lineId;
+        let multiFlag = false;
+        for(let i = 0; i < stationFrameNum; i++){
+            if(lineIdBuf !== dispStationList[i].lineId){ //路線が変わったら
+                lineNameList.push([this.setting.lineDict[dispStationList[i].lineId].name, this.setting.lineDict[dispStationList[i].lineId].eng]);
+                multiFlag = true;
+            }
+            else{
+                lineNameList.push(null);
+            }
+            lineIdBuf = dispStationList[i].lineId;
         }
+        if(multiFlag){
+            lineNameList.unshift([this.setting.lineDict[dispStationList[0].lineId].name, this.setting.lineDict[dispStationList[0].lineId].eng]);
+        }
+        for(let i = lineNameList.length - 1; 0 <= i; i--){
+            if(lineNameList[i] !== null){
+                let temp = lineNameList[i];
+                lineNameList[i] = null;
+                lineNameList[lineNameList.length-1] = temp;
+                break;
+            }
+        }
+        console.log(lineNameList);
 
         return {
             dispStationList: dispStationList,
             stationFrameNum: stationFrameNum,
             colorList: colorList,
+            lineNameList: lineNameList,
             passStationList: passStationList,
             leftStationList: leftStationList,
             hereDrawPos: hereDrawPos,

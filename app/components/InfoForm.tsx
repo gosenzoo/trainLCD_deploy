@@ -31,6 +31,17 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
 
     return(
         <div>
+            <label>進行方向</label>
+            <select onChange={(e) => {formUpdated(e, 'leftOrRight')}} value={setting.info.leftOrRight}>
+                <option value={'right'}>右</option>
+                <option value={'left'}>左</option>
+            </select>
+            <br></br>
+            環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
+            <br></br>
+            座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
+            <br></br>
+            <br></br>
             <h2>基本設定</h2>
             <label>設定名</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
@@ -77,15 +88,6 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>号車</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'carNumber')}} value={setting.info.carNumber}></input>
             <br></br>
-            <label>進行方向</label>
-            <select onChange={(e) => {formUpdated(e, 'leftOrRight')}} value={setting.info.leftOrRight}>
-                <option value={'right'}>右</option>
-                <option value={'left'}>左</option>
-            </select>
-            <br></br>
-            環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
-            <br></br>
-            座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
         </div>
     )
 }

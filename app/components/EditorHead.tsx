@@ -65,12 +65,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
         }
         if(displayType === "JE-E131"){ console.log("ないです") }
     }
-    const deleteSetting = () => {
-        if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
-            setSetting(initSettingObject)
-        }
-        return
-    }
 
     return(
         <div>
@@ -108,16 +102,21 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <br></br>
             <br></br>
             <button onClick={downloadFromSettings}>設定をダウンロード</button>
+            <button onClick={() => {
+                if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
+                    setSetting(initSettingObject);
+                }
+                return;
+            }}>設定を初期化</button>
             <br></br>
             <br></br>
+            <h2>表示設定</h2>
             <select onChange={displayTypeSelectChanged}>
                 <option value="tokyu">東急</option>
                 <option value="JW-225">JR西日本 225系</option>
                 <option value="JE-E131">JR東日本 E131系</option>
             </select>
             <button onClick={openDisplay}>表示</button>
-            <br></br>
-            <button onClick={deleteSetting}>設定を初期化</button>
         </div>
     )
 }

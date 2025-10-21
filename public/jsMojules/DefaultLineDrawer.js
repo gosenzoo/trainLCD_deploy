@@ -63,7 +63,7 @@ class DefaultLineDrawer{
         // 線と現在地アイコン
         const lineObj = document.createElementNS("http://www.w3.org/2000/svg", "g");
         // 線
-        lineObj.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
+        lineObj.appendChild(this.createLine(drawParams.stationFrameNum, drawParams.colorList, drawParams.lineNameList, drawParams.passStationList, drawParams.hereDrawPos, drawParams.lineLeapPosList, drawParams.isStart, drawParams.isEnd)) //線
         // 現在地アイコン
         let d = drawParams.hereDrawPos * (this.lenStartToEnd / (drawParams.stationFrameNum - 1));
         lineObj.appendChild(this.createHereIcon(this.stationStartX + d, this.lineY));
@@ -229,7 +229,7 @@ class DefaultLineDrawer{
         return stationParts;
     }
     // 線組み立て
-    createLine(stationFrameNum, colorList, passStationList, hereDrawPos, lineLeapPosList, isStart, isEnd){
+    createLine(stationFrameNum, colorList, lineNameList, passStationList, hereDrawPos, lineLeapPosList, isStart, isEnd){
         console.log(hereDrawPos);
 
         const line = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
