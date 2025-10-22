@@ -128,8 +128,18 @@
       <rect id="stationEnd" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
       <!-- 路線ベース通過駅アイコン -->
       <polygon id="passStation" points="1256,738 1267,738 1296,764.5 1267,791 1256,791 1285,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
-      <!-- 路線ベース路線名テキスト -->
-      <rect id="lineNameText" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle}' />
+      <!-- 路線ベース路線名テキスト始点側 -->
+      <rect id="lineNameStartText" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト先端側 -->
+      <rect id="lineNameEndText" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト始点側(英語) -->
+      <rect id="lineNameStartTextEng" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト先端側(英語) -->
+      <rect id="lineNameEndTextEng" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- (分) -->
+      <rect id="MinuteText" x="1770" y="752" width="60" height="44" fill="#ffffff" data-style='{"fill": "rgb(255, 255, 255)", "fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle", "textShadow": "1px 1px 1px rgb(50, 50, 50)"}' />
+      <!-- (min) -->
+      <rect id="MinuteTextEng" x="1760" y="752" width="70" height="44" fill="#ffffff" data-style='{"fill": "rgb(255, 255, 255)", "fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle", "textShadow": "1px 1px 1px rgb(50, 50, 50)"}' />
       <!-- 路線ベース2影 -->
       <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
               fill="url(#outerGradient)"

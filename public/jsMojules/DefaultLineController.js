@@ -14,7 +14,8 @@ class DefaultLineController{
         let startInd;
         if(progressParams.posState === 2) { startInd = progressParams.currentStationInd; }
         else{ startInd = progressParams.currentStationInd - 1; }
-        let dispStationList = []
+        let dispStationList = [];
+        let dispStationNum = Math.min(this.setting.stationList.length, stationFrameNum);
         let dispStationListStartInd; //表示駅リスト左端駅の、全体リスト上でのインデックス
         let hereDrawPos;
         if(!this.setting.info.isLoop){ //環状運転でない場合
@@ -139,8 +140,14 @@ class DefaultLineController{
         let multiFlag = false;
         for(let i = 0; i < stationFrameNum; i++){
             if(lineIdBuf !== dispStationList[i].lineId){ //路線が変わったら
-                lineNameList.push([this.setting.lineDict[dispStationList[i].lineId].name, this.setting.lineDict[dispStationList[i].lineId].eng]);
-                multiFlag = true;
+                if(Math.floor(hereDrawPos) < i){ //通過した区間は、別路線かは気にしない
+                    lineNameList.push([
+                        this.setting.lineDict[dispStationList[i].lineId].name,
+                        this.setting.lineDict[dispStationList[i].lineId].eng,
+                        this.setting.lineDict[dispStationList[i].lineId].color
+                    ]);
+                    multiFlag = true;
+                }
             }
             else{
                 lineNameList.push(null);
@@ -148,7 +155,11 @@ class DefaultLineController{
             lineIdBuf = dispStationList[i].lineId;
         }
         if(multiFlag){
-            lineNameList.unshift([this.setting.lineDict[dispStationList[0].lineId].name, this.setting.lineDict[dispStationList[0].lineId].eng]);
+            lineNameList.unshift([
+                this.setting.lineDict[dispStationList[0].lineId].name,
+                this.setting.lineDict[dispStationList[0].lineId].eng,
+                this.setting.lineDict[dispStationList[0].lineId].color
+            ]);
         }
         for(let i = lineNameList.length - 1; 0 <= i; i--){
             if(lineNameList[i] !== null){
