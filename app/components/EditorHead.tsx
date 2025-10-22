@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
 import { read } from "fs"
+import { info } from "console"
 
 type editorHeadType = {
     setting: settingType,
@@ -33,8 +34,12 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
                 reader.onload = (ee: any) => {
                     try {
                         readData = JSON.parse(ee.target.result)
+                        mergeProperties(readData.info, initSettingObject.info);
                         readData.stationList.forEach(station => {
                             mergeProperties(station, initSettingObject.station);
+                        });
+                        Object.values(readData.lineDict).forEach(line => {
+                            mergeProperties(line, initSettingObject.line);
                         });
                     }
                     catch (err) {

@@ -1,11 +1,25 @@
 import { initScriptLoader } from "next/script"
 import "./type"
 
-const initSettingObject: settingType = {
-    info: {settingName: "", destination: "", destinationKana: "", destinationEng: "", destinationNum: "", destinationColor: "", direction: "", trainType: "", trainTypeEng: "",trainTypeSub: "", trainTypeSubEng: "", trainTypeColor: "", lineLogo: "", lineColor: "", carNumber: "", leftOrRight: 'right', isLoop: false, isMoveByCoord: false},
-    stationList: [],
-    lineDict: {},
-    iconDict: {}
+const initInfoObject: infoType = {
+    settingName: "",
+    destination: "",
+    destinationKana: "",
+    destinationEng: "",
+    destinationNum: "",
+    destinationColor: "",
+    direction: "",
+    trainType: "",
+    trainTypeEng: "",
+    trainTypeSub: "",
+    trainTypeSubEng: "",
+    trainTypeColor: "",
+    lineLogo: "",
+    lineColor: "",
+    carNumber: "",
+    leftOrRight: 'right',
+    isLoop: false,
+    isMoveByCoord: false
 }
 
 const initStationObject: stationType = {
@@ -23,4 +37,19 @@ const initStationObject: stationType = {
     transferTextEng: ""
 }
 
-export default {setting: initSettingObject, station: initStationObject}
+const initLineObject = {
+    lineIconKey: "",
+    name: "",
+    kana: "",
+    eng: "",
+    color: "",
+}
+
+const initSettingObject: settingType = {
+    info: initInfoObject,
+    stationList: [],
+    lineDict: {},
+    iconDict: {}
+}
+
+export default {setting: initSettingObject, info: initInfoObject, station: initStationObject, line: initLineObject}
