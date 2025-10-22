@@ -133,6 +133,8 @@ class DefaultLineController{
             dispStationList[i]._dispTime = timeList[i];
         }
         console.log(dispStationList)
+        let isDispTime = this.setting.info.isDispTime && !timeList.every(time => time < 0);
+        console.log(isDispTime)
 
         //路線名
         const lineNameList = []
@@ -184,6 +186,8 @@ class DefaultLineController{
             isStart: isStart,
             isEnd: isEnd,
             leftOrRight: this.setting.info.leftOrRight,
+            isDispTime: isDispTime,
+            isDispLineName: this.setting.info.isDispLineName
         }
     }
 

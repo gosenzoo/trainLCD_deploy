@@ -76,13 +76,17 @@ class DefaultLineDrawer{
         // 駅関連
         const jps = document.createElementNS("http://www.w3.org/2000/svg", "g");
         for(let i = 0; i < drawParams.dispStationList.length; i++){
-            if(drawParams.leftOrRight === "right"){ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
-            else{ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
+            if(drawParams.leftOrRight === "right"){ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + i * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i], drawParams.isDispTime)); }
+            else{ jps.appendChild(this.createStationParts(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i], drawParams.isDispTime)); }
         }
         //分
-        jps.appendChild(this.createMinute(drawParams.leftOrRight));
+        if(drawParams.isDispTime){
+            jps.appendChild(this.createMinute(drawParams.leftOrRight));
+        }
         //路線名
-        jps.appendChild(this.createLineName(drawParams.lineNameList, drawParams.leftOrRight));
+        if(drawParams.isDispLineName){
+            jps.appendChild(this.createLineName(drawParams.lineNameList, drawParams.leftOrRight));
+        }
 
         // 英語
         // 駅関連
@@ -92,9 +96,13 @@ class DefaultLineDrawer{
             else{ engs.appendChild(this.createStationPartsEng(drawParams.dispStationList[i], this.stationStartX + (drawParams.stationFrameNum - 1 - i) * this.lenStartToEnd / (drawParams.stationFrameNum - 1), this.lineY, drawParams.lineDict, drawParams.passStationList[i] || drawParams.leftStationList[i])); }
         }
         //(min)
-        engs.appendChild(this.createMinuteEng(drawParams.leftOrRight));
+        if(drawParams.isDispTime){
+            engs.appendChild(this.createMinuteEng(drawParams.leftOrRight));
+        }
         //路線名
-        engs.appendChild(this.createLineNameEng(drawParams.lineNameList, drawParams.leftOrRight));
+        if(drawParams.isDispLineName){
+            engs.appendChild(this.createLineNameEng(drawParams.lineNameList, drawParams.leftOrRight));
+        }
         
         group.appendChild(this.animator.createStepSVG([jps, engs], [9020, 4510]));
 
@@ -103,7 +111,7 @@ class DefaultLineDrawer{
         return group;
     }
     // 駅関連の文字を組み立て
-    createStationParts(station, x, y, lineDict, isPass){
+    createStationParts(station, x, y, lineDict, isPass, isDispTime){
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
@@ -158,7 +166,7 @@ class DefaultLineDrawer{
         }
 
         //所要時間
-        if(!isPass && !(station._dispTime < 0)){
+        if(!isPass && !(station._dispTime < 0) && isDispTime){
             const timeTextRect = (mapSVG).querySelector("#body-defaultLine-timeText");
             stationParts.appendChild(this.textDrawer.createByAreaEl(station._dispTime, timeTextRect).element);
         }

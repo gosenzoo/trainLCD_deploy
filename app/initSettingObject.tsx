@@ -19,7 +19,9 @@ const initInfoObject: infoType = {
     carNumber: "",
     leftOrRight: 'right',
     isLoop: false,
-    isMoveByCoord: false
+    isMoveByCoord: false,
+    isDispTime: true,
+    isDispLineName: true
 }
 
 const initStationObject: stationType = {

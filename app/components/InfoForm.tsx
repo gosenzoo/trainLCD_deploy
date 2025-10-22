@@ -17,7 +17,7 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
 
         const _setting: settingType = structuredClone(setting)
 
-        if(field !== "isLoop" && field !== "isMoveByCoord"){
+        if((field !== "isLoop") && (field !== "isMoveByCoord") && (field !== "isDispTime") && (field !== "isDispLineName")){
             //テキストボックス入力の場合
             _setting.info[field] = e.target.value
         }
@@ -40,6 +40,10 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
             <br></br>
             座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
+            <br></br>
+            所要時間表示<input type="checkbox" onChange={(e) => {formUpdated(e, 'isDispTime')}} checked={setting.info.isDispTime}></input>
+            <br></br>
+            路線名表示<input type="checkbox" onChange={(e) => {formUpdated(e, 'isDispLineName')}} checked={setting.info.isDispLineName}></input>
             <br></br>
             <br></br>
             <h2>基本設定</h2>
