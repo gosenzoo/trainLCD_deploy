@@ -57,8 +57,8 @@ class TextDrawer{
 
         const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
         const fontSize = this.getFontSize(height, styleJson.fontFamily, lang);
-
         let textWidth = this.getTextWidth(text, fontSize, styleJson);
+        //if(text === "Tamanomiya"){console.log("textWidth:" + textWidth + " maxWidth:" + maxWidth)}
         if(textWidth > maxWidth){ //テキスト描画時の長さがmaxSizeを超えていたら、圧縮
             textElem.setAttribute("textLength", `${maxWidth}px`); //テキストの長さを設定
             textElem.setAttribute("lengthAdjust", "spacingAndGlyphs"); //文字間隔とグリフの調整を有効にする
@@ -164,7 +164,7 @@ class TextDrawer{
         const ctx = canvas.getContext('2d');
 
         // フォントスタイルを正確に組み立て
-        ctx.font = `${fontSize}px '${styleJson.fontFamily}'`;
+        ctx.font = `${styleJson.fontWeight} ${fontSize}px '${styleJson.fontFamily}'`;
         //if(text === "湘南新宿ライン"){ console.log(ctx.font); }
 
         const metrics = ctx.measureText(text);

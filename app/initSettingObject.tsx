@@ -1,3 +1,4 @@
+import { initScriptLoader } from "next/script"
 import "./type"
 
 const initSettingObject: settingType = {
@@ -7,4 +8,19 @@ const initSettingObject: settingType = {
     iconDict: {}
 }
 
-export default initSettingObject
+const initStationObject: stationType = {
+    name: "",
+    kana: "",
+    eng: "",
+    number: "",
+    lineColor: "",
+    transfers: "",
+    isPass: false,
+    sectionTime: "",
+    lineId: "",
+    coordinate: [null, null],
+    transferText: "",
+    transferTextEng: ""
+}
+
+export default {setting: initSettingObject, station: initStationObject}

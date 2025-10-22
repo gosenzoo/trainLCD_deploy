@@ -35,7 +35,7 @@ class DefaultLineDrawer{
 
         const params = {
             styleJson: JSON.parse(transferLine.getAttribute("data-style")),
-            ctextHeightRatio: parseFloat(transferLine.getAttribute("data-textHeightRatio")),
+            textHeightRatio: parseFloat(transferLine.getAttribute("data-textHeightRatio")),
             left: parseFloat(transferArea.getAttribute("x")),
             top: parseFloat(transferArea.getAttribute("y")),
             width: parseFloat(transferArea.getAttribute("width")),
@@ -45,7 +45,7 @@ class DefaultLineDrawer{
 
         const paramsEng = {
             styleJson: JSON.parse(transferLineEng.getAttribute("data-style")),
-            ctextHeightRatio: parseFloat(transferLineEng.getAttribute("data-textHeightRatio")),
+            textHeightRatio: parseFloat(transferLineEng.getAttribute("data-textHeightRatio")),
             left: parseFloat(transferArea.getAttribute("x")),
             top: parseFloat(transferArea.getAttribute("y")),
             width: parseFloat(transferArea.getAttribute("width")),
@@ -206,8 +206,9 @@ class DefaultLineDrawer{
 
             const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
             let y1 = this.params.top;
+            const transferLineEngRect = (this.mapSVG).querySelector("#body-defaultLine-transferLineEng");
             for(let i = 0; i < transferCnt; i++){
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(lineTexts[i], this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio));
+                transferTexts.appendChild(this.textDrawer.createIconTextByArea(lineTexts[i], this.params.left, y1, this.params.width, height, JSON.parse(transferLineEngRect.getAttribute("data-style")), "ja", this.params.textHeightRatio));
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加

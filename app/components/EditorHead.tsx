@@ -2,10 +2,21 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
+import { read } from "fs"
 
 type editorHeadType = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
+}
+
+function mergeProperties<T extends object, U extends object>(A: T, B: U): T & U {
+  for (const key of Object.keys(B) as Array<keyof U>) {
+    if (!Object.hasOwn(A, key)) {
+      // @ts-expect-error: AとBの型をマージしているため
+      A[key] = B[key];
+    }
+  }
+  return A as T & U;
 }
 
 const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
@@ -22,6 +33,9 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
                 reader.onload = (ee: any) => {
                     try {
                         readData = JSON.parse(ee.target.result)
+                        readData.stationList.forEach(station => {
+                            mergeProperties(station, initSettingObject.station);
+                        });
                     }
                     catch (err) {
                         alert('設定ファイル読み込み時にエラーが発生')
@@ -104,7 +118,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <button onClick={downloadFromSettings}>設定をダウンロード</button>
             <button onClick={() => {
                 if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
-                    setSetting(initSettingObject);
+                    setSetting(initSettingObject.setting);
                 }
                 return;
             }}>設定を初期化</button>

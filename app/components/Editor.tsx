@@ -10,7 +10,7 @@ import "../type"
 import initSettingObject from '../initSettingObject'
 
 const Editor = () => {
-    const [setting, setSetting] = useState<settingType>(initSettingObject)
+    const [setting, setSetting] = useState<settingType>(initSettingObject.setting)
 
     return(
         <div>
