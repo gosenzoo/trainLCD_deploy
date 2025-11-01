@@ -35,7 +35,7 @@
     </linearGradient>
 
     <filter id="outline">
-      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="1" />
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2" />
       <feFlood flood-color="black" result="BLACK"/>
       <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
       <feMerge>
@@ -161,7 +161,7 @@
     </g>
     <g id="body-defaultLine-stationText" data-basePoint="1694,721">
       <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-      <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="250" fill="#99999950" />
+      <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="210" fill="#99999950" />
       <rect id="body-defaultLine-transferLine" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
       <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
       <rect id="body-defaultLine-stationName" x="1656.5" y="359" width="75" height="320" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
@@ -171,6 +171,11 @@
     </g>
   </g>
 
-  <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" />
-  <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
+  <g id="footer" visibility="visible">
+    <!-- 時間は異なります(英語) -->
+    <rect id="footer-estimateTimeText" x="1396" y="1028" width="510" height="35" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "regular", "textAnchor": "end", "fill": "rgb(0, 0, 0)"}' lang="en" />
+  </g>
+
+  <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+  <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" />
 </svg>

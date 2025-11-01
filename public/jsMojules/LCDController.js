@@ -10,43 +10,43 @@ class LCDController{
         this.animator = new Animator(); //アニメーターを初期化
 
         this.stopStationList = getStopStation(this.setting.stationList, this.setting.info.isLoop); //停車駅リストを保存
-        this.dispPageList = [["defaultLine"], ["defaultLine"], ["defaultLine"]]; //表示ページリストを初期化
         //進行状況コントローラーを初期化
         this.progressController = new ProgressController(this.setting.stationList.map(station => station.isPass), this.setting.info.isLoop);
         this.progressController.onLongStop = () => { this.setLCDToDisplay(); console.log("長時間停車!") }; //長時間停車イベント時にLCDを更新
         //ヘッダーコントローラーを初期化
         this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator)); //ヘッダーコントローラーを初期化
-        /* //コントローラー辞書を初期化
-        this.bodyControllerDict = {
-            //"defaultLine": new DefaultLineController(displayType)
-        };*/
+        //フッターコントローラを初期化
+        this.footerController = new FooterController(setting, new FooterDrawer(mapSVG, setting.iconDict, this.animator)); //フッターコントローラーを初期化
         
-        this.bodyController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator)); //使用するボディコントローラーを初期化 */
+        //デフォルト線路コントローラーを初期化
+        this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator));
 
-        this.setLCDToDisplay()
+        //[つぎは、まもなく、ただいま]の順
+        this.pageList = [
+            [[this.defaultLineController, 8000]],
+            [[this.defaultLineController, 8000]],
+            [[this.defaultLineController, 8000]]
+        ];
+
+        this.pageRotator = new PageRotator(() => {
+            this.setLCDToDisplay();
+        });
+
+        this.pageRotator.restart(this.pageList[this.progressController.posState]);
     }
 
     moveStation(step){
         this.progressController.moveStation(step); //現在の駅インデックスを更新
-        this.setLCDToDisplay()
+        this.pageRotator.restart(this.pageList[this.progressController.posState]);
     }
     moveState(step){
         this.progressController.moveState(step); //進行状態を更新
-        this.setLCDToDisplay()
+        this.pageRotator.restart(this.pageList[this.progressController.posState]);
     }
 
     //描画先にLCDをレンダリング
     setLCDToDisplay(){
-        let start = performance.now();
-        let t0 = performance.now();
         this.setTempToDisplay(this.createLCD());
-        let t1 = performance.now();
-        //console.log(`setLCDToDisplay(createLCD+setTempToDisplay): ${t1 - t0} ms`);
-        void this.displaySVG.offsetWidth; // reflowを強制
-        requestAnimationFrame(() => {
-            let end = performance.now();
-            //console.log(`setLCDToDisplay(render): ${end - start} ms`);
-        })
     }
     //描画先に仮描画先の内容を反映（レンダリング）
     setTempToDisplay(tempSVG){
@@ -64,8 +64,9 @@ class LCDController{
 
         //LCD要素を組み立てて追加
         this.animator.resetNum(); //アニメーターの番号をリセット
-        tempSVG.appendChild(this.bodyController.createAll(this.progressController.progressParams));
+        tempSVG.appendChild(this.pageRotator.getCurrentPage().createAll(this.progressController.progressParams));
         tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
+        //tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams));
 
         return tempSVG;
     }
