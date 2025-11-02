@@ -20,6 +20,12 @@ class LCDController{
         
         //デフォルト線路コントローラーを初期化
         this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator));
+        //全体路線コントローラを初期化
+        this.overLineController = new OverLineController(setting, new OverLineDrawer(mapSVG, setting.iconDict, this.animator));
+        //ホーム案内コントローラーを初期化
+        this.platformController = new PlatformController(setting, new PlatformDrawer(mapSVG, setting.iconDict, this.animator));
+        //乗換案内画面コントローラーを初期化
+        this.transferController = new TrasnferController(setting, new TransferDrawer(mapSVG, setting.iconDict, this.animator));
 
         //[つぎは、まもなく、ただいま]の順
         this.pageList = [
