@@ -15,7 +15,7 @@ class PlatformDrawer{
         //手前
         group.appendChild(this.createOneRail(837));
         //奥
-        group.appendChild(this.createOneRail(483));
+        //group.appendChild(this.createOneRail(483));
 
         //ホーム描画
         group.appendChild(this.createPlatformObj());
@@ -139,7 +139,14 @@ class PlatformDrawer{
                 baseBody:  "#b8b8b8",
                 baseShadow:"#9a9a9a",
                 yellow:    "#ffdd00"
-            }
+            },
+            // フェードは必要に応じて
+            hideTop: true,
+            hideBottom: false,
+            platformEdgeFadeLen: 20,
+            platformEdgeFadeStart: 10,
+            outlineFadeLen: 20,
+            outlineFadeStart: 5
         });
     }
 
@@ -157,7 +164,7 @@ class PlatformDrawer{
         const moveDur = Math.max(0.05, slideOffset / Math.max(1, slideSpeed)); // s
         const totalDur = moveDur + stopDuration; // s
         const pMove = (moveDur / totalDur) * 100; // 入線完了の%位置
-        const EPS = 0.05; // %単位の極小オフセット（同時刻競合の回避用）
+        const EPS = 0.01; // %単位の極小オフセット（同時刻競合の回避用）
 
         // 入線方向：left→右から左(+)、right→左から右(-)
         const dir = (trainParams.baseMode === "right") ? -1 : 1;
