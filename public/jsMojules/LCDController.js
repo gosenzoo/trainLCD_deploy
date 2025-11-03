@@ -27,9 +27,10 @@ class LCDController{
         //乗換案内画面コントローラーを初期化
         this.transferController = new TrasnferController(setting, new TransferDrawer(mapSVG, setting.iconDict, this.animator));
 
-        //[つぎは、まもなく、ただいま]の順
+        //[つぎは、まもなく、ただいま、駅通過中]の順
         this.pageList = [
             [[this.defaultLineController, 8000]],
+            [[this.platformController, 8000]],
             [[this.defaultLineController, 8000]],
             [[this.defaultLineController, 8000]]
         ];
@@ -38,16 +39,16 @@ class LCDController{
             this.setLCDToDisplay();
         });
 
-        this.pageRotator.restart(this.pageList[this.progressController.posState]);
+        this.pageRotator.restart(this.selectPage());
     }
 
     moveStation(step){
         this.progressController.moveStation(step); //現在の駅インデックスを更新
-        this.pageRotator.restart(this.pageList[this.progressController.posState]);
+        this.pageRotator.restart(this.selectPage());
     }
     moveState(step){
         this.progressController.moveState(step); //進行状態を更新
-        this.pageRotator.restart(this.pageList[this.progressController.posState]);
+        this.pageRotator.restart(this.selectPage());
     }
 
     //描画先にLCDをレンダリング
@@ -75,6 +76,25 @@ class LCDController{
         //tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams));
 
         return tempSVG;
+    }
+
+    selectPage(){
+        switch(this.progressController.posState){
+            case 0: //つぎは
+                return this.pageList[0];
+            case 1: //まもなく
+                return this.pageList[1];
+            case 2: //ただいま
+                if(this.progressController.runState === 1){ //停車中
+                    return this.pageList[2];
+                }
+                else{ //駅通過中
+                    return this.pageList[3];
+                }
+            default:
+                console.warn("不明な進行状態:", this.progressController.posState);
+                break;
+        }
     }
 
     //指定したSVG親要素内のすべてのアニメーション要素に対して beginElement() を適用する関数

@@ -69,6 +69,7 @@ class TextDrawer{
         if(styleJson.textAnchor === "middle"){ textElem.setAttribute("x", String(x + maxWidth / 2)); }
         else if(styleJson.textAnchor === "start"){ textElem.setAttribute("x", String(x)); }
         else if(styleJson.textAnchor === "end"){ textElem.setAttribute("x", String(x + maxWidth)); }
+        else{ textElem.setAttribute("x", String(x)); }
 
         let yOffset = height; 
         if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
