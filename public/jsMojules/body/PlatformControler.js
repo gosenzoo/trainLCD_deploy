@@ -7,8 +7,16 @@ class PlatformController {
     }
 
     extractDrawParams(progressParams){
-        return {
+        let dispStation;
+        let i = 0;
+        do{
+            dispStation = this.setting.stationList[progressParams.currentStationInd + i];
+            i++;
+        }while(dispStation.isPass);
 
+        return {
+            leftOrRight: this.setting.info.leftOrRight,
+            dispStation: dispStation,
         }
     }
 

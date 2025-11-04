@@ -78,7 +78,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             lineId: _lineId,
             coordinate: [null, null],
             transferText: "",
-            transferTextEng: ""
+            transferTextEng: "",
+            doorSide: 'left'
         })
         setSetting(_setting)
 
@@ -158,6 +159,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                             <th>駅名英語</th>
                             <th>ナンバリング</th>
                             <th>乗換路線</th>
+                            <th>ドア</th>
                             <th>次区間路線名</th>
                             <th>次区間所要時間</th>
                             <th>緯度</th>
@@ -202,6 +204,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 )
                                             })
                                         }
+                                    </td>
+                                    <td>
+                                        {(station?.doorSide === 'left') ? '左' : '右'}
                                     </td>
                                     <td style={{backgroundColor: setting.lineDict[station?.lineId]?.color}}>
                                         {setting.lineDict[station?.lineId]?.name}

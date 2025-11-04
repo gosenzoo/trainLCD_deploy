@@ -13,7 +13,7 @@ class PlatformDrawer{
         //group.appendChild(mapSVG.getElementById("tokyu-okuHome").cloneNode(true));
 
         //group.append(this.createStationSet("right", "left"));
-        group.append(this.createStationSet("right", "left"));
+        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide));
 
         return group;
     }

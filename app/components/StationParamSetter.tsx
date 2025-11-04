@@ -119,6 +119,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 }
             </select>
             <br></br>
+            <label>開くドア</label>
+            <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide}>
+                <option value={'right'}>右</option>
+                <option value={'left'}>左</option>
+            </select>
+            <br></br>
             <label>次区間所要時間(分)</label>
             <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
                 value={ targetStation?.sectionTime}

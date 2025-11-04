@@ -36,7 +36,8 @@ const initStationObject: stationType = {
     lineId: "",
     coordinate: [null, null],
     transferText: "",
-    transferTextEng: ""
+    transferTextEng: "",
+    doorSide: 'left'
 }
 
 const initLineObject = {
