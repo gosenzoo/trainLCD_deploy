@@ -184,4 +184,5 @@
   <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
   <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
   <image id="platform-jitubutu" href="./displaySvg/tokyu/platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+  <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
 </svg>

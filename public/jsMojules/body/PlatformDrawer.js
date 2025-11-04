@@ -10,18 +10,120 @@ class PlatformDrawer{
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         //group.appendChild(mapSVG.getElementById("platform-jitubutu").cloneNode(true));
+        //group.appendChild(mapSVG.getElementById("tokyu-okuHome").cloneNode(true));
 
-        //レール描画
-        //手前
-        group.appendChild(this.createOneRail(837));
-        //奥
-        //group.appendChild(this.createOneRail(483));
+        //group.append(this.createStationSet("right", "left"));
+        group.append(this.createStationSet("right", "left"));
 
-        //ホーム描画
-        group.appendChild(this.createPlatformObj());
+        return group;
+    }
 
-        //列車描画
-        group.appendChild(this.createTrainObj());
+    createStationSet(leftOfRight, doorSide){
+        const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+
+        //手前右向き
+        if((leftOfRight === "right") && (doorSide === "left")){
+            //レール描画
+            //手前
+            group.appendChild(this.createOneRail(837));
+            //奥
+            //group.appendChild(this.createOneRail(483));
+
+            //ホーム描画
+            group.appendChild(this.createPlatformObj({
+                referencePos: "front",
+                hideTop: true,
+                hideBottom: false,
+                anchorX: 46,
+                anchorY: 737,
+            }));
+
+            //列車描画
+            group.appendChild(this.createTrainObj({
+                baseMode: "right",
+                baseX: 1750,
+                baseY: 818,
+            }));
+        }
+        //手前左向き
+        else if((leftOfRight === "left") && (doorSide === "right")){
+            //レール描画
+            //手前
+            group.appendChild(this.createOneRail(837));
+            //奥
+            //group.appendChild(this.createOneRail(483));
+
+            //ホーム描画
+            group.appendChild(this.createPlatformObj({
+                referencePos: "front",
+                hideTop: true,
+                hideBottom: false,
+                anchorX: 46,
+                anchorY: 737,
+            }));
+
+            //列車描画
+            group.appendChild(this.createTrainObj({
+                baseMode: "left",
+                baseX: 170,
+                baseY: 818,
+            }));
+        }
+        //奥右向き
+        else if((leftOfRight === "right") && (doorSide === "right")){
+            //レール描画
+            //手前
+            //group.appendChild(this.createOneRail(824));
+            //奥
+            group.appendChild(this.createOneRail(496));
+
+            //列車描画
+            group.appendChild(this.createTrainObj({
+                baseMode: "right",
+                baseX: 1750,
+                baseY: 480,
+            }));
+
+            //ホーム描画
+            group.appendChild(this.createPlatformObj({
+                referencePos: "back",
+                hideTop: false,
+                hideBottom: true,
+                anchorX: 66,
+                anchorY: 480,
+                width: 1788,
+                baseBodyHeight: 23,
+                baseShadowHeight: 9,
+            }));
+        }
+        //奥左向き
+        else if((leftOfRight === "left") && (doorSide === "left")){
+            //レール描画
+            //手前
+            //group.appendChild(this.createOneRail(824));
+            //奥
+            group.appendChild(this.createOneRail(496));
+
+            //列車描画
+            group.appendChild(this.createTrainObj({
+                baseMode: "left",
+                baseX: 170,
+                baseY: 480,
+            }));
+
+            //ホーム描画
+            group.appendChild(this.createPlatformObj({
+                referencePos: "back",
+                hideTop: false,
+                hideBottom: true,
+                anchorX: 66,
+                anchorY: 480,
+                width: 1788,
+                baseBodyHeight: 23,
+                baseShadowHeight: 9,
+            }));
+        }
+        
 
         return group;
     }
@@ -47,11 +149,11 @@ class PlatformDrawer{
             colorSleeper: '#cfcfcfff',
             colorSleeperSide: '#9e9e9eff',
             colorRail: '#cfcfcfff',
-            colorRailFront: '#6e6e6eff',
+            colorRailFront: '#505050ff',
             colorRailOutline: '#6e6e6eff',
         });
     }
-    createTrainObj(){
+    createTrainObj(params = {}){
         const baseTrainParams = {
             carLength: 154,
             height: 66,
@@ -77,8 +179,8 @@ class PlatformDrawer{
 
             highlightCarId: 0,
             highlight: {
-                height: 95,
-                depth: 50,
+                height: 90,
+                depth: 30,
                 colorSideFace: "#313131ff",
                 colorMainFace: "#4e4e4eff",
                 colorTopFace:  "#7d7d7dff",
@@ -93,7 +195,7 @@ class PlatformDrawer{
             carLabels: ["1", "2", "3","4","5","6","7","8","9","10"],
             textDrawer: this.textDrawer,
             labelHeightNormal: 76,
-            labelHeightHighlight: 110,
+            labelHeightHighlight: 105,
             labelBottomOffset: -10,
             labelWidth: 120,
             labelStyleNormal: {
@@ -106,7 +208,7 @@ class PlatformDrawer{
         };
         // 3秒表示してまた入線する列車 <g> を作る
         const trainLoopG = this.createTrainApproach({
-            trainParams: baseTrainParams,
+            trainParams: {...baseTrainParams, ...params},
             stopDuration: 10, // 停車表示 4s
             slideOffset: 1920, // 画面外からの距離(px)
             slideSpeed: 1200, // 速度（px/s）→ 入線時間 ~0.75s
@@ -114,8 +216,8 @@ class PlatformDrawer{
         });
         return trainLoopG;
     }
-    createPlatformObj(){
-        return createPlatform({
+    createPlatformObj(params = {}){
+        return createPlatform({...{
             width: 1828,
             depth: 260,
             vanishX: 960,
@@ -133,11 +235,11 @@ class PlatformDrawer{
             anchorY: 737,
             referencePos: "front",
             colors: {
-                topFill:   "#e6e6e6",
-                frontFill: "#cfcfcf",
+                topFill:   "#d1d1d1ff",
+                frontFill: "#a9a9a9ff",
                 outline:   "#333333",
-                baseBody:  "#b8b8b8",
-                baseShadow:"#9a9a9a",
+                baseBody:  "#858585ff",
+                baseShadow:"#6f6f6fff",
                 yellow:    "#ffdd00"
             },
             // フェードは必要に応じて
@@ -147,7 +249,7 @@ class PlatformDrawer{
             platformEdgeFadeStart: 10,
             outlineFadeLen: 20,
             outlineFadeStart: 5
-        });
+        }, ...params});
     }
 
     // createTrain は既存のまま利用

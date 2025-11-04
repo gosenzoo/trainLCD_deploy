@@ -308,10 +308,19 @@ function createPlatform(params) {
   gRoot.appendChild(gFooth);
   gRoot.appendChild(gOutline);
 
-  // アンカー移動（足場前面の下底左端）
-  const pFLB = { x: frontRect.x, y: frontRect.y + frontRect.height };
-  const tx = anchorX - pFLB.x;
-  const ty = anchorY - pFLB.y;
+  // --- アンカー移動 ---
+  // front: 足場前面の下底左端（pFLB）
+  // back : 足場上面の上底左端（D）
+  let anchorPoint;
+  if (referencePos === "back") {
+    anchorPoint = { x: D.x, y: D.y }; // 上底左端
+  } else {
+    const pFLB = { x: frontRect.x, y: frontRect.y + frontRect.height };
+    anchorPoint = pFLB;               // 下底左端
+  }
+
+  const tx = anchorX - anchorPoint.x;
+  const ty = anchorY - anchorPoint.y;
   gRoot.setAttribute('transform', `translate(${tx}, ${ty})`);
 
   return gRoot;
