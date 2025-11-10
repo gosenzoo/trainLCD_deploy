@@ -93,7 +93,29 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <input type="text" onChange={(e) => {formUpdated(e, 'carNumber')}} value={setting.info.carNumber}></input>
             <br></br>
             <label>全体号車</label>
-            <input type="text" onChange={(e) => {formUpdated(e, 'carNumberList')}} value={setting.info.carNumberList}></input>
+            <input id="carNumberListInput" type="text" onChange={(e) => {formUpdated(e, 'carNumberList')}} value={setting.info.carNumberList}></input>
+            <button onClick={(e) => {
+                const carNumberListInput = document.getElementById("carNumberListInput") as HTMLInputElement;
+                const carNumberListArr = carNumberListInput.value.split(",");
+                carNumberListArr.reverse();
+                carNumberListInput.value = carNumberListArr.join(",");
+            }}>反転</button>
+            <br></br>
+            <label>全体号車連番入力</label>
+            <input id="sequenceCarTextInput" type="text"></input>
+            <button onClick={(e) => {
+                const sequenceCarTextInput = document.getElementById("sequenceCarTextInput") as HTMLInputElement;
+                const carNumberListInput = document.getElementById("carNumberListInput") as HTMLInputElement;
+                const maxNum = parseInt(sequenceCarTextInput.value);
+                let carNumberListStr = "";
+                for(let i=1; i<=maxNum; i++){
+                    carNumberListStr += i.toString();
+                    if(i !== maxNum){
+                        carNumberListStr += ",";
+                    }
+                }
+                carNumberListInput.value = carNumberListStr;
+            }}>入力</button>
             <br></br>
             <label>前方オフセット</label>
             <input type="number" onChange={(e) => {formUpdated(e, 'headOffset')}} value={setting.info.headOffset}></input>
