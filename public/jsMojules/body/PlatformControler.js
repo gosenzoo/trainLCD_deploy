@@ -32,7 +32,7 @@ class PlatformController {
             baseX = 1920 - headOffset;
         }
         else{
-            baseX = margin;
+            baseX = headOffset;
         }
 
         if(highlightCarId !== -1){
