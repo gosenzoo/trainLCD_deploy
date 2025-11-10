@@ -14,9 +14,43 @@ class PlatformController {
             i++;
         }while(dispStation.isPass);
 
+        const headOffset = parseInt(this.setting.info.headOffset);//仮データ
+        const backOffset = parseInt(this.setting.info.backOffset);//仮データ
+        const gap = 5;
+        const wholeLength = 1920 - headOffset - backOffset;
+
+        const carLabelText = this.setting.info.carNumberList;//仮データ
+        const carLabels = carLabelText.split(",");
+        const highlightCarId = carLabels.findIndex(label => label.includes("*"));
+        const cars = carLabels.length;
+
+        const carLength = (wholeLength - (cars - 1) * gap) / (cars);
+        const labelWidth = carLength - 10;
+
+        let baseX;
+        if(this.setting.info.leftOrRight === "right"){
+            baseX = 1920 - headOffset;
+        }
+        else{
+            baseX = margin;
+        }
+
+        if(highlightCarId !== -1){
+            carLabels[highlightCarId] = carLabels[highlightCarId].replace("*", "");
+        }
+        let trainParams = {
+            cars: cars,
+            carLength: carLength,
+            highlightCarId: highlightCarId,
+            carLabels: carLabels,
+            labelWidth: labelWidth,
+            baseX: baseX
+        }
+
         return {
             leftOrRight: this.setting.info.leftOrRight,
             dispStation: dispStation,
+            trainParams: trainParams
         }
     }
 

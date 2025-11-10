@@ -13,12 +13,12 @@ class PlatformDrawer{
         //group.appendChild(mapSVG.getElementById("tokyu-okuHome").cloneNode(true));
 
         //group.append(this.createStationSet("right", "left"));
-        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide));
+        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams));
 
         return group;
     }
 
-    createStationSet(leftOfRight, doorSide){
+    createStationSet(leftOfRight, doorSide, trainParams){
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
         //手前右向き
@@ -41,8 +41,13 @@ class PlatformDrawer{
             //列車描画
             group.appendChild(this.createTrainObj({
                 baseMode: "right",
-                baseX: 1750,
+                baseX: trainParams.baseX,
                 baseY: 818,
+                cars: trainParams.cars,
+                carLength: trainParams.carLength,
+                highlightCarId: trainParams.highlightCarId,
+                carLabels: trainParams.carLabels,
+                labelWidth: trainParams.labelWidth,
             }));
         }
         //手前左向き
@@ -65,8 +70,13 @@ class PlatformDrawer{
             //列車描画
             group.appendChild(this.createTrainObj({
                 baseMode: "left",
-                baseX: 170,
+                baseX: trainParams.baseX,
                 baseY: 818,
+                cars: trainParams.cars,
+                carLength: trainParams.carLength,
+                highlightCarId: trainParams.highlightCarId,
+                carLabels: trainParams.carLabels,
+                labelWidth: trainParams.labelWidth,
             }));
         }
         //奥右向き
@@ -80,8 +90,13 @@ class PlatformDrawer{
             //列車描画
             group.appendChild(this.createTrainObj({
                 baseMode: "right",
-                baseX: 1750,
+                baseX: trainParams.baseX,
                 baseY: 480,
+                cars: trainParams.cars,
+                carLength: trainParams.carLength,
+                highlightCarId: trainParams.highlightCarId,
+                carLabels: trainParams.carLabels,
+                labelWidth: trainParams.labelWidth,
             }));
 
             //ホーム描画
@@ -107,8 +122,13 @@ class PlatformDrawer{
             //列車描画
             group.appendChild(this.createTrainObj({
                 baseMode: "left",
-                baseX: 170,
+                baseX: trainParams.baseX,
                 baseY: 480,
+                cars: trainParams.cars,
+                carLength: trainParams.carLength,
+                highlightCarId: trainParams.highlightCarId,
+                carLabels: trainParams.carLabels,
+                labelWidth: trainParams.labelWidth,
             }));
 
             //ホーム描画
@@ -192,7 +212,7 @@ class PlatformDrawer{
             animStartX: 300,
             animInitialSpeed: 1200,
 
-            carLabels: ["1", "2", "3","4","5","6","7","8","9","10"],
+            carLabels: ["1","2","3","4","5","6","7","8","9","10"],
             textDrawer: this.textDrawer,
             labelHeightNormal: 76,
             labelHeightHighlight: 105,

@@ -25,7 +25,10 @@ type infoType = {
     isLoop: boolean,
     isMoveByCoord: boolean,
     isDispTime: boolean,
-    isDispLineName: boolean
+    isDispLineName: boolean,
+    carNumberList: string,
+    headOffset: string,
+    backOffset: string
 }
 
 type stationType = {
@@ -57,4 +60,4 @@ type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transf
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 
 type infoMembers = 'settingName' | 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 
-    'carNumber' | 'leftOrRight' | 'isLoop' | 'isMoveByCoord' | 'isDispTime' | 'isDispLineName'
+    'carNumber' | 'leftOrRight' | 'isLoop' | 'isMoveByCoord' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset'

@@ -20,6 +20,7 @@ function createPlatform(params) {
   } = params;
 
   const SVG_NS = "http://www.w3.org/2000/svg";
+  const EPS = 1e-3;
 
   const vanish = { x: vanishX, y: vanishY };
   const towardByDeltaY = (p, v, dyAbs) => {
@@ -61,106 +62,157 @@ function createPlatform(params) {
   const defs = document.createElementNS(SVG_NS, 'defs');
 
   // 台座グラデ（上=1, 下=0）
-  const grad = document.createElementNS(SVG_NS, 'linearGradient');
-  const gradId = `grad-base-body-${Math.random().toString(36).slice(2)}`;
-  grad.setAttribute('id', gradId);
-  grad.setAttribute('gradientUnits', 'userSpaceOnUse');
-  grad.setAttribute('x1', '0'); grad.setAttribute('x2', '0');
+  const gradBase = document.createElementNS(SVG_NS, 'linearGradient');
+  const gradBaseId = `grad-base-body-${Math.random().toString(36).slice(2)}`;
+  gradBase.setAttribute('id', gradBaseId);
+  gradBase.setAttribute('gradientUnits', 'userSpaceOnUse');
+  gradBase.setAttribute('x1', '0'); gradBase.setAttribute('x2', '0');
+  defs.appendChild(gradBase);
 
-  const stopTop = document.createElementNS(SVG_NS, 'stop');
-  stopTop.setAttribute('offset', '0%');
-  stopTop.setAttribute('stop-color', colors.baseBody);
-  stopTop.setAttribute('stop-opacity', '1');
+  // stopは後で座標決定後にセット
+  const stopBaseTop = document.createElementNS(SVG_NS, 'stop');
+  stopBaseTop.setAttribute('offset', '0%');
+  stopBaseTop.setAttribute('stop-color', colors.baseBody);
+  stopBaseTop.setAttribute('stop-opacity', '1');
+  const stopBaseKeep = document.createElementNS(SVG_NS, 'stop');
+  stopBaseKeep.setAttribute('stop-color', colors.baseBody);
+  stopBaseKeep.setAttribute('stop-opacity', '1');
+  const stopBaseBottom = document.createElementNS(SVG_NS, 'stop');
+  stopBaseBottom.setAttribute('offset', '100%');
+  stopBaseBottom.setAttribute('stop-color', colors.baseBody);
+  stopBaseBottom.setAttribute('stop-opacity', '0');
+  gradBase.appendChild(stopBaseTop);
+  gradBase.appendChild(stopBaseKeep);
+  gradBase.appendChild(stopBaseBottom);
 
-  const stopStart = document.createElementNS(SVG_NS, 'stop');
-  stopStart.setAttribute('stop-color', colors.baseBody);
-  stopStart.setAttribute('stop-opacity', '1');
-
-  const stopBottom = document.createElementNS(SVG_NS, 'stop');
-  stopBottom.setAttribute('offset', '100%');
-  stopBottom.setAttribute('stop-color', colors.baseBody);
-  stopBottom.setAttribute('stop-opacity', '0');
-
-  grad.appendChild(stopTop);
-  grad.appendChild(stopStart);
-  grad.appendChild(stopBottom);
-  defs.appendChild(grad);
-
-  // フェード用マスク
-  function makeVerticalMask(idBase, edge, start, len, hideUpper) {
-    const mask = document.createElementNS(SVG_NS, 'mask');
-    const maskId = `${idBase}-${Math.random().toString(36).slice(2)}`;
-    mask.setAttribute('id', maskId);
-
+  // 上面フィル用：フェードを stop-opacity で表現（iOS対策）
+  function makePlatformFillGradient(hideUpper, edge, start, len) {
+    const gid = `grad-platform-fill-${Math.random().toString(36).slice(2)}`;
     const lg = document.createElementNS(SVG_NS, 'linearGradient');
-    const lgId = `${maskId}-lg`;
-    lg.setAttribute('id', lgId);
+    lg.setAttribute('id', gid);
     lg.setAttribute('gradientUnits', 'userSpaceOnUse');
     lg.setAttribute('x1', '0'); lg.setAttribute('x2', '0');
 
-    const minX = Math.min(A.x, B.x, C.x, D.x);
-    const maxX = Math.max(A.x, B.x, C.x, D.x);
-    const minY = Math.min(yTopEdge, yBottomEdge);
-    const maxY = Math.max(yTopEdge, yBottomEdge);
-    const pad = 100;
-
-    const rect = document.createElementNS(SVG_NS, 'rect');
-    rect.setAttribute('x', String(minX - pad));
-    rect.setAttribute('y', String(minY - pad));
-    rect.setAttribute('width', String((maxX - minX) + pad * 2));
-    rect.setAttribute('height', String((maxY - minY) + pad * 2));
-    rect.setAttribute('fill', `url(#${lgId})`);
-
     if (hideUpper) {
       const y1 = edge;
-      const y2 = edge + Math.max(0, start + len);
+      let y2 = edge + Math.max(0, start + len);
+      if (Math.abs(y2 - y1) < EPS) y2 = y1 + EPS;
       lg.setAttribute('y1', String(y1));
       lg.setAttribute('y2', String(y2));
 
-      const s0 = document.createElementNS(SVG_NS, 'stop');
-      s0.setAttribute('offset', '0%'); s0.setAttribute('stop-color', '#fff'); s0.setAttribute('stop-opacity', '0');
+      const total = y2 - y1;
+      const offKeep = (start / total) * 100;
 
-      const total = Math.max(1e-6, (y2 - y1));
-      const off1 = (start / total) * 100;
+      const s0 = document.createElementNS(SVG_NS, 'stop');
+      s0.setAttribute('offset', '0%');
+      s0.setAttribute('stop-color', colors.topFill);
+      s0.setAttribute('stop-opacity', '0');
+
       const s1 = document.createElementNS(SVG_NS, 'stop');
-      s1.setAttribute('offset', `${Math.max(0, Math.min(100, off1))}%`);
-      s1.setAttribute('stop-color', '#fff'); s1.setAttribute('stop-opacity', '0');
+      s1.setAttribute('offset', `${Math.max(0, Math.min(100, offKeep))}%`);
+      s1.setAttribute('stop-color', colors.topFill);
+      s1.setAttribute('stop-opacity', '0');
 
       const s2 = document.createElementNS(SVG_NS, 'stop');
-      s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#fff'); s2.setAttribute('stop-opacity', '1');
+      s2.setAttribute('offset', '100%');
+      s2.setAttribute('stop-color', colors.topFill);
+      s2.setAttribute('stop-opacity', '1');
 
       lg.appendChild(s0); lg.appendChild(s1); lg.appendChild(s2);
     } else {
-      const y2 = edge;
+      let y2 = edge;
       const y1 = edge - Math.max(0, start + len);
+      if (Math.abs(y2 - y1) < EPS) y2 = y1 + EPS;
       lg.setAttribute('y1', String(y1));
       lg.setAttribute('y2', String(y2));
 
-      const total = Math.max(1e-6, (y2 - y1));
-      const offKeep1 = ((y2 - (start + len) - y1) / total) * 100;
-      const offKeep2 = ((y2 - start - y1) / total) * 100;
+      const total = y2 - y1;
+      const offFadeEnd = (len / total) * 100; // y1→(y2-start)までで 1→0
 
       const s0 = document.createElementNS(SVG_NS, 'stop');
-      s0.setAttribute('offset', '0%'); s0.setAttribute('stop-color', '#fff'); s0.setAttribute('stop-opacity', '1');
+      s0.setAttribute('offset', '0%');
+      s0.setAttribute('stop-color', colors.topFill);
+      s0.setAttribute('stop-opacity', '1');
 
       const s1 = document.createElementNS(SVG_NS, 'stop');
-      s1.setAttribute('offset', `${Math.max(0, Math.min(100, offKeep1))}%`);
-      s1.setAttribute('stop-color', '#fff'); s1.setAttribute('stop-opacity', '1');
+      s1.setAttribute('offset', `${Math.max(0, Math.min(100, offFadeEnd))}%`);
+      s1.setAttribute('stop-color', colors.topFill);
+      s1.setAttribute('stop-opacity', '0');
 
       const s2 = document.createElementNS(SVG_NS, 'stop');
-      s2.setAttribute('offset', `${Math.max(0, Math.min(100, offKeep2))}%`);
-      s2.setAttribute('stop-color', '#fff'); s2.setAttribute('stop-opacity', '0');
+      s2.setAttribute('offset', '100%');
+      s2.setAttribute('stop-color', colors.topFill);
+      s2.setAttribute('stop-opacity', '0');
 
-      const s3 = document.createElementNS(SVG_NS, 'stop');
-      s3.setAttribute('offset', '100%'); s3.setAttribute('stop-color', '#fff'); s3.setAttribute('stop-opacity', '0');
-
-      lg.appendChild(s0); lg.appendChild(s1); lg.appendChild(s2); lg.appendChild(s3);
+      lg.appendChild(s0); lg.appendChild(s1); lg.appendChild(s2);
     }
-
     defs.appendChild(lg);
-    mask.appendChild(rect);
-    defs.appendChild(mask);
-    return `url(#${maskId})`;
+    return gid;
+  }
+
+  // 外枠ストローク用：stop-opacity でフェード
+  function makeOutlineStrokeGradient(hideUpper, edge, start, len) {
+    const gid = `grad-outline-stroke-${Math.random().toString(36).slice(2)}`;
+    const lg = document.createElementNS(SVG_NS, 'linearGradient');
+    lg.setAttribute('id', gid);
+    lg.setAttribute('gradientUnits', 'userSpaceOnUse');
+    lg.setAttribute('x1', '0'); lg.setAttribute('x2', '0');
+
+    if (hideUpper) {
+      const y1 = edge;
+      let y2 = edge + Math.max(0, start + len);
+      if (Math.abs(y2 - y1) < EPS) y2 = y1 + EPS;
+      lg.setAttribute('y1', String(y1));
+      lg.setAttribute('y2', String(y2));
+
+      const total = y2 - y1;
+      const offKeep = (start / total) * 100;
+
+      const s0 = document.createElementNS(SVG_NS, 'stop');
+      s0.setAttribute('offset', '0%');
+      s0.setAttribute('stop-color', colors.outline);
+      s0.setAttribute('stop-opacity', '0');
+
+      const s1 = document.createElementNS(SVG_NS, 'stop');
+      s1.setAttribute('offset', `${Math.max(0, Math.min(100, offKeep))}%`);
+      s1.setAttribute('stop-color', colors.outline);
+      s1.setAttribute('stop-opacity', '0');
+
+      const s2 = document.createElementNS(SVG_NS, 'stop');
+      s2.setAttribute('offset', '100%');
+      s2.setAttribute('stop-color', colors.outline);
+      s2.setAttribute('stop-opacity', '1');
+
+      lg.appendChild(s0); lg.appendChild(s1); lg.appendChild(s2);
+    } else {
+      let y2 = edge;
+      const y1 = edge - Math.max(0, start + len);
+      if (Math.abs(y2 - y1) < EPS) y2 = y1 + EPS;
+      lg.setAttribute('y1', String(y1));
+      lg.setAttribute('y2', String(y2));
+
+      const total = y2 - y1;
+      const offFadeEnd = (len / total) * 100;
+
+      const s0 = document.createElementNS(SVG_NS, 'stop');
+      s0.setAttribute('offset', '0%');
+      s0.setAttribute('stop-color', colors.outline);
+      s0.setAttribute('stop-opacity', '1');
+
+      const s1 = document.createElementNS(SVG_NS, 'stop');
+      s1.setAttribute('offset', `${Math.max(0, Math.min(100, offFadeEnd))}%`);
+      s1.setAttribute('stop-color', colors.outline);
+      s1.setAttribute('stop-opacity', '0');
+
+      const s2 = document.createElementNS(SVG_NS, 'stop');
+      s2.setAttribute('offset', '100%');
+      s2.setAttribute('stop-color', colors.outline);
+      s2.setAttribute('stop-opacity', '0');
+
+      lg.appendChild(s0); lg.appendChild(s1); lg.appendChild(s2);
+    }
+    defs.appendChild(lg);
+    return gid;
   }
 
   // ---- 台座（背面）----
@@ -178,9 +230,9 @@ function createPlatform(params) {
     const y2 = baseBodyRect.y + baseBodyRect.height;
     const blurStartY = Math.max(y1, y2 - baseBlurLength);
     const blurStartRatio = (blurStartY - y1) / (y2 - y1);
-    grad.setAttribute('y1', String(y1));
-    grad.setAttribute('y2', String(y2));
-    stopStart.setAttribute('offset', `${Math.max(0, Math.min(1, blurStartRatio)) * 100}%`);
+    gradBase.setAttribute('y1', String(y1));
+    gradBase.setAttribute('y2', String(y2));
+    stopBaseKeep.setAttribute('offset', `${Math.max(0, Math.min(1, blurStartRatio)) * 100}%`);
   }
 
   if (!hideBottom) {
@@ -189,7 +241,7 @@ function createPlatform(params) {
     baseBody.setAttribute('y', baseBodyRect.y);
     baseBody.setAttribute('width', baseBodyRect.width);
     baseBody.setAttribute('height', baseBodyRect.height);
-    baseBody.setAttribute('fill', `url(#${gradId})`);
+    baseBody.setAttribute('fill', `url(#${gradBaseId})`);
     gBase.appendChild(baseBody);
 
     const baseShadow = document.createElementNS(SVG_NS, 'rect');
@@ -207,14 +259,16 @@ function createPlatform(params) {
   // 上面（台形）
   const topPath = document.createElementNS(SVG_NS, 'path');
   topPath.setAttribute('d', `M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} L ${D.x} ${D.y} Z`);
-  topPath.setAttribute('fill', colors.topFill);
 
-  if (hideTop && (platformEdgeFadeLen > 0)) {
-    const maskUrl = makeVerticalMask('mask-platform-top', yTopEdge, platformEdgeFadeStart, platformEdgeFadeLen, true);
-    topPath.setAttribute('mask', maskUrl);
-  } else if (hideBottom && (platformEdgeFadeLen > 0)) {
-    const maskUrl = makeVerticalMask('mask-platform-bottom', yBottomEdge, platformEdgeFadeStart, platformEdgeFadeLen, false);
-    topPath.setAttribute('mask', maskUrl);
+  // フィル（フェード）
+  if (hideTop && platformEdgeFadeLen > 0) {
+    const gid = makePlatformFillGradient(true, yTopEdge, platformEdgeFadeStart, platformEdgeFadeLen);
+    topPath.setAttribute('fill', `url(#${gid})`);
+  } else if (hideBottom && platformEdgeFadeLen > 0) {
+    const gid = makePlatformFillGradient(false, yBottomEdge, platformEdgeFadeStart, platformEdgeFadeLen);
+    topPath.setAttribute('fill', `url(#${gid})`);
+  } else {
+    topPath.setAttribute('fill', colors.topFill);
   }
   gFooth.appendChild(topPath);
 
@@ -235,7 +289,6 @@ function createPlatform(params) {
   // 上面の外周（A→Bは描かない）
   const outlineTop_1 = document.createElementNS(SVG_NS, 'path');
   outlineTop_1.setAttribute('fill', 'none');
-  outlineTop_1.setAttribute('stroke', colors.outline);
   outlineTop_1.setAttribute('stroke-width', outlineWidth);
   outlineTop_1.setAttribute('stroke-linejoin', 'round');
 
@@ -243,11 +296,11 @@ function createPlatform(params) {
   if (!hideTop) {
     outlineTop_1.setAttribute('d', `M ${B.x} ${B.y} L ${C.x} ${C.y} L ${D.x} ${D.y} L ${A.x} ${A.y}`);
   } else {
+    // C→D を描かない
     outlineTop_1.setAttribute('d', `M ${B.x} ${B.y} L ${C.x} ${C.y}`);
     outlineTop_2 = document.createElementNS(SVG_NS, 'path');
     outlineTop_2.setAttribute('d', `M ${D.x} ${D.y} L ${A.x} ${A.y}`);
     outlineTop_2.setAttribute('fill', 'none');
-    outlineTop_2.setAttribute('stroke', colors.outline);
     outlineTop_2.setAttribute('stroke-width', outlineWidth);
     outlineTop_2.setAttribute('stroke-linejoin', 'round');
   }
@@ -263,37 +316,47 @@ function createPlatform(params) {
     outlineFrontLeft = document.createElementNS(SVG_NS, 'path');
     outlineFrontLeft.setAttribute('d', `M ${pFLU.x} ${pFLU.y} L ${pFLB.x} ${pFLB.y}`);
     outlineFrontLeft.setAttribute('fill', 'none');
-    outlineFrontLeft.setAttribute('stroke', colors.outline);
     outlineFrontLeft.setAttribute('stroke-width', outlineWidth);
     outlineFrontLeft.setAttribute('stroke-linejoin', 'round');
 
     outlineFrontRight = document.createElementNS(SVG_NS, 'path');
     outlineFrontRight.setAttribute('d', `M ${pFRB.x} ${pFRB.y} L ${pFRU.x} ${pFRU.y}`);
     outlineFrontRight.setAttribute('fill', 'none');
-    outlineFrontRight.setAttribute('stroke', colors.outline);
     outlineFrontRight.setAttribute('stroke-width', outlineWidth);
     outlineFrontRight.setAttribute('stroke-linejoin', 'round');
 
     outlineFrontBottom = document.createElementNS(SVG_NS, 'path');
     outlineFrontBottom.setAttribute('d', `M ${pFLB.x} ${pFLB.y} L ${pFRB.x} ${pFRB.y}`);
     outlineFrontBottom.setAttribute('fill', 'none');
-    outlineFrontBottom.setAttribute('stroke', colors.outline);
     outlineFrontBottom.setAttribute('stroke-width', outlineWidth);
   }
 
-  // 外枠フェード（★hideTop時は前面下辺・左右縦線にはマスク適用しない＝常に表示）
-  const needsOutlineMask = (outlineFadeLen > 0) && (hideTop || hideBottom);
-  if (needsOutlineMask) {
-    const maskUrl = hideTop
-      ? makeVerticalMask('mask-outline-top', yTopEdge, outlineFadeStart, outlineFadeLen, true)
-      : makeVerticalMask('mask-outline-bottom', yBottomEdge, outlineFadeStart, outlineFadeLen, false);
+  // 外枠のストローク指定（hideTop: 前面三辺は常時表示, hideBottom: 前面枠は描かない）
+  if ((hideTop || hideBottom) && outlineFadeLen > 0) {
+    const gid = hideTop
+      ? makeOutlineStrokeGradient(true,  yTopEdge,    outlineFadeStart, outlineFadeLen)
+      : makeOutlineStrokeGradient(false, yBottomEdge, outlineFadeStart, outlineFadeLen);
 
-    // 上面側の線にのみ適用
-    outlineTop_1.setAttribute('mask', maskUrl);
-    if (outlineTop_2) outlineTop_2.setAttribute('mask', maskUrl);
+    // 上面側（B→C, D→Aなど）だけにグラデーションストローク
+    outlineTop_1.setAttribute('stroke', `url(#${gid})`);
+    if (outlineTop_2) outlineTop_2.setAttribute('stroke', `url(#${gid})`);
 
-    // hideBottom の場合は前面枠を描いていないのでここは何もしない。
-    // hideTop の場合は前面左右・下辺を常時表示したいのでマスクは適用しない。
+    if (!hideTop) {
+      // hideBottom の場合：前面枠は描かないので何もしない
+      // hideTop=false のときはここに来ない
+    }
+  } else {
+    // フェードなし：単色ストローク
+    outlineTop_1.setAttribute('stroke', colors.outline);
+    if (outlineTop_2) outlineTop_2.setAttribute('stroke', colors.outline);
+  }
+
+  // 前面枠のストローク（hideTop のときも単色で常時表示）
+  if (!hideBottom) {
+    const strokeColor = colors.outline;
+    outlineFrontLeft.setAttribute('stroke', strokeColor);
+    outlineFrontRight.setAttribute('stroke', strokeColor);
+    outlineFrontBottom.setAttribute('stroke', strokeColor);
   }
 
   gOutline.appendChild(outlineTop_1);
@@ -316,9 +379,8 @@ function createPlatform(params) {
     anchorPoint = { x: D.x, y: D.y }; // 上底左端
   } else {
     const pFLB = { x: frontRect.x, y: frontRect.y + frontRect.height };
-    anchorPoint = pFLB;               // 下底左端
+    anchorPoint = pFLB;             // 下底左端
   }
-
   const tx = anchorX - anchorPoint.x;
   const ty = anchorY - anchorPoint.y;
   gRoot.setAttribute('transform', `translate(${tx}, ${ty})`);

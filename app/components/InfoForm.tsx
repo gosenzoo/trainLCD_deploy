@@ -92,6 +92,14 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>号車</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'carNumber')}} value={setting.info.carNumber}></input>
             <br></br>
+            <label>全体号車</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'carNumberList')}} value={setting.info.carNumberList}></input>
+            <br></br>
+            <label>前方オフセット</label>
+            <input type="number" onChange={(e) => {formUpdated(e, 'headOffset')}} value={setting.info.headOffset}></input>
+            <br></br>
+            <label>後方オフセット</label>
+            <input type="number" onChange={(e) => {formUpdated(e, 'backOffset')}} value={setting.info.backOffset}></input>
         </div>
     )
 }
