@@ -2,8 +2,4 @@
     <rect id="lineColor" x="0" y="0" rx="35" ry="35" width="225" height="225" fill="#ff0000" />
     <rect id="symbolArea" x="25" y="21" width="175" height="62" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
     <rect id="numberArea" x="25" y="105" width="175" height="97" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
-    <!-- <rect id="lineColor" x="0" y="0" width="225" rx="25" ry="25" height="225" fill="rgb(0, 0, 0)"/> -->
-    <!-- <rect x="25" y="25" width="175" height="175" fill="rgb(255, 255, 255)"/> -->
-    <!-- <rect id="symbolArea" x="30" y="63" width="165" height="98" fill="#e1e1e1" data-font-family="Overused Grotesk" data-font-weight="600" /> -->
-    <!-- <text x="112.5" y="161" font-family="Overused Grotesk" font-size="150" font-weight="500" text-anchor="middle">JK</text> -->
 </svg>

@@ -17,18 +17,18 @@ class HeaderDrawer{
         group.appendChild(this.createCarNum(drawParams.dispCarNum)) //号車
 
         if(drawParams.isTerminal){ //終点なら
-            group.appendChild(this.createNumbering(drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
+            group.appendChild(this.createNumbering(drawParams.dispStation.numIconPresetKey, drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTerminalText(drawParams.arrivingTextType)); //終着駅テキスト
         }
         else if(drawParams.isLongStop){ //長時間停車中なら
-            group.appendChild(this.createNumbering(drawParams.destinationColor, drawParams.destinationNum)); //ナンバリング
+            group.appendChild(this.createNumbering(drawParams.dispStation.numIconPresetKey, drawParams.destinationColor, drawParams.destinationNum)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.destinationText, drawParams.destinationKana, drawParams.destinationEng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createLongStopText(drawParams)); //長時間停車テキスト
         }
         else{ //通常
-            group.appendChild(this.createNumbering(drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
+            group.appendChild(this.createNumbering(drawParams.dispStation.numIconPresetKey, drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
@@ -90,9 +90,10 @@ class HeaderDrawer{
 
         return stationNameText;
     }
-    createNumbering(color, number){ //表示駅のナンバリングを描画
+    createNumbering(numIconKey, color, number){ //表示駅のナンバリングを描画
         if(number === ""){ return document.createElementNS("http://www.w3.org/2000/svg", "g"); }
 
+        /*
         const numbering = (this.mapSVG).querySelector("#header-numbering").cloneNode(true); //ナンバリングSVGを複製
         const lineColorRect = numbering.querySelector("#icon-lineColor");
         const symbolRect = numbering.querySelector("#icon-symbol");
@@ -103,8 +104,33 @@ class HeaderDrawer{
         numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[1], numberRect).element); //ナンバリングテキストを追加
         symbolRect.remove(); //記号矩形を削除
         numberRect.remove(); //ナンバリング矩形を削除
+        */
 
-        numbering.appendChild(this.numIconDrawer.createNumIconFromPreset("tokyu", "A", "01", color, {x: 0, y: 0, width: 50, height: 50}));
+        const numberingRect = (this.mapSVG).querySelector("#header-numbering-rect").cloneNode(true); //ナンバリングSVGを複製
+        const geometory = {
+            x: parseFloat(numberingRect.getAttribute("x")),
+            y: parseFloat(numberingRect.getAttribute("y")),
+            width: parseFloat(numberingRect.getAttribute("width")),
+            height: parseFloat(numberingRect.getAttribute("height"))
+        }
+
+        const def = 
+        `<defs>
+            <filter id="whiteOutline">
+            <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="5" />
+            <feFlood flood-color="white" result="BLACK"/>
+            <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
+            <feMerge>
+                <feMergeNode in="OUTLINE"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+            </filter>
+        </defs>`;
+        const numbering = this.numIconDrawer.createNumIconFromPreset(numIconKey, number.split(" ")[0], number.split(" ")[1], color, geometory);
+        numbering.setAttribute("filter", "url(#whiteOutline)");
+        numbering.innerHTML += def;
+
+        //numbering.appendChild(icon);
 
         return numbering;
     }

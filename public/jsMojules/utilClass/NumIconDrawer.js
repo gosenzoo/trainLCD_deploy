@@ -7,7 +7,6 @@ class NumIconDrawer {
 
     createNumIconFromPreset(key, symbolText, numberText, lineColor, geometory = { x: 0, y: 0, width: 0, height: 0 }) {
         let presetSVG = this.numIconPresets[key];
-        console.log(this.numIconPresets.keys);
         if (!presetSVG) {
             console.error(`ナンバリング記号プリセットが見つかりません: ${key}`);
             return null;
