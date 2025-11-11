@@ -1,6 +1,9 @@
 //URLからSVGをelementとして取得する関数
 async function getSVGElementFromUrl(url) {
-    const response = await fetch(url);
+    const response = await fetch(url)
+    if(!response.ok){
+        throw new Error(`HTTP error: ${response.status}`);;
+    };
     const svgText = await response.text();
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(svgText, "image/svg+xml");

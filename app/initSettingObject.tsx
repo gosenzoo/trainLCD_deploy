@@ -33,6 +33,7 @@ const initStationObject: stationType = {
     eng: "",
     number: "",
     lineColor: "",
+    numIconPresetKey: "tokyu",
     transfers: "",
     isPass: false,
     sectionTime: "",

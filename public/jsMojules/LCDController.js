@@ -1,5 +1,5 @@
 class LCDController{
-    constructor(setting, mapSVG, displaySVG){
+    constructor(setting, mapSVG, numIconPresets, displaySVG){
         for(let i = 0; i < setting.stationList.length; i++){
             setting.stationList[i]._id = i;
         }
@@ -8,24 +8,25 @@ class LCDController{
         this.mapSVG = mapSVG; //フォーマットSVG
         this.displaySVG = displaySVG; //描画先SVG
         this.animator = new Animator(); //アニメーターを初期化
+        this.numIconDrawer = new NumIconDrawer(numIconPresets); //ナンバリング記号ドロワーを初期化
 
         this.stopStationList = getStopStation(this.setting.stationList, this.setting.info.isLoop); //停車駅リストを保存
         //進行状況コントローラーを初期化
         this.progressController = new ProgressController(this.setting.stationList.map(station => station.isPass), this.setting.info.isLoop);
         this.progressController.onLongStop = () => { this.setLCDToDisplay(); console.log("長時間停車!") }; //長時間停車イベント時にLCDを更新
         //ヘッダーコントローラーを初期化
-        this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator)); //ヘッダーコントローラーを初期化
+        this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer)); //ヘッダーコントローラーを初期化
         //フッターコントローラを初期化
-        this.footerController = new FooterController(setting, new FooterDrawer(mapSVG, setting.iconDict, this.animator)); //フッターコントローラーを初期化
+        this.footerController = new FooterController(setting, new FooterDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer)); //フッターコントローラーを初期化
         
         //デフォルト線路コントローラーを初期化
-        this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator));
+        this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //全体路線コントローラを初期化
-        this.overLineController = new OverLineController(setting, new OverLineDrawer(mapSVG, setting.iconDict, this.animator));
+        this.overLineController = new OverLineController(setting, new OverLineDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //ホーム案内コントローラーを初期化
-        this.platformController = new PlatformController(setting, new PlatformDrawer(mapSVG, setting.iconDict, this.animator));
+        this.platformController = new PlatformController(setting, new PlatformDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //乗換案内画面コントローラーを初期化
-        this.transferController = new TrasnferController(setting, new TransferDrawer(mapSVG, setting.iconDict, this.animator));
+        this.transferController = new TrasnferController(setting, new TransferDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
 
         //[つぎは、まもなく、ただいま、駅通過中]の順
         this.pageList = [

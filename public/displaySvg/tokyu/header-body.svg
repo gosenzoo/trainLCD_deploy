@@ -186,3 +186,21 @@
   <image id="platform-jitubutu" href="./displaySvg/tokyu/platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
   <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
 </svg>
+
+
+
+<!-- <svg width="200" height="200">
+  <defs>
+    <filter id="whiteOutline">
+      <feMorphology operator="dilate" radius="3" result="dilated" />
+      <feFlood flood-color="white" result="white" />
+      <feComposite in="white" in2="dilated" operator="in" result="outline" />
+      <feComposite in="outline" in2="SourceGraphic" operator="over" />
+    </filter>
+  </defs>
+
+  <text x="20" y="100"
+        fill="black"
+        font-size="60"
+        filter="url(#whiteOutline)">A</text>
+</svg> -->

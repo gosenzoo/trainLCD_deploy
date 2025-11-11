@@ -72,6 +72,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             eng: "",
             number: _number,
             lineColor: _color,
+            numIconPresetKey: "tokyu",
             transfers: "",
             isPass: false,
             sectionTime: "",

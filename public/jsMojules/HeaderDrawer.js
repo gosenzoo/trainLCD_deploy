@@ -1,9 +1,10 @@
 class HeaderDrawer{
-    constructor(mapSVG, iconDict, animator){
+    constructor(mapSVG, iconDict, animator, numIconDrawer){
         this.mapSVG = mapSVG;
         this.iconDict = iconDict;
         this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを生成
         this.animator = animator;
+        this.numIconDrawer = numIconDrawer;
 
         console.log("HeaderDrawer初期化完了");
     }
@@ -102,6 +103,8 @@ class HeaderDrawer{
         numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[1], numberRect).element); //ナンバリングテキストを追加
         symbolRect.remove(); //記号矩形を削除
         numberRect.remove(); //ナンバリング矩形を削除
+
+        numbering.appendChild(this.numIconDrawer.createNumIconFromPreset("tokyu", "A", "01", color, {x: 0, y: 0, width: 50, height: 50}));
 
         return numbering;
     }

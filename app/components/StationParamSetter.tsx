@@ -102,6 +102,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 value={ targetStation?.lineColor}
             ></input>
             <br></br>
+            <label>ナンバリング記号</label>
+            <input type="text" id="numIconPresetKeyInput" onChange={(e) => formUpdated(e, 'numIconPresetKey')}
+                value={ targetStation?.numIconPresetKey}
+            ></input>
+            <br></br>
             <label>乗換路線</label>
             <input type="text" id="transfersInput" onChange={(e) => formUpdated(e, 'transfers')}
                 value={ targetStation?.transfers}

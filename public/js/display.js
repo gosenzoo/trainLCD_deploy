@@ -30,10 +30,29 @@ window.onload = async function(){
     //〇localStrogeからsettings読み込み
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
     //〇フォーマットSVGの読み込み
-    mapSVG = await getSVGElementFromUrl(`/displaySvg/tokyu/header-body.svg`)
+    mapSVG = await getSVGElementFromUrl(`/displaySvg/tokyu/header-body.svg`);
+    //〇ナンバリング記号フォーマットSVGの読み込み
+    const _numIconKeyList = new Set();
+    settings.stationList.forEach(station => {
+        _numIconKeyList.add(station.numIconPresetKey);
+    });
+    const numIconKeyList = [..._numIconKeyList];
+    const numIconPresets = {};
+    // すべてのキーを処理し終えるまで待ちたい
+    await Promise.all(
+        numIconKeyList.map(async (key) => {
+            try {
+                const svgElement = await getSVGElementFromUrl(`/presetNumIcons/${key}.svg`);
+                numIconPresets[key] = svgElement;
+            } catch(err){
+                return;
+            }
+        })
+    );
+    console.log(numIconPresets);
 
     //LCDControllerを召喚
-    lcdController = new LCDController(settings, mapSVG, displaySVG);
+    lcdController = new LCDController(settings, mapSVG, numIconPresets, displaySVG);
 
     //ユーザ操作を受け付けるイベントリスナーを設定
     window.addEventListener("keydown", (e) => keyDown(e, lcdController)); //キーダウン（PC）
