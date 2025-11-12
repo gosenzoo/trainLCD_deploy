@@ -155,6 +155,7 @@ class DefaultLineDrawer{
         const stNameBottom = numIconTop - nameGap; //駅名下端のY座標を計算
         stNameRect.setAttribute("height", stNameBottom - parseFloat(stNameRect.getAttribute("y"))); //駅名rectの高さを調整
         
+        //stationParts.appendChild(stNameRect)
         //駅名
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
@@ -263,11 +264,14 @@ class DefaultLineDrawer{
             }
         })
         const jpWidth = parseFloat(stNameRect.getAttribute("height")) - (this.lineY - numIconTop); 
-        const width = jpWidth / (Math.sin(Math.abs(Math.PI * degree / 180)))
+        const enHeight = stationNameEngRect.getAttribute("height");
+        const radAbsDegree = Math.abs(Math.PI * degree / 180);
+        const width = jpWidth / (Math.sin(radAbsDegree)) - enHeight * Math.cos(radAbsDegree);
         console.log(width)
         stationNameEngRect.setAttribute("width", width);
         
         //駅名
+        //stationParts.appendChild(stationNameEngRect)
         stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);
 
         //乗換路線
