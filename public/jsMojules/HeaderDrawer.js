@@ -22,7 +22,7 @@ class HeaderDrawer{
             group.appendChild(this.createTerminalText(drawParams.arrivingTextType)); //終着駅テキスト
         }
         else if(drawParams.isLongStop){ //長時間停車中なら
-            group.appendChild(this.createNumbering(drawParams.dispStation.numIconPresetKey, drawParams.destinationColor, drawParams.destinationNum)); //ナンバリング
+            group.appendChild(this.createNumbering(drawParams.destinationNumIconKey, drawParams.destinationColor, drawParams.destinationNum)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.destinationText, drawParams.destinationKana, drawParams.destinationEng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createLongStopText(drawParams)); //長時間停車テキスト
@@ -92,19 +92,6 @@ class HeaderDrawer{
     }
     createNumbering(numIconKey, color, number){ //表示駅のナンバリングを描画
         if(number === ""){ return document.createElementNS("http://www.w3.org/2000/svg", "g"); }
-
-        /*
-        const numbering = (this.mapSVG).querySelector("#header-numbering").cloneNode(true); //ナンバリングSVGを複製
-        const lineColorRect = numbering.querySelector("#icon-lineColor");
-        const symbolRect = numbering.querySelector("#icon-symbol");
-        const numberRect = numbering.querySelector("#icon-number");
-
-        lineColorRect.setAttribute("fill", color); //線色を設定
-        numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[0], symbolRect).element); //路線記号テキストを追加
-        numbering.appendChild(this.textDrawer.createByAreaEl(number.split(" ")[1], numberRect).element); //ナンバリングテキストを追加
-        symbolRect.remove(); //記号矩形を削除
-        numberRect.remove(); //ナンバリング矩形を削除
-        */
 
         const numberingRect = (this.mapSVG).querySelector("#header-numbering-rect").cloneNode(true); //ナンバリングSVGを複製
         const geometory = {

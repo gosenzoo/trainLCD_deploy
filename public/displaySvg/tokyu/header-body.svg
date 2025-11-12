@@ -102,7 +102,7 @@
   </g>
 
   <!-- 標準路線図ボディ -->
-  <g id="body-defaultLine" style="isolation: isolate;" visibility="hidden">
+  <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
     <g filter="url(#outline)">
       <!-- 路線ベース左端（始点） -->
       <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(221, 221, 221)" />
@@ -160,12 +160,13 @@
               style="mix-blend-mode: multiply;" />
     </g>
     <g id="body-defaultLine-stationText" data-basePoint="1694,721">
-      <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+      <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+      <rect id="body-defaultLine-numIconRect" x="1660" y="649" width="68" height="68" fill="#96a9ff" />
       <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="210" fill="#99999950" />
       <rect id="body-defaultLine-transferLine" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
       <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
-      <rect id="body-defaultLine-stationName" x="1656.5" y="359" width="75" height="320" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
-      <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="340" height="70" fill="#99999950" transform="translate(1628, 650) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
+      <rect id="body-defaultLine-stationName" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+      <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="333" height="70" fill="#99999950" transform="translate(1634, 680) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
       <!-- 駅所要時間 -->
       <rect id="body-defaultLine-timeText" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
     </g>
@@ -182,9 +183,9 @@
   </g>
 
   <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
-  <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
-  <image id="platform-jitubutu" href="./displaySvg/tokyu/platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
-  <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+  <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" />
+  <!-- <image id="platform-jitubutu" href="./displaySvg/tokyu/platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
+  <!-- <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
 </svg>
 
 

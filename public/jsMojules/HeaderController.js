@@ -29,6 +29,7 @@ class HeaderController{
             destinationEng: this.setting.info.destinationEng,
             destinationNum: this.setting.info.destinationNum,
             destinationColor: this.setting.info.destinationColor,
+            destinationNumIconKey: this.setting.info.destinationNumIconKey,
             viaText: this.setting.info.direction,
             trainType: {text: this.setting.info.trainType, color: this.setting.info.trainTypeColor},
             trainTypeEng: this.setting.info.trainTypeEng,

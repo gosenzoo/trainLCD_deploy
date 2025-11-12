@@ -36,6 +36,7 @@ window.onload = async function(){
     settings.stationList.forEach(station => {
         _numIconKeyList.add(station.numIconPresetKey);
     });
+    _numIconKeyList.add(settings.info.destinationNumIconKey);
     const numIconKeyList = [..._numIconKeyList];
     const numIconPresets = {};
     // すべてのキーを処理し終えるまで待ちたい

@@ -65,6 +65,13 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <label>行き先色</label>
             <input type="color" onChange={(e) => {formUpdated(e, 'destinationColor')}} value={setting.info.destinationColor}></input>
             <br></br>
+            <label>行先ナンバリング記号</label>
+            <select onChange={(e) => {formUpdated(e, 'destinationNumIconKey')}} value={setting.info.destinationNumIconKey}>
+                <option value="tokyu">東急</option>
+                <option value="JR_east">JR東日本</option>
+                <option value="tokyo_subway">東京地下鉄</option>
+            </select>
+            <br></br>
             <label>経由等</label>
             <input type="text" onChange={(e) => {formUpdated(e, 'direction')}} value={setting.info.direction}></input>
             <br></br>

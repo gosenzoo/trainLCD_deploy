@@ -109,6 +109,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <option value="tokyo_subway">東京地下鉄</option>
             </select>
             <br></br>
+            <label>ナンバリング表示形式</label>
+            <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType}>
+                <option value="0">テキスト</option>
+                <option value="1">アイコン</option>
+            </select>
+            <br></br>
             <label>乗換路線</label>
             <input type="text" id="transfersInput" onChange={(e) => formUpdated(e, 'transfers')}
                 value={ targetStation?.transfers}

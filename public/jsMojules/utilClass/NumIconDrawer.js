@@ -35,7 +35,10 @@ class NumIconDrawer {
                 symbolArea = child;
             } else if (id === "numberArea") {
                 numberArea = child;
-            } else {
+            } else if((id === "outline") && (outlineWidth <= 0)) {
+                //アウトラインがない場合、outline要素は追加しない
+            }
+            else {
                 group.appendChild(child);
             }
         }

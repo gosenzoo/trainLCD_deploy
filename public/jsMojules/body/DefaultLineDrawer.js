@@ -1,9 +1,10 @@
 class DefaultLineDrawer{
-    constructor(mapSVG, iconDict, animator){
+    constructor(mapSVG, iconDict, animator, numIconDrawer){
         this.mapSVG = mapSVG
         this.iconDict = iconDict;
         this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを作成
         this.animator = animator;
+        this.numIconDrawer = numIconDrawer;
 
         this.lineX = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("x"));
         this.lineY = parseFloat(mapSVG.querySelector("#lineStart").getAttribute("y"));
@@ -115,19 +116,50 @@ class DefaultLineDrawer{
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
+        const stNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName").cloneNode(true); //駅名テキストrect
+        //駅名下の間隔計算
+        const nameGap = this.lineY - (parseFloat(stNameRect.getAttribute("y")) + parseFloat(stNameRect.getAttribute("height"))); //駅名中心から線までの距離を計算
+
+        //ナンバリングの上端位置
+        let numIconTop = 0;
+        
         // ナンバリング
         if(station.number === ""){
-            
+            //ナンバリングがない場合は何もしない
+
+            numIconTop = 0;
         }
-        else{
-            stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        else if(station.lineNumberType === "0"){
+            //ナンバリング文字表示の場合
+            const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
+
+            stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+
+            numIconTop = parseFloat(numRect.getAttribute("y"));
         }
+        else if(station.lineNumberType === "1"){
+            //ナンバリングアイコン表示の場合
+            const numIconRect = this.mapSVG.querySelector("#body-defaultLine-numIconRect").cloneNode(true); //ナンバリングアイコン用矩形
+
+            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(station.numIconPresetKey, station.number.split(' ')[0], station.number.split(' ')[1], station.lineColor, {
+                x: parseFloat(numIconRect.getAttribute("x")),
+                y: parseFloat(numIconRect.getAttribute("y")),
+                width: parseFloat(numIconRect.getAttribute("width")),
+                height: parseFloat(numIconRect.getAttribute("height"))
+            })); //ナンバリングアイコンを追加
+
+            numIconTop = parseFloat(numIconRect.getAttribute("y"));
+        }
+
+        //駅名下端位置を調整
+        const stNameBottom = numIconTop - nameGap; //駅名下端のY座標を計算
+        stNameRect.setAttribute("height", stNameBottom - parseFloat(stNameRect.getAttribute("y"))); //駅名rectの高さを調整
         
         //駅名
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-        stationParts.appendChild(this.textDrawer.createByAreaEl2(nameText, this.stationNameParams).element);
+        stationParts.appendChild(this.textDrawer.createByAreaEl(nameText, stNameRect).element);
 
         //乗換路線
         if((station.transfers.length > 0) || (station.transferText !== "")){
@@ -185,16 +217,57 @@ class DefaultLineDrawer{
         let stationParts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         stationParts.setAttribute("data-basePoint", this.stationTextBase); //ベースポイントを設定
 
+        const stNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName").cloneNode(true); //駅名テキストrect
+
+        //ナンバリングの上端位置
+        let numIconTop = 0;
+        
         // ナンバリング
         if(station.number === ""){
+            //ナンバリングがない場合は何もしない
 
+            numIconTop = 0;
         }
-        else{
-            stationParts.appendChild(this.textDrawer.createByAreaEl2(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, this.numParams).element); //ナンバリングを追加
+        else if(station.lineNumberType === "0"){
+            //ナンバリング文字表示の場合
+            const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
+
+            stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+
+            numIconTop = parseFloat(numRect.getAttribute("y"));
         }
+        else if(station.lineNumberType === "1"){
+            //ナンバリングアイコン表示の場合
+            const numIconRect = this.mapSVG.querySelector("#body-defaultLine-numIconRect").cloneNode(true); //ナンバリングアイコン用矩形
+
+            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(station.numIconPresetKey, station.number.split(' ')[0], station.number.split(' ')[1], station.lineColor, {
+                x: parseFloat(numIconRect.getAttribute("x")),
+                y: parseFloat(numIconRect.getAttribute("y")),
+                width: parseFloat(numIconRect.getAttribute("width")),
+                height: parseFloat(numIconRect.getAttribute("height"))
+            })); //ナンバリングアイコンを追加
+
+            numIconTop = parseFloat(numIconRect.getAttribute("y"));
+        }
+
+        //駅名下端位置を調整
+        const upLen = (parseFloat(stNameRect.getAttribute("y")) + parseFloat(stNameRect.getAttribute("height"))) - numIconTop; //駅名下端のY座標を計算
+        const stationNameEngRect = this.mapSVG.querySelector("#body-defaultLine-stationNameEng").cloneNode(true); //駅名テキストrect
+        stationNameEngRect.setAttribute("transform", `translate(0, -${upLen}) ${stationNameEngRect.getAttribute("transform")}`); //駅名rectの高さを調整
+        //駅名横幅を計算
+        const transforms = stationNameEngRect.getAttribute("transform").split(" ");
+        let degree = 90;
+        transforms.forEach((tr) => {
+            if(tr.includes("rotate")){ 
+                degree = parseFloat(tr.match(/-?\d+(\.\d+)?/)[0]);    
+            }
+        })
+        const jpWidth = parseFloat(stNameRect.getAttribute("height")) - (this.lineY - numIconTop); 
+        const width = jpWidth / (Math.sin(Math.abs(Math.PI * degree / 180)))
+        console.log(width)
+        stationNameEngRect.setAttribute("width", width);
         
         //駅名
-        const stationNameEngRect = this.mapSVG.querySelector("#body-defaultLine-stationNameEng"); //駅名テキストrect
         stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);
 
         //乗換路線
