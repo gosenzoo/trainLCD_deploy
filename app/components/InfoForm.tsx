@@ -70,6 +70,8 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
                 <option value="tokyu">東急</option>
                 <option value="JR_east">JR東日本</option>
                 <option value="tokyo_subway">東京地下鉄</option>
+                <option value="JR_west">JR西日本</option>
+                <option value="JR_central">JR東海</option>
             </select>
             <br></br>
             <label>経由等</label>

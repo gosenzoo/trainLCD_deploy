@@ -1,0 +1,8 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <rect id="outline" x="0" y="0" width="225" height="225" stroke-width="5" stroke="#ffffff" />
+    <rect id="lineColor" x="0" y="0" width="225" height="225" fill="#ff0000" />
+    <rect id="back" x="7" y="78" width="211" height="140" fill="#ffffff" />
+    <rect id="symbolArea" x="30" y="6" width="165" height="66" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
+    <rect id="numberArea" x="20" y="90" width="185" height="116" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <!-- <image href="./JR_central-original.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>
