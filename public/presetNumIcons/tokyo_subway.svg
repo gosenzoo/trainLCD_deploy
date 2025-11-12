@@ -1,0 +1,8 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <circle id="outline" cx="112.5" cy="112.5" r="112.5" stroke-width="5" stroke="#ffffff" />
+    <circle id="lineColor" cx="112.5" cy="112.5" r="112.5" fill="#ff0000" />
+    <circle id="back" cx="112.5" cy="112.5" r="85" fill="#ffffff" />
+    <rect id="symbolArea" x="55" y="40" width="115" height="56" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <rect id="numberArea" x="55" y="108" width="115" height="62" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <!-- <image href="./tokyo-subway-original.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>

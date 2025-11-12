@@ -106,6 +106,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey}>
                 <option value="tokyu">東急</option>
                 <option value="JR_east">JR東日本</option>
+                <option value="tokyo_subway">東京地下鉄</option>
             </select>
             <br></br>
             <label>乗換路線</label>
