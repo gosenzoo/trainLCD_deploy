@@ -5,7 +5,7 @@ class NumIconDrawer {
         console.log(numIconPresets);
     }
 
-    createNumIconFromPreset(key, symbolText, numberText, lineColor, geometory = { x: 0, y: 0, width: 0, height: 0 }) {
+    createNumIconFromPreset(key, symbolText, numberText, lineColor, geometory = { x: 0, y: 0, width: 0, height: 0 }, outlineWidth = 0) {
         let presetSVG = this.numIconPresets[key];
         if (!presetSVG) {
             console.error(`ナンバリング記号プリセットが見つかりません: ${key}`);
@@ -65,6 +65,11 @@ class NumIconDrawer {
         // a=sx, d=sy, e=tx, f=ty
         const tx = dst.x - src.x * sx;
         const ty = dst.y - src.y * sy;
+
+        //アウトラインの太さを設定
+        group.querySelectorAll("#outline").forEach(elem => {
+            elem.setAttribute("stroke-width", outlineWidth * 2 / ((sx + sy) / 2)); //平均スケールで補正
+        });
 
         group.setAttribute("transform", `matrix(${sx} 0 0 ${sy} ${tx} ${ty})`);
 

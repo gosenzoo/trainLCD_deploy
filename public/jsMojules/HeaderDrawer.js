@@ -114,23 +114,7 @@ class HeaderDrawer{
             height: parseFloat(numberingRect.getAttribute("height"))
         }
 
-        const def = 
-        `<defs>
-            <filter id="whiteOutline">
-            <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="5" />
-            <feFlood flood-color="white" result="BLACK"/>
-            <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
-            <feMerge>
-                <feMergeNode in="OUTLINE"/>
-                <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-            </filter>
-        </defs>`;
-        const numbering = this.numIconDrawer.createNumIconFromPreset(numIconKey, number.split(" ")[0], number.split(" ")[1], color, geometory);
-        numbering.setAttribute("filter", "url(#whiteOutline)");
-        numbering.innerHTML += def;
-
-        //numbering.appendChild(icon);
+        const numbering = this.numIconDrawer.createNumIconFromPreset(numIconKey, number.split(" ")[0], number.split(" ")[1], color, geometory, 5);
 
         return numbering;
     }

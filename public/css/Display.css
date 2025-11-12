@@ -1,4 +1,9 @@
 @font-face {
+    font-family: "OverusedGrotesk-SemiBold";
+    src: url("/fonts/OverusedGrotesk-SemiBold.woff2") format('woff2');
+}
+
+@font-face {
     font-family: "mPlus1";
     src: url("../fonts/MPLUS1-VariableFont_wght.woff") format('woff');
 }

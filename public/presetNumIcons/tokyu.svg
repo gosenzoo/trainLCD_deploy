@@ -1,4 +1,5 @@
 <svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <rect id="outline" x="0" y="0" rx="35" ry="35" width="225" height="225" stroke-width="6" stroke="#ffffff" />
     <rect id="lineColor" x="0" y="0" rx="35" ry="35" width="225" height="225" fill="#ff0000" />
     <rect id="symbolArea" x="25" y="21" width="175" height="62" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
     <rect id="numberArea" x="25" y="105" width="175" height="97" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
