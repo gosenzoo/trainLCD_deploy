@@ -15,6 +15,51 @@ class PlatformDrawer{
         //group.append(this.createStationSet("right", "left"));
         group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams));
 
+        //乗り換えがあれば下部に乗換案内を表示
+        if((drawParams.dispStation.transfers.length > 0)){
+            const transferListEl = this.mapSVG.getElementById("body-platform-transferList");
+            
+            const listAreaRect = transferListEl.querySelector("#transferListArea");
+            console.log(listAreaRect)
+            const area = {
+                x: parseFloat(listAreaRect.getAttribute("x")),
+                y: parseFloat(listAreaRect.getAttribute("y")),
+                width: parseFloat(listAreaRect.getAttribute("width")),
+                height: parseFloat(listAreaRect.getAttribute("height")),
+            };
+
+            let nowX = area.x;
+            //乗換ごとに回す
+            drawParams.dispStation.transfers.split(" ").forEach(tid => {
+                const lineObj = drawParams.lineDict[tid]; //路線オブジェクト
+                console.log(lineObj)
+
+                console.log("AAAAAAAAAAAAAAA")
+                const tw = new TransferWidget(
+                    `:${lineObj.lineIconKey}:`,
+                    `${lineObj.name}`,
+                    `${lineObj.eng}`,
+                    nowX,   // x
+                    area.y,   // y
+                    2000, // width(全体の最大横幅)
+                    area.height,   // height（アイコンの高さ）
+                    0,    // topTextOffset
+                    55,   // topTextHeight
+                    0,    // bottomTextOffset
+                    5,    // iconGap（今回は未使用）
+                    5,   // iconTextGap
+                    3,    // textGap
+                    this.textDrawer,
+                    {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"},
+                    {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
+                );
+                
+                group.appendChild(tw.group);
+
+                nowX += tw.overallArea.width + 20;
+            })
+        }
+
         return group;
     }
 

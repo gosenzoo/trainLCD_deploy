@@ -115,6 +115,8 @@ class TextDrawer{
 
         const spacing = 1;
 
+        let wholeWidth = 0;
+
         //空文字を除いたテキスト、絵文字IDの数をそれぞれ計算
         let textCnt = 0;
         let iconCnt = 0;
@@ -137,12 +139,18 @@ class TextDrawer{
         let nowX = x; //現在のx座標
         for(let i = 0; i < textList.length; i++){
             if(i % 2 === 0){ //テキストなら
-                if(textList[i] === ""){ continue; } //空文字ならスキップ
+                if(textList[i] === ""){ 
+                    //空文字ならアイコン間隔をあけてスキップ
+                    nowX += spacing;
+                    wholeWidth += spacing;
+                    continue;
+                }
                 const textObj = this.createByArea(
                     textList[i], nowX, y + (height * (1 - textHeightRatio) / 2), textWidth, height * textHeightRatio, styleJson, lang
                 );
                 iconTextElem.appendChild(textObj.element);
                 nowX += textObj.width; //次のテキストのx座標を更新
+                wholeWidth += textObj.width;
             }
             else{ //アイコンなら
                 if(textList[i] === ""){ continue; } //空文字ならスキップ
@@ -153,10 +161,11 @@ class TextDrawer{
                 iconElem.setAttribute("width", String(height));
                 iconElem.setAttribute("height", String(height));
                 iconTextElem.appendChild(iconElem);
-                nowX += height + spacing; //次のアイコンのx座標を更新
+                nowX += height; //次のアイコンのx座標を更新
+                wholeWidth += height;
             }
         }
-        return iconTextElem;
+        return {element: iconTextElem, width: wholeWidth};
     }
 
     getTextWidth(text, fontSize, styleJson){

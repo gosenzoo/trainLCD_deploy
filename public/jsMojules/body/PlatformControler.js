@@ -50,7 +50,8 @@ class PlatformController {
         return {
             leftOrRight: this.setting.info.leftOrRight,
             dispStation: dispStation,
-            trainParams: trainParams
+            trainParams: trainParams,
+            lineDict: this.setting.lineDict
         }
     }
 
