@@ -46,6 +46,9 @@
     <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
     </filter>
+    <filter id="dropShadow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="-4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
+    </filter>
     <filter id="grayscale">
       <fecolormatrix type="matrix" values="0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0 0 0 1 0"></fecolormatrix>
     </filter>
@@ -84,13 +87,7 @@
       <rect id="trainTypeSubTextEng" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
     </g>
     <!-- ナンバリング -->
-    <rect id="header-numbering-rect" x="482" y="152" width="162" height="162" fill="rgb(255, 255, 255)" />
-    <!-- <g id="header-numbering">
-      <rect x="477" y="147" rx="30" ry="30" width="172" height="172" fill="rgb(255, 255, 255)" />
-      <rect id="icon-lineColor" x="482" y="152" rx="25" ry="25" width="162" height="162" fill="#ff0000" />
-      <rect id="icon-symbol" x="500" y="167" width="126" height="45" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
-      <rect id="icon-number" x="500" y="228" width="126" height="70" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
-    </g> -->
+    <rect id="header-numbering-rect" x="482" y="152" width="162" height="162" fill="#aeaeae" />
     <!-- 駅名 -->
     <rect id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
     <rect id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
@@ -175,7 +172,9 @@
   <!-- プラットフォーム -->
   <g id="body-platform" style="isolation: isolate;" visibility="visible">
     <g id="body-platform-transferList">
-      <!-- <text x="800" y="800" font-size="60">のりかえ</text> -->
+      <rect id="transferListBack" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(#dropShadow2)"></rect>
+      <rect id="transferListTextRect" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
+      <rect id="transferListTextEngRect" x="32" y="942" width="203" height="36" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}'></rect>
       <rect id="transferListArea" x="280" y="886" width="1600" height="88" fill="#999999"></rect>
     </g>
   </g>

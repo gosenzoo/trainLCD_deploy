@@ -17,7 +17,17 @@ class PlatformDrawer{
 
         //乗り換えがあれば下部に乗換案内を表示
         if((drawParams.dispStation.transfers.length > 0)){
-            const transferListEl = this.mapSVG.getElementById("body-platform-transferList");
+            //おおもと
+            const transferListEl = this.mapSVG.getElementById("body-platform-transferList").cloneNode(true);
+
+            const transferListBackEl = this.mapSVG.getElementById("transferListBack").cloneNode(true);
+            group.appendChild(transferListBackEl);
+
+            //テキスト
+            const transferListText = this.mapSVG.getElementById("transferListTextRect");
+            group.appendChild(this.textDrawer.createByAreaEl("のりかえ", transferListText).element);
+            const transferListTextEng = this.mapSVG.getElementById("transferListTextEngRect");
+            group.appendChild(this.textDrawer.createByAreaEl("Transfer", transferListTextEng).element);
             
             const listAreaRect = transferListEl.querySelector("#transferListArea");
             console.log(listAreaRect)
