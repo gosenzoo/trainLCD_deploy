@@ -219,6 +219,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 targetStation.transferText = transferText;
                 targetStation.transferTextEng = transferTextEng;
             }}>登録路線情報を反映</button>
+            <br></br>
+            <label>ホーム乗換案内行ごと表示数</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
+                value={ targetStation?.transferCountLineP}
+            ></input>
         </div>
     )
 }

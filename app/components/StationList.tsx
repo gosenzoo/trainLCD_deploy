@@ -81,7 +81,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             coordinate: [null, null],
             transferText: "",
             transferTextEng: "",
-            doorSide: 'left'
+            doorSide: 'left',
+            transferCountLineP: ""
         })
         setSetting(_setting)
 

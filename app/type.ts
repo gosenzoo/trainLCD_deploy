@@ -47,7 +47,8 @@ type stationType = {
     coordinate: [number | null, number | null],
     transferText: string,
     transferTextEng: string,
-    doorSide: 'left' | 'right' 
+    doorSide: 'left' | 'right',
+    transferCountLineP: string
 }
 
 type lineType = {
@@ -58,7 +59,7 @@ type lineType = {
     color: string,
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'numIconPresetKey' | 'lineNumberType'
+type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'numIconPresetKey' | 'lineNumberType' | 'transferCountLineP'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 

@@ -29,7 +29,27 @@ class PlatformDrawer{
             const transferListTextEng = this.mapSVG.getElementById("transferListTextEngRect");
             group.appendChild(this.textDrawer.createByAreaEl("Transfer", transferListTextEng).element);
             
-            const listAreaRect = transferListEl.querySelector("#transferListArea");
+            //行ごとの描画数を取得
+            let transferCountLineP = drawParams.dispStation.transferCountLineP;
+            let lineCounts;
+            if(transferCountLineP === ""){
+                //空なら１列
+                lineCounts = [1];
+            }
+            else{
+                lineCounts = transferCountLineP.split(",").map((n) => { return parseInt(n); });
+            }
+
+            //表示エリア取得
+            let listAreaRect;
+            if(lineCounts.length > 1){
+                //複数行なら広めに
+                listAreaRect = transferListEl.querySelector("#transferListAreaMulti");
+            }
+            else{
+                //１行なら標準
+                listAreaRect = transferListEl.querySelector("#transferListArea");
+            }
             console.log(listAreaRect)
             const area = {
                 x: parseFloat(listAreaRect.getAttribute("x")),
@@ -38,8 +58,8 @@ class PlatformDrawer{
                 height: parseFloat(listAreaRect.getAttribute("height")),
             };
 
-            const colGap = 20;
-            const tws = [];
+            //乗換路線リストウィジェット
+            const twList = new TransferListWidget(area, lineCounts, 20, 5);
             //乗換ごとに回す
             drawParams.dispStation.transfers.split(" ").forEach(tid => {
                 const lineObj = drawParams.lineDict[tid]; //路線オブジェクト
@@ -48,55 +68,25 @@ class PlatformDrawer{
                     `:${lineObj.lineIconKey}:`,
                     `${lineObj.name}`,
                     `${lineObj.eng}`,
-                    0,   // x
-                    0,   // y
-                    2000, // width(全体の最大横幅)
-                    area.height,   // height（アイコンの高さ）
+                    0,   // x いらない
+                    0,   // y いらない
+                    2000, // width(全体の最大横幅) いらない
+                    88,   // height（アイコンの高さ）
                     0,    // topTextOffset
                     55,   // topTextHeight
                     0,    // bottomTextOffset
                     5,    // iconGap（今回は未使用）
-                    5,   // iconTextGap
+                    5,    // iconTextGap
                     3,    // textGap
                     this.textDrawer,
                     {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"},
                     {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
                 );
 
-                //テスト用
-                /*
-                const test = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                test.setAttribute("x", tw.overallArea.x);
-                test.setAttribute("y", tw.overallArea.y);
-                test.setAttribute("width", tw.overallArea.width / 2);
-                test.setAttribute("height", tw.overallArea.height);
-                test.setAttribute("fill", "#cccccc");
-                group.appendChild(test);
-                */
-                
-                //group.appendChild(tw.getElement());
+                twList.addWidget(tw);
+            });
 
-                tws.push(tw);
-
-                //次に備えて間隔をあける
-                //nowX += tw.overallArea.width + colGap;
-            })
-            //行全体の生の大きさ計算
-            let lineWidth = (tws.length - 1) * colGap;
-            tws.forEach((tw) => { lineWidth += tw.overallArea.width; })
-
-            //表示エリアに合わせる
-            let ratio = 1.0;
-            if(lineWidth > area.width){
-                ratio = area.width / lineWidth;
-            }
-            let nowX = area.x;
-            tws.forEach((tw) => {
-                tw.setCoordinate(nowX, area.y);
-                tw.fitWidth(tw.overallArea.width * ratio);
-                group.appendChild(tw.getElement())
-                nowX += tw.overallArea.width + colGap * ratio;
-            })
+            group.appendChild(twList.getElement());
         }
 
         return group;
