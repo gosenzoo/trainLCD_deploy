@@ -25,7 +25,8 @@ const initInfoObject: infoType = {
     isDispLineName: true,
     carNumberList: "1*,2,3,4,5,6,7,8",
     headOffset: "170",
-    backOffset: "170"
+    backOffset: "170",
+    isDrawStopText: false
 }
 
 const initStationObject: stationType = {

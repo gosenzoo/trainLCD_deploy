@@ -74,7 +74,7 @@ class LCDController{
         this.animator.resetNum(); //アニメーターの番号をリセット
         tempSVG.appendChild(this.pageRotator.getCurrentPage().createAll(this.progressController.progressParams));
         tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
-        //tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams));
+        tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams));
 
         return tempSVG;
     }

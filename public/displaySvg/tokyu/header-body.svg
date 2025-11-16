@@ -159,7 +159,7 @@
     <g id="body-defaultLine-stationText" data-basePoint="1694,721">
       <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
       <rect id="body-defaultLine-numIconRect" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
-      <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="210" fill="#99999950" />
+      <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="180" fill="#99999950" />
       <rect id="body-defaultLine-transferLine" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
       <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
       <rect id="body-defaultLine-stationName" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
@@ -183,11 +183,12 @@
   <g id="footer" visibility="visible">
     <!-- 時間は異なります(英語) -->
     <rect id="footer-estimateTimeText" x="1396" y="1028" width="510" height="35" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "regular", "textAnchor": "end", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <rect id="footer-stopText" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
   </g>
 
   <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
   <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
-  <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+  <!-- <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
   <!-- <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
 </svg>
 
