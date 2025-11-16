@@ -32,101 +32,151 @@ class TransferWidget {
     styleJsonTop = {},
     styleJsonBottom = {}
   ) {
-    const SVG_NS = "http://www.w3.org/2000/svg";
+    //パラメータ保管
+    this.params = {
+        iconList: iconList,
+        topText: topText,
+        bottomText: bottomText,
+        x: x,
+        y: y,
+        width,
+        height: height,
+        topTextOffset: topTextOffset,
+        topTextHeight: topTextHeight,
+        bottomTextOffset: bottomTextOffset,
+        iconGap: iconGap,
+        iconTextGap: iconTextGap,
+        textGap: textGap,
+        styleJsonTop: styleJsonTop,
+        styleJsonBottom:styleJsonBottom
+    }
+    this.textDrawer = textDrawer;
+    
+    // テキスト領域縦幅の計算
+    this.textAreaHeight = topTextOffset + height + bottomTextOffset;
+    this.topTextAreaHeight = topTextHeight;
+    this.bottomTextAreaHeight = this.textAreaHeight - textGap - topTextHeight;
 
-    // 親 <g> 要素
-    this.group = document.createElementNS(SVG_NS, "g");
+    // アイコンオフセット / テキストオフセット
+    this.iconOffset = Math.max(topTextOffset, 0);
+    this.textOffset = Math.min(topTextOffset, 0);
 
-    // 1. テキスト領域縦幅の計算
-    const textAreaHeight = topTextOffset + height + bottomTextOffset;
-    const topTextAreaHeight = topTextHeight;
-    const bottomTextAreaHeight = textAreaHeight - textGap - topTextHeight;
-
-    // 2. アイコンオフセット / テキストオフセット
-    const iconOffset = Math.max(topTextOffset, 0);
-    const textOffset = Math.min(topTextOffset, 0);
-
-    // 3. アイコン描画
-    //   textDrawer.createByAreaEl(iconList, x, y + アイコンオフセット, 2000, height)
+    // アイコン長取得
     const iconObj = textDrawer.createIconTextByArea(
       iconList,
       x,
-      y + iconOffset,
+      y + this.iconOffset,
       width,
       height,
       styleJsonTop
     );
-    const iconWidth = iconObj.width;
+    this.iconWidth = iconObj.width;
+    
+    //無変形テキスト横幅取得
+    this.RtopTextWidth = this.textDrawer.getTextWidth(this.params.topText, this.textDrawer.getFontSize(this.topTextAreaHeight, this.params.styleJsonTop.fontFamily, 'ja'), this.params.styleJsonTop);
+    this.RbottomTextWidth = this.textDrawer.getTextWidth(this.params.bottomText, this.textDrawer.getFontSize(this.bottomTextAreaHeight, this.params.styleJsonBottom.fontFamily, 'ja'), this.params.styleJsonBottom);
+    this.RtextAreaWidth = Math.max(this.RtopTextWidth, this.RbottomTextWidth);
 
-    // アイコンのグループがあれば this.group に追加
-    if (iconObj && iconObj.group instanceof SVGGElement) {
-      this.group.appendChild(iconObj.group);
-    }
+    //テキスト横幅を無変形のもので初期化
+    this.topTextWidth = this.RtopTextWidth;
+    this.bottomTextWidth = this.RtextAreaWidth;
+    this.textAreaWidth = Math.max(this.topTextWidth, this.bottomTextWidth);
+  }
 
-    // 4. 上段・下段テキスト描画
-    const textBaseX = x + iconWidth + iconTextGap;
-    const topTextY = y + textOffset;
-    const bottomTextY = y + textOffset + topTextAreaHeight + textGap;
-    const maxTextWidth = width - iconWidth - iconTextGap
-
-    // 上段テキスト
-    const topTextObj = textDrawer.createByArea(
-      topText,
-      textBaseX,
-      topTextY,
-      maxTextWidth,
-      topTextAreaHeight,
-      styleJsonTop
-    );
-
-    // 下段テキスト
-    const bottomTextObj = textDrawer.createByArea(
-      bottomText,
-      textBaseX,
-      bottomTextY,
-      maxTextWidth,
-      bottomTextAreaHeight,
-      styleJsonBottom
-    );
-
-    if (topTextObj && topTextObj.group instanceof SVGGElement) {
-      (this.group).appendChild(topTextObj.group);
-    }
-    if (bottomTextObj && bottomTextObj.group instanceof SVGGElement) {
-      (this.group).appendChild(bottomTextObj.group);
-    }
-
-    // 5. テキスト領域横幅
-    const topTextWidth =
-      topTextObj && typeof topTextObj.width === "number" ? topTextObj.width : 0;
-    const bottomTextWidth =
-      bottomTextObj && typeof bottomTextObj.width === "number" ? bottomTextObj.width : 0;
-    const textAreaWidth = Math.max(topTextWidth, bottomTextWidth);
-
-    // 6. 全体横幅
-    const overallWidth = iconWidth + iconTextGap + textAreaWidth;
-
+  get overallArea(){
+    //全体横幅
+    const overallWidth = this.iconWidth + this.params.iconTextGap + this.textAreaWidth;
+    
     // 7. 全体縦幅
-    const overallHeight = Math.max(height, textAreaHeight);
+    const overallHeight = Math.max(this.params.height, this.textAreaHeight);
 
     // 8. 全体領域
-    this.overallArea = {
-      x: x,
-      y: y,
+    return {
+      x: this.params.x,
+      y: this.params.y - this.iconOffset,
       width: overallWidth,
       height: overallHeight,
     };
+  }
 
-    (this.group).appendChild(iconObj.element);
-    (this.group).appendChild(topTextObj.element);
-    (this.group).appendChild(bottomTextObj.element);
+  setCoordinate(x, y){
+    this.params.x = x;
+    this.params.y = y;
+  }
 
-    // お好みでフィールドとして保持しておく
-    this.iconObj = iconObj;
-    this.topTextObj = topTextObj;
-    this.bottomTextObj = bottomTextObj;
-    this.iconGap = iconGap;
-    this.iconTextGap = iconTextGap;
-    this.textGap = textGap;
+  fitWidth(newWidth){
+    this.params.width = newWidth;
+
+    //テキストに割り振れる長さ
+    const newTextWidth = newWidth - this.iconWidth - this.params.iconTextGap;
+
+    //無変形テキスト横幅取得
+    //上
+    if(newTextWidth >= this.RtopTextWidth){
+        //新しい大きさに、変形しなくても収まる場合
+        this.topTextWidth = this.RtopTextWidth;
+    }
+    else{
+        //変形が必要な場合
+        this.topTextWidth = newTextWidth;
+    }
+    //下
+    if(newTextWidth >= this.RbottomTextWidth){
+        //新しい大きさに、変形しなくても収まる場合
+        this.bottomTextWidth = this.RbottomTextWidth;
+    }
+    else{
+        //変形が必要な場合
+        this.bottomTextWidth = newTextWidth;
+    }
+    //全体
+    this.textAreaWidth = Math.max(this.topTextWidth, this.bottomTextWidth);
+  }
+
+  //エレメントを取得
+  getElement(){
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const group = document.createElementNS(SVG_NS, "g");
+
+    // 3. アイコン描画
+    const iconObj = this.textDrawer.createIconTextByArea(
+      this.params.iconList,
+      this.params.x,
+      this.params.y + this.iconOffset,
+      this.params.width,
+      this.params.height,
+      this.params.styleJsonTop
+    );
+    group.appendChild(iconObj.element);
+
+    // 上段・下段テキスト描画
+    const textBaseX = this.params.x + this.iconWidth + this.params.iconTextGap;
+    const topTextY = this.params.y + this.textOffset;
+    const bottomTextY = this.params.y + this.textOffset + this.topTextAreaHeight + this.params.textGap;
+    const maxTextWidth = this.params.width - this.iconWidth - this.params.iconTextGap;
+
+    // 上段テキスト
+    const topTextObj = this.textDrawer.createByArea(
+      this.params.topText,
+      textBaseX,
+      topTextY,
+      maxTextWidth,
+      this.topTextAreaHeight,
+      this.params.styleJsonTop
+    );
+    group.appendChild(topTextObj.element);
+
+    // 下段テキスト
+    const bottomTextObj = this.textDrawer.createByArea(
+      this.params.bottomText,
+      textBaseX,
+      bottomTextY,
+      maxTextWidth,
+      this.bottomTextAreaHeight,
+      this.params.styleJsonBottom
+    );
+    group.appendChild(bottomTextObj.element);
+
+    return group;
   }
 }

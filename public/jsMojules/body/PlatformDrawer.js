@@ -38,19 +38,18 @@ class PlatformDrawer{
                 height: parseFloat(listAreaRect.getAttribute("height")),
             };
 
-            let nowX = area.x;
+            const colGap = 20;
+            const tws = [];
             //乗換ごとに回す
             drawParams.dispStation.transfers.split(" ").forEach(tid => {
                 const lineObj = drawParams.lineDict[tid]; //路線オブジェクト
-                console.log(lineObj)
 
-                console.log("AAAAAAAAAAAAAAA")
                 const tw = new TransferWidget(
                     `:${lineObj.lineIconKey}:`,
                     `${lineObj.name}`,
                     `${lineObj.eng}`,
-                    nowX,   // x
-                    area.y,   // y
+                    0,   // x
+                    0,   // y
                     2000, // width(全体の最大横幅)
                     area.height,   // height（アイコンの高さ）
                     0,    // topTextOffset
@@ -63,10 +62,40 @@ class PlatformDrawer{
                     {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"},
                     {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
                 );
-                
-                group.appendChild(tw.group);
 
-                nowX += tw.overallArea.width + 20;
+                //テスト用
+                /*
+                const test = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                test.setAttribute("x", tw.overallArea.x);
+                test.setAttribute("y", tw.overallArea.y);
+                test.setAttribute("width", tw.overallArea.width / 2);
+                test.setAttribute("height", tw.overallArea.height);
+                test.setAttribute("fill", "#cccccc");
+                group.appendChild(test);
+                */
+                
+                //group.appendChild(tw.getElement());
+
+                tws.push(tw);
+
+                //次に備えて間隔をあける
+                //nowX += tw.overallArea.width + colGap;
+            })
+            //行全体の生の大きさ計算
+            let lineWidth = (tws.length - 1) * colGap;
+            tws.forEach((tw) => { lineWidth += tw.overallArea.width; })
+
+            //表示エリアに合わせる
+            let ratio = 1.0;
+            if(lineWidth > area.width){
+                ratio = area.width / lineWidth;
+            }
+            let nowX = area.x;
+            tws.forEach((tw) => {
+                tw.setCoordinate(nowX, area.y);
+                tw.fitWidth(tw.overallArea.width * ratio);
+                group.appendChild(tw.getElement())
+                nowX += tw.overallArea.width + colGap * ratio;
             })
         }
 
