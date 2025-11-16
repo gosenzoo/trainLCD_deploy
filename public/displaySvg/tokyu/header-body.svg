@@ -178,6 +178,12 @@
       <rect id="transferListAreaMulti" x="280" y="866" width="1600" height="128" fill="#999999"></rect>
       <rect id="transferListArea" x="280" y="886" width="1600" height="88" fill="#5f5f5f"></rect>
     </g>
+
+    <!-- 矢印 -->
+    <g id="body-platform-trainArrow" transform="translate(1778,752)" data-basePoint="0,0">
+      <polygon points="0,0 40,0 40,-16 75,18 40,52 40,36 00,36" stroke-width="7" stroke="#ffffff"/>
+      <polygon points="0,0 40,0 40,-16 75,18 40,52 40,36 00,36" fill="rgb(255, 0, 0)"/>
+    </g>
   </g>
 
   <g id="footer" visibility="visible">
@@ -188,7 +194,7 @@
 
   <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
   <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
-  <!-- <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
+  <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
   <!-- <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
 </svg>
 
