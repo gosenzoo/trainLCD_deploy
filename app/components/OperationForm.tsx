@@ -132,6 +132,10 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 const carNumberListArr = carNumberListInput.value.split(",");
                 carNumberListArr.reverse();
                 carNumberListInput.value = carNumberListArr.join(",");
+
+                const _setting: settingType = structuredClone(setting);
+                _setting.operationList[operationInd].carNumberList = carNumberListInput.value;
+                setSetting(_setting);
             }}>反転</button>
             <br></br>
             <label>全体号車連番入力</label>
@@ -143,11 +147,18 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 let carNumberListStr = "";
                 for(let i=1; i<=maxNum; i++){
                     carNumberListStr += i.toString();
+                    if(i.toString() === setting.operationList[operationInd].carNumber){
+                        carNumberListStr += "*"; //表示号車と同じ番号ならハイライト印をつける
+                    }
                     if(i !== maxNum){
                         carNumberListStr += ",";
                     }
                 }
                 carNumberListInput.value = carNumberListStr;
+                
+                const _setting: settingType = structuredClone(setting);
+                _setting.operationList[operationInd].carNumberList = carNumberListStr;
+                setSetting(_setting);
             }}>入力</button>
             <br></br>
             <label>前方オフセット</label>
