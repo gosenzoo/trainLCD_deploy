@@ -95,6 +95,10 @@ class PlatformDrawer{
     createStationSet(leftOfRight, doorSide, trainParams, isDrawLine, carLineColor){
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
+        const isDispOther = false;
+        const otherTrainCarCounts = 6;
+        const otherTrainCarLeft = 1;
+
         let sideFace = "#313131ff";
         let mainFace = "#3c3c3cff";
         let topFace = "#8b8b8bff";
@@ -111,12 +115,15 @@ class PlatformDrawer{
             //手前
             group.appendChild(this.createOneRail(837));
             //奥
-            //group.appendChild(this.createOneRail(483));
+            if(isDispOther){
+                group.appendChild(this.createOneRail(483));
+                group.appendChild(this.createOtherTrainObj(200, 483, 6));
+            }
 
             //ホーム描画
             group.appendChild(this.createPlatformObj({
                 referencePos: "front",
-                hideTop: true,
+                hideTop: !isDispOther,
                 hideBottom: false,
                 anchorX: 46,
                 anchorY: 737,
@@ -150,12 +157,14 @@ class PlatformDrawer{
             //手前
             group.appendChild(this.createOneRail(837));
             //奥
-            //group.appendChild(this.createOneRail(483));
+            if(isDispOther){
+                group.appendChild(this.createOneRail(483));
+            }
 
             //ホーム描画
             group.appendChild(this.createPlatformObj({
                 referencePos: "front",
-                hideTop: true,
+                hideTop: !isDispOther,
                 hideBottom: false,
                 anchorX: 46,
                 anchorY: 737,
@@ -176,10 +185,10 @@ class PlatformDrawer{
                 highlight: {
                     height: 90,
                     depth: 30,
-                    colorSideFace: "#313131ff",
-                    colorMainFace: "#4e4e4eff",
-                    colorTopFace:  "#7d7d7dff",
-                    colorEdges:    "#a4a4a4ff",
+                    colorSideFace: sideFace,
+                    colorMainFace: mainFace,
+                    colorTopFace:  topFace,
+                    colorEdges:    edges,
                 },
             }));
         }
@@ -187,7 +196,9 @@ class PlatformDrawer{
         else if((leftOfRight === "right") && (doorSide === "right")){
             //レール描画
             //手前
-            //group.appendChild(this.createOneRail(824));
+            if(isDispOther){
+                group.appendChild(this.createOneRail(824));
+            }
             //奥
             group.appendChild(this.createOneRail(496));
 
@@ -206,10 +217,10 @@ class PlatformDrawer{
                 highlight: {
                     height: 90,
                     depth: 30,
-                    colorSideFace: "#313131ff",
-                    colorMainFace: "#4e4e4eff",
-                    colorTopFace:  "#7d7d7dff",
-                    colorEdges:    "#a4a4a4ff",
+                    colorSideFace: sideFace,
+                    colorMainFace: mainFace,
+                    colorTopFace:  topFace,
+                    colorEdges:    edges,
                 },
             }));
 
@@ -217,7 +228,7 @@ class PlatformDrawer{
             group.appendChild(this.createPlatformObj({
                 referencePos: "back",
                 hideTop: false,
-                hideBottom: true,
+                hideBottom: !isDispOther,
                 anchorX: 66,
                 anchorY: 480,
                 width: 1788,
@@ -229,7 +240,9 @@ class PlatformDrawer{
         else if((leftOfRight === "left") && (doorSide === "left")){
             //レール描画
             //手前
-            //group.appendChild(this.createOneRail(824));
+            if(isDispOther){
+                group.appendChild(this.createOneRail(824));
+            }
             //奥
             group.appendChild(this.createOneRail(496));
 
@@ -248,10 +261,10 @@ class PlatformDrawer{
                 highlight: {
                     height: 90,
                     depth: 30,
-                    colorSideFace: "#313131ff",
-                    colorMainFace: "#4e4e4eff",
-                    colorTopFace:  "#7d7d7dff",
-                    colorEdges:    "#a4a4a4ff",
+                    colorSideFace: sideFace,
+                    colorMainFace: mainFace,
+                    colorTopFace:  topFace,
+                    colorEdges:    edges,
                 },
             }));
 
@@ -259,7 +272,7 @@ class PlatformDrawer{
             group.appendChild(this.createPlatformObj({
                 referencePos: "back",
                 hideTop: false,
-                hideBottom: true,
+                hideBottom: !isDispOther,
                 anchorX: 66,
                 anchorY: 480,
                 width: 1788,
@@ -272,6 +285,40 @@ class PlatformDrawer{
         return group;
     }
 
+    createOtherTrainObj(x, y, cars){
+        const trainParams = {
+            carLength: 154,
+            height: 66,
+            depth: 30,
+            cars: cars,
+            vanishY: -2000,
+            gap: 5,
+            margin: 40,
+            strokeWidth: 2.5,
+            colorSideFace: "#565656ff",
+            colorMainFace: "#828282ff",
+            colorTopFace:  "#b9b9b9ff",
+            colorEdges:    "#d1d1d1ff",
+            shadowPos:     10,
+            shadowDepth:   30,
+            shadowColor:   "rgba(0,0,0,1)",
+
+            baseX: x,
+            baseY: y,
+            //baseX: 120,
+            //baseY: 818,
+            baseMode: "left", // ← これで入線方向を決めます（left:右→左 / right:左→右）
+        };
+        const otherTrain = createTrain({
+            ...trainParams,
+            animate: false,
+            carLabels: null,
+            textDrawer: null,
+            highlightCarId: null,
+        });
+        
+        return otherTrain
+    }
     createOneRail(y){
         return createRail({
             railWidth: 20,
@@ -308,8 +355,8 @@ class PlatformDrawer{
             margin: 40,
             strokeWidth: 2.5,
             colorSideFace: "#a9a9a9ff",
-            colorMainFace: "#d2d2d2ff",
-            colorTopFace:  "#e8e8e8ff",
+            colorMainFace: "#d7d7d7ff",
+            colorTopFace:  "#efefefff",
             colorEdges:    "#ffffffff",
             shadowPos:     10,
             shadowDepth:   30,
