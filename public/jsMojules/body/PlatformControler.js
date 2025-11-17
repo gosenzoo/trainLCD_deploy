@@ -52,6 +52,8 @@ class PlatformController {
             dispStation: dispStation,
             trainParams: trainParams,
             lineDict: this.setting.lineDict,
+            isDrawLine: this.setting.info.isDrawLine,
+            carLineColor: this.setting.info.carLineColor
         }
     }
 

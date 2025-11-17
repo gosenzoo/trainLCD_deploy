@@ -13,7 +13,7 @@ class PlatformDrawer{
         //group.appendChild(mapSVG.getElementById("tokyu-okuHome").cloneNode(true));
 
         //group.append(this.createStationSet("right", "left"));
-        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams));
+        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams, drawParams.isDrawLine, drawParams.carLineColor));
 
         //乗り換えがあれば下部に乗換案内を表示
         if((drawParams.dispStation.transfers.length > 0)){
@@ -92,8 +92,18 @@ class PlatformDrawer{
         return group;
     }
 
-    createStationSet(leftOfRight, doorSide, trainParams){
+    createStationSet(leftOfRight, doorSide, trainParams, isDrawLine, carLineColor){
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
+
+        let sideFace = "#313131ff";
+        let mainFace = "#3c3c3cff";
+        let topFace = "#8b8b8bff";
+        let edges = "#cbcbcbff";
+
+        sideFace = combineByOKLCH(carLineColor, sideFace);
+        mainFace = combineByOKLCH(carLineColor, mainFace);
+        topFace = combineByOKLCH(carLineColor, topFace);
+        edges = combineByOKLCH(carLineColor, edges);
 
         //手前右向き
         if((leftOfRight === "right") && (doorSide === "left")){
@@ -122,6 +132,16 @@ class PlatformDrawer{
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
+                drawLine: isDrawLine,
+                lineColor: carLineColor,
+                highlight: {
+                    height: 90,
+                    depth: 30,
+                    colorSideFace: sideFace,
+                    colorMainFace: mainFace,
+                    colorTopFace:  topFace,
+                    colorEdges:    edges,
+                },
             }));
         }
         //手前左向き
@@ -151,6 +171,16 @@ class PlatformDrawer{
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
+                drawLine: isDrawLine,
+                lineColor: carLineColor,
+                highlight: {
+                    height: 90,
+                    depth: 30,
+                    colorSideFace: "#313131ff",
+                    colorMainFace: "#4e4e4eff",
+                    colorTopFace:  "#7d7d7dff",
+                    colorEdges:    "#a4a4a4ff",
+                },
             }));
         }
         //奥右向き
@@ -171,6 +201,16 @@ class PlatformDrawer{
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
+                drawLine: isDrawLine,
+                lineColor: carLineColor,
+                highlight: {
+                    height: 90,
+                    depth: 30,
+                    colorSideFace: "#313131ff",
+                    colorMainFace: "#4e4e4eff",
+                    colorTopFace:  "#7d7d7dff",
+                    colorEdges:    "#a4a4a4ff",
+                },
             }));
 
             //ホーム描画
@@ -203,6 +243,16 @@ class PlatformDrawer{
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
+                drawLine: isDrawLine,
+                lineColor: carLineColor,
+                highlight: {
+                    height: 90,
+                    depth: 30,
+                    colorSideFace: "#313131ff",
+                    colorMainFace: "#4e4e4eff",
+                    colorTopFace:  "#7d7d7dff",
+                    colorEdges:    "#a4a4a4ff",
+                },
             }));
 
             //ホーム描画
@@ -256,7 +306,7 @@ class PlatformDrawer{
             vanishY: -2000,
             gap: 5,
             margin: 40,
-            strokeWidth: 1.5,
+            strokeWidth: 2.5,
             colorSideFace: "#a9a9a9ff",
             colorMainFace: "#d2d2d2ff",
             colorTopFace:  "#e8e8e8ff",
@@ -299,6 +349,12 @@ class PlatformDrawer{
                 textAnchor: "middle",
             },
             highlightLabelFill: "#ffffffff",
+            drawLine: true,                // ← 追加：false ならラインを描かない
+            lineThickness: 10,              // 通常ライン太さ（0以下で非描画）
+            lineOffset: 0,                 // 通常ライン下辺の位置＝側面底辺 - lineOffset
+            highlightLineThickness: 10,  // ハイライト用（未指定なら lineThickness）
+            highlightLineOffset: 0,     // ハイライト用（未指定なら lineOffset）
+            lineColor: "#ff4d4dff",          // ライン色
         };
         // 3秒表示してまた入線する列車 <g> を作る
         const trainLoopG = this.createTrainApproach({

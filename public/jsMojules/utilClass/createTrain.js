@@ -35,6 +35,14 @@ function createTrain(params) {
     labelWidth = 80,
     labelStyleNormal = {},
     highlightLabelFill = "#ffffffff",
+
+    // === ライン描画用パラメータ ===
+    drawLine = false,                // ← 追加：false ならラインを描かない
+    lineThickness = 10,              // 通常ライン太さ（0以下で非描画）
+    lineOffset = 0,                 // 通常ライン下辺の位置＝側面底辺 - lineOffset
+    highlightLineThickness = 10,  // ハイライト用（未指定なら lineThickness）
+    highlightLineOffset = 0,     // ハイライト用（未指定なら lineOffset）
+    lineColor = "#ff4d4dff",          // ライン色
   } = params;
 
   const NS = "http://www.w3.org/2000/svg";
@@ -46,33 +54,30 @@ function createTrain(params) {
     textDrawer &&
     typeof textDrawer.createByArea === "function";
 
-  // ハイライト車両の高さ/奥行 (指定がなければ通常値を使う)
+  // ハイライト車両の高さ/奥行
   const hHeight = typeof highlight.height === "number" ? highlight.height : height;
   const hDepth  = typeof highlight.depth  === "number" ? highlight.depth  : depth;
 
-  // 編成の全長（全車同長）
+  // 編成の全長
   const trainWidth = cars * carLength + (cars - 1) * gap;
 
-  // 上面のために「最大の奥行」を使って側面の“基準上辺”を決める
+  // 上面のために最大の奥行で基準上辺を決める
   const maxDepth = Math.max(depth, hDepth);
 
-  // 側面の“基準上辺 y”
   const baseTopY = margin + maxDepth;
-
-  // 「通常車両」の底辺（全車共通）
   const baseBottomY = baseTopY + height;
 
   // 左端X
   const originX = margin;
 
-  // 消失点Xは編成中心に固定
+  // 消失点は編成中心
   const vanishX = originX + trainWidth / 2;
   const vanish  = { x: vanishX, y: vanishY };
 
   // ルートg
   const rootG = document.createElementNS(NS, "g");
 
-  // 境界の傾き
+  // 境界の傾きベクトル
   const dirs = [];
   for (let i = 0; i <= cars; i++) {
     let baseXforDir;
@@ -106,7 +111,7 @@ function createTrain(params) {
   shadowPoly.setAttribute("stroke", "none");
   rootG.appendChild(shadowPoly);
 
-  // 2. 車両本体
+  // 2. 車両本体（端→中心→中央 の順）
   const order = endToCenterOrder(cars);
 
   for (const i of order) {
@@ -120,7 +125,7 @@ function createTrain(params) {
     const carHeight = isHighlightTarget ? hHeight : height;
     const carDepth  = isHighlightTarget ? hDepth  : depth;
 
-    const bottomY = baseBottomY;              // ←全車両そろえる
+    const bottomY = baseBottomY; // 底辺は全車共通
     const topY    = bottomY - carHeight;
     const topPlaneY = topY - carDepth;
 
@@ -211,7 +216,7 @@ function createTrain(params) {
       }
     }
 
-    // 境界線
+    // 境界線（側面-上面）
     const boundaryLine = createPolyline(NS, [
       [TL.x, TL.y],
       [TR.x, TR.y],
@@ -226,6 +231,28 @@ function createTrain(params) {
     }
     carG.appendChild(boundaryLine);
 
+    // === ライン長方形（側面上） ===
+    if (drawLine) {
+      const t = isHighlightTarget
+        ? (typeof highlightLineThickness === "number" ? highlightLineThickness : lineThickness)
+        : lineThickness;
+      const off = isHighlightTarget
+        ? (typeof highlightLineOffset === "number" ? highlightLineOffset : lineOffset)
+        : lineOffset;
+
+      if (typeof t === "number" && t > 0) {
+        const lineRect = document.createElementNS(NS, "rect");
+        const ly = bottomY - off - t; // 下辺が bottomY - off になるように
+        lineRect.setAttribute("x", String(x0));
+        lineRect.setAttribute("y", String(ly));
+        lineRect.setAttribute("width", String(carLength));
+        lineRect.setAttribute("height", String(t));
+        lineRect.setAttribute("fill", lineColor);
+        lineRect.setAttribute("stroke", "none");
+        carG.appendChild(lineRect);
+      }
+    }
+
     // --- ラベル描画 ---
     if (shouldDrawLabels) {
       const labelText = carLabels[i];
@@ -234,7 +261,6 @@ function createTrain(params) {
       const labelTop = labelBottom - lh;
       const labelLeft = xMid - labelWidth / 2;
 
-      // 通常のstyle
       const styleJson = labelStyleNormal || {};
       const normalTextColor = styleJson.fill || "#000000";
 
@@ -249,15 +275,14 @@ function createTrain(params) {
       if (labelG) {
         carG.appendChild(labelG);
 
-        // ハイライトの場合は、ラベルの <text> にも同期点滅を追加
         if (isHighlightTarget) {
-            addBlinkTextDiscrete(
-                labelG,
-                highlightLabelFill,
-                normalTextColor,
-                highlightBlinkMs,
-                NS
-            );
+          addBlinkTextDiscrete(
+            labelG,
+            highlightLabelFill,
+            normalTextColor,
+            highlightBlinkMs,
+            NS
+          );
         }
       }
     }
@@ -327,11 +352,7 @@ function createTrain(params) {
     if (typeof animStartX === "number") {
       startXAbs = animStartX;
     } else {
-      if (baseMode === "left") {
-        startXAbs = baseX + 800;
-      } else {
-        startXAbs = baseX - 800;
-      }
+      startXAbs = (baseMode === "left") ? (baseX + 800) : (baseX - 800);
     }
     const startDx = startXAbs - chosenAnchor.x;
 

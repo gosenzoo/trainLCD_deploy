@@ -17,7 +17,7 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
 
         const _setting: settingType = structuredClone(setting)
 
-        if((field !== "isLoop") && (field !== "isMoveByCoord") && (field !== "isDispTime") && (field !== "isDispLineName") && (field !== "isDrawStopText")){
+        if((field !== "isLoop") && (field !== "isMoveByCoord") && (field !== "isDispTime") && (field !== "isDispLineName") && (field !== "isDrawStopText") && (field !== "isDrawLine")){
             //テキストボックス入力の場合
             _setting.info[field] = e.target.value
         }
@@ -132,6 +132,12 @@ const InfoForm: React.FC<infoFormType> = ({setting, setSetting}) => {
             <br></br>
             <label>後方オフセット</label>
             <input type="number" onChange={(e) => {formUpdated(e, 'backOffset')}} value={setting.info.backOffset}></input>
+            <br></br>
+            <label>列車ライン色</label>
+            <input type="color" onChange={(e) => {formUpdated(e, 'carLineColor')}} value={setting.info.carLineColor}></input>
+            <br></br>
+            <label>列車にラインを描画するか</label>
+            <input type="checkbox" onChange={(e) => {formUpdated(e, 'isDrawLine')}} checked={setting.info.isDrawLine}></input>
         </div>
     )
 }
