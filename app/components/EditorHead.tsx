@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
-import { read } from "fs"
-import { info } from "console"
 
 type editorHeadType = {
     setting: settingType,
@@ -34,7 +32,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
                 reader.onload = (ee: any) => {
                     try {
                         readData = JSON.parse(ee.target.result)
-                        mergeProperties(readData.info, initSettingObject.info);
+                        mergeProperties(readData.operation, initSettingObject.operation);
                         readData.stationList.forEach(station => {
                             mergeProperties(station, initSettingObject.station);
                         });
@@ -85,6 +83,28 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
         if(displayType === "JE-E131"){ console.log("ないです") }
     }
 
+    const formUpdated = (e:any, field: infoMembers) => {
+        if(!setting){
+            return
+        }
+        if(!setting.operation){
+            return
+        }
+
+        const _setting: settingType = structuredClone(setting)
+
+        if((field !== "isMoveByCoord") && (field !== "isLoop")){
+            //テキストボックス入力の場合
+            _setting.info[field] = e.target.value
+        }
+        else{
+            //チェックボックス入力の場合
+            _setting.info[field] = e.target.checked
+        }
+
+        setSetting(_setting)
+    }
+
     return(
         <div>
             <label>設定ファイル入力</label>
@@ -92,7 +112,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <br></br>
             <button onClick={() => {
                 let _setting = setting;
-                _setting.info = readData.info;
+                _setting.operation = readData.operation;
                 setSetting(_setting);
             }}>info読み込み</button>
             <br></br>
@@ -129,7 +149,15 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             }}>設定を初期化</button>
             <br></br>
             <br></br>
-            <h2>表示設定</h2>
+
+            <h2>全体設定</h2>
+            <label>設定名</label>
+            <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
+            <br></br>
+            環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
+            <br></br>
+            座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
+            <br></br>
             <select onChange={displayTypeSelectChanged}>
                 <option value="tokyu">東急</option>
                 <option value="JW-225">JR西日本 225系</option>

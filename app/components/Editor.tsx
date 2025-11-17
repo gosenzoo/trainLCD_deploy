@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import EditorHead from "./EditorHead"
-import InfoForm from './InfoForm'
+import OperationForm from './OperationForm'
 import StationList from "./StationList"
 import LineList from "./LineList"
 import IconList from './IconList'
@@ -16,7 +16,7 @@ const Editor = () => {
         <div>
             <EditorHead setting={setting} setSetting={setSetting}/>
             <br></br>
-            <InfoForm setting={setting} setSetting={setSetting}/>
+            <OperationForm setting={setting} setSetting={setSetting}/>
             <br></br>
             <StationList setting={setting} setSetting={setSetting}/>
             <br></br>

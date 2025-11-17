@@ -14,12 +14,12 @@ class PlatformController {
             i++;
         }while(dispStation.isPass);
 
-        const headOffset = parseInt(this.setting.info.headOffset);//仮データ
-        const backOffset = parseInt(this.setting.info.backOffset);//仮データ
+        const headOffset = parseInt(this.setting.operation.headOffset);//仮データ
+        const backOffset = parseInt(this.setting.operation.backOffset);//仮データ
         const gap = 5;
         const wholeLength = 1920 - headOffset - backOffset;
 
-        const carLabelText = this.setting.info.carNumberList;//仮データ
+        const carLabelText = this.setting.operation.carNumberList;//仮データ
         const carLabels = carLabelText.split(",");
         const highlightCarId = carLabels.findIndex(label => label.includes("*"));
         const cars = carLabels.length;
@@ -28,7 +28,7 @@ class PlatformController {
         const labelWidth = carLength - 10;
 
         let baseX;
-        if(this.setting.info.leftOrRight === "right"){
+        if(this.setting.operation.leftOrRight === "right"){
             baseX = 1920 - headOffset;
         }
         else{
@@ -48,12 +48,12 @@ class PlatformController {
         }
 
         return {
-            leftOrRight: this.setting.info.leftOrRight,
+            leftOrRight: this.setting.operation.leftOrRight,
             dispStation: dispStation,
             trainParams: trainParams,
             lineDict: this.setting.lineDict,
-            isDrawLine: this.setting.info.isDrawLine,
-            carLineColor: this.setting.info.carLineColor
+            isDrawLine: this.setting.operation.isDrawLine,
+            carLineColor: this.setting.operation.carLineColor
         }
     }
 

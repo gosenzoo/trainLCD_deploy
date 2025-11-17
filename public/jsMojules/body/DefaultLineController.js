@@ -133,7 +133,7 @@ class DefaultLineController{
             dispStationList[i]._dispTime = timeList[i];
         }
         console.log(dispStationList)
-        let isDispTime = this.setting.info.isDispTime && !timeList.every(time => time < 0);
+        let isDispTime = this.setting.operation.isDispTime && !timeList.every(time => time < 0);
         console.log(isDispTime)
 
         //路線名
@@ -185,9 +185,9 @@ class DefaultLineController{
             lineLeapPosList: lineLeapPosList,
             isStart: isStart,
             isEnd: isEnd,
-            leftOrRight: this.setting.info.leftOrRight,
+            leftOrRight: this.setting.operation.leftOrRight,
             isDispTime: isDispTime,
-            isDispLineName: this.setting.info.isDispLineName
+            isDispLineName: this.setting.operation.isDispLineName
         }
     }
 

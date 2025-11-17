@@ -1,8 +1,12 @@
-import { initScriptLoader } from "next/script"
 import "./type"
 
 const initInfoObject: infoType = {
     settingName: "",
+    isLoop: false,
+    isMoveByCoord: false,
+}
+
+const initOperationObject: operationType = {
     destination: "",
     destinationKana: "",
     destinationEng: "",
@@ -19,8 +23,6 @@ const initInfoObject: infoType = {
     lineColor: "",
     carNumber: "",
     leftOrRight: 'right',
-    isLoop: false,
-    isMoveByCoord: false,
     isDispTime: true,
     isDispLineName: true,
     carNumberList: "1*,2,3,4,5,6,7,8",
@@ -60,9 +62,10 @@ const initLineObject = {
 
 const initSettingObject: settingType = {
     info: initInfoObject,
+    operation: initOperationObject,
     stationList: [],
     lineDict: {},
     iconDict: {}
 }
 
-export default {setting: initSettingObject, info: initInfoObject, station: initStationObject, line: initLineObject}
+export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject}
