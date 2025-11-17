@@ -7,7 +7,7 @@ class FooterController{
     }
 
     //進行パラメータから描画用パラメータを抽出
-    extractDrawParams(progressParams){
+    extractDrawParams(progressParams, operation){
         //表示駅取得
         let dispStation;
         let i = 0;
@@ -18,10 +18,10 @@ class FooterController{
         let dispStationInd = i  + progressParams.currentStationInd;
 
         //時間関連
-        this.setting.info.isDrawTime;
+        operation.isDrawTime;
 
         //〇〇のつぎは△△にとまります関連
-        let isDrawStopText = this.setting.info.isDrawStopText;
+        let isDrawStopText = operation.isDrawStopText;
         if(progressParams.isTerminal){
             //次が終点なら描画しない（するものがないので）
             isDrawStopText = 0;
@@ -50,8 +50,8 @@ class FooterController{
         }
     }
 
-    createAll(progressParams){
-        let drawParams = this.extractDrawParams(progressParams);
+    createAll(progressParams, operation){
+        let drawParams = this.extractDrawParams(progressParams, operation);
         return this.footerDrawer.createAll(drawParams, 1);
     }
 }

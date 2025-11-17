@@ -7,7 +7,7 @@ class HeaderController{
     }
 
     //進行パラメータから描画用パラメータを抽出
-    extractDrawParams(progressParams){
+    extractDrawParams(progressParams, operation){
         let arrivingTextType;
         if(progressParams.posState === 1){ arrivingTextType = 1; } //停車駅駅手前状態は、まもなく
         else if(progressParams.runState === 1){ arrivingTextType = 2; } //停車中は、ただいま
@@ -23,35 +23,25 @@ class HeaderController{
         return {
             dispStation: dispStation,
             arrivingTextType: arrivingTextType,
-            dispCarNum: this.setting.operation.carNumber,
-            destinationText: this.setting.operation.destination,
-            destinationKana: this.setting.operation.destinationKana,
-            destinationEng: this.setting.operation.destinationEng,
-            destinationNum: this.setting.operation.destinationNum,
-            destinationColor: this.setting.operation.destinationColor,
-            destinationNumIconKey: this.setting.operation.destinationNumIconKey,
-            viaText: this.setting.operation.direction,
-            trainType: {text: this.setting.operation.trainType, color: this.setting.operation.trainTypeColor},
-            trainTypeEng: this.setting.operation.trainTypeEng,
-            trainTypeSub: this.setting.operation.trainTypeSub,
-            trainTypeSubEng: this.setting.operation.trainTypeSubEng,
+            dispCarNum: operation.carNumber,
+            destinationText: operation.destination,
+            destinationKana: operation.destinationKana,
+            destinationEng: operation.destinationEng,
+            destinationNum: operation.destinationNum,
+            destinationColor: operation.destinationColor,
+            destinationNumIconKey: operation.destinationNumIconKey,
+            viaText: operation.direction,
+            trainType: {text: operation.trainType, color: operation.trainTypeColor},
+            trainTypeEng: operation.trainTypeEng,
+            trainTypeSub: operation.trainTypeSub,
+            trainTypeSubEng: operation.trainTypeSubEng,
             isLongStop: progressParams.isLongStop, //長時間停車中かどうか
             isTerminal: progressParams.isTerminal, //終着駅かどうか（終着駅表示を出すかどうか）
         }
     }
 
-    createAll(progressParams){
-        let drawParams = this.extractDrawParams(progressParams);
+    createAll(progressParams, operation){
+        let drawParams = this.extractDrawParams(progressParams, operation);
         return this.headerDrawer.createAll(drawParams, 1);
     }
-    /*
-    getHeaderParams(){
-        return {
-            trainType: this.trainTypeObject, //列車種別オブジェクト
-            destinationText: this.destinationText, //行先・経由地のテキスト
-            viaText: this.viaText, //経由地のテキスト
-            carNumText: this.carNumText, //号車のテキスト
-            headerStation: this.headerStation //ヘッダーの駅オブジェクト
-        }
-    }*/
 }

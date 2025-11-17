@@ -1,6 +1,6 @@
 type settingType = {
     info: infoType,
-    operation: operationType,
+    operationList: operationType[],
     stationList: stationType[],
     lineDict: {[id: string]: lineType},
     iconDict: {[id: string]: string}
@@ -36,7 +36,8 @@ type operationType = {
     backOffset: string,
     isDrawStopText: boolean,
     isDrawLine: boolean,
-    carLineColor: string
+    carLineColor: string,
+    startStationInd: string
 }
 
 type stationType = {
@@ -73,4 +74,4 @@ type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
 type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 
-    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor'
+    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'startStationInd'

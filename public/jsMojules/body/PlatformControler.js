@@ -6,7 +6,7 @@ class PlatformController {
         console.log("PlatformController初期化完了");
     }
 
-    extractDrawParams(progressParams){
+    extractDrawParams(progressParams, operation){
         let dispStation;
         let i = 0;
         do{
@@ -14,12 +14,12 @@ class PlatformController {
             i++;
         }while(dispStation.isPass);
 
-        const headOffset = parseInt(this.setting.operation.headOffset);//仮データ
-        const backOffset = parseInt(this.setting.operation.backOffset);//仮データ
+        const headOffset = parseInt(operation.headOffset);//仮データ
+        const backOffset = parseInt(operation.backOffset);//仮データ
         const gap = 5;
         const wholeLength = 1920 - headOffset - backOffset;
 
-        const carLabelText = this.setting.operation.carNumberList;//仮データ
+        const carLabelText = operation.carNumberList;//仮データ
         const carLabels = carLabelText.split(",");
         const highlightCarId = carLabels.findIndex(label => label.includes("*"));
         const cars = carLabels.length;
@@ -28,7 +28,7 @@ class PlatformController {
         const labelWidth = carLength - 10;
 
         let baseX;
-        if(this.setting.operation.leftOrRight === "right"){
+        if(operation.leftOrRight === "right"){
             baseX = 1920 - headOffset;
         }
         else{
@@ -48,17 +48,17 @@ class PlatformController {
         }
 
         return {
-            leftOrRight: this.setting.operation.leftOrRight,
+            leftOrRight: operation.leftOrRight,
             dispStation: dispStation,
             trainParams: trainParams,
             lineDict: this.setting.lineDict,
-            isDrawLine: this.setting.operation.isDrawLine,
-            carLineColor: this.setting.operation.carLineColor
+            isDrawLine: operation.isDrawLine,
+            carLineColor: operation.carLineColor
         }
     }
 
-    createAll(progressParams){
-        let drawParams = this.extractDrawParams(progressParams);
+    createAll(progressParams, operation){
+        let drawParams = this.extractDrawParams(progressParams, operation);
         return this.platformDrawer.createAll(drawParams, 1);
     }
 }

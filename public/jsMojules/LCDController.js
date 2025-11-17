@@ -70,13 +70,37 @@ class LCDController{
         tempSVG.appendChild(mapSVG.getElementById("defs").cloneNode(true))
         tempSVG.appendChild(mapSVG.getElementById("background").cloneNode(true));
 
+        //現在のoperationオブジェクトを取得
+        const operation = this.getOperation(this.setting.operationList, this.progressController.progressParams.sectionInd);
+        console.log(operation)
         //LCD要素を組み立てて追加
         this.animator.resetNum(); //アニメーターの番号をリセット
-        tempSVG.appendChild(this.pageRotator.getCurrentPage().createAll(this.progressController.progressParams));
-        tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams));
-        tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams));
+        tempSVG.appendChild(this.pageRotator.getCurrentPage().createAll(this.progressController.progressParams, operation));
+        tempSVG.appendChild(this.headerController.createAll(this.progressController.progressParams, operation));
+        tempSVG.appendChild(this.footerController.createAll(this.progressController.progressParams, operation));
 
         return tempSVG;
+    }
+
+    getOperation(operaionList, ind){
+        // operationListは、[開始駅 startStationInd]パラメータを持つ。
+        // startStationに停車中の状態から、最後の駅のまもなく状態までの表示
+
+        // ソート
+        operaionList.sort((a, b) => a.startStationInd - b.startStationInd);
+
+        let nowOperation = null;
+        operaionList.forEach(operation => {
+            if(operation.startStationInd <= ind){
+                nowOperation = operation;
+            }
+            else{
+                return;
+            }
+        })
+        if(nowOperation === null){ console.error("この区間の運用情報が定義されていません"); }
+
+        return nowOperation;
     }
 
     selectPage(){

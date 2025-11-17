@@ -32,7 +32,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
                 reader.onload = (ee: any) => {
                     try {
                         readData = JSON.parse(ee.target.result)
-                        mergeProperties(readData.operation, initSettingObject.operation);
+                        mergeProperties(readData.operationList, initSettingObject.operation);
                         readData.stationList.forEach(station => {
                             mergeProperties(station, initSettingObject.station);
                         });
@@ -87,7 +87,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
         if(!setting){
             return
         }
-        if(!setting.operation){
+        if(!setting.info){
             return
         }
 
@@ -112,7 +112,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             <br></br>
             <button onClick={() => {
                 let _setting = setting;
-                _setting.operation = readData.operation;
+                _setting.operationList = readData.operationList;
                 setSetting(_setting);
             }}>info読み込み</button>
             <br></br>

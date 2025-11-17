@@ -64,7 +64,9 @@ class ProgressController{
     get stateInd(){
         return this._stateInd; //状態インデックスを取得
     }
-
+    get sectionInd(){
+        return parseInt((this._stateInd - (this.statesPerStation - 1)) / this.statesPerStation);
+    }
     moveState(step){
         this.stateInd += step;
     }
@@ -74,6 +76,7 @@ class ProgressController{
     get progressParams(){
         return {
             currentStationInd: this.currentStationInd,
+            sectionInd: this.sectionInd,
             posState: this.posState,
             runState: this.runState,
             isCurrentStationPass: this.isCurrentStationPass,
@@ -84,6 +87,7 @@ class ProgressController{
     get currentStationInd(){
         return parseInt(this.stateInd / this.statesPerStation); //状態インデックスを駅インデックスに変換
     }
+    
     get posState(){
         return this.stateInd % this.statesPerStation; //状態インデックスを位置状態に変換
     }

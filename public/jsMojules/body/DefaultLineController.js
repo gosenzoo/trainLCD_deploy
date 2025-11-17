@@ -7,7 +7,7 @@ class DefaultLineController{
     }
 
     //進行パラメータから描画用パラメータを抽出
-    extractDrawParams(progressParams){
+    extractDrawParams(progressParams, operation){
         let stationFrameNum = 8; //本来settingから取得（setting側未対応）
 
         //描画対象駅オブジェクトを取得
@@ -133,7 +133,7 @@ class DefaultLineController{
             dispStationList[i]._dispTime = timeList[i];
         }
         console.log(dispStationList)
-        let isDispTime = this.setting.operation.isDispTime && !timeList.every(time => time < 0);
+        let isDispTime = operation.isDispTime && !timeList.every(time => time < 0);
         console.log(isDispTime)
 
         //路線名
@@ -185,14 +185,14 @@ class DefaultLineController{
             lineLeapPosList: lineLeapPosList,
             isStart: isStart,
             isEnd: isEnd,
-            leftOrRight: this.setting.operation.leftOrRight,
+            leftOrRight: operation.leftOrRight,
             isDispTime: isDispTime,
-            isDispLineName: this.setting.operation.isDispLineName
+            isDispLineName: operation.isDispLineName
         }
     }
 
-    createAll(progressParams){
-        let drawParams = this.extractDrawParams(progressParams);
+    createAll(progressParams, operation){
+        let drawParams = this.extractDrawParams(progressParams, operation);
         return this.defaultLineDrawer.createAll(drawParams, 1);
     }
 }

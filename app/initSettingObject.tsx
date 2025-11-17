@@ -30,7 +30,8 @@ const initOperationObject: operationType = {
     backOffset: "170",
     isDrawStopText: false,
     isDrawLine: false,
-    carLineColor: "#FFFFFF"
+    carLineColor: "#FFFFFF",
+    startStationInd: "0"
 }
 
 const initStationObject: stationType = {
@@ -62,7 +63,7 @@ const initLineObject = {
 
 const initSettingObject: settingType = {
     info: initInfoObject,
-    operation: initOperationObject,
+    operationList: [initOperationObject],
     stationList: [],
     lineDict: {},
     iconDict: {}

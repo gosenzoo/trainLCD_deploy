@@ -12,8 +12,8 @@ class TrasnferController {
         }
     }
 
-    createAll(progressParams){
-        let drawParams = this.extractDrawParams(progressParams);
+    createAll(progressParams, operation){
+        let drawParams = this.extractDrawParams(progressParams, operation);
         return this.transferDrawer.createAll(drawParams, 1);
     }
 }
