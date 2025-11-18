@@ -172,7 +172,8 @@ class PlatformDrawer{
                     baseY: 463,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
-                    baseMode: leftOfRight
+                    baseMode: leftOfRight,
+                    wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
             }
 
@@ -255,7 +256,8 @@ class PlatformDrawer{
                     baseY: 804,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
-                    baseMode: leftOfRight
+                    baseMode: leftOfRight,
+                    wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
             }
         }
@@ -307,7 +309,8 @@ class PlatformDrawer{
                     baseY: 804,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
-                    baseMode: leftOfRight
+                    baseMode: leftOfRight,
+                    wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
             }
         }
