@@ -123,7 +123,8 @@ class PlatformDrawer{
                     baseY: 463,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
-                    baseMode: leftOfRight
+                    baseMode: leftOfRight,
+                    wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
             }
 
@@ -356,7 +357,7 @@ class PlatformDrawer{
             `${lineParams.name}`,
             `${lineParams.eng}`,
             0,   // x いらない
-            params.baseY - 90,   // y いらない
+            0,   // y いらない
             2000, // width(全体の最大横幅) いらない
             88,   // height（アイコンの高さ）
             0,    // topTextOffset
@@ -370,7 +371,10 @@ class PlatformDrawer{
             {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
         );
         tw.setHeight(80);
-        const twWidth = tw.overallArea.width;
+        const leftX = params.baseMode === "left" ? params.baseX : params.baseX - params.wholeLength;
+        const x = leftX + params.wholeLength / 2 - tw.overallArea.width / 2;
+        console.log(tw.overallArea.width);
+        tw.setCoordinate(x, params.baseY - 87);
         group.appendChild(tw.getElement());
         
         return group;

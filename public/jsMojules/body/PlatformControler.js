@@ -70,7 +70,8 @@ class PlatformController {
         let otherTrainParams = {
             cars: cars,
             carLength: carLength * ratio,
-            baseX: (baseX - centerX) * ratio + centerX
+            baseX: (baseX - centerX) * ratio + centerX,
+            wholeLength: wholeLength * ratio
         }
 
         //路線オブジェクトを求める
