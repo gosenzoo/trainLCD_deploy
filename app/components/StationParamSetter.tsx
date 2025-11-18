@@ -224,6 +224,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
                 value={ targetStation?.transferCountLineP}
             ></input>
+            <br></br>
+            <label>ホーム向側列車の路線ID</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
+                value={ targetStation?.otherLineInd}
+            ></input>
         </div>
     )
 }

@@ -13,7 +13,7 @@ class PlatformDrawer{
         //group.appendChild(mapSVG.getElementById("tokyu-okuHome").cloneNode(true));
 
         //group.append(this.createStationSet("right", "left"));
-        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams, drawParams.isDrawLine, drawParams.carLineColor));
+        group.append(this.createStationSet(drawParams.leftOrRight, drawParams.dispStation.doorSide, drawParams.trainParams, drawParams.isDrawLine, drawParams.carLineColor, drawParams.otherTrainParams, drawParams.otherLineParams));
 
         //乗り換えがあれば下部に乗換案内を表示
         if((drawParams.dispStation.transfers.length > 0)){
@@ -92,12 +92,13 @@ class PlatformDrawer{
         return group;
     }
 
-    createStationSet(leftOfRight, doorSide, trainParams, isDrawLine, carLineColor){
+    createStationSet(leftOfRight, doorSide, trainParams, isDrawLine, carLineColor, otherTrainParams, otherLineParams){
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
 
-        const isDispOther = false;
-        const otherTrainCarCounts = 6;
-        const otherTrainCarLeft = 1;
+        console.log(otherLineParams);
+        const isDispOther = otherLineParams !== null;
+        const otherTrainCarCounts = otherTrainParams.cars;
+        const otherTrainCarLeft = 0;
 
         let sideFace = "#313131ff";
         let mainFace = "#3c3c3cff";
@@ -117,7 +118,13 @@ class PlatformDrawer{
             //奥
             if(isDispOther){
                 group.appendChild(this.createOneRail(483));
-                group.appendChild(this.createOtherTrainObj(200, 483, 6));
+                group.appendChild(this.createOtherTrainObj({
+                    baseX: otherTrainParams.baseX,
+                    baseY: 463,
+                    cars: otherTrainCarCounts,
+                    carLength: otherTrainParams.carLength,
+                    baseMode: leftOfRight
+                }, otherLineParams));
             }
 
             //ホーム描画
@@ -131,7 +138,7 @@ class PlatformDrawer{
 
             //列車描画
             group.appendChild(this.createTrainObj({
-                baseMode: "right",
+                baseMode: leftOfRight,
                 baseX: trainParams.baseX,
                 baseY: 818,
                 cars: trainParams.cars,
@@ -159,6 +166,13 @@ class PlatformDrawer{
             //奥
             if(isDispOther){
                 group.appendChild(this.createOneRail(483));
+                group.appendChild(this.createOtherTrainObj({
+                    baseX: otherTrainParams.baseX,
+                    baseY: 463,
+                    cars: otherTrainCarCounts,
+                    carLength: otherTrainParams.carLength,
+                    baseMode: leftOfRight
+                }, otherLineParams));
             }
 
             //ホーム描画
@@ -172,7 +186,7 @@ class PlatformDrawer{
 
             //列車描画
             group.appendChild(this.createTrainObj({
-                baseMode: "left",
+                baseMode: leftOfRight,
                 baseX: trainParams.baseX,
                 baseY: 818,
                 cars: trainParams.cars,
@@ -195,16 +209,12 @@ class PlatformDrawer{
         //奥右向き
         else if((leftOfRight === "right") && (doorSide === "right")){
             //レール描画
-            //手前
-            if(isDispOther){
-                group.appendChild(this.createOneRail(824));
-            }
             //奥
             group.appendChild(this.createOneRail(496));
 
             //列車描画
             group.appendChild(this.createTrainObj({
-                baseMode: "right",
+                baseMode: leftOfRight,
                 baseX: trainParams.baseX,
                 baseY: 480,
                 cars: trainParams.cars,
@@ -235,20 +245,28 @@ class PlatformDrawer{
                 baseBodyHeight: 23,
                 baseShadowHeight: 9,
             }));
+
+            //手前
+            if(isDispOther){
+                group.appendChild(this.createOneRail(824));
+                group.appendChild(this.createOtherTrainObj({
+                    baseX: otherTrainParams.baseX,
+                    baseY: 804,
+                    cars: otherTrainCarCounts,
+                    carLength: otherTrainParams.carLength,
+                    baseMode: leftOfRight
+                }, otherLineParams));
+            }
         }
         //奥左向き
         else if((leftOfRight === "left") && (doorSide === "left")){
             //レール描画
-            //手前
-            if(isDispOther){
-                group.appendChild(this.createOneRail(824));
-            }
             //奥
             group.appendChild(this.createOneRail(496));
 
             //列車描画
             group.appendChild(this.createTrainObj({
-                baseMode: "left",
+                baseMode: leftOfRight,
                 baseX: trainParams.baseX,
                 baseY: 480,
                 cars: trainParams.cars,
@@ -279,18 +297,32 @@ class PlatformDrawer{
                 baseBodyHeight: 23,
                 baseShadowHeight: 9,
             }));
+
+            //手前
+            if(isDispOther){
+                group.appendChild(this.createOneRail(824));
+                group.appendChild(this.createOtherTrainObj({
+                    baseX: otherTrainParams.baseX,
+                    baseY: 804,
+                    cars: otherTrainCarCounts,
+                    carLength: otherTrainParams.carLength,
+                    baseMode: leftOfRight
+                }, otherLineParams));
+            }
         }
         
-
         return group;
     }
 
-    createOtherTrainObj(x, y, cars){
+    createOtherTrainObj(params = {}, lineParams){
+        const NS = "http://www.w3.org/2000/svg";
+        const group = document.createElementNS(NS, "g")
+
         const trainParams = {
             carLength: 154,
             height: 66,
             depth: 30,
-            cars: cars,
+            cars: 1,
             vanishY: -2000,
             gap: 5,
             margin: 40,
@@ -303,21 +335,45 @@ class PlatformDrawer{
             shadowDepth:   30,
             shadowColor:   "rgba(0,0,0,1)",
 
-            baseX: x,
-            baseY: y,
+            baseX: 0,
+            baseY: 0,
             //baseX: 120,
             //baseY: 818,
             baseMode: "left", // ← これで入線方向を決めます（left:右→左 / right:左→右）
         };
         const otherTrain = createTrain({
             ...trainParams,
+            ...params,
             animate: false,
             carLabels: null,
             textDrawer: null,
             highlightCarId: null,
         });
+        group.appendChild(otherTrain);
+
+        const tw = new TransferWidget(
+            `:${lineParams.lineIconKey}:`,
+            `${lineParams.name}`,
+            `${lineParams.eng}`,
+            0,   // x いらない
+            params.baseY - 90,   // y いらない
+            2000, // width(全体の最大横幅) いらない
+            88,   // height（アイコンの高さ）
+            0,    // topTextOffset
+            55,   // topTextHeight
+            0,    // bottomTextOffset
+            5,    // iconGap（今回は未使用）
+            5,    // iconTextGap
+            3,    // textGap
+            this.textDrawer,
+            {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"},
+            {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
+        );
+        tw.setHeight(80);
+        const twWidth = tw.overallArea.width;
+        group.appendChild(tw.getElement());
         
-        return otherTrain
+        return group;
     }
     createOneRail(y){
         return createRail({
@@ -397,9 +453,9 @@ class PlatformDrawer{
             },
             highlightLabelFill: "#ffffffff",
             drawLine: true,                // ← 追加：false ならラインを描かない
-            lineThickness: 10,              // 通常ライン太さ（0以下で非描画）
+            lineThickness: 12,              // 通常ライン太さ（0以下で非描画）
             lineOffset: 0,                 // 通常ライン下辺の位置＝側面底辺 - lineOffset
-            highlightLineThickness: 10,  // ハイライト用（未指定なら lineThickness）
+            highlightLineThickness: 12,  // ハイライト用（未指定なら lineThickness）
             highlightLineOffset: 0,     // ハイライト用（未指定なら lineOffset）
             lineColor: "#ff4d4dff",          // ライン色
         };

@@ -50,7 +50,8 @@ const initStationObject: stationType = {
     transferText: "",
     transferTextEng: "",
     doorSide: 'left',
-    transferCountLineP: ""
+    transferCountLineP: "",
+    otherLineInd: ""
 }
 
 const initLineObject = {
