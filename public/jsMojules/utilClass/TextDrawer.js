@@ -45,6 +45,9 @@ class TextDrawer{
         //return { element: document.createElementNS("http://www.w3.org/2000/svg", "text"), width: 100 }; //ダミー
         if(lang === null){ lang = "ja"; }
 
+        let strokeWidth = 0;
+        let stroke;
+
         //文字間隔がJSONなら、適する値を取り出す
         if(this.isObject(styleJson.letterSpacing)){
             if(Object.keys(styleJson.letterSpacing).includes(`${text.length}`)){
@@ -53,6 +56,12 @@ class TextDrawer{
             else{
                 styleJson.letterSpacing = "0px";
             }
+        }
+        if(styleJson.stroke){
+            //strokeが定義されていれば
+            strokeWidth = styleJson.stroke.strokeWidth;
+            stroke = styleJson.stroke.stroke;
+            delete styleJson.stroke;
         }
 
         const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -79,7 +88,25 @@ class TextDrawer{
             textElem.setAttribute("transform", transform);
         }
 
-        return {element: textElem, width: textWidth};
+        let ret;
+
+        if(strokeWidth > 0){
+            //縁取りがあれば
+            const strokeText = textElem.cloneNode(true);
+            strokeText.setAttribute("stroke-width", strokeWidth * 2);
+            strokeText.setAttribute("stroke", stroke);
+
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.appendChild(strokeText);
+            g.appendChild(textElem);
+            ret = g;
+        }
+        else{
+            //縁取りがなければ
+            ret = textElem;
+        }
+
+        return {element: ret, width: textWidth};
     }
     createByAreaVertical(text, x, y, width, height, styleJson, spacing=5, base="bottom"){
         if(spacing === null){ spacing = 5; }

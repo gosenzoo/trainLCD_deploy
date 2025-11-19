@@ -331,10 +331,10 @@ class PlatformDrawer{
             gap: 5,
             margin: 40,
             strokeWidth: 2.5,
-            colorSideFace: "#565656ff",
-            colorMainFace: "#828282ff",
-            colorTopFace:  "#b9b9b9ff",
-            colorEdges:    "#d1d1d1ff",
+            colorSideFace: "#989898ff",
+            colorMainFace: "#929292ff",
+            colorTopFace:  "#bababaff",
+            colorEdges:    "#e2e2e2ff",
             shadowPos:     10,
             shadowDepth:   30,
             shadowColor:   "rgba(0,0,0,1)",
@@ -370,8 +370,8 @@ class PlatformDrawer{
             5,    // iconTextGap
             3,    // textGap
             this.textDrawer,
-            {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"},
-            {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)"}
+            {fontFamily: "BIZ UDGothic", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)", stroke: {strokeWidth: 2.5, stroke: "#FFFFFF"}},
+            {fontFamily: "sans-serif", fontWeight: "bold", textAnchor: "start", fill: "rgb(0, 0, 0)", stroke: {strokeWidth: 2.5, stroke: "#FFFFFF"}}
         );
         tw.setHeight(80);
         const leftX = params.baseMode === "left" ? params.baseX : params.baseX - params.wholeLength;
@@ -495,7 +495,7 @@ class PlatformDrawer{
             anchorY: 737,
             referencePos: "front",
             colors: {
-                topFill:   "#d1d1d1ff",
+                topFill:   "#e6e6e6ff",
                 frontFill: "#a9a9a9ff",
                 outline:   "#333333",
                 baseBody:  "#858585ff",

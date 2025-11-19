@@ -107,41 +107,51 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
 
     return(
         <div>
+            <button onClick={e => {
+                const lcdStrageItem = localStorage.getItem('lcdStrage');
+                if(!lcdStrageItem){
+                    alert("localStrageにアイテムがありません");
+                    return;
+                }
+                const setting = JSON.parse(lcdStrageItem);
+                setSetting(setting);
+            }}>LocalStrageから読み込み</button>
+            <br></br>
             <label>設定ファイル入力</label>
             <input id="settingInput" type="file" onChange={inputToSetting}></input>
             <br></br>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 let _setting = setting;
                 _setting.operationList = readData.operationList;
                 setSetting(_setting);
             }}>info読み込み</button>
             <br></br>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 let _setting = setting;
                 _setting.stationList = readData.stationList;
                 setSetting(_setting);
             }}>駅読み込み</button>
             <br></br>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 let _setting = setting;
                 _setting.lineDict = readData.lineDict;
                 setSetting(_setting);
             }}>路線読み込み</button>
             <br></br>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 let _setting = setting;
                 _setting.iconDict = structuredClone(readData.iconDict);
                 console.log(_setting)
                 setSetting(_setting);
             }}>アイコン読み込み</button>
             <br></br>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 setSetting(readData);
             }}>すべて読み込み</button>
             <br></br>
             <br></br>
             <button onClick={downloadFromSettings}>設定をダウンロード</button>
-            <button onClick={() => {
+            <button onClick={(e) => {
                 if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
                     setSetting(initSettingObject.setting);
                 }
