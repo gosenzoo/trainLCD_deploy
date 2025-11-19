@@ -123,6 +123,7 @@ class PlatformDrawer{
                     baseY: 463,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
+                    gap: otherTrainParams.gap,
                     baseMode: leftOfRight,
                     wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
@@ -144,6 +145,7 @@ class PlatformDrawer{
                 baseY: 818,
                 cars: trainParams.cars,
                 carLength: trainParams.carLength,
+                gap: trainParams.gap,
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
@@ -172,6 +174,7 @@ class PlatformDrawer{
                     baseY: 463,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
+                    gap: otherTrainParams.gap,
                     baseMode: leftOfRight,
                     wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
@@ -193,6 +196,7 @@ class PlatformDrawer{
                 baseY: 818,
                 cars: trainParams.cars,
                 carLength: trainParams.carLength,
+                gap: trainParams.gap,
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
@@ -221,6 +225,7 @@ class PlatformDrawer{
                 baseY: 480,
                 cars: trainParams.cars,
                 carLength: trainParams.carLength,
+                gap: trainParams.gap,
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
@@ -256,6 +261,7 @@ class PlatformDrawer{
                     baseY: 804,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
+                    gap: otherTrainParams.gap,
                     baseMode: leftOfRight,
                     wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));
@@ -274,6 +280,7 @@ class PlatformDrawer{
                 baseY: 480,
                 cars: trainParams.cars,
                 carLength: trainParams.carLength,
+                gap: trainParams.gap,
                 highlightCarId: trainParams.highlightCarId,
                 carLabels: trainParams.carLabels,
                 labelWidth: trainParams.labelWidth,
@@ -309,6 +316,7 @@ class PlatformDrawer{
                     baseY: 804,
                     cars: otherTrainCarCounts,
                     carLength: otherTrainParams.carLength,
+                    gap: otherTrainParams.gap,
                     baseMode: leftOfRight,
                     wholeLength: otherTrainParams.wholeLength
                 }, otherLineParams));

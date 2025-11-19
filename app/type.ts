@@ -57,7 +57,11 @@ type stationType = {
     transferTextEng: string,
     doorSide: 'left' | 'right',
     transferCountLineP: string,
-    otherLineInd: string
+    otherLineInd: string,
+    slotNum: string,
+    leftSlotInd: string,
+    otherCarNum: string,
+    otherLeftSlotInd: string
 }
 
 type lineType = {
@@ -68,7 +72,8 @@ type lineType = {
     color: string,
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'numIconPresetKey' | 'lineNumberType' | 'transferCountLineP' | 'otherLineInd'
+type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'numIconPresetKey' | 'lineNumberType' | 'transferCountLineP' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+    'otherCarNum' | 'otherLeftSlotInd'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 

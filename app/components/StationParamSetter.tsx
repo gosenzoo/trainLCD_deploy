@@ -24,6 +24,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             if(!(field in _setting.stationList[ind - 1])){
                 return
             }
+
             _setting.stationList[ind - 1][field] = e.target.value
 
             //かなに変更があった場合、ローマ字も更新
@@ -225,9 +226,50 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 value={ targetStation?.transferCountLineP}
             ></input>
             <br></br>
+            <br></br>
+            <label>スロット分割数</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}
+                value={ targetStation?.slotNum}
+            ></input>
+            <br></br>
+            <label>列車左端スロット</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'leftSlotInd')}
+                value={ targetStation?.leftSlotInd}
+            ></input>
+            <br></br>
             <label>ホーム向側列車の路線ID</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
+            <input id="otherTrainIDInput" type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
                 value={ targetStation?.otherLineInd}
+            ></input>
+            <select onChange={e => {
+                if (!e.target.value) return;
+                let otherTrainIDInput = document.getElementById("otherTrainIDInput") as HTMLTextAreaElement;
+                if(!otherTrainIDInput){ return; }
+                otherTrainIDInput.value = e.target.value;
+                targetStation.otherLineInd = otherTrainIDInput.value;
+                // 選択をリセット（連続で同じ項目を挿入できるように）
+                e.target.value = '接続路線を追加';
+            }}>
+                <option>接続路線を追加</option>
+                {
+                    Object.keys(setting.lineDict).map((key, index) => {
+                        return(
+                            <option key={index} value={key}>
+                                {setting.lineDict[key].name}
+                            </option>
+                        )
+                    })
+                }
+            </select>
+            <br></br>
+            <label>向側列車両数</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'otherCarNum')}
+                value={ targetStation?.otherCarNum}
+            ></input>
+            <br></br>
+            <label>向側列車左端スロット</label>
+            <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
+                value={ targetStation?.otherLeftSlotInd}
             ></input>
         </div>
     )
