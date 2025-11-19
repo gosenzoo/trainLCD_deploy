@@ -121,13 +121,13 @@ class DefaultLineDrawer{
         const nameGap = this.lineY - (parseFloat(stNameRect.getAttribute("y")) + parseFloat(stNameRect.getAttribute("height"))); //駅名中心から線までの距離を計算
 
         //ナンバリングの上端位置
-        let numIconTop = 0;
+        let numIconTop = this.lineY;
         
         // ナンバリング
         if(station.number === ""){
             //ナンバリングがない場合は何もしない
 
-            numIconTop = 0;
+            numIconTop = this.lineY;
         }
         else if(station.lineNumberType === "0"){
             //ナンバリング文字表示の場合
@@ -221,13 +221,13 @@ class DefaultLineDrawer{
         const stNameRect = this.mapSVG.querySelector("#body-defaultLine-stationName").cloneNode(true); //駅名テキストrect
 
         //ナンバリングの上端位置
-        let numIconTop = 0;
+        let numIconTop = this.lineY;
         
         // ナンバリング
         if(station.number === ""){
             //ナンバリングがない場合は何もしない
 
-            numIconTop = 0;
+            numIconTop = this.lineY;
         }
         else if(station.lineNumberType === "0"){
             //ナンバリング文字表示の場合
@@ -254,7 +254,7 @@ class DefaultLineDrawer{
         //駅名下端位置を調整
         const upLen = (parseFloat(stNameRect.getAttribute("y")) + parseFloat(stNameRect.getAttribute("height"))) - numIconTop; //駅名下端のY座標を計算
         const stationNameEngRect = this.mapSVG.querySelector("#body-defaultLine-stationNameEng").cloneNode(true); //駅名テキストrect
-        stationNameEngRect.setAttribute("transform", `translate(0, -${upLen}) ${stationNameEngRect.getAttribute("transform")}`); //駅名rectの高さを調整
+        stationNameEngRect.setAttribute("transform", `translate(0, ${-upLen}) ${stationNameEngRect.getAttribute("transform")}`); //駅名rectの高さを調整
         //駅名横幅を計算
         const transforms = stationNameEngRect.getAttribute("transform").split(" ");
         let degree = 90;
@@ -267,11 +267,9 @@ class DefaultLineDrawer{
         const enHeight = stationNameEngRect.getAttribute("height");
         const radAbsDegree = Math.abs(Math.PI * degree / 180);
         const width = jpWidth / (Math.sin(radAbsDegree)) - enHeight * Math.cos(radAbsDegree);
-        console.log(width)
         stationNameEngRect.setAttribute("width", width);
         
         //駅名
-        //stationParts.appendChild(stationNameEngRect)
         stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);
 
         //乗換路線
