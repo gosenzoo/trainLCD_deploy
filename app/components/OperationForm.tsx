@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, HtmlHTMLAttributes } from "react"
 import "../type"
 import initObjects from "../initSettingObject"
+import { isatty } from "tty"
 
 type operationFormType = {
     setting: settingType,
@@ -19,15 +20,32 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             return
         }
 
+        const allOperationCheckbox = document.getElementById("allOperationCheckbox") as HTMLInputElement;
+        const isAll = allOperationCheckbox.checked;
+
         const _setting: settingType = structuredClone(setting)
 
         if((field !== "isDispTime") && (field !== "isDispLineName") && (field !== "isDrawStopText") && (field !== "isDrawLine")){
             //テキストボックス入力の場合
-            _setting.operationList[operationInd][field] = e.target.value
+            if(isAll){
+                _setting.operationList.forEach((operation) => {
+                    operation[field] = e.target.value;
+                });
+            }
+            else{
+                _setting.operationList[operationInd][field] = e.target.value;
+            }
         }
         else{
             //チェックボックス入力の場合
-            _setting.operationList[operationInd][field] = e.target.checked
+            if(isAll){
+                _setting.operationList.forEach((operation) => {
+                    operation[field] = e.target.value;
+                });
+            }
+            else{
+                _setting.operationList[operationInd][field] = e.target.checked;
+            }
         }
 
         setSetting(_setting)
@@ -36,6 +54,9 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
     return(
         <div>
             <h2>運用設定</h2>
+            <label>すべての運用に適用</label>
+            <input id="allOperationCheckbox" type="checkbox"></input>
+            <br></br>
             <select onChange={e => {setOperationInd(parseInt(e.target.value))}}>
                 {setting.operationList.map((operation, index) => {
                     return (
