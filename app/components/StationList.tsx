@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from 'react'
 import "../type"
 import StationParamSetter from './StationParamSetter'
@@ -231,8 +233,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 ( innerHTML ?
                                                     <svg 
                                                     viewBox='0 0 225 225'
-                                                    width="30px"
-                                                    height="30px"
+                                                    width="20px"
+                                                    height="20px"
                                                     dangerouslySetInnerHTML={{ __html: innerHTML }}>
                                                     </svg> : ""
                                                 ))
