@@ -6,6 +6,11 @@ export default function createIconFromPreset(
     lineColor: string,
     outlineWidth = 0
 ) {
+    if (typeof window === "undefined" || typeof DOMParser === "undefined") {
+        // SSR / Node.js 環境ではパースしない
+        return null;
+    }
+    
     let presetSVGText = numIconPresets[key];
     if (!presetSVGText) {
         console.error(`ナンバリング記号プリセットが見つかりません: ${key}`);
