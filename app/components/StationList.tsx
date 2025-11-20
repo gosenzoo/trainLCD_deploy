@@ -202,17 +202,18 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 if(!Object.keys(setting.lineDict).includes(line)){
                                                     return
                                                 }
-                                                return ((typeof setting.iconDict[setting.lineDict[line].lineIconKey] === "string") ?
-                                                ((setting.iconDict[setting.lineDict[line].lineIconKey] as string) ?
+                                                const iconParams = setting.iconDict[setting.lineDict[line].lineIconKey];
+                                                return ((typeof iconParams === "string") ?
+                                                ((iconParams as string) ?
                                                     <img
-                                                        src={(setting.iconDict[setting.lineDict[line].lineIconKey] as string)}
+                                                        src={(iconParams as string)}
                                                         alt=""
                                                         width="20px"
                                                         height="20px"
                                                     />
                                                 : "") : 
-                                                ( setting.iconDict[setting.lineDict[line].lineIconKey] ?
-                                                    setting.iconDict[setting.lineDict[line].lineIconKey].presetType : ""
+                                                ( iconParams ?
+                                                    iconParams.presetType : ""
                                                 ))
                                             })
                                         }

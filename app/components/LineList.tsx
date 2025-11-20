@@ -83,6 +83,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                     <tbody id="linesTableBody">
                         {
                             Object.keys(setting.lineDict).map((key, index) => {
+                                const iconParams = setting.iconDict[setting.lineDict[key].lineIconKey];
                                 return(
                                     <tr key={index}>
                                         <th className={ selectedIndexes.includes(key) ? 'selected' : '' } onClick={indexClicked}>
@@ -90,17 +91,17 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                         </th>
                                         <td>
                                             {
-                                                (typeof setting.iconDict[setting.lineDict[key].lineIconKey] === "string") ?
-                                                ((setting.iconDict[setting.lineDict[key].lineIconKey] as string) ?
+                                                (typeof iconParams === "string") ?
+                                                ((iconParams as string) ?
                                                     <img
-                                                        src={(setting.iconDict[setting.lineDict[key].lineIconKey] as string)}
+                                                        src={(iconParams as string)}
                                                         alt=""
                                                         width="30px"
                                                         height="30px"
                                                     />
                                                 : "") : 
-                                                ( setting.iconDict[setting.lineDict[key].lineIconKey] ?
-                                                    setting.iconDict[setting.lineDict[key].lineIconKey].presetType : ""
+                                                ( iconParams ?
+                                                    iconParams.presetType : ""
                                                 )
                                             }
                                         </td>
