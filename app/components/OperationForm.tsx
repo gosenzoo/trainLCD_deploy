@@ -2,6 +2,7 @@ import React, { useState, useEffect, HtmlHTMLAttributes } from "react"
 import "../type"
 import initObjects from "../initSettingObject"
 import { isatty } from "tty"
+import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 
 type operationFormType = {
     setting: settingType,
@@ -112,11 +113,13 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             <br></br>
             <label>行先ナンバリング記号</label>
             <select onChange={(e) => {formUpdated(e, 'destinationNumIconKey')}} value={setting.operationList[operationInd].destinationNumIconKey}>
-                <option value="N_tokyu">東急</option>
-                <option value="N_JR_east">JR東日本</option>
-                <option value="N_tokyo_subway">東京地下鉄</option>
-                <option value="N_JR_west">JR西日本</option>
-                <option value="N_JR_central">JR東海</option>
+                {
+                    numberIndexes.map(num => {
+                        return(
+                            <option value={num.key}>{num.name}</option>
+                        )
+                    })
+                }
             </select>
             <br></br>
             <label>経由等</label>

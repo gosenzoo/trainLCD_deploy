@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { presetIconMaker } from "../modules/presetIconMaker";
 import "../type"
+import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 
 type iconListProps = {
     setting: settingType,
@@ -175,11 +176,13 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             <br></br>
             プリセットから登録<br></br>
             <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
-                <option value="I_JR_east">JR東日本</option>
-                <option value="I_tokyo_subway">東京地下鉄</option>
-                <option value="I_train_normal1">地上路線汎用１</option>
-                <option value="I_train_normal2">地上路線汎用２</option>
-                <option value="I_train_subway1">地下路線汎用</option>
+                {
+                    numberIndexes.map(num => {
+                        return(
+                            <option value={num.key}>{num.name}</option>
+                        )
+                    })
+                }
             </select>
             <br></br>
             アイコンの路線記号

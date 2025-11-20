@@ -2,6 +2,7 @@ import React, { useState, useEffect, TextareaHTMLAttributes } from 'react'
 import "../type"
 import kanaToAlphabet from "../modules/KanaConverter"
 import { text } from 'stream/consumers'
+import { iconIndexes, numberIndexes } from '../modules/presetIndex'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -105,11 +106,13 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             <br></br>
             <label>ナンバリング記号</label>
             <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey}>
-                <option value="N_tokyu">東急</option>
-                <option value="N_JR_east">JR東日本</option>
-                <option value="N_tokyo_subway">東京地下鉄</option>
-                <option value="N_JR_west">JR西日本</option>
-                <option value="N_JR_central">JR東海</option>
+                {
+                    numberIndexes.map(num => {
+                        return(
+                            <option value={num.key}>{num.name}</option>
+                        )
+                    })
+                }
             </select>
             <br></br>
             <label>ナンバリング表示形式</label>
