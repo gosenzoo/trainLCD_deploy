@@ -4,8 +4,11 @@ type presetIndexType = {
 }
 
 const iconIndexes: presetIndexType[] = [
+    {key: "I_tokyu", name: "東急" },
     {key: "I_JR_east", name: "JR東日本" },
     {key: "I_tokyo_subway", name: "東京地下鉄" },
+    {key: "I_JR_west", name: "JR西日本" },
+    {key: "I_mono_color", name: "単色" },
     {key: "I_train_normal1", name: "地上路線汎用１" },
     {key: "I_train_normal2", name: "地上路線汎用２" },
     {key: "I_train_subway1", name: "地下路線汎用" },

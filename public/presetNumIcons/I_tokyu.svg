@@ -1,0 +1,5 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <rect id="lineColor" x="0" y="0" rx="35" ry="35" width="225" height="225" fill="#ff0000" />
+    <rect id="symbolArea" x="25" y="68" width="175" height="89" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
+    <!-- <image href="./I_tokyu-original.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>

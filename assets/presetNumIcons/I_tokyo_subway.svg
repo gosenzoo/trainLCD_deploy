@@ -1,0 +1,6 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <circle id="lineColor" cx="112.5" cy="112.5" r="112.5" fill="rgb(0, 0, 0)"/>
+    <circle cx="112.5" cy="112.5" r="61.5" fill="#ffffff"/>
+    <rect id="symbolArea" x="63" y="75" width="99" height="73" fill="#e1e1e1" data-style='{"fontFamily": "Overused Grotesk", "fontWeight": "800", "textAnchor": "middle"}' lang='en' />
+    <!-- <text x="112.5" y="161" font-family="Overused Grotesk" font-size="150" font-weight="500" text-anchor="middle">JK</text> -->
+</svg>

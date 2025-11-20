@@ -3,6 +3,9 @@ import { presetIconMaker } from "../modules/presetIconMaker";
 import "../type"
 import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 
+import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import createNumIconFromPreset from '../modules/createIconFromPreset'
+
 type iconListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
@@ -12,9 +15,11 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [newIconName, setNewIconName] = useState<string>("")
     const [newIconImage, setNewIconImage] = useState<string>("")
-    const [iconPresetType, setIconPresetType] = useState<string>("I_JR_east")
+    const [iconPresetType, setIconPresetType] = useState<string>("I_tokyu")
     const [iconPresetSymbol, setIconPresetSymbol] = useState<string>("")
     const [iconPresetColor, setIconPresetColor] = useState<string>("")
+
+    const presetIconDict = loadPresetNumIconTexts();
 
     const toBase64Utf8 = (str: string) => {
         return btoa(
@@ -134,6 +139,17 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                     <tbody id="iconTableBody">
                         {
                             Object.keys(setting.iconDict).map((key, index) => {
+                                let innerHTML;
+                                let base;
+                                let isBase = false;
+                                if(typeof setting.iconDict[key] === "string"){
+                                    base = setting.iconDict[key];
+                                    isBase = true;
+                                }
+                                else{
+                                    innerHTML = createNumIconFromPreset(presetIconDict, setting.iconDict[key].presetType, setting.iconDict[key].symbol, "", setting.iconDict[key].color)?.outerHTML;
+                                }
+                                
                                 return(
                                     <tr key={index}>
                                         <th className={ selectedIndexes.includes(key) ? 'selected' : '' } onClick={indexClicked}>
@@ -141,17 +157,22 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                                         </th>
                                         <td>
                                             {
-                                                (typeof setting.iconDict[key] === "string") ?
-                                                ((setting.iconDict[key] as string) ?
+                                                (isBase) ?
+                                                ((base) ?
                                                     <img
-                                                        src={(setting.iconDict[key] as string)}
+                                                        src={base}
                                                         alt=""
                                                         width="30px"
                                                         height="30px"
                                                     />
                                                 : "") : 
-                                                ( setting.iconDict[key] ?
-                                                    setting.iconDict[key].presetType : ""
+                                                ( (innerHTML) ?
+                                                    <svg 
+                                                    viewBox='0 0 225 225'
+                                                    width="30px"
+                                                    height="30px"
+                                                    dangerouslySetInnerHTML={{ __html: innerHTML }}>
+                                                    </svg> : ""
                                                 )
                                             }
                                         </td>
@@ -177,7 +198,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             プリセットから登録<br></br>
             <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
                 {
-                    numberIndexes.map(num => {
+                    iconIndexes.map(num => {
                         return(
                             <option value={num.key}>{num.name}</option>
                         )

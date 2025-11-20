@@ -3,6 +3,9 @@ import "../type"
 import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
 
+import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import createNumIconFromPreset from '../modules/createIconFromPreset'
+
 type stationListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
@@ -14,6 +17,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
     const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
     const [activeTab, setActiveTab] = useState<TabType>('stationParam');
+
+    const presetIconDict = loadPresetNumIconTexts();
 
     const indexClicked = (e: any) => {
         if (!isMultiSelect) {
@@ -203,17 +208,33 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                     return
                                                 }
                                                 const iconParams = setting.iconDict[setting.lineDict[line].lineIconKey];
-                                                return ((typeof iconParams === "string") ?
-                                                ((iconParams as string) ?
+                                                let innerHTML;
+                                                let base;
+                                                let isBase = false;
+                                                if(typeof iconParams === "string"){
+                                                    base = iconParams;
+                                                    isBase = true;
+                                                }
+                                                else{
+                                                    innerHTML = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, "", iconParams.color)?.outerHTML;
+                                                }
+
+                                                return (isBase ?
+                                                (base ?
                                                     <img
-                                                        src={(iconParams as string)}
+                                                        src={base}
                                                         alt=""
                                                         width="20px"
                                                         height="20px"
                                                     />
                                                 : "") : 
-                                                ( iconParams ?
-                                                    iconParams.presetType : ""
+                                                ( innerHTML ?
+                                                    <svg 
+                                                    viewBox='0 0 225 225'
+                                                    width="30px"
+                                                    height="30px"
+                                                    dangerouslySetInnerHTML={{ __html: innerHTML }}>
+                                                    </svg> : ""
                                                 ))
                                             })
                                         }

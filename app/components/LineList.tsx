@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import "../type"
 import kanaToAlphabet from '../modules/KanaConverter'
 
+import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import createNumIconFromPreset from '../modules/createIconFromPreset'
+
 type lineListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
@@ -9,6 +12,8 @@ type lineListProps = {
 
 const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
+
+    const presetIconDict = loadPresetNumIconTexts();
 
     const indexClicked = (e: any) => {
         setSelectedIndexes([e.target.innerHTML])
@@ -84,6 +89,17 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                         {
                             Object.keys(setting.lineDict).map((key, index) => {
                                 const iconParams = setting.iconDict[setting.lineDict[key].lineIconKey];
+                                let innerHTML;
+                                let base;
+                                let isBase = false;
+                                if(typeof iconParams === "string"){
+                                    base = iconParams;
+                                    isBase = true;
+                                }
+                                else{
+                                    innerHTML = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, "", iconParams.color)?.outerHTML;
+                                }
+
                                 return(
                                     <tr key={index}>
                                         <th className={ selectedIndexes.includes(key) ? 'selected' : '' } onClick={indexClicked}>
@@ -91,17 +107,22 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                         </th>
                                         <td>
                                             {
-                                                (typeof iconParams === "string") ?
-                                                ((iconParams as string) ?
+                                                (isBase) ?
+                                                (base ?
                                                     <img
-                                                        src={(iconParams as string)}
+                                                        src={base}
                                                         alt=""
                                                         width="30px"
                                                         height="30px"
                                                     />
                                                 : "") : 
-                                                ( iconParams ?
-                                                    iconParams.presetType : ""
+                                                ( innerHTML ?
+                                                    <svg 
+                                                    viewBox='0 0 225 225'
+                                                    width="30px"
+                                                    height="30px"
+                                                    dangerouslySetInnerHTML={{ __html: innerHTML }}>
+                                                    </svg> : ""
                                                 )
                                             }
                                         </td>
