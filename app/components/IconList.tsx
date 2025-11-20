@@ -11,7 +11,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [newIconName, setNewIconName] = useState<string>("")
     const [newIconImage, setNewIconImage] = useState<string>("")
-    const [iconPresetType, setIconPresetType] = useState<string>("JR_east")
+    const [iconPresetType, setIconPresetType] = useState<string>("I_JR_east")
     const [iconPresetSymbol, setIconPresetSymbol] = useState<string>("")
     const [iconPresetColor, setIconPresetColor] = useState<string>("")
 
@@ -46,6 +46,17 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             setSetting(_setting)
         }
         if(method === 'preset'){
+            //アイコン情報をiconDictに登録
+            const iconParams: iconParamsType = {
+                presetType: iconPresetType,
+                color: iconPresetColor,
+                symbol: iconPresetSymbol
+            }
+
+            _setting.iconDict[newIconName] = iconParams;
+            setSetting(_setting)
+
+            /*
             fetch(`/presetIcons/${iconPresetType}.svg`)
                 .then((res) => res.text())
                 .then((data) => {
@@ -62,6 +73,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
 
                     setSetting(_setting)
                 });
+            */
         }
     }
     const iconDeleteButtonClicked = () => {
@@ -127,12 +139,20 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                                             {key}
                                         </th>
                                         <td>
-                                            <img
-                                                src={(setting.iconDict[key] as string) || ""}
-                                                alt=""
-                                                width="30px"
-                                                height="30px"
-                                            />
+                                            {
+                                                (typeof setting.iconDict[key] === "string") ?
+                                                ((setting.iconDict[key] as string) ?
+                                                    <img
+                                                        src={(setting.iconDict[key] as string)}
+                                                        alt=""
+                                                        width="30px"
+                                                        height="30px"
+                                                    />
+                                                : "") : 
+                                                ( setting.iconDict[key] ?
+                                                    setting.iconDict[key].presetType : ""
+                                                )
+                                            }
                                         </td>
                                     </tr>
                                 )
@@ -155,11 +175,11 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             <br></br>
             プリセットから登録<br></br>
             <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
-                <option value="JR_east">JR東日本</option>
-                <option value="tokyo_subway">東京地下鉄</option>
-                <option value="train_normal1">地上路線汎用１</option>
-                <option value="train_normal2">地上路線汎用２</option>
-                <option value="train_subway1">地下路線汎用</option>
+                <option value="I_JR_east">JR東日本</option>
+                <option value="I_tokyo_subway">東京地下鉄</option>
+                <option value="I_train_normal1">地上路線汎用１</option>
+                <option value="I_train_normal2">地上路線汎用２</option>
+                <option value="I_train_subway1">地下路線汎用</option>
             </select>
             <br></br>
             アイコンの路線記号

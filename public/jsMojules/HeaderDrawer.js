@@ -32,6 +32,7 @@ class HeaderDrawer{
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別
             group.appendChild(this.createRunstateText(drawParams.arrivingTextType)); //つぎは、まもなく、ただいま
+            console.log((drawParams.destinationText, drawParams.viaText, drawParams.destinationEng))
             group.appendChild(this.createDestination(drawParams.destinationText, drawParams.viaText, drawParams.destinationEng)); //行先・経由地
         }
 
@@ -125,7 +126,7 @@ class HeaderDrawer{
         return carNum;
     }
     createDestination(destinationText, viaText, destinationEng){ //行先・方面を描画
-        if(destinationText == null || destinationText == ""){ return null; }
+        //if(destinationText == null || destinationText == ""){ return null; }
 
         const destination = document.createElementNS("http://www.w3.org/2000/svg", "g"); //行先・方面地グループを作成
 

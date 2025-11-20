@@ -3,7 +3,7 @@ type settingType = {
     operationList: operationType[],
     stationList: stationType[],
     lineDict: {[id: string]: lineType},
-    iconDict: {[id: string]: string}
+    iconDict: {[id: string]: string | iconParamsType}
 }
 
 type infoType = {
@@ -70,6 +70,13 @@ type lineType = {
     kana: string,
     eng: string,
     color: string,
+}
+
+
+type iconParamsType = {
+    presetType: string,
+    color: string,
+    symbol: string
 }
 
 type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'numIconPresetKey' | 'lineNumberType' | 'transferCountLineP' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |

@@ -31,12 +31,22 @@ window.onload = async function(){
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
     //〇フォーマットSVGの読み込み
     mapSVG = await getSVGElementFromUrl(`/displaySvg/tokyu/header-body.svg`);
-    //〇ナンバリング記号フォーマットSVGの読み込み
+    //〇アイコンフォーマットSVGの読み込み
+    //各駅ナンバリング
     const _numIconKeyList = new Set();
     settings.stationList.forEach(station => {
         _numIconKeyList.add(station.numIconPresetKey);
     });
-    _numIconKeyList.add(settings.info.destinationNumIconKey);
+    //行先駅ナンバリング
+    settings.operationList.forEach(operation => {
+        _numIconKeyList.add(operation.destinationNumIconKey);
+    })
+    //アイコンリスト
+    Object.keys(settings.iconDict).forEach((key) => {
+        const icon = settings.iconDict[key];
+        if(typeof icon === "string"){ return; }
+        _numIconKeyList.add(icon.presetType);
+    });
     const numIconKeyList = [..._numIconKeyList];
     const numIconPresets = {};
     // すべてのキーを処理し終えるまで待ちたい
@@ -50,6 +60,7 @@ window.onload = async function(){
             }
         })
     );
+    console.log(numIconKeyList)
     console.log(numIconPresets);
 
     //LCDControllerを召喚

@@ -49,8 +49,12 @@ class NumIconDrawer {
             lineColorEl.setAttribute("fill", lineColor);
         }
 
-        group.appendChild(this.textDrawer.createByAreaEl(symbolText, symbolArea).element);
-        group.appendChild(this.textDrawer.createByAreaEl(numberText, numberArea).element);
+        if(symbolArea){
+            group.appendChild(this.textDrawer.createByAreaEl(symbolText, symbolArea).element);
+        }
+        if(numberArea){
+            group.appendChild(this.textDrawer.createByAreaEl(numberText, numberArea).element);
+        }
 
         // 3) group全体を geometory の範囲に合わせて変形
         //    変形前の範囲は defaultGeomeroty

@@ -72,7 +72,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             eng: "",
             number: _number,
             lineColor: _color,
-            numIconPresetKey: "tokyu",
+            numIconPresetKey: "N_tokyu",
             lineNumberType: "0",
             transfers: "",
             isPass: false,
@@ -202,14 +202,18 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                                                 if(!Object.keys(setting.lineDict).includes(line)){
                                                     return
                                                 }
-                                                return(
-                                                    <img src={(setting.iconDict[setting.lineDict[line].lineIconKey]) as string || ""}
-                                                        key={index}
+                                                return ((typeof setting.iconDict[setting.lineDict[line].lineIconKey] === "string") ?
+                                                ((setting.iconDict[setting.lineDict[line].lineIconKey] as string) ?
+                                                    <img
+                                                        src={(setting.iconDict[setting.lineDict[line].lineIconKey] as string)}
                                                         alt=""
                                                         width="20px"
                                                         height="20px"
                                                     />
-                                                )
+                                                : "") : 
+                                                ( setting.iconDict[setting.lineDict[line].lineIconKey] ?
+                                                    setting.iconDict[setting.lineDict[line].lineIconKey].presetType : ""
+                                                ))
                                             })
                                         }
                                     </td>

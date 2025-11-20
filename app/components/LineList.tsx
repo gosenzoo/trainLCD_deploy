@@ -90,14 +90,18 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                         </th>
                                         <td>
                                             {
-                                                (setting.iconDict[setting.lineDict[key].lineIconKey] as string) ?
-                                                <img
-                                                    src={(setting.iconDict[setting.lineDict[key].lineIconKey] as string)}
-                                                    alt=""
-                                                    width="30px"
-                                                    height="30px"
-                                                />
-                                                : ""
+                                                (typeof setting.iconDict[setting.lineDict[key].lineIconKey] === "string") ?
+                                                ((setting.iconDict[setting.lineDict[key].lineIconKey] as string) ?
+                                                    <img
+                                                        src={(setting.iconDict[setting.lineDict[key].lineIconKey] as string)}
+                                                        alt=""
+                                                        width="30px"
+                                                        height="30px"
+                                                    />
+                                                : "") : 
+                                                ( setting.iconDict[setting.lineDict[key].lineIconKey] ?
+                                                    setting.iconDict[setting.lineDict[key].lineIconKey].presetType : ""
+                                                )
                                             }
                                         </td>
                                         <td>

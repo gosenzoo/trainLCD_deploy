@@ -134,6 +134,7 @@ class TransferWidget {
 
   calcWidthParams(){
     // アイコン長取得
+    console.log(this.iconList)
     const iconObj = this.textDrawer.createIconTextByArea(
       this.iconList,
       this.x,
@@ -177,10 +178,10 @@ class TransferWidget {
     const bottomTextY = this.y + this.posParams.textOffset + this.posParams.topTextAreaHeight + this.posParams.textGap;
     const maxTextWidth = this.width - this.iconWidth - this.posParams.iconTextGap;
 
-    console.log(this.rawPosParams, this.posParams)
-    console.log(textBaseX, topTextY, bottomTextY, maxTextWidth);
-    console.log(this.topTextWidth, this.bottomTextWidth)
-    console.log(this.width, this.iconWidth, this.textAreaWidth)
+    //console.log(this.rawPosParams, this.posParams)
+    //console.log(textBaseX, topTextY, bottomTextY, maxTextWidth);
+    //console.log(this.topTextWidth, this.bottomTextWidth)
+    //console.log(this.width, this.iconWidth, this.textAreaWidth)
 
     // 上段テキスト
     const topTextObj = this.textDrawer.createByArea(

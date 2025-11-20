@@ -1,8 +1,9 @@
 class PlatformDrawer{
-    constructor(mapSVG, iconDict, animator){
+    constructor(mapSVG, iconDict, animator, numIconDrawer){
         this.mapSVG = mapSVG
         this.iconDict = iconDict;
-        this.textDrawer = new TextDrawer(this.iconDict); //テキスト描画用のインスタンスを作成
+        this.numIconDrawer = numIconDrawer;
+        this.textDrawer = new TextDrawer(this.iconDict, numIconDrawer); //テキスト描画用のインスタンスを作成
         this.animator = animator;
     }
 

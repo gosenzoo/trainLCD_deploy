@@ -1,7 +1,8 @@
 class TextDrawer{
-    constructor(iconDict){
+    constructor(iconDict, numIconDrawer){
         this.iconDict = iconDict; //アイコン辞書を保存
         this.capRatioCache = {};
+        this.numIconDrawer = numIconDrawer;
     }
 
     //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
@@ -180,15 +181,32 @@ class TextDrawer{
             }
             else{ //アイコンなら
                 if(textList[i] === ""){ continue; } //空文字ならスキップ
-                const iconElem = document.createElementNS("http://www.w3.org/2000/svg", "image");
-                iconElem.setAttribute("href", this.iconDict[textList[i]]); //アイコンのURLを設定
-                iconElem.setAttribute("x", String(nowX));
-                iconElem.setAttribute("y", String(y));
-                iconElem.setAttribute("width", String(height));
-                iconElem.setAttribute("height", String(height));
-                iconTextElem.appendChild(iconElem);
-                nowX += height; //次のアイコンのx座標を更新
-                wholeWidth += height;
+                if(typeof this.iconDict[textList[i]] === "string"){
+                    //base64なら
+                    const iconElem = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                    iconElem.setAttribute("href", this.iconDict[textList[i]]); //アイコンのURLを設定
+                    iconElem.setAttribute("x", String(nowX));
+                    iconElem.setAttribute("y", String(y));
+                    iconElem.setAttribute("width", String(height));
+                    iconElem.setAttribute("height", String(height));
+                    iconTextElem.appendChild(iconElem);
+                    nowX += height; //次のアイコンのx座標を更新
+                    wholeWidth += height;
+                }
+                else{
+                    //プリセットなら
+                    const iconParams = this.iconDict[textList[i]];
+                    const geometory = {
+                        x: nowX,
+                        y: y,
+                        width: height,
+                        height: height,
+                    }
+                    const icon = this.numIconDrawer.createNumIconFromPreset(iconParams.presetType, iconParams.symbol, "", iconParams.color, geometory, 0);
+                    iconTextElem.appendChild(icon);
+                    nowX += height; //次のアイコンのx座標を更新
+                    wholeWidth += height;
+                }
             }
         }
         return {element: iconTextElem, width: wholeWidth};
