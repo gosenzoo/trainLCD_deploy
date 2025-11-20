@@ -98,7 +98,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                                     base = iconParams;
                                     isBase = true;
                                 }
-                                else{
+                                else if(iconParams){
                                     innerHTML = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, "", iconParams.color)?.outerHTML;
                                 }
 

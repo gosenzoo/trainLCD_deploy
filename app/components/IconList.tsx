@@ -149,7 +149,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                                     base = iconObj;
                                     isBase = true;
                                 }
-                                else{
+                                else if(iconObj){
                                     innerHTML = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, "", iconObj.color)?.outerHTML;
                                 }
                                 
