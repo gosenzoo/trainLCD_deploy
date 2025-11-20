@@ -10,7 +10,7 @@ import "../type"
 import initSettingObject from '../initSettingObject'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
-import createNumIconFromPreset from '../modules/createIconFromPreset'
+import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 const Editor = () => {
     const [setting, setSetting] = useState<settingType>(initSettingObject.setting)

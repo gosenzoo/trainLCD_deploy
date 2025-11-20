@@ -5,7 +5,7 @@ import "../type"
 import kanaToAlphabet from '../modules/KanaConverter'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
-import createNumIconFromPreset from '../modules/createIconFromPreset'
+import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 type lineListProps = {
     setting: settingType,

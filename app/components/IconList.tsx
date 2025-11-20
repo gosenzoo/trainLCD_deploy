@@ -6,7 +6,7 @@ import "../type"
 import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
-import createNumIconFromPreset from '../modules/createIconFromPreset'
+import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 type iconListProps = {
     setting: settingType,

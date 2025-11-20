@@ -6,7 +6,7 @@ import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
-import createNumIconFromPreset from '../modules/createIconFromPreset'
+import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 type stationListProps = {
     setting: settingType,
