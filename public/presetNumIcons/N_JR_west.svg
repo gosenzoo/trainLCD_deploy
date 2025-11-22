@@ -1,7 +1,7 @@
 <svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
     <rect id="outline" x="0" y="0" width="225" height="225" stroke-width="5" stroke="#ffffff" />
     <rect id="lineColor" x="0" y="0" width="225" height="225" fill="#ff0000" />
-    <rect id="symbolArea" x="30" y="17" width="165" height="80" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
+    <rect id="symbolArea" x="30" y="17" width="165" height="80" fill="#99999950" data-style='{"fontFamily": "Overused Grotesk", "fontWeight": "600", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
     <rect id="numberArea" x="30" y="115" width="165" height="93" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
     <!-- <image href="./JR_west-original.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
 </svg>
