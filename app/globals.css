@@ -1,155 +1,458 @@
 @import url("https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=M+PLUS+1:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
+/* ============================================
+   CSS 変数 / デザイントークン
+   ============================================ */
+:root {
+  --bg-base:      #0d1117;
+  --bg-surface:   #161b22;
+  --bg-overlay:   #1c2128;
+  --border:       #30363d;
+  --border-focus: #388bfd;
+  --text-primary: #f0f6fc;
+  --text-muted:   #8b949e;
+  --accent:       #388bfd;
+  --accent-hover: #58a6ff;
+  --accent-dim:   rgba(56, 139, 253, 0.15);
+  --success:      #3fb950;
+  --danger:       #f85149;
+  --radius-sm:    4px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --shadow:       0 4px 24px rgba(0, 0, 0, 0.5);
+  --transition:   150ms ease;
+}
+
+/* ============================================
+   ベース
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'BIZ UDGothic', 'M PLUS 1', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ============================================
+   見出し
+   ============================================ */
 h1 {
-  font-family: 'BIZ UDGothic';
-  font-weight: 'bold';
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.04em;
 }
+
 h2 {
-  font-family: 'BIZ UDGothic';
-  font-weight: 'bold';
-  margin: 0;
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-label {
-  display: inline-block;
-  width: 150px;
-  vertical-align: top;
-}
-
-#stationsTableContainer{
-  overflow: auto;
-  width: 100%;
-  height: 300px;
-  border-top: 1px solid #999;
-  border-left: 1px solid #999;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-}
-#stationTable {
-  margin: 0;
-  border-spacing: 0;
-  overflow-y: scroll;
-}
-#stationsTable td{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #FFF;
-}
-#stationsTable th{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #f2f2f2;
+/* ============================================
+   ヘッダー
+   ============================================ */
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  left: 0;
-}
-#stationsTable tr:first-child th{
-  border-top: 1px solid #999;
-}
-#stationsTable th:first-child{
-  border-left: 1px solid #999;
-}
-#stationsTable tr:first-child th:first-child{
-  z-index: 1;
-}
-#stationsTable .selected {
-  background: rgb(184, 184, 184);
-  border-top: 1px solid #333;
-  border-left: 1px solid #333;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
-table,
-td {
-  border: 1px solid #333;
+.app-header::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 1.4rem;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-right: 12px;
 }
 
+/* ============================================
+   エディターコンテナ
+   ============================================ */
+.editor-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-#linesTableContainer{
+/* セクションカード */
+.editor-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+}
+
+/* ============================================
+   フォーム要素
+   ============================================ */
+label {
+  display: inline-block;
+  min-width: 160px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+input[type="color"] {
+  width: 44px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  cursor: pointer;
+  padding: 2px;
+  vertical-align: middle;
+}
+
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+select {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 6px 28px 6px 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color var(--transition);
+}
+
+select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* フォーム行 */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* ============================================
+   ボタン
+   ============================================ */
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+
+button:hover {
+  background: #282e35;
+  border-color: #484f58;
+  color: var(--text-primary);
+}
+
+/* アクセントボタン（表示・追加系） */
+button.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* 危険系ボタン（削除・初期化） */
+button.btn-danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+button.btn-danger:hover {
+  background: rgba(248, 81, 73, 0.15);
+}
+
+/* ボタングループ */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* ============================================
+   テーブル共通
+   ============================================ */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: max-content;
+}
+
+td, th {
+  border: none;
+  font-size: 0.85rem;
+  padding: 7px 12px;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+th {
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-overlay);
+}
+
+tr:hover td {
+  background: var(--bg-overlay);
+}
+
+/* ============================================
+   駅テーブル
+   ============================================ */
+#stationsTableContainer {
   overflow: auto;
   width: 100%;
-  height: 200px;
-  border-top: 1px solid #999;
-  border-left: 1px solid #999;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
+  max-height: 320px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
 }
+
+#stationsTable {
+  margin: 0;
+  border-spacing: 0;
+  width: 100%;
+}
+
+#stationsTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+#stationsTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
+  position: sticky;
+  top: 0;
+}
+
+#stationsTable thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-top: none;
+}
+
+#stationsTable tr:first-child th {
+  border-top: none;
+}
+
+#stationsTable th:first-child {
+  border-left: none;
+}
+
+#stationsTable tr:first-child th:first-child {
+  z-index: 1;
+}
+
+#stationsTable .selected {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* ============================================
+   路線テーブル
+   ============================================ */
+#linesTableContainer {
+  overflow: auto;
+  width: 100%;
+  max-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+}
+
 #linesTable {
   margin: 0;
   border-spacing: 0;
-  overflow-y: scroll;
-}
-#linesTable td{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #FFF;
-}
-#linesTable th{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #f2f2f2;
-  position: sticky;
-  top: 0;
-  left: 0;
-}
-#linesTable tr:first-child th{
-  border-top: 1px solid #999;
-}
-#linesTable th:first-child{
-  border-left: 1px solid #999;
-}
-#linesTable tr:first-child th:first-child{
-  z-index: 1;
-}
-#linesTable .selected {
-  background: rgb(184, 184, 184);
-  border-top: 1px solid #333;
-  border-left: 1px solid #333;
+  width: 100%;
 }
 
-#iconTableContainer{
+#linesTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+#linesTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
+  position: sticky;
+  top: 0;
+}
+
+#linesTable thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+#linesTable tr:first-child th {
+  border-top: none;
+}
+
+#linesTable th:first-child {
+  border-left: none;
+}
+
+#linesTable tr:first-child th:first-child {
+  z-index: 1;
+}
+
+#linesTable .selected {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* ============================================
+   アイコンテーブル
+   ============================================ */
+#iconTableContainer {
   overflow: auto;
   width: 100%;
-  height: 200px;
-  border-top: 1px solid #999;
-  border-left: 1px solid #999;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
+  max-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
 }
+
 #iconTable {
   margin: 0;
   border-spacing: 0;
-  overflow-y: scroll;
+  width: 100%;
 }
-#iconTable td{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #FFF;
+
+#iconTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
 }
-#iconTable th{
-  white-space: nowrap;
-  border-right: 1px solid #999;
-  border-bottom: 1px solid #999;
-  background: #f2f2f2;
+
+#iconTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
   position: sticky;
   top: 0;
-  left: 0;
 }
-#iconTable tr:first-child th{
-  border-top: 1px solid #999;
+
+#iconTable thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
 }
-#iconTable th:first-child{
-  border-left: 1px solid #999;
+
+#iconTable tr:first-child th {
+  border-top: none;
 }
-#iconTable tr:first-child th:first-child{
+
+#iconTable th:first-child {
+  border-left: none;
+}
+
+#iconTable tr:first-child th:first-child {
   z-index: 1;
 }
+
 #iconTable .selected {
-  background: rgb(184, 184, 184);
-  border-top: 1px solid #333;
-  border-left: 1px solid #333;
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* ============================================
+   タブボタン
+   ============================================ */
+.tab-btn {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+  border-bottom: none !important;
+  padding: 7px 18px !important;
+}
+
+.tab-btn.active {
+  background: var(--bg-surface) !important;
+  border-color: var(--border) !important;
+  color: var(--accent-hover) !important;
+  border-bottom-color: var(--bg-surface) !important;
 }

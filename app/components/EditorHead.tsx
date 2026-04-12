@@ -107,73 +107,78 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
 
     return(
         <div>
-            <button onClick={e => {
-                const lcdStrageItem = localStorage.getItem('lcdStrage');
-                if(!lcdStrageItem){
-                    alert("localStrageにアイテムがありません");
+            <h2>ファイル操作</h2>
+            <div className="btn-group">
+                <button onClick={e => {
+                    const lcdStrageItem = localStorage.getItem('lcdStrage');
+                    if(!lcdStrageItem){
+                        alert("localStrageにアイテムがありません");
+                        return;
+                    }
+                    const setting = JSON.parse(lcdStrageItem);
+                    setSetting(setting);
+                }}>LocalStorageから読み込み</button>
+                <button onClick={downloadFromSettings} className="btn-primary">設定をダウンロード</button>
+                <button onClick={(e) => {
+                    if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
+                        setSetting(initSettingObject.setting);
+                    }
                     return;
-                }
-                const setting = JSON.parse(lcdStrageItem);
-                setSetting(setting);
-            }}>LocalStrageから読み込み</button>
-            <br></br>
-            <label>設定ファイル入力</label>
-            <input id="settingInput" type="file" onChange={inputToSetting}></input>
-            <br></br>
-            <button onClick={(e) => {
-                let _setting = setting;
-                _setting.operationList = readData.operationList;
-                setSetting(_setting);
-            }}>info読み込み</button>
-            <br></br>
-            <button onClick={(e) => {
-                let _setting = setting;
-                _setting.stationList = readData.stationList;
-                setSetting(_setting);
-            }}>駅読み込み</button>
-            <br></br>
-            <button onClick={(e) => {
-                let _setting = setting;
-                _setting.lineDict = readData.lineDict;
-                setSetting(_setting);
-            }}>路線読み込み</button>
-            <br></br>
-            <button onClick={(e) => {
-                let _setting = setting;
-                _setting.iconDict = structuredClone(readData.iconDict);
-                console.log(_setting)
-                setSetting(_setting);
-            }}>アイコン読み込み</button>
-            <br></br>
-            <button onClick={(e) => {
-                setSetting(readData);
-            }}>すべて読み込み</button>
-            <br></br>
-            <br></br>
-            <button onClick={downloadFromSettings}>設定をダウンロード</button>
-            <button onClick={(e) => {
-                if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){
-                    setSetting(initSettingObject.setting);
-                }
-                return;
-            }}>設定を初期化</button>
-            <br></br>
-            <br></br>
+                }} className="btn-danger">設定を初期化</button>
+            </div>
+            <div className="form-row">
+                <label>設定ファイル入力</label>
+                <input id="settingInput" type="file" onChange={inputToSetting}></input>
+            </div>
+            <div className="btn-group">
+                <button onClick={(e) => {
+                    let _setting = setting;
+                    _setting.operationList = readData.operationList;
+                    setSetting(_setting);
+                }}>運用読み込み</button>
+                <button onClick={(e) => {
+                    let _setting = setting;
+                    _setting.stationList = readData.stationList;
+                    setSetting(_setting);
+                }}>駅読み込み</button>
+                <button onClick={(e) => {
+                    let _setting = setting;
+                    _setting.lineDict = readData.lineDict;
+                    setSetting(_setting);
+                }}>路線読み込み</button>
+                <button onClick={(e) => {
+                    let _setting = setting;
+                    _setting.iconDict = structuredClone(readData.iconDict);
+                    console.log(_setting)
+                    setSetting(_setting);
+                }}>アイコン読み込み</button>
+                <button onClick={(e) => {
+                    setSetting(readData);
+                }} className="btn-primary">すべて読み込み</button>
+            </div>
 
             <h2>全体設定</h2>
-            <label>設定名</label>
-            <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
-            <br></br>
-            環状運転<input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
-            <br></br>
-            座標による駅移動<input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
-            <br></br>
-            <select onChange={displayTypeSelectChanged}>
-                <option value="tokyu">東急</option>
-                <option value="JW-225">JR西日本 225系</option>
-                <option value="JE-E131">JR東日本 E131系</option>
-            </select>
-            <button onClick={openDisplay}>表示</button>
+            <div className="form-row">
+                <label>設定名</label>
+                <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
+            </div>
+            <div className="form-row">
+                <label>環状運転</label>
+                <input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
+            </div>
+            <div className="form-row">
+                <label>座標による駅移動</label>
+                <input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
+            </div>
+            <div className="form-row">
+                <label>表示タイプ</label>
+                <select onChange={displayTypeSelectChanged}>
+                    <option value="tokyu">東急</option>
+                    <option value="JW-225">JR西日本 225系</option>
+                    <option value="JE-E131">JR東日本 E131系</option>
+                </select>
+                <button onClick={openDisplay} className="btn-primary">表示を開く</button>
+            </div>
         </div>
     )
 }

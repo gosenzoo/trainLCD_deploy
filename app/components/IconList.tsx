@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { presetIconMaker } from "../modules/presetIconMaker";
 import "../type"
 import { iconIndexes, numberIndexes } from "../modules/presetIndex"
+import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
@@ -21,7 +22,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [iconPresetSymbol, setIconPresetSymbol] = useState<string>("")
     const [iconPresetColor, setIconPresetColor] = useState<string>("")
 
-    const presetIconDict = loadPresetNumIconTexts();
+    const presetIconDict = loadPresetNumIconTexts()
 
     const toBase64Utf8 = (str: string) => {
         return btoa(
@@ -30,9 +31,11 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
         );
     }
 
-    const indexClicked = (e: any) => {
-        setSelectedIndexes([e.target.innerHTML])
+    // iconDict のキー（文字列）をそのまま選択キーとして使用するため変換不要
+    const handleRowClick = (key: string) => {
+        setSelectedIndexes([key])
     }
+
     const iconAddButtonClicked = (method: String) => {
         const _setting: settingType = structuredClone(setting)
         if(newIconName === ''){
@@ -49,173 +52,104 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                 alert("アイコン画像が設定されていません")
                 return
             }
+            // base64 画像 URL をそのまま文字列として格納
             _setting.iconDict[newIconName] = newIconImage
-
             setSetting(_setting)
         }
         if(method === 'preset'){
-            //アイコン情報をiconDictに登録
+            // プリセット情報をオブジェクトとして格納
             const iconParams: iconParamsType = {
                 presetType: iconPresetType,
                 color: iconPresetColor,
                 symbol: iconPresetSymbol
             }
-
-            _setting.iconDict[newIconName] = iconParams;
+            _setting.iconDict[newIconName] = iconParams
             setSetting(_setting)
-
-            /*
-            fetch(`/presetIcons/${iconPresetType}.svg`)
-                .then((res) => res.text())
-                .then((data) => {
-                    const parser = new DOMParser();
-                    const _iconDOM = parser.parseFromString(data, 'image/svg+xml');
-
-                    const iconDOM = presetIconMaker(_iconDOM, iconPresetColor, iconPresetSymbol)
-
-                    const serializer = new XMLSerializer();
-                    const svgIconText = serializer.serializeToString(iconDOM.documentElement);
-                    //svgIconTextをdata URIに変換
-                    const iconBase64 = toBase64Utf8(svgIconText);
-                    _setting.iconDict[newIconName] = 'data:image/svg+xml;base64,' + iconBase64;
-
-                    setSetting(_setting)
-                });
-            */
         }
     }
+
     const iconDeleteButtonClicked = () => {
         const _setting = structuredClone(setting)
-
-        selectedIndexes.map((key, index) => {
-            delete _setting.iconDict[key]
-        })
-
+        selectedIndexes.forEach(key => { delete _setting.iconDict[key] })
         setSelectedIndexes([])
-
         setSetting(_setting)
     }
 
-    const iconNameTextboxChanged = (e: any) => {
-        setNewIconName(e.target.value)
-    }
-    const iconImageInputChanged = (e: any) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onloadend = () => {
-                if(typeof reader.result !== 'string'){
-                    return
+    // アイコン一覧テーブルのカラム定義
+    // iconDict の値は string（base64画像）か iconParamsType（プリセット）の2種類
+    const iconColumns: ColumnDef<string | iconParamsType>[] = [
+        {
+            header: 'ID',
+            isSelector: true,  // クリックで行選択
+            cell: (_, key) => key,
+        },
+        {
+            header: 'アイコン',
+            // string なら <img>、iconParamsType なら SVG プリセットを描画する
+            cell: (iconObj) => {
+                if (typeof iconObj === 'string') {
+                    return iconObj ? <img src={iconObj} alt="" width="30px" height="30px" /> : null
+                } else if (iconObj) {
+                    const html = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, '', iconObj.color)?.outerHTML
+                    return html ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} /> : null
                 }
-                setNewIconImage(reader.result);
-            }
-
-            reader.readAsDataURL(file);
-        }
-    }
-    const iconPresetSelectChanged = (e:any) => {
-        setIconPresetType(e.target.value)
-        console.log("typechanged")
-    }
-    const iconPresetSymbolInputChanged = (e: any) => {
-        setIconPresetSymbol(e.target.value)
-        console.log("symbolchanged")
-    }
-    const iconPresetColorInputChanged = (e: any) => {
-        setIconPresetColor(e.target.value)
-        console.log("colorchanged")
-    }
+                return null
+            },
+        },
+    ]
 
     return(
         <div>
             <h2>アイコン登録</h2>
-            <div id="iconTableContainer">
-                <table id="iconTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>アイコン</th>
-                        </tr>
-                    </thead>
-                    <tbody id="iconTableBody">
-                        {
-                            Object.keys(setting.iconDict).map((key, index) => {
-                                let innerHTML;
-                                let base;
-                                let isBase = false;
-                                let iconObj = setting.iconDict[key];
-                                if(typeof iconObj === "string"){
-                                    base = iconObj;
-                                    isBase = true;
-                                }
-                                else if(iconObj){
-                                    innerHTML = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, "", iconObj.color)?.outerHTML;
-                                }
-                                
-                                return(
-                                    <tr key={index}>
-                                        <th className={ selectedIndexes.includes(key) ? 'selected' : '' } onClick={indexClicked}>
-                                            {key}
-                                        </th>
-                                        <td>
-                                            {
-                                                (isBase) ?
-                                                ((base) ?
-                                                    <img
-                                                        src={base}
-                                                        alt=""
-                                                        width="30px"
-                                                        height="30px"
-                                                    />
-                                                : "") : 
-                                                ( (innerHTML) ?
-                                                    <svg 
-                                                    viewBox='0 0 225 225'
-                                                    width="30px"
-                                                    height="30px"
-                                                    dangerouslySetInnerHTML={{ __html: innerHTML }}>
-                                                    </svg> : ""
-                                                )
-                                            }
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
+            {/* iconDict を { key, data } 配列に変換して渡す */}
+            <GenericItemList
+                columns={iconColumns}
+                rows={Object.entries(setting.iconDict).map(([key, iconObj]) => ({ key, data: iconObj }))}
+                selectedKeys={selectedIndexes}
+                onRowClick={handleRowClick}
+                tableId="iconTable"
+                containerId="iconTableContainer"
+            />
+            <div className="btn-group" style={{marginTop: '10px'}}>
+                <button onClick={iconDeleteButtonClicked} className="btn-danger">削除</button>
             </div>
-            <button onClick={iconDeleteButtonClicked}>削除</button>
-            <br></br>
-            <label>登録する名前</label>
-            <input type="text" id="iconNameTextBox" onChange={iconNameTextboxChanged} placeholder="例：jt"></input>
-            <br></br>
-            <br></br>
-            <label>画像アップロード</label>
-            <input type="file" id="iconImgInput" onChange={iconImageInputChanged}></input>
-            <br></br>
-            <button onClick={() => {iconAddButtonClicked('img')}}>アイコン追加</button>
-            <br></br>
-            <br></br>
-            プリセットから登録<br></br>
-            <select id="iconPresetSelect" onChange={iconPresetSelectChanged}>
-                {
-                    iconIndexes.map(num => {
-                        return(
-                            <option value={num.key}>{num.name}</option>
-                        )
-                    })
-                }
-            </select>
-            <br></br>
-            アイコンの路線記号
-            <input type="text" id="iconPresetLineSymbolInput" onChange={iconPresetSymbolInputChanged} placeholder='例：JT'></input>
-            <br></br>
-            路線カラー
-            <input type="color" id="iconPresetLineColorInput" onChange={iconPresetColorInputChanged}></input>
-            <br></br>
-            <button onClick={() => { iconAddButtonClicked('preset') }}>アイコン追加</button>
+            <div className="form-row">
+                <label>登録する名前</label>
+                <input type="text" id="iconNameTextBox" onChange={(e) => setNewIconName(e.target.value)} placeholder="例：jt" />
+            </div>
+            <div className="form-row">
+                <label>画像アップロード</label>
+                <input type="file" id="iconImgInput" onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                            if (typeof reader.result === 'string') setNewIconImage(reader.result)
+                        }
+                        reader.readAsDataURL(file)
+                    }
+                }} />
+                <button onClick={() => iconAddButtonClicked('img')}>アイコン追加</button>
+            </div>
+            <div className="form-row">
+                <label>プリセットから登録</label>
+                <select id="iconPresetSelect" onChange={(e) => setIconPresetType(e.target.value)}>
+                    {iconIndexes.map(num => (
+                        <option key={num.key} value={num.key}>{num.name}</option>
+                    ))}
+                </select>
+            </div>
+            <div className="form-row">
+                <label>アイコンの路線記号</label>
+                <input type="text" id="iconPresetLineSymbolInput" onChange={(e) => setIconPresetSymbol(e.target.value)} placeholder='例：JT' />
+            </div>
+            <div className="form-row">
+                <label>路線カラー</label>
+                <input type="color" id="iconPresetLineColorInput" onChange={(e) => setIconPresetColor(e.target.value)} />
+            </div>
+            <div className="btn-group">
+                <button onClick={() => iconAddButtonClicked('preset')}>アイコン追加（プリセット）</button>
+            </div>
         </div>
     )
 }

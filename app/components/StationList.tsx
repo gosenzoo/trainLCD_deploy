@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import "../type"
 import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
+import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
@@ -18,264 +19,214 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
     const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
-    const [activeTab, setActiveTab] = useState<TabType>('stationParam');
+    const [activeTab, setActiveTab] = useState<TabType>('stationParam')
 
-    const presetIconDict = loadPresetNumIconTexts();
+    const presetIconDict = loadPresetNumIconTexts()
 
-    const indexClicked = (e: any) => {
+    // GenericItemList は 0-based string key を返す。
+    // 内部では StationParamSetter・MapComponent との互換性のため 1-based number で管理し、
+    // GenericItemList との境界でのみ相互変換する。
+    const handleRowClick = (key: string) => {
+        const rowIndex = parseInt(key) + 1  // 0-based key → 1-based rowIndex に変換
         if (!isMultiSelect) {
-            setSelectedIndexes([e.target.parentNode.rowIndex])
-        }
-        else {
-            let _selectedIndexes: number[] = [...selectedIndexes]
-
-            if(selectedIndexes.includes(e.target.parentNode.rowIndex)){
-                _selectedIndexes = _selectedIndexes.filter(item => item !== e.target.parentNode.rowIndex)
+            setSelectedIndexes([rowIndex])
+        } else {
+            let _selectedIndexes = [...selectedIndexes]
+            if (selectedIndexes.includes(rowIndex)) {
+                _selectedIndexes = _selectedIndexes.filter(i => i !== rowIndex)
+            } else {
+                _selectedIndexes.push(rowIndex)
             }
-            else{
-                _selectedIndexes.push(e.target.parentNode.rowIndex)
-            }
-
             _selectedIndexes.sort((a, b) => b - a)
             setSelectedIndexes(_selectedIndexes)
         }
     }
+
     const addStation = () => {
-        if(!setting.stationList){
-            return
-        }
+        if(!setting.stationList) return
         const _setting: settingType = structuredClone(setting)
 
-        //参照するインデックスの設定
-        let _index = _setting.stationList.length //最後尾に追加する設定
-        if(selectedIndexes.length > 0){ //選択されている場合、選択の最後尾に追加する設定
+        let _index = _setting.stationList.length
+        if(selectedIndexes.length > 0){
             _index = selectedIndexes[selectedIndexes.length - 1]
         }
 
-        //ナンバリング、色連番
-        let _number: string  = ""
-        let _color: string = ""
-        let _lineId: string = ""
+        let _number = ""
+        let _color = ""
+        let _lineId = ""
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
                 _number = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].number
                 let nextNumber = String(Number(_number.split(" ")[1]) + (isNumberDescending ? -1 : 1))
                 nextNumber = nextNumber.length === 1 ? "0" + nextNumber : nextNumber
                 _number = (_number.includes(" ") ? _number.split(" ")[0] : _number) + ((nextNumber === "NaN") ? "" : " " + nextNumber)
-
                 _color = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineColor
                 _lineId = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineId
-            }
-            else{
+            } else {
                 _number = _setting.stationList[_setting.stationList.length - 1].number
-
                 _color = _setting.stationList[_setting.stationList.length - 1].lineColor
                 _lineId = _setting.stationList[_setting.stationList.length - 1].lineId
             }
         }
         _setting.stationList.splice(_index, 0, {
-            name: "",
-            kana: "",
-            eng: "",
-            number: _number,
-            lineColor: _color,
-            numIconPresetKey: "N_tokyu",
-            lineNumberType: "0",
-            transfers: "",
-            isPass: false,
-            sectionTime: "",
-            lineId: _lineId,
-            coordinate: [null, null],
-            transferText: "",
-            transferTextEng: "",
-            doorSide: 'left',
-            transferCountLineP: "",
-            otherLineInd: "",
-            slotNum: "0",
-            leftSlotInd: "0",
-            otherCarNum: "0",
-            otherLeftSlotInd: "0"
+            name: "", kana: "", eng: "", number: _number, lineColor: _color,
+            numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: "",
+            isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
+            transferText: "", transferTextEng: "", doorSide: 'left',
+            transferCountLineP: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
+            otherCarNum: "0", otherLeftSlotInd: "0"
         })
         setSetting(_setting)
-
         setSelectedIndexes([selectedIndexes[selectedIndexes.length - 1] + 1])
     }
+
     const deleteStation = () => {
         const _setting = structuredClone(setting)
         selectedIndexes.sort((a, b) => b - a)
         selectedIndexes.forEach(ind => {
             _setting.stationList.splice(ind - 1, 1)
-        });
-
+        })
         setSetting(_setting)
         setSelectedIndexes(isMultiSelect ? [] : [selectedIndexes[selectedIndexes.length - 1]])
     }
-    const multiSelectCheckboxClicked = (e: any) => {
-        setIsMultiSelect(e.target.checked)
-    }
+
     const allSelectButtonClicked = () => {
-        if (setting.stationList.length === 0) {
-            return
-        }
-    
+        if (setting.stationList.length === 0) return
         if (selectedIndexes.length === setting.stationList.length) {
             setSelectedIndexes([])
-        }
-        else {
-            let _selectedIndexes = []
-            for (let i = 1; i <= setting.stationList.length; i++) {
-                _selectedIndexes.push(i)
-            }
-            setSelectedIndexes(_selectedIndexes)
+        } else {
+            setSelectedIndexes(Array.from({ length: setting.stationList.length }, (_, i) => i + 1))
         }
     }
+
     const reverseButtonClilcked = () => {
         const _setting = structuredClone(setting)
-
-        //選択状態の駅のリストを取得
-        let selectedStatons = selectedIndexes.map(index => _setting.stationList[index - 1]);
-
-        selectedStatons.reverse() //順序反転
-
-        //反転した駅リストをもとの場所に格納
+        const selectedStations = selectedIndexes.map(index => _setting.stationList[index - 1])
+        selectedStations.reverse()
         selectedIndexes.forEach((index, i) => {
-            _setting.stationList[index - 1] = selectedStatons[i]
+            _setting.stationList[index - 1] = selectedStations[i]
         })
-
         setSetting(_setting)
     }
-    const passBoxChanged = (e: any, index:number) => {
+
+    const passBoxChanged = (e: any, index: number) => {
         const _setting = structuredClone(setting)
         _setting.stationList[index].isPass = e.target.checked
         setSetting(_setting)
     }
 
+    // 駅一覧テーブルのカラム定義
+    const stationColumns: ColumnDef<stationType>[] = [
+        {
+            header: '通過',
+            // key（0-based）をそのままインデックスとして使用
+            cell: (station, key) => (
+                <input
+                    type="checkbox"
+                    onChange={(e) => passBoxChanged(e, parseInt(key))}
+                    checked={station.isPass}
+                />
+            ),
+        },
+        {
+            header: '駅名',
+            isSelector: true,  // クリックで行選択
+            cell: (station) => station.name,
+        },
+        {
+            header: '駅名かな',
+            cell: (station) => station.kana,
+        },
+        {
+            header: '駅名英語',
+            cell: (station) => station.eng,
+        },
+        {
+            header: 'ナンバリング',
+            cell: (station) => station.number,
+            cellStyle: (station) => ({ backgroundColor: station.lineColor }),  // 路線カラーをセル背景に反映
+        },
+        {
+            header: '乗換路線',
+            // transfersはスペース区切りの路線IDリスト。各IDをアイコンとして描画する。
+            cell: (station) => (
+                <>
+                    {station.transfers.split(' ').map((lineId, idx) => {
+                        if (!lineId || !Object.keys(setting.lineDict).includes(lineId)) return null
+                        const iconParams = setting.iconDict[setting.lineDict[lineId].lineIconKey]
+                        if (typeof iconParams === 'string') {
+                            return iconParams ? <img key={idx} src={iconParams} alt="" width="20px" height="20px" /> : null
+                        } else if (iconParams) {
+                            const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                            return html ? <svg key={idx} viewBox='0 0 225 225' width="20px" height="20px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                        }
+                        return null
+                    })}
+                </>
+            ),
+        },
+        {
+            header: 'ドア',
+            cell: (station) => station.doorSide === 'left' ? '左' : '右',
+        },
+        {
+            header: '次区間路線名',
+            cell: (station) => setting.lineDict[station.lineId]?.name,
+            cellStyle: (station) => ({ backgroundColor: setting.lineDict[station.lineId]?.color }),  // 路線カラーをセル背景に反映
+        },
+        {
+            header: '次区間所要時間',
+            cell: (station) => station.sectionTime,
+        },
+        {
+            header: '緯度',
+            cell: (station) => station.coordinate[0] ?? '',
+        },
+        {
+            header: '経度',
+            cell: (station) => station.coordinate[1] ?? '',
+        },
+    ]
+
     const renderContent = () => {
         switch (activeTab) {
-        case 'stationParam':
-            return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>;
-        case 'mapComponent':
-            return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes}/>;
-        default:
-            return null;
+            case 'stationParam':
+                return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
+            case 'mapComponent':
+                return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
+            default:
+                return null
         }
-    };
+    }
 
-    return(
+    return (
         <div>
             <h2>駅設定</h2>
-            <div id="stationsTableContainer">
-                <table id="stationsTable">
-                    <thead>
-                        <tr>
-                            <th>通過</th>
-                            <th>駅名</th>
-                            <th>駅名かな</th>
-                            <th>駅名英語</th>
-                            <th>ナンバリング</th>
-                            <th>乗換路線</th>
-                            <th>ドア</th>
-                            <th>次区間路線名</th>
-                            <th>次区間所要時間</th>
-                            <th>緯度</th>
-                            <th>経度</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stationsTableBody">
-                        {
-                            setting?.stationList.map((station, index) => (
-                                <tr key={index}>
-                                    <th>
-                                        <input type="checkbox" onChange={(e) => passBoxChanged(e, index)} checked={station.isPass}></input>
-                                    </th>
-                                    <th className={ selectedIndexes.includes(index + 1) ? 'selected' : '' } onClick={indexClicked}>
-                                        {station?.name}
-                                    </th>
-                                    <td>
-                                        {station?.kana}
-                                    </td>
-                                    <td>
-                                        {station?.eng}
-                                    </td>
-                                    <td style={{backgroundColor: station?.lineColor}}>
-                                        {station?.number}
-                                    </td>
-                                    <td>
-                                        {
-                                            station?.transfers.split(" ").map((line, index) => {
-                                                if(!line){
-                                                    return
-                                                }
-                                                if(!Object.keys(setting.lineDict).includes(line)){
-                                                    return
-                                                }
-                                                const iconParams = setting.iconDict[setting.lineDict[line].lineIconKey];
-                                                let innerHTML;
-                                                let base;
-                                                let isBase = false;
-                                                if(typeof iconParams === "string"){
-                                                    base = iconParams;
-                                                    isBase = true;
-                                                }
-                                                else if(iconParams){
-                                                    innerHTML = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, "", iconParams.color)?.outerHTML;
-                                                }
-
-                                                return (isBase ?
-                                                (base ?
-                                                    <img
-                                                        src={base}
-                                                        alt=""
-                                                        width="20px"
-                                                        height="20px"
-                                                    />
-                                                : "") : 
-                                                ( innerHTML ?
-                                                    <svg 
-                                                    viewBox='0 0 225 225'
-                                                    width="20px"
-                                                    height="20px"
-                                                    dangerouslySetInnerHTML={{ __html: innerHTML }}>
-                                                    </svg> : ""
-                                                ))
-                                            })
-                                        }
-                                    </td>
-                                    <td>
-                                        {(station?.doorSide === 'left') ? '左' : '右'}
-                                    </td>
-                                    <td style={{backgroundColor: setting.lineDict[station?.lineId]?.color}}>
-                                        {setting.lineDict[station?.lineId]?.name}
-                                    </td>
-                                    <td>
-                                        {station?.sectionTime}
-                                    </td>
-                                    <td>
-                                        {station?.coordinate[0]}
-                                    </td>
-                                    <td>
-                                        {station?.coordinate[1]}
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
+            {/* 1-based の selectedIndexes を 0-based string key に変換して渡す */}
+            <GenericItemList
+                columns={stationColumns}
+                rows={setting.stationList.map((station, i) => ({ key: String(i), data: station }))}
+                selectedKeys={selectedIndexes.map(i => String(i - 1))}
+                onRowClick={handleRowClick}
+                tableId="stationsTable"
+                containerId="stationsTableContainer"
+            />
+            <div className="btn-group" style={{marginTop: '10px'}}>
+                <button>上に移動</button>
+                <button>下に移動</button>
+                <button onClick={addStation} className="btn-primary">駅追加</button>
+                <button onClick={deleteStation} className="btn-danger">駅削除</button>
+                <label style={{minWidth: 'auto'}}>複数選択</label>
+                <input type="checkbox" onChange={(e) => setIsMultiSelect(e.target.checked)} />
+                <button onClick={allSelectButtonClicked}>全選択/解除</button>
+                <button onClick={reverseButtonClilcked}>反転</button>
+                <label style={{minWidth: 'auto'}}>ナンバリング補完降順</label>
+                <input type="checkbox" onChange={(e) => setIsNumberDescending(e.target.checked)} />
             </div>
-            <button>上に移動</button>
-            <button>下に移動</button>
-            <button onClick={addStation}>駅追加</button>
-            <button onClick={deleteStation}>駅削除</button>
-            複数選択
-            <input type="checkbox" onChange={multiSelectCheckboxClicked}></input>
-            <button onClick={allSelectButtonClicked}>全選択/解除</button>
-            <button onClick={reverseButtonClilcked}>反転</button>
-            ナンバリング補完降順
-            <input type="checkbox" onChange={(e) => {setIsNumberDescending(e.target.checked)}}></input>
-            <br></br>
-            <button onClick={() => setActiveTab('stationParam')}>駅パラメータ</button>
-            <button onClick={() => setActiveTab('mapComponent')}>マップ</button>
-            <br></br>
+            <div className="btn-group" style={{marginBottom: '0'}}>
+                <button onClick={() => setActiveTab('stationParam')}>駅パラメータ</button>
+                <button onClick={() => setActiveTab('mapComponent')}>マップ</button>
+            </div>
             {renderContent()}
         </div>
     )

@@ -28,6 +28,7 @@ class HeaderDrawer{
             group.appendChild(this.createLongStopText(drawParams)); //長時間停車テキスト
         }
         else{ //通常
+            console.log(drawParams.destinationNumIconKey, drawParams.destinationColor, drawParams.destinationNum)
             group.appendChild(this.createNumbering(drawParams.dispStation.numIconPresetKey, drawParams.dispStation.lineColor, drawParams.dispStation.number)); //ナンバリング
             group.appendChild(this.createStationNameText(drawParams.dispStation.name, drawParams.dispStation.kana, drawParams.dispStation.eng)); //駅名
             group.appendChild(this.createTrainType(drawParams.trainType.text, drawParams.trainType.color, drawParams.trainTypeEng, drawParams.trainTypeSub, drawParams.trainTypeSubEng)) //種別

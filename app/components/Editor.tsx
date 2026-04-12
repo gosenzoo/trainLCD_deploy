@@ -22,16 +22,22 @@ const Editor = () => {
     console.log(presetIconDict)
 
     return(
-        <div>
-            <EditorHead setting={setting} setSetting={setSetting}/>
-            <br></br>
-            <OperationForm setting={setting} setSetting={setSetting}/>
-            <br></br>
-            <StationList setting={setting} setSetting={setSetting}/>
-            <br></br>
-            <LineList setting={setting} setSetting={setSetting}/>
-            <br></br>
-            <IconList setting={setting} setSetting={setSetting}/>
+        <div className="editor-container">
+            <div className="editor-section">
+                <EditorHead setting={setting} setSetting={setSetting}/>
+            </div>
+            <div className="editor-section">
+                <OperationForm setting={setting} setSetting={setSetting}/>
+            </div>
+            <div className="editor-section">
+                <StationList setting={setting} setSetting={setSetting}/>
+            </div>
+            <div className="editor-section">
+                <LineList setting={setting} setSetting={setSetting}/>
+            </div>
+            <div className="editor-section">
+                <IconList setting={setting} setSetting={setSetting}/>
+            </div>
         </div>
     )
 }
