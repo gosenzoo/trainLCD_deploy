@@ -193,8 +193,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             case 'stationParam':
                 return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
             case 'mapComponent':
-                return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
-            default:
+                //return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
+                return <div style={{padding: '20px', border: '1px solid #ccc', marginTop: '10px'}}>マップコンポーネントは現在開発中です。</div>
+                default:
                 return null
         }
     }
