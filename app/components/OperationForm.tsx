@@ -81,11 +81,11 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
         //テキストボックス入力の場合
         if(isAll){
             _setting.operationList.forEach((operation) => {
-                operation[field] = e.target.value;
+                operation[field] = e.target.value as never;
             });
         }
         else{
-            _setting.operationList[operationInd][field] = e.target.value;
+            _setting.operationList[operationInd][field] = e.target.value as never;
         }
 
         setSetting(_setting)
@@ -98,11 +98,11 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
 
         if(isAll){
             _setting.operationList.forEach((operation) => {
-                operation[field] = checked;
+                operation[field] = checked as never;
             });
         }
         else{
-            _setting.operationList[operationInd][field] = checked;
+            _setting.operationList[operationInd][field] = checked as never;
         }
 
         setSetting(_setting)
