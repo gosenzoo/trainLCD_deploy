@@ -95,7 +95,8 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
         const _setting: settingType = structuredClone(setting)
 
         //テキストボックス入力の場合
-        _setting.info[field] = e.target.value
+        // infoMembers は値型が混在するユニオンのため as never でキャストする
+        _setting.info[field] = e.target.value as never
 
         setSetting(_setting)
     }
@@ -104,7 +105,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
     const toggleUpdated = (checked: boolean, field: infoMembers) => {
         if(!setting || !setting.info){ return }
         const _setting: settingType = structuredClone(setting)
-        _setting.info[field] = checked
+        _setting.info[field] = checked as never
         setSetting(_setting)
     }
 
