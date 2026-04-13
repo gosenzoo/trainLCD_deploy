@@ -8,6 +8,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
+import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 
 type stationListProps = {
     setting: settingType,
@@ -97,6 +98,25 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         } else {
             setSelectedIndexes(Array.from({ length: setting.stationList.length }, (_, i) => i + 1))
         }
+    }
+
+    const moveUp = () => {
+        if (selectedIndexes.length === 0) return
+        // 内部は 1-based のため 0-based に変換してユーティリティを呼び出す
+        const { newArr, newSelected } = moveArrayItemsUp(setting.stationList, selectedIndexes.map(i => i - 1))
+        const _setting = structuredClone(setting)
+        _setting.stationList = newArr
+        setSetting(_setting)
+        setSelectedIndexes(newSelected.map(i => i + 1))  // 0-based → 1-based に戻す
+    }
+
+    const moveDown = () => {
+        if (selectedIndexes.length === 0) return
+        const { newArr, newSelected } = moveArrayItemsDown(setting.stationList, selectedIndexes.map(i => i - 1))
+        const _setting = structuredClone(setting)
+        _setting.stationList = newArr
+        setSetting(_setting)
+        setSelectedIndexes(newSelected.map(i => i + 1))
     }
 
     const reverseButtonClilcked = () => {
@@ -213,16 +233,22 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 containerId="stationsTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
-                <button>上に移動</button>
-                <button>下に移動</button>
+                <button onClick={moveUp}>上に移動</button>
+                <button onClick={moveDown}>下に移動</button>
                 <button onClick={addStation} className="btn-primary">駅追加</button>
                 <button onClick={deleteStation} className="btn-danger">駅削除</button>
-                <label style={{minWidth: 'auto'}}>複数選択</label>
-                <input type="checkbox" onChange={(e) => setIsMultiSelect(e.target.checked)} />
+                {/* 複数選択トグルボタン */}
+                <button
+                    onClick={() => setIsMultiSelect(v => !v)}
+                    className={`btn-toggle${isMultiSelect ? ' btn-toggle--active' : ''}`}
+                >複数選択</button>
                 <button onClick={allSelectButtonClicked}>全選択/解除</button>
                 <button onClick={reverseButtonClilcked}>反転</button>
-                <label style={{minWidth: 'auto'}}>ナンバリング補完降順</label>
-                <input type="checkbox" onChange={(e) => setIsNumberDescending(e.target.checked)} />
+                {/* ナンバリング補完降順トグルボタン */}
+                <button
+                    onClick={() => setIsNumberDescending(v => !v)}
+                    className={`btn-toggle${isNumberDescending ? ' btn-toggle--active' : ''}`}
+                >ナンバリング補完降順</button>
             </div>
             <div className="btn-group" style={{marginBottom: '0'}}>
                 <button onClick={() => setActiveTab('stationParam')}>駅パラメータ</button>

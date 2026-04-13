@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
+import ToggleSwitch from './ToggleSwitch'
 
 type editorHeadType = {
     setting: settingType,
@@ -93,15 +94,17 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
 
         const _setting: settingType = structuredClone(setting)
 
-        if((field !== "isMoveByCoord") && (field !== "isLoop")){
-            //テキストボックス入力の場合
-            _setting.info[field] = e.target.value
-        }
-        else{
-            //チェックボックス入力の場合
-            _setting.info[field] = e.target.checked
-        }
+        //テキストボックス入力の場合
+        _setting.info[field] = e.target.value
 
+        setSetting(_setting)
+    }
+
+    // トグルスイッチ用ハンドラ（boolean 値を直接受け取る）
+    const toggleUpdated = (checked: boolean, field: infoMembers) => {
+        if(!setting || !setting.info){ return }
+        const _setting: settingType = structuredClone(setting)
+        _setting.info[field] = checked
         setSetting(_setting)
     }
 
@@ -164,11 +167,11 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             </div>
             <div className="form-row">
                 <label>環状運転</label>
-                <input type="checkbox" onChange={(e) => {formUpdated(e, 'isLoop')}} checked={setting.info.isLoop}></input>
+                <ToggleSwitch checked={setting.info.isLoop} onChange={(v) => toggleUpdated(v, 'isLoop')} />
             </div>
             <div className="form-row">
                 <label>座標による駅移動</label>
-                <input type="checkbox" onChange={(e) => {formUpdated(e, 'isMoveByCoord')}} checked={setting.info.isMoveByCoord}></input>
+                <ToggleSwitch checked={setting.info.isMoveByCoord} onChange={(v) => toggleUpdated(v, 'isMoveByCoord')} />
             </div>
             <div className="form-row">
                 <label>表示タイプ</label>

@@ -442,17 +442,294 @@ tr:hover td {
 }
 
 /* ============================================
-   タブボタン
+   モーダルポップアップ
    ============================================ */
-.tab-btn {
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
-  border-bottom: none !important;
-  padding: 7px 18px !important;
+
+/* 画面全体を覆う半透明オーバーレイ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tab-btn.active {
-  background: var(--bg-surface) !important;
-  border-color: var(--border) !important;
+/* ポップアップ本体 */
+.modal-dialog {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  width: min(600px, 90vw);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+
+/* タイトル行 */
+.modal-title {
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+/* スクロール可能な本体エリア */
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 乗換路線表示テーブルコンテナ（読み取り専用・インライン） */
+#transferLineDisplayContainer {
+  overflow: auto;
+  width: 50%;
+  max-height: 160px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  margin-bottom: 4px;
+}
+
+#transferLineDisplayTable {
+  margin: 0;
+  border-spacing: 0;
+  width: 100%;
+}
+
+#transferLineDisplayTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+#transferLineDisplayTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
+  position: sticky;
+  top: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+#transferLineDisplayTable .selected {
+  background: var(--accent-dim) !important;
   color: var(--accent-hover) !important;
-  border-bottom-color: var(--bg-surface) !important;
+  font-weight: 700;
+}
+
+/* ポップアップ内テーブルコンテナ */
+#transferLinePopupContainer {
+  overflow: auto;
+  width: 100%;
+  max-height: 340px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+}
+
+#transferLinePopupTable {
+  margin: 0;
+  border-spacing: 0;
+  width: 100%;
+}
+
+#transferLinePopupTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+#transferLinePopupTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
+  position: sticky;
+  top: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+#transferLinePopupTable .selected {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* フッターボタン行（右寄せ） */
+.modal-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================
+   トグルスイッチ
+   ============================================ */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  min-width: unset;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* ネイティブ checkbox を非表示にする */
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  position: absolute;
+}
+
+/* スライダー本体 */
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+/* スライダーのつまみ */
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform var(--transition), background var(--transition);
+}
+
+/* ON 状態 */
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translate(18px, -50%);
+  background: #fff;
+}
+
+/* トグルボタン基本スタイル（非押下：浮き出た立体感） */
+button.btn-toggle {
+  background: linear-gradient(180deg, #252b33 0%, var(--bg-overlay) 100%);
+  border-color: var(--border);
+  border-bottom-color: #0a0d11;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.55);
+  transform: translateY(-1px);
+}
+
+button.btn-toggle:hover:not(.btn-toggle--active) {
+  background: linear-gradient(180deg, #2d343e 0%, #222830 100%);
+  border-bottom-color: #080b0f;
+}
+
+/* トグルボタン押下状態（奥に押し込まれた感） */
+button.btn-toggle.btn-toggle--active {
+  background: var(--bg-base);
+  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+  color: var(--accent-hover);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  transform: translateY(2px);
+}
+
+button.btn-toggle.btn-toggle--active:hover {
+  background: #0a0e14;
+  color: var(--accent-hover);
+}
+
+/* ============================================
+   タブ UI
+   ============================================ */
+
+/* タブ行コンテナ: 高さの違うタブを下揃えにする */
+.operation-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: flex-end;
+  margin-bottom: 0;
+}
+
+/* タブボタン（非選択）: 低く・暗く表示してフォームの後ろに引っ込んでいるように見せる */
+button.tab-btn {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border: 1px solid var(--border);
+  border-bottom-color: var(--border);
+  background: var(--bg-base);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 4px 14px;
+  transform: translateY(2px);  /* 2px 下に沈めてフォームの奥に隠れているように見せる */
+  position: relative;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+button.tab-btn:hover:not(.active) {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+/* タブボタン（選択中）: フォームと同じ高さ・背景で「続いている」ように見せる */
+button.tab-btn.active {
+  background: var(--bg-surface);
+  border-color: var(--border);
+  border-bottom-color: var(--bg-surface);  /* 底辺を消してフォームと接続する */
+  color: var(--accent-hover);
+  font-weight: 600;
+  padding: 7px 14px;
+  transform: translateY(0);
+  position: relative;
+  z-index: 2;
+}
+
+/* 未使用運用タブ（適用範囲が駅リストと重ならない運用） */
+button.tab-btn.tab-btn--unused {
+  background: #0a0c0f;
+  color: #555e6b;
+  border-color: #252b33;
+}
+
+button.tab-btn.tab-btn--unused:hover:not(.active) {
+  background: #0d1017;
+  color: var(--text-muted);
+}
+
+button.tab-btn.active.tab-btn--unused {
+  background: var(--bg-overlay);
+  border-color: var(--border);
+  border-bottom-color: var(--bg-overlay);
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+/* タブの下に接続するフォーム本体エリア */
+.tab-form-body {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  position: relative;
+  z-index: 1;
+  background: var(--bg-surface);
 }

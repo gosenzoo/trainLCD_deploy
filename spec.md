@@ -232,11 +232,15 @@ graph TD
     Editor --> StationList
     Editor --> LineList
     Editor --> IconList
+    TransferLinePopup["TransferLinePopup\n接続路線追加ポップアップ"]
+
     StationList --> GenericItemList
     LineList --> GenericItemList
     IconList --> GenericItemList
     StationList --> StationParamSetter
     StationList --> MapComponent
+    StationParamSetter --> TransferLinePopup
+    TransferLinePopup --> GenericItemList
 ```
 
 ### 4.2 `GenericItemList` — 汎用テーブルコンポーネント
@@ -285,11 +289,213 @@ type GenericItemListProps<T> = {
 `GenericItemList` はテーブルの描画と行選択通知のみを担い、以下は各コンポーネントが引き続き担当する：
 
 - `selectedKeys` の管理（単一選択 / 複数選択は各コンポーネントで実装）
-- 追加・削除・編集操作
+- 追加・削除・編集・並び替え操作
 - `ColumnDef.cell` 関数によるカスタムセル描画（アイコン表示、カラーセルなど）
 - 追加フォーム・詳細設定パネルの表示
 
-### 4.3 状態管理
+### 4.3 `TransferLinePopup` — 接続路線追加ポップアップ
+
+`StationParamSetter` 内の「乗換路線」欄に配置するモーダルポップアップ。
+
+#### 乗換路線の表示・操作
+
+「乗換路線」欄のテキストボックスを廃止し、`transfers` に登録済みの路線を **`GenericItemList`** で表示・操作する。
+
+- `transfers`（スペース区切りの路線IDリスト）に含まれるIDのみを行として表示
+- **路線記号列** に `isSelector: true` を付与しクリックで行選択可能にする
+- 路線カラーはカラムのセル背景で表示
+- 選択状態は `transferSelectedKeys: string[]`（選択中の路線IDリスト）で管理
+
+テーブル下部ボタン:
+
+| ボタン | 動作 |
+|--------|------|
+| 上に移動 | 選択行を `transfers` 配列内で1つ上へ移動 |
+| 下に移動 | 選択行を1つ下へ移動 |
+| 削除 | 選択行を `transfers` から除去（`btn-danger`） |
+
+並び替えは `listOperations.ts` の `moveArrayItemsUp` / `moveArrayItemsDown` を利用。操作結果は `stationList[].transfers` に即時反映する。
+
+追加操作は下記の「接続路線を追加」ボタンで行う。テキストボックスによる直接編集は廃止。
+
+#### トリガー
+
+「乗換路線」表示の下にある **「接続路線を追加」ボタン** をクリックするとポップアップが開く。
+
+#### ポップアップ内容
+
+- **タイトル**: 接続路線を追加
+- **本体**: `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：ID・路線記号・路線名・路線カラー）
+  - 単一選択のみ
+- **フッターボタン**:
+  - `この路線を追加` — 選択中の路線IDを対象駅の `transfers` フィールドにスペース区切りで追記し、ポップアップを閉じる
+  - `閉じる` — 何もせずポップアップを閉じる
+
+#### 状態管理
+
+`StationParamSetter` 内で以下の state を追加する：
+
+| state | 型 | 説明 |
+|-------|----|------|
+| `isTransferPopupOpen` | `boolean` | ポップアップ表示フラグ |
+| `transferPopupSelectedKey` | `string` | ポップアップ内で選択中の路線キー |
+
+#### CSS
+
+| クラス | 役割 |
+|--------|------|
+| `.modal-backdrop` | 画面全体を覆う半透明オーバーレイ（`position: fixed`, `z-index: 1000`） |
+| `.modal-dialog` | ポップアップ本体（中央配置、最大高さ `70vh`、スクロール可能） |
+| `.modal-title` | タイトル行 |
+| `.modal-footer` | ボタン行（右寄せ） |
+
+### 4.5 リスト並び替え・複数選択
+
+`StationList`・`LineList`・`IconList` の全リストに共通する「上に移動/下に移動/複数選択」操作を `app/modules/listOperations.ts` に集約する。各リストはこのモジュールの関数を呼び出して使用する。
+
+#### 提供関数
+
+```typescript
+// 配列要素を上に移動（StationList 向け）
+// selectedIndexes: 0-based インデックス
+export function moveArrayItemsUp<T>(
+    arr: T[],
+    selectedIndexes: number[]
+): { newArr: T[], newSelected: number[] }
+
+// 配列要素を下に移動（StationList 向け）
+export function moveArrayItemsDown<T>(
+    arr: T[],
+    selectedIndexes: number[]
+): { newArr: T[], newSelected: number[] }
+
+// 辞書エントリを上に移動（LineList・IconList 向け）
+// orderedKeys: 現在の表示順キー配列
+// swapped: 値が入れ替わったキーのペア（参照更新に利用）
+// newSelected: 移動後の新しい選択キー
+export function moveDictItemsUp<T>(
+    dict: Record<string, T>,
+    orderedKeys: string[],
+    selectedKeys: string[]
+): { newDict: Record<string, T>, swapped: [string, string][], newSelected: string[] }
+
+// 辞書エントリを下に移動（LineList・IconList 向け）
+export function moveDictItemsDown<T>(
+    dict: Record<string, T>,
+    orderedKeys: string[],
+    selectedKeys: string[]
+): { newDict: Record<string, T>, swapped: [string, string][], newSelected: string[] }
+```
+
+#### 動作仕様
+
+**配列系（moveArrayItems\*）**
+- 選択アイテムが境界（先頭/末尾）にある場合は操作を行わず現状を返す
+- 複数選択時は選択グループ全体を1ステップ移動する
+  - 上移動: 選択インデックスを昇順で処理（上から順に swap）
+  - 下移動: 選択インデックスを降順で処理（下から順に swap）
+
+**辞書系（moveDictItems\*）**
+- `orderedKeys` の順序で移動対象の位置を決定する
+- 隣接するキー同士の **値** を交換し、`swapped: [keyA, keyB][]` で交換ペアを返す
+- 呼び出し側が `swapped` を使って cross-reference を更新する責任を持つ
+  - `LineList`: `stationList[].lineId` を keyA ↔ keyB で入れ替える
+  - `IconList`: `lineDict[].lineIconKey` を keyA ↔ keyB で入れ替える
+- `newSelected` は移動後の新しい選択キーを示す
+
+#### 複数選択の実装方針
+
+各リストに `isMultiSelect: boolean` state を追加する。
+
+| 状態 | `handleRowClick` の動作 |
+|------|------------------------|
+| `isMultiSelect = false` | クリックした1行のみ選択 |
+| `isMultiSelect = true`  | クリックで選択トグル（追加/解除） |
+
+#### UI（全リスト共通）
+
+テーブル直下の `.btn-group` に以下ボタンを追加する：
+
+| ボタン | 動作 |
+|--------|------|
+| 上に移動 | 選択行を1ステップ上へ |
+| 下に移動 | 選択行を1ステップ下へ |
+| 複数選択 | トグルボタン（`btn-toggle` クラス） |
+
+### 4.6 `OperationForm` — 運用タブ UI
+
+複数の運用を切り替えるUIをタブ形式で実装する。
+
+#### レイアウト
+
+```
+[ 運用を追加 ] [ 表示中を削除 ]
+┌──────────────┬──────────────┬──────────────┐
+│ 渋谷→元町・中華街 │ 元町・中華街→渋谷 │  ...  │  ← タブ行
+└──────────────┴──────────────┴──────────────┘
+  選択中のタブに対応するフォーム内容
+```
+
+- タブは既存の `.tab-btn` / `.tab-btn.active` クラスを使用
+- 選択中の運用インデックスは `operationInd` state で管理（既存）
+- 従来の `<select>` は廃止し、タブに置き換える
+
+#### `startStationInd` の入力 UI
+
+| 項目 | 内容 |
+|------|------|
+| ラベル | 運用開始駅（旧: 設定開始駅ID） |
+| UI | `<select>` で駅リストから選択 |
+| 選択肢 | `stationList` の各駅を `[インデックス] - 駅名` 形式で列挙 |
+| 値 | 選択された駅の 0-based インデックス（文字列） |
+| 駅名が空の場合 | `[インデックス] - 駅名未定義` と表示 |
+
+#### タブラベルの生成ロジック
+
+タブに表示するテキスト: **「[開始駅名] → [終了駅名]」**
+
+```
+getOperationTabLabel(operation, index, operationList, stationList) → string
+```
+
+| 変数 | 内容 |
+|------|------|
+| 開始駅インデックス | `parseInt(operation.startStationInd)` |
+| 終了駅インデックス | 次の運用の `startStationInd`（そのまま）。最後の運用は `stationList.length - 1` |
+| 次の運用の決定 | `operationList` を `startStationInd` の昇順でソートし、対象運用の次のエントリを参照 |
+| 範囲外クランプ | インデックスが `[0, stationList.length - 1]` の範囲外なら近い方の端にクランプ |
+| 駅名 | `stationList[clampedIndex]?.name` が空の場合は `"駅名未定義"` を表示 |
+
+例：
+- `startStationInd = "0"`, 次の運用なし → `"渋谷 → 元町・中華街"`
+- `startStationInd = "-5"` → インデックス 0 にクランプ → `"渋谷 → ..."`
+
+#### 未使用運用の判定とスタイル
+
+実際の表示で使われない運用（適用範囲が駅リストと重ならない）は、タブを視覚的に区別する。
+
+**未使用の判定**
+
+```
+isOperationUnused(operation, index, operationList, stationList) → boolean
+```
+
+操作の適用範囲 `[startInd, endInd]` が `[0, stationList.length - 1]` と重ならない場合に `true`。
+
+| 条件 | 判定 |
+|------|------|
+| `startInd > stationList.length - 1` | 未使用（開始が範囲外） |
+| `endInd < 0` | 未使用（終了が範囲外） |
+| stationList が空 | 全運用が未使用 |
+
+※ クランプ前の生のインデックス値で判定する（クランプ後では境界ケースが消えるため）
+
+**スタイル**
+
+- タブラベルの先頭に `(未使用)` を付与
+- CSS クラス `.tab-btn--unused` を追加し、選択状態によらず暗い外観にする
+
+### 4.7 状態管理
 
 `Editor.tsx` が `settingType` の React state（`useState`）を保有し、`setting` と `setSetting` を全子コンポーネントへ props で渡す。各コンポーネントは変更時に `structuredClone(setting)` でディープコピーを作成してから値を書き換え `setSetting` を呼ぶ。
 
@@ -311,6 +517,50 @@ sequenceDiagram
     Display->>localStorage: JSON.parse(lcdStrage)
     Display-->>User: LCD画面アニメーション
 ```
+
+### 4.8 UI コンポーネント規約
+
+#### トグルスイッチ (`ToggleSwitch`)
+
+真偽値設定の入力UIは以下の3種類を使い分ける。
+
+| 種別 | 実装 | 使用箇所 |
+|------|------|----------|
+| 駅通過判定（`isPass`） | `<input type="checkbox">` のまま | `StationList` 通過列 |
+| トグルスイッチ | `<ToggleSwitch>` コンポーネント | 設定値の ON/OFF |
+| トグルボタン | `<button className="btn-toggle">` | モード切替・操作フラグ |
+
+**トグルスイッチ** — `ToggleSwitch` コンポーネント (`app/components/ToggleSwitch.tsx`):
+
+```typescript
+type ToggleSwitchProps = {
+    checked: boolean
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    id?: string
+}
+```
+
+スタイル (`app/globals.css` の `.toggle-switch` / `.toggle-slider`):
+- OFF 状態: `var(--border)` 色の pill 形状
+- ON 状態: `var(--accent)` 色 + 白い円が右にスライド
+
+適用箇所:
+
+| コンポーネント | フィールド |
+|---|---|
+| `EditorHead` | `isLoop`、`isMoveByCoord` |
+| `OperationForm` | `isDispTime`、`isDispLineName`、`isDrawStopText`、`isDrawLine` |
+
+**トグルボタン** — `btn-toggle` / `btn-toggle--active` クラス (`app/globals.css`):
+- 通常状態: 通常ボタンと同じ見た目
+- アクティブ状態 (`.btn-toggle--active`): `var(--accent)` 背景色でハイライト
+
+適用箇所:
+
+| コンポーネント | 対象 |
+|---|---|
+| `OperationForm` | すべての運用に適用 |
+| `StationList` | 複数選択、ナンバリング補完降順 |
 
 ---
 
@@ -351,6 +601,17 @@ classDiagram
         +src/generated/presetNumIconTexts.ts を生成
     }
 
+    class listOperations {
+        <<module>>
+        +moveArrayItemsUp(arr, selectedIndexes) newArr, newSelected
+        +moveArrayItemsDown(arr, selectedIndexes) newArr, newSelected
+        +moveDictItemsUp(dict, orderedKeys, selectedKeys) newDict, swapped, newSelected
+        +moveDictItemsDown(dict, orderedKeys, selectedKeys) newDict, swapped, newSelected
+    }
+
+    StationList ..> listOperations : 配列上下移動
+    LineList ..> listOperations : 辞書上下移動
+    IconList ..> listOperations : 辞書上下移動
     StationList ..> createIconFromPreset : 乗換アイコン生成
     LineList ..> createIconFromPreset : 路線アイコン生成
     IconList ..> createIconFromPreset : アイコンプレビュー
@@ -370,6 +631,7 @@ classDiagram
 | `presetIndex.ts` | アイコン・ナンバリングプリセットの key/name リスト定義 |
 | `KanaConverter.tsx` | ひらがな/カタカナ → ローマ字変換（駅名・路線名の英語自動補完） |
 | `presetIconMaker.tsx` | SVG DOM にカラー・シンボルを適用するユーティリティ |
+| `listOperations.ts` | リスト並び替え共通ユーティリティ（配列系・辞書系それぞれの上下移動関数） |
 | `generatePresetNumIconTexts.js` | ビルド用スクリプト。`assets/presetNumIcons/*.svg` を読み込み TypeScript ファイルを生成 |
 
 ---

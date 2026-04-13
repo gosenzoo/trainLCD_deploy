@@ -7,6 +7,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
+import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 
 type lineListProps = {
     setting: settingType,
@@ -15,12 +16,55 @@ type lineListProps = {
 
 const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
+    const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
 
     const presetIconDict = loadPresetNumIconTexts()
 
     // lineDict のキー（文字列）をそのまま選択キーとして使用するため変換不要
     const handleRowClick = (key: string) => {
-        setSelectedIndexes([key])
+        if (!isMultiSelect) {
+            setSelectedIndexes([key])
+        } else {
+            // 複数選択モード: クリックでトグル
+            setSelectedIndexes(prev =>
+                prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+            )
+        }
+    }
+
+    // lineDict は数値キー順で表示するため、上下移動も数値昇順を基準にする
+    const getOrderedKeys = () =>
+        Object.keys(setting.lineDict).sort((a, b) => Number(a) - Number(b))
+
+    const moveUp = () => {
+        if (selectedIndexes.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsUp(_setting.lineDict, getOrderedKeys(), selectedIndexes)
+        _setting.lineDict = newDict
+        // stationList の lineId 参照を交換されたキーペアで更新する
+        swapped.forEach(([keyA, keyB]) => {
+            _setting.stationList.forEach(station => {
+                if (station.lineId === keyA) station.lineId = keyB
+                else if (station.lineId === keyB) station.lineId = keyA
+            })
+        })
+        setSetting(_setting)
+        setSelectedIndexes(newSelected)
+    }
+
+    const moveDown = () => {
+        if (selectedIndexes.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsDown(_setting.lineDict, getOrderedKeys(), selectedIndexes)
+        _setting.lineDict = newDict
+        swapped.forEach(([keyA, keyB]) => {
+            _setting.stationList.forEach(station => {
+                if (station.lineId === keyA) station.lineId = keyB
+                else if (station.lineId === keyB) station.lineId = keyA
+            })
+        })
+        setSetting(_setting)
+        setSelectedIndexes(newSelected)
     }
 
     const addLine = () => {
@@ -119,8 +163,15 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 containerId="linesTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
+                <button onClick={moveUp}>上に移動</button>
+                <button onClick={moveDown}>下に移動</button>
                 <button onClick={addLine} className="btn-primary">路線追加</button>
                 <button onClick={deleteLine} className="btn-danger">路線削除</button>
+                {/* 複数選択トグルボタン */}
+                <button
+                    onClick={() => setIsMultiSelect(v => !v)}
+                    className={`btn-toggle${isMultiSelect ? ' btn-toggle--active' : ''}`}
+                >複数選択</button>
             </div>
             <div className="form-row">
                 <label>路線記号</label>

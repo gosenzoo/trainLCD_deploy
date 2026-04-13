@@ -8,6 +8,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
+import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 
 type iconListProps = {
     setting: settingType,
@@ -16,6 +17,7 @@ type iconListProps = {
 
 const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
+    const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [newIconName, setNewIconName] = useState<string>("")
     const [newIconImage, setNewIconImage] = useState<string>("")
     const [iconPresetType, setIconPresetType] = useState<string>("I_tokyu")
@@ -33,7 +35,48 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
 
     // iconDict のキー（文字列）をそのまま選択キーとして使用するため変換不要
     const handleRowClick = (key: string) => {
-        setSelectedIndexes([key])
+        if (!isMultiSelect) {
+            setSelectedIndexes([key])
+        } else {
+            // 複数選択モード: クリックでトグル
+            setSelectedIndexes(prev =>
+                prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+            )
+        }
+    }
+
+    // iconDict の表示順はオブジェクトの挿入順（Object.keys の返す順）を使用する
+    const getOrderedKeys = () => Object.keys(setting.iconDict)
+
+    const moveUp = () => {
+        if (selectedIndexes.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsUp(_setting.iconDict, getOrderedKeys(), selectedIndexes)
+        _setting.iconDict = newDict
+        // lineDict の lineIconKey 参照を交換されたキーペアで更新する
+        swapped.forEach(([keyA, keyB]) => {
+            Object.values(_setting.lineDict).forEach(line => {
+                if (line.lineIconKey === keyA) line.lineIconKey = keyB
+                else if (line.lineIconKey === keyB) line.lineIconKey = keyA
+            })
+        })
+        setSetting(_setting)
+        setSelectedIndexes(newSelected)
+    }
+
+    const moveDown = () => {
+        if (selectedIndexes.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsDown(_setting.iconDict, getOrderedKeys(), selectedIndexes)
+        _setting.iconDict = newDict
+        swapped.forEach(([keyA, keyB]) => {
+            Object.values(_setting.lineDict).forEach(line => {
+                if (line.lineIconKey === keyA) line.lineIconKey = keyB
+                else if (line.lineIconKey === keyB) line.lineIconKey = keyA
+            })
+        })
+        setSetting(_setting)
+        setSelectedIndexes(newSelected)
     }
 
     const iconAddButtonClicked = (method: String) => {
@@ -111,7 +154,14 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                 containerId="iconTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
+                <button onClick={moveUp}>上に移動</button>
+                <button onClick={moveDown}>下に移動</button>
                 <button onClick={iconDeleteButtonClicked} className="btn-danger">削除</button>
+                {/* 複数選択トグルボタン */}
+                <button
+                    onClick={() => setIsMultiSelect(v => !v)}
+                    className={`btn-toggle${isMultiSelect ? ' btn-toggle--active' : ''}`}
+                >複数選択</button>
             </div>
             <div className="form-row">
                 <label>登録する名前</label>
