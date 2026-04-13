@@ -100,6 +100,8 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  /* スマホで横スクロールが発生しないよう幅を制限する */
+  overflow-x: hidden;
 }
 
 /* セクションカード */
@@ -109,6 +111,17 @@ h2 {
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   box-shadow: var(--shadow);
+  /* 内容が溢れても親を突き破らないよう制限する */
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .editor-container {
+    padding: 12px 12px;
+  }
+  .editor-section {
+    padding: 14px 14px;
+  }
 }
 
 /* ============================================
@@ -190,6 +203,16 @@ select:focus {
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+/* スマホ幅ではラベルを横幅いっぱいに広げて、入力欄を次の行に折り返す */
+/* toggle-switch は <label> だが幅を変えてはいけないので除外する */
+@media (max-width: 640px) {
+  .form-row label:not(.toggle-switch) {
+    width: 100%;
+    min-width: unset;
+  }
 }
 
 /* ============================================
@@ -280,8 +303,9 @@ tr:hover td {
    ============================================ */
 #stationsTableContainer {
   overflow: auto;
-  width: 100%;
-  max-height: 320px;
+  width: fit-content;
+  max-width: 100%;
+  height: 320px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-base);
@@ -290,7 +314,7 @@ tr:hover td {
 #stationsTable {
   margin: 0;
   border-spacing: 0;
-  width: 100%;
+  width: max-content;
 }
 
 #stationsTable td {
@@ -336,8 +360,9 @@ tr:hover td {
    ============================================ */
 #linesTableContainer {
   overflow: auto;
-  width: 100%;
-  max-height: 220px;
+  width: fit-content;
+  max-width: 100%;
+  height: 220px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-base);
@@ -346,7 +371,7 @@ tr:hover td {
 #linesTable {
   margin: 0;
   border-spacing: 0;
-  width: 100%;
+  width: max-content;
 }
 
 #linesTable td {
@@ -391,8 +416,9 @@ tr:hover td {
    ============================================ */
 #iconTableContainer {
   overflow: auto;
-  width: 100%;
-  max-height: 220px;
+  width: fit-content;
+  max-width: 100%;
+  height: 220px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-base);
@@ -401,7 +427,7 @@ tr:hover td {
 #iconTable {
   margin: 0;
   border-spacing: 0;
-  width: 100%;
+  width: max-content;
 }
 
 #iconTable td {
@@ -490,8 +516,9 @@ tr:hover td {
 /* 乗換路線表示テーブルコンテナ（読み取り専用・インライン） */
 #transferLineDisplayContainer {
   overflow: auto;
-  width: 50%;
-  max-height: 160px;
+  width: fit-content;
+  max-width: 50%;
+  height: 160px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-base);
@@ -501,7 +528,7 @@ tr:hover td {
 #transferLineDisplayTable {
   margin: 0;
   border-spacing: 0;
-  width: 100%;
+  width: max-content;
 }
 
 #transferLineDisplayTable td {
@@ -539,7 +566,7 @@ tr:hover td {
 #transferLinePopupTable {
   margin: 0;
   border-spacing: 0;
-  width: 100%;
+  width: max-content;
 }
 
 #transferLinePopupTable td {

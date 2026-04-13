@@ -6,7 +6,7 @@ import { iconIndexes, numberIndexes } from '../modules/presetIndex'
 import GenericItemList, { ColumnDef } from './GenericItemList'
 import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
-import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
+import { moveArrayItemsUp, moveArrayItemsDown, moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -15,9 +15,10 @@ type stationParamsSetterProps = {
 }
 
 const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes}) => {
-    // 接続路線追加ポップアップの表示フラグと選択中路線キー
+    // 接続路線追加ポップアップの表示フラグと選択中路線キー（複数選択対応）
     const [isTransferPopupOpen, setIsTransferPopupOpen] = useState<boolean>(false)
-    const [transferPopupSelectedKey, setTransferPopupSelectedKey] = useState<string>('')
+    const [transferPopupSelectedKey, setTransferPopupSelectedKey] = useState<string[]>([])
+    const [isPopupMultiSelect, setIsPopupMultiSelect] = useState<boolean>(false)
     // 乗換路線リストの選択状態（路線IDリスト）
     const [transferSelectedKeys, setTransferSelectedKeys] = useState<string[]>([])
 
@@ -50,22 +51,104 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     }
     // ポップアップで「この路線を追加」を押したときの処理
     const addTransferLine = () => {
-        if (!transferPopupSelectedKey) return
+        if (transferPopupSelectedKey.length === 0) return
         const _setting = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const station = _setting.stationList[ind - 1]
             if (!station) return
             // スペース区切りで路線IDを追記する（重複は追加しない）
             const ids = station.transfers ? station.transfers.split(' ') : []
-            if (!ids.includes(transferPopupSelectedKey)) {
-                ids.push(transferPopupSelectedKey)
-                station.transfers = ids.join(' ')
-            }
+            transferPopupSelectedKey.forEach(key => {
+                if (!ids.includes(key)) ids.push(key)
+            })
+            station.transfers = ids.join(' ')
         })
         setSetting(_setting)
         setIsTransferPopupOpen(false)
-        setTransferPopupSelectedKey('')
+        setTransferPopupSelectedKey([])
     }
+
+    // ポップアップ内の路線リスト操作
+    const getPopupOrderedKeys = () =>
+        Object.keys(setting.lineDict).sort((a, b) => Number(a) - Number(b))
+
+    const popupHandleRowClick = (key: string) => {
+        if (!isPopupMultiSelect) {
+            setTransferPopupSelectedKey([key])
+        } else {
+            setTransferPopupSelectedKey(prev =>
+                prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+            )
+        }
+    }
+
+    const popupMoveUp = () => {
+        if (transferPopupSelectedKey.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsUp(_setting.lineDict, getPopupOrderedKeys(), transferPopupSelectedKey)
+        _setting.lineDict = newDict
+        // stationList の lineId 参照を交換されたキーペアで更新する
+        swapped.forEach(([keyA, keyB]) => {
+            _setting.stationList.forEach(station => {
+                if (station.lineId === keyA) station.lineId = keyB
+                else if (station.lineId === keyB) station.lineId = keyA
+            })
+        })
+        setSetting(_setting)
+        setTransferPopupSelectedKey(newSelected)
+    }
+
+    const popupMoveDown = () => {
+        if (transferPopupSelectedKey.length === 0) return
+        const _setting = structuredClone(setting)
+        const { newDict, swapped, newSelected } = moveDictItemsDown(_setting.lineDict, getPopupOrderedKeys(), transferPopupSelectedKey)
+        _setting.lineDict = newDict
+        swapped.forEach(([keyA, keyB]) => {
+            _setting.stationList.forEach(station => {
+                if (station.lineId === keyA) station.lineId = keyB
+                else if (station.lineId === keyB) station.lineId = keyA
+            })
+        })
+        setSetting(_setting)
+        setTransferPopupSelectedKey(newSelected)
+    }
+
+    const popupAddLine = () => {
+        if (!setting.lineDict) return
+        const _setting = structuredClone(setting)
+        let _index = 0
+        if (Object.keys(_setting.lineDict).length > 0) {
+            _index = Math.max(...Object.keys(_setting.lineDict).map(Number)) + 1
+        }
+        _setting.lineDict[_index] = { lineIconKey: "", name: "", kana: "", eng: "", color: "" }
+        setSetting(_setting)
+        setTransferPopupSelectedKey([String(_index)])
+    }
+
+    const popupDeleteLine = () => {
+        const _setting = structuredClone(setting)
+        transferPopupSelectedKey.forEach(key => { delete _setting.lineDict[key] })
+        setTransferPopupSelectedKey([])
+        setSetting(_setting)
+    }
+
+    const popupFormUpdated = (e: any, field: lineMembers) => {
+        if (!setting) return
+        const _setting = structuredClone(setting)
+        transferPopupSelectedKey.forEach(key => {
+            if (!_setting.lineDict[key]) return
+            _setting.lineDict[key][field] = e.target.value
+            // かな変更時に英語を自動補完する
+            if (field === 'kana') {
+                _setting.lineDict[key].eng = kanaToAlphabet(e.target.value, 1)
+            }
+        })
+        setSetting(_setting)
+    }
+
+    // ポップアップ内フォームの表示対象（選択中の最後の行）
+    const lastPopupSelected = transferPopupSelectedKey[transferPopupSelectedKey.length - 1]
+    const popupSelectedLine = setting && lastPopupSelected ? setting.lineDict[lastPopupSelected] : undefined
 
     // 乗換路線リストの操作対象配列（targetStation の transfers をスペース分割したもの）
     const targetStation = setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]
@@ -252,7 +335,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <button onClick={moveTransferDown}>下に移動</button>
                 <button onClick={deleteTransfer} className="btn-danger">削除</button>
                 {/* 接続路線追加ボタン: クリックでポップアップを開く */}
-                <button onClick={() => { setTransferPopupSelectedKey(''); setIsTransferPopupOpen(true) }}>
+                <button onClick={() => { setTransferPopupSelectedKey([]); setIsPopupMultiSelect(false); setIsTransferPopupOpen(true) }}>
                     接続路線を追加
                 </button>
             </div>
@@ -263,21 +346,59 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <div className="modal-dialog" onClick={e => e.stopPropagation()}>
                         <p className="modal-title">接続路線を追加</p>
                         <div className="modal-body">
+                            {/* 路線一覧 */}
                             <GenericItemList
                                 columns={lineColumns}
                                 rows={Object.entries(setting.lineDict).map(([key, line]) => ({ key, data: line }))}
-                                selectedKeys={transferPopupSelectedKey ? [transferPopupSelectedKey] : []}
-                                onRowClick={key => setTransferPopupSelectedKey(key)}
+                                selectedKeys={transferPopupSelectedKey}
+                                onRowClick={popupHandleRowClick}
                                 tableId="transferLinePopupTable"
                                 containerId="transferLinePopupContainer"
                             />
+                            {/* 路線操作ボタン（LineList と同等） */}
+                            <div className="btn-group" style={{marginTop: '8px'}}>
+                                <button onClick={popupMoveUp}>上に移動</button>
+                                <button onClick={popupMoveDown}>下に移動</button>
+                                <button onClick={popupAddLine} className="btn-primary">路線追加</button>
+                                <button onClick={popupDeleteLine} className="btn-danger">路線削除</button>
+                                <button
+                                    onClick={() => setIsPopupMultiSelect(v => !v)}
+                                    className={`btn-toggle${isPopupMultiSelect ? ' btn-toggle--active' : ''}`}
+                                >複数選択</button>
+                            </div>
+                            {/* 路線編集フォーム（選択中の路線を編集） */}
+                            <div className="form-row">
+                                <label>路線記号</label>
+                                <input type="text" onChange={(e) => popupFormUpdated(e, 'lineIconKey')}
+                                    value={popupSelectedLine?.lineIconKey ?? ''} />
+                            </div>
+                            <div className="form-row">
+                                <label>路線名</label>
+                                <input type="text" onChange={(e) => popupFormUpdated(e, 'name')}
+                                    value={popupSelectedLine?.name ?? ''} />
+                            </div>
+                            <div className="form-row">
+                                <label>路線名かな</label>
+                                <input type="text" onChange={(e) => popupFormUpdated(e, 'kana')}
+                                    value={popupSelectedLine?.kana ?? ''} />
+                            </div>
+                            <div className="form-row">
+                                <label>路線名英語</label>
+                                <input type="text" onChange={(e) => popupFormUpdated(e, 'eng')}
+                                    value={popupSelectedLine?.eng ?? ''} />
+                            </div>
+                            <div className="form-row">
+                                <label>路線カラー</label>
+                                <input type="color" onChange={(e) => popupFormUpdated(e, 'color')}
+                                    value={popupSelectedLine?.color || '#000000'} />
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button onClick={() => setIsTransferPopupOpen(false)}>閉じる</button>
                             <button
                                 onClick={addTransferLine}
                                 className="btn-primary"
-                                disabled={!transferPopupSelectedKey}
+                                disabled={transferPopupSelectedKey.length === 0}
                             >この路線を追加</button>
                         </div>
                     </div>

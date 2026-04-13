@@ -325,20 +325,32 @@ type GenericItemListProps<T> = {
 #### ポップアップ内容
 
 - **タイトル**: 接続路線を追加
-- **本体**: `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：ID・路線記号・路線名・路線カラー）
-  - 単一選択のみ
+- **本体**:
+  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：ID・路線記号・路線名・路線カラー）
+  - ボタン行: `上に移動` / `下に移動` / `路線追加`（`btn-primary`） / `路線削除`（`btn-danger`） / `複数選択`（`btn-toggle`）
+    - 上下移動・追加・削除は LineList の同機能と同一ロジック（`listOperations.ts` 利用）
+    - 操作結果は `setting.lineDict` に即時反映される（LineList と同じデータを操作）
+  - 路線編集フォーム: 選択中の路線（`transferPopupSelectedKey` の末尾キー）に対して以下を編集可能
+    | ラベル | フィールド |
+    |--------|-----------|
+    | 路線記号 | `lineIconKey` |
+    | 路線名 | `name` |
+    | 路線名かな | `kana`（変更時に `eng` を自動補完） |
+    | 路線名英語 | `eng` |
+    | 路線カラー | `color` |
 - **フッターボタン**:
   - `この路線を追加` — 選択中の路線IDを対象駅の `transfers` フィールドにスペース区切りで追記し、ポップアップを閉じる
   - `閉じる` — 何もせずポップアップを閉じる
 
 #### 状態管理
 
-`StationParamSetter` 内で以下の state を追加する：
+`StationParamSetter` 内で以下の state を追加する（既存含む）：
 
 | state | 型 | 説明 |
 |-------|----|------|
 | `isTransferPopupOpen` | `boolean` | ポップアップ表示フラグ |
-| `transferPopupSelectedKey` | `string` | ポップアップ内で選択中の路線キー |
+| `transferPopupSelectedKey` | `string[]` | ポップアップ内で選択中の路線キー（複数選択対応） |
+| `isPopupMultiSelect` | `boolean` | ポップアップ内複数選択モードフラグ |
 
 #### CSS
 
