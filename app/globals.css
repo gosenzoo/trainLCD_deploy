@@ -874,6 +874,22 @@ button.tab-btn.active.tab-btn--unused {
 }
 
 /* ============================================
+   ページフッター
+   ============================================ */
+.app-footer {
+  margin-top: 40px;
+  padding: 24px 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+/* ============================================
    iOS Safari フォーカス時自動拡大防止
    タッチデバイスのみフォーム要素を 16px 以上にする
    （16px 未満だと iOS Safari がフォーカス時に自動ズームする）
