@@ -766,8 +766,8 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 | ID | 役割 |
 |---|---|
 | `lineColor` | `fill` 属性を引数 `lineColor` で上書き |
-| `symbolArea` | 路線記号テキスト描画領域（将来対応） |
-| `numberArea` | ナンバリングテキスト描画領域（将来対応） |
+| `symbolArea` | 路線記号テキスト描画領域。`<rect>` の `data-style`（JSON）・`x`/`y`/`width`/`height`・`lang` 属性をもとに SVG `<text>` を生成して配置する |
+| `numberArea` | ナンバリングテキスト描画領域。`symbolArea` と同じロジックで描画 |
 | `outline` | アウトライン要素（`outlineWidth > 0` の時のみ追加） |
 
 ---
