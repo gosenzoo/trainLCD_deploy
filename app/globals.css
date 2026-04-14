@@ -872,3 +872,18 @@ button.tab-btn.active.tab-btn--unused {
   z-index: 1;
   background: var(--bg-surface);
 }
+
+/* ============================================
+   iOS Safari フォーカス時自動拡大防止
+   タッチデバイスのみフォーム要素を 16px 以上にする
+   （16px 未満だと iOS Safari がフォーカス時に自動ズームする）
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  input[type="text"],
+  input[type="number"],
+  input[type="file"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

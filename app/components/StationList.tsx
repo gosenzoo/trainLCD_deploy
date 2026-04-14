@@ -78,7 +78,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             otherCarNum: "0", otherLeftSlotInd: "0"
         })
         setSetting(_setting)
-        setSelectedIndexes([selectedIndexes[selectedIndexes.length - 1] + 1])
+        // 未選択時は末尾追加なので新しい末尾インデックス（1-based）を選択状態にする
+        const newIndex = selectedIndexes.length > 0
+            ? selectedIndexes[selectedIndexes.length - 1] + 1
+            : _setting.stationList.length
+        setSelectedIndexes([newIndex])
     }
 
     const deleteStation = () => {
