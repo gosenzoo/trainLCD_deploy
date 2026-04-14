@@ -223,7 +223,7 @@ graph TD
     LineList["LineList\n路線一覧テーブル"]
     IconList["IconList\nアイコン一覧テーブル"]
     GenericItemList["GenericItemList\n汎用テーブル（行選択）"]
-    StationParamSetter["StationParamSetter\n選択駅の詳細設定"]
+    StationParamSetter["StationParamSetter\n選択駅の詳細設定（入れ子アコーディオンあり）"]
     MapComponent["MapComponent\nGoogle Mapsで座標設定"]
 
     Page --> Header
@@ -434,6 +434,14 @@ type GenericItemListProps<T> = {
 | `isTransferPopupOpen` | `boolean` | ポップアップ表示フラグ |
 | `transferPopupSelectedKey` | `string[]` | ポップアップ内で選択中の路線キー（複数選択対応） |
 | `isPopupMultiSelect` | `boolean` | ポップアップ内複数選択モードフラグ |
+
+#### 入れ子アコーディオン（詳細設定）
+
+`StationParamSetter` 内の「次区間所要時間(分)」以降の項目（次区間路線ID・乗換案内・乗換案内英語・ホーム乗換案内行ごと表示数・スロット関連・向側列車設定）を `AccordionSection` で包み、**デフォルト閉じ** で表示する。
+
+- タイトル: `詳細設定`
+- `defaultOpen={false}` を指定する
+- 見出し行のスタイルは外側アコーディオンと統一するが、入れ子であることを示すため若干インデントを抑える（CSS は `.section-header` / `.section-body` をそのまま流用）
 
 #### CSS
 
@@ -779,6 +787,33 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 | `tokyu` | `public/display.html` | 東急スタイル |
 | `JW-225` | `public/Display_JW-225.html` | JR西日本 225系 |
 | `JE-E131` | （未実装） | JR東日本 E131系 |
+
+### 行先データのフォールバック（`LCDController.getOperation`）
+
+以下の 2 段階で末尾停車駅の情報を行先データに補完する。
+
+**「末尾停車駅」の定義：** `stationList` のうち `isPass` が `false` の最後の駅。該当駅がなければ `stationList` の最後の要素を使用する。
+
+#### ① operation 自体が存在しない場合
+
+`operationList` が空、または現在の区間インデックスに対応するエントリが存在しない場合（`nowOperation === null`）、全フィールドをデフォルト値で構成した **フォールバック operation オブジェクト** を生成する（行先フィールドは後述の ② で補完）。
+
+#### ② 行先パラメータが空の場合（① の後に必ず実施）
+
+`nowOperation` の行先関連フィールドが空文字・`null`・`undefined` の場合、末尾停車駅の対応する値で上書きする。
+
+| operation フィールド | 参照元（末尾停車駅） |
+|---|---|
+| `destination` | `.name` |
+| `destinationKana` | `.kana` |
+| `destinationEng` | `.eng` |
+| `destinationNum` | `.number` |
+| `destinationColor` | `.lineColor` |
+| `destinationNumIconKey` | `.numIconPresetKey` |
+| `carNumber` | `"1"`（固定） |
+| `trainType` | `"普通"`（固定） |
+| `trainTypeEng` | `"Local"`（固定） |
+| `trainTypeColor` | `"#0185ff"`（固定） |
 
 ---
 

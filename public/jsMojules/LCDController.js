@@ -98,7 +98,70 @@ class LCDController{
                 return;
             }
         })
-        if(nowOperation === null){ console.error("この区間の運用情報が定義されていません"); }
+
+        // isPass が false の最後の駅を末尾停車駅とする。なければ stationList の最終要素を使用
+        const stationList = this.setting.stationList;
+        const lastStopStation = [...stationList].reverse().find(s => !s.isPass) ?? stationList[stationList.length - 1];
+
+        // ① 運用データ自体が未設定の場合、デフォルト値で operation オブジェクトを生成する
+        if(nowOperation === null){
+            console.warn("この区間の運用情報が定義されていません。末尾停車駅をフォールバック行先として使用します。");
+            nowOperation = {
+                destination:          "",
+                destinationKana:      "",
+                destinationEng:       "",
+                destinationNum:       "",
+                destinationColor:     "",
+                destinationNumIconKey:"",
+                direction:        "",
+                trainType:        "",
+                trainTypeEng:     "",
+                trainTypeSub:     "",
+                trainTypeSubEng:  "",
+                trainTypeColor:   "",
+                lineLogo:         "",
+                lineColor:        "",
+                carNumber:        "",
+                leftOrRight:      "right",
+                isDispTime:       true,
+                isDispLineName:   true,
+                carNumberList:    "1*,2,3,4,5,6,7,8",
+                headOffset:       "170",
+                backOffset:       "170",
+                isDrawStopText:   false,
+                isDrawLine:       false,
+                carLineColor:     "#FFFFFF",
+                startStationInd:  "0"
+            };
+        }
+
+        // ② 行先パラメータが空の場合、末尾停車駅の対応する値で補完する
+        const destFallbackMap = [
+            ['destination',           'name'],
+            ['destinationKana',       'kana'],
+            ['destinationEng',        'eng'],
+            ['destinationNum',        'number'],
+            ['destinationColor',      'lineColor'],
+            ['destinationNumIconKey', 'numIconPresetKey'],
+        ];
+        destFallbackMap.forEach(([opField, stationField]) => {
+            if(!nowOperation[opField] && lastStopStation?.[stationField]){
+                nowOperation[opField] = lastStopStation[stationField];
+            }
+        });
+
+        // ③ その他パラメータが空の場合、固定のデフォルト値で補完する
+        const fixedFallbackMap = [
+            ['carNumber',      '1'],
+            ['trainType',      '普通'],
+            ['trainTypeEng',   'Local'],
+            ['trainTypeColor', '#0185ff'],
+        ];
+        fixedFallbackMap.forEach(([opField, defaultVal]) => {
+            if(!nowOperation[opField]){
+                nowOperation[opField] = defaultVal;
+            }
+        });
 
         return nowOperation;
     }

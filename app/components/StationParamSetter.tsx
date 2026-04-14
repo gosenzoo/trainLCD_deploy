@@ -7,6 +7,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown, moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
+import AccordionSection from './AccordionSection'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -475,6 +476,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <option value={'left'}>左</option>
             </select>
             <br></br>
+            {/* 次区間所要時間以降の詳細設定を入れ子アコーディオンでまとめる（デフォルト閉じ） */}
+            <AccordionSection title="詳細設定" defaultOpen={false}>
             <label>次区間所要時間(分)</label>
             <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
                 value={ targetStation?.sectionTime}
@@ -605,6 +608,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
                 value={ targetStation?.otherLeftSlotInd}
             ></input>
+            </AccordionSection>
         </div>
     )
 }

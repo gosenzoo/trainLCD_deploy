@@ -50,16 +50,16 @@ const Editor = () => {
                     <EditorHead setting={setting} setSetting={setSetting}
                         displayType={displayType} setDisplayType={setDisplayType}/>
                 </AccordionSection>
-                <AccordionSection title="運用設定">
-                    <OperationForm setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
                 <AccordionSection title="駅設定">
                     <StationList setting={setting} setSetting={setSetting}/>
                 </AccordionSection>
-                <AccordionSection title="路線登録">
+                <AccordionSection title="運用設定">
+                    <OperationForm setting={setting} setSetting={setSetting}/>
+                </AccordionSection>
+                <AccordionSection title="路線登録" defaultOpen={false}>
                     <LineList setting={setting} setSetting={setSetting}/>
                 </AccordionSection>
-                <AccordionSection title="アイコン登録">
+                <AccordionSection title="アイコン登録" defaultOpen={false}>
                     <IconList setting={setting} setSetting={setSetting}/>
                 </AccordionSection>
             </div>

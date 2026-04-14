@@ -5,11 +5,13 @@ import React, { useState } from 'react'
 type AccordionSectionProps = {
     title: string
     children: React.ReactNode
+    // 初期表示時の開閉状態（省略時は true = 展開済み）
+    defaultOpen?: boolean
 }
 
 // 見出しクリックで本体を開閉するアコーディオンセクション
-const AccordionSection: React.FC<AccordionSectionProps> = ({ title, children }) => {
-    const [isOpen, setIsOpen] = useState<boolean>(true)
+const AccordionSection: React.FC<AccordionSectionProps> = ({ title, children, defaultOpen = true }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(defaultOpen)
 
     return (
         <div className="editor-section">
