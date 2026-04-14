@@ -482,6 +482,17 @@ tr:hover td {
   justify-content: center;
 }
 
+/* ポップアップ内から開くポップアップ用（z-index を高くして最前面に表示） */
+.modal-backdrop-top {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ポップアップ本体 */
 .modal-dialog {
   background: var(--bg-surface);
@@ -548,6 +559,45 @@ tr:hover td {
 }
 
 #transferLineDisplayTable .selected {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* 路線記号追加ポップアップ内テーブルコンテナ */
+#lineIconPickerContainer {
+  overflow: auto;
+  width: fit-content;
+  max-width: 100%;
+  height: 260px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+}
+
+#lineIconPickerTable {
+  margin: 0;
+  border-spacing: 0;
+  width: max-content;
+}
+
+#lineIconPickerTable td {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+#lineIconPickerTable th {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-overlay);
+  position: sticky;
+  top: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+#lineIconPickerTable .selected {
   background: var(--accent-dim) !important;
   color: var(--accent-hover) !important;
   font-weight: 700;

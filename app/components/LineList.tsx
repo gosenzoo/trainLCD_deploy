@@ -17,6 +17,9 @@ type lineListProps = {
 const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
+    // 路線記号追加ポップアップの表示フラグと選択中アイコンキー
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState<boolean>(false)
+    const [iconPickerSelectedKey, setIconPickerSelectedKey] = useState<string>('')
 
     const presetIconDict = loadPresetNumIconTexts()
 
@@ -106,15 +109,11 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
         setSetting(_setting)
     }
 
-    // 路線一覧テーブルのカラム定義
+    // 路線一覧テーブルのカラム定義（ID列は非表示・路線記号列でクリック選択）
     const lineColumns: ColumnDef<lineType>[] = [
         {
-            header: 'ID',
-            isSelector: true,  // クリックで行選択
-            cell: (_, key) => key,
-        },
-        {
             header: '路線記号',
+            isSelector: true,  // クリックで行選択
             // iconDict から lineIconKey に対応するアイコンを描画する
             cell: (line) => {
                 const iconParams = setting.iconDict[line.lineIconKey]
@@ -145,6 +144,40 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             cellStyle: (line) => ({ backgroundColor: line.color }),  // 路線カラーをセル背景で表示
         },
     ]
+
+    // 路線記号追加ポップアップのアイコン一覧カラム定義
+    const iconPickerColumns: ColumnDef<string | iconParamsType>[] = [
+        {
+            header: 'ID',
+            isSelector: true,
+            cell: (_, key) => key,
+        },
+        {
+            header: 'アイコン',
+            // string なら <img>、iconParamsType なら SVG プリセットを描画する
+            cell: (iconObj) => {
+                if (typeof iconObj === 'string') {
+                    return iconObj ? <img src={iconObj} alt="" width="30px" height="30px" /> : null
+                } else if (iconObj) {
+                    const html = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, '', iconObj.color)?.outerHTML
+                    return html ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                }
+                return null
+            },
+        },
+    ]
+
+    // 選択中のアイコンキーを選択中路線の lineIconKey にセットする
+    const applyIconPicker = () => {
+        if (!iconPickerSelectedKey) return
+        const _setting = structuredClone(setting)
+        selectedIndexes.forEach(key => {
+            if (_setting.lineDict[key]) _setting.lineDict[key].lineIconKey = iconPickerSelectedKey
+        })
+        setSetting(_setting)
+        setIsIconPickerOpen(false)
+        setIconPickerSelectedKey('')
+    }
 
     // 編集フォームに表示する対象：選択中の最後の行
     const lastSelected = selectedIndexes[selectedIndexes.length - 1]
@@ -178,7 +211,38 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 <input type="text" id="lineIconKeyInput" onChange={(e) => formUpdated(e, 'lineIconKey')}
                     value={selectedLine?.lineIconKey ?? ''}
                 />
+                {/* アイコン一覧から lineIconKey を選択するポップアップを開くボタン */}
+                <button onClick={() => { setIconPickerSelectedKey(''); setIsIconPickerOpen(true) }}>
+                    路線記号追加
+                </button>
             </div>
+
+            {/* 路線記号追加ポップアップ */}
+            {isIconPickerOpen && (
+                <div className="modal-backdrop" onClick={() => setIsIconPickerOpen(false)}>
+                    <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+                        <p className="modal-title">路線記号を選択</p>
+                        <div className="modal-body">
+                            <GenericItemList
+                                columns={iconPickerColumns}
+                                rows={Object.entries(setting.iconDict).map(([key, iconObj]) => ({ key, data: iconObj }))}
+                                selectedKeys={iconPickerSelectedKey ? [iconPickerSelectedKey] : []}
+                                onRowClick={key => setIconPickerSelectedKey(key)}
+                                tableId="lineIconPickerTable"
+                                containerId="lineIconPickerContainer"
+                            />
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={() => setIsIconPickerOpen(false)}>閉じる</button>
+                            <button
+                                onClick={applyIconPicker}
+                                className="btn-primary"
+                                disabled={!iconPickerSelectedKey}
+                            >この記号を設定</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="form-row">
                 <label>路線名</label>
                 <input type="text" id="lineNameInput" onChange={(e) => formUpdated(e, 'name')}

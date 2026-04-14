@@ -293,7 +293,44 @@ type GenericItemListProps<T> = {
 - `ColumnDef.cell` 関数によるカスタムセル描画（アイコン表示、カラーセルなど）
 - 追加フォーム・詳細設定パネルの表示
 
-### 4.3 `TransferLinePopup` — 接続路線追加ポップアップ
+### 4.3 `LineIconPickerPopup` — 路線記号追加ポップアップ
+
+`LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームに設置するアイコン選択ポップアップ。
+
+#### トリガー
+
+路線記号（`lineIconKey`）入力欄の横に置いた **「路線記号追加」ボタン** をクリックすると開く。
+
+#### ポップアップ内容
+
+- **タイトル**: 路線記号を選択
+- **本体**: `GenericItemList` で `iconDict` の一覧を表示
+  - カラム定義: ID（`isSelector: true`）・アイコンプレビュー（`IconList` と同じ描画ロジック）
+  - 単一選択
+- **フッターボタン**:
+  - `この記号を設定` — 選択中のアイコンキーを選択中路線の `lineIconKey` にセットし、ポップアップを閉じる
+  - `閉じる` — 何もせずポップアップを閉じる
+
+#### 状態管理
+
+| state | 型 | 置き場所 | 説明 |
+|-------|----|----------|------|
+| `isIconPickerOpen` | `boolean` | `LineList` / `StationParamSetter` | ポップアップ表示フラグ |
+| `iconPickerSelectedKey` | `string` | 同上 | 選択中のアイコンキー |
+
+`StationParamSetter` の接続路線追加ポップアップ内に表示する場合も、同じ state・ロジックを `StationParamSetter` 内で管理する。
+
+#### CSS
+
+`StationParamSetter` の接続路線追加ポップアップ内から開く場合はポップアップが入れ子になるため、`.modal-backdrop` の `z-index: 1000` より高い `z-index: 1100` を持つ `.modal-backdrop-top` クラスを使用する。
+
+| クラス | 役割 |
+|--------|------|
+| `.modal-backdrop-top` | 最前面に表示するオーバーレイ（`z-index: 1100`） |
+
+---
+
+### 4.4 `TransferLinePopup` — 接続路線追加ポップアップ
 
 `StationParamSetter` 内の「乗換路線」欄に配置するモーダルポップアップ。
 
@@ -326,7 +363,7 @@ type GenericItemListProps<T> = {
 
 - **タイトル**: 接続路線を追加
 - **本体**:
-  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：ID・路線記号・路線名・路線カラー）
+  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線記号・路線名・路線カラー）
   - ボタン行: `上に移動` / `下に移動` / `路線追加`（`btn-primary`） / `路線削除`（`btn-danger`） / `複数選択`（`btn-toggle`）
     - 上下移動・追加・削除は LineList の同機能と同一ロジック（`listOperations.ts` 利用）
     - 操作結果は `setting.lineDict` に即時反映される（LineList と同じデータを操作）

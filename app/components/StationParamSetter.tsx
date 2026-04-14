@@ -19,6 +19,9 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const [isTransferPopupOpen, setIsTransferPopupOpen] = useState<boolean>(false)
     const [transferPopupSelectedKey, setTransferPopupSelectedKey] = useState<string[]>([])
     const [isPopupMultiSelect, setIsPopupMultiSelect] = useState<boolean>(false)
+    // 路線記号追加ポップアップの表示フラグと選択中アイコンキー（接続路線ポップアップ内から開く）
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState<boolean>(false)
+    const [iconPickerSelectedKey, setIconPickerSelectedKey] = useState<string>('')
     // 乗換路線リストの選択状態（路線IDリスト）
     const [transferSelectedKeys, setTransferSelectedKeys] = useState<string[]>([])
 
@@ -150,6 +153,39 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const lastPopupSelected = transferPopupSelectedKey[transferPopupSelectedKey.length - 1]
     const popupSelectedLine = setting && lastPopupSelected ? setting.lineDict[lastPopupSelected] : undefined
 
+    // 路線記号追加ポップアップのアイコン一覧カラム定義
+    const iconPickerColumns: ColumnDef<string | iconParamsType>[] = [
+        {
+            header: 'ID',
+            isSelector: true,
+            cell: (_, key) => key,
+        },
+        {
+            header: 'アイコン',
+            cell: (iconObj) => {
+                if (typeof iconObj === 'string') {
+                    return iconObj ? <img src={iconObj} alt="" width="30px" height="30px" /> : null
+                } else if (iconObj) {
+                    const html = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, '', iconObj.color)?.outerHTML
+                    return html ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                }
+                return null
+            },
+        },
+    ]
+
+    // 選択中のアイコンキーを接続路線ポップアップで選択中の路線の lineIconKey にセットする
+    const applyIconPicker = () => {
+        if (!iconPickerSelectedKey) return
+        const _setting = structuredClone(setting)
+        transferPopupSelectedKey.forEach(key => {
+            if (_setting.lineDict[key]) _setting.lineDict[key].lineIconKey = iconPickerSelectedKey
+        })
+        setSetting(_setting)
+        setIsIconPickerOpen(false)
+        setIconPickerSelectedKey('')
+    }
+
     // 乗換路線リストの操作対象配列（targetStation の transfers をスペース分割したもの）
     const targetStation = setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]
     const transfersArr = (targetStation?.transfers ?? '').split(' ').filter(id => id && setting.lineDict[id])
@@ -220,14 +256,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     ]
 
     // 路線一覧テーブルのカラム定義（LineList と同じ、ポップアップ用）
+    // 路線一覧テーブルのカラム定義（ID列は非表示・路線記号列でクリック選択）
     const lineColumns: ColumnDef<lineType>[] = [
         {
-            header: 'ID',
-            isSelector: true,
-            cell: (_, key) => key,
-        },
-        {
             header: '路線記号',
+            isSelector: true,  // クリックで行選択
             cell: (line) => {
                 const iconParams = setting.iconDict[line.lineIconKey]
                 if (typeof iconParams === 'string') {
@@ -371,6 +404,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                 <label>路線記号</label>
                                 <input type="text" onChange={(e) => popupFormUpdated(e, 'lineIconKey')}
                                     value={popupSelectedLine?.lineIconKey ?? ''} />
+                                {/* アイコン一覧から lineIconKey を選択するポップアップを開くボタン */}
+                                <button onClick={() => { setIconPickerSelectedKey(''); setIsIconPickerOpen(true) }}>
+                                    路線記号追加
+                                </button>
                             </div>
                             <div className="form-row">
                                 <label>路線名</label>
@@ -400,6 +437,33 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                 className="btn-primary"
                                 disabled={transferPopupSelectedKey.length === 0}
                             >この路線を追加</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 路線記号追加ポップアップ（接続路線ポップアップ内から開くため z-index を高くする） */}
+            {isIconPickerOpen && (
+                <div className="modal-backdrop-top" onClick={() => setIsIconPickerOpen(false)}>
+                    <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+                        <p className="modal-title">路線記号を選択</p>
+                        <div className="modal-body">
+                            <GenericItemList
+                                columns={iconPickerColumns}
+                                rows={Object.entries(setting.iconDict).map(([key, iconObj]) => ({ key, data: iconObj }))}
+                                selectedKeys={iconPickerSelectedKey ? [iconPickerSelectedKey] : []}
+                                onRowClick={key => setIconPickerSelectedKey(key)}
+                                tableId="lineIconPickerTable"
+                                containerId="lineIconPickerContainer"
+                            />
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={() => setIsIconPickerOpen(false)}>閉じる</button>
+                            <button
+                                onClick={applyIconPicker}
+                                className="btn-primary"
+                                disabled={!iconPickerSelectedKey}
+                            >この記号を設定</button>
                         </div>
                     </div>
                 </div>
