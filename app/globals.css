@@ -21,6 +21,8 @@
   --radius-lg:    12px;
   --shadow:       0 4px 24px rgba(0, 0, 0, 0.5);
   --transition:   150ms ease;
+  /* ヘッダー高さ: sticky ツールバーの top 計算に使用 */
+  --header-height: 65px;
 }
 
 /* ============================================
@@ -91,6 +93,18 @@ h2 {
 }
 
 /* ============================================
+   表示ツールバー（ヘッダー直下 sticky）
+   ============================================ */
+.display-toolbar {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 99;
+  background-color: var(--bg-base);
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ============================================
    エディターコンテナ
    ============================================ */
 .editor-container {
@@ -104,22 +118,70 @@ h2 {
   overflow-x: hidden;
 }
 
-/* セクションカード */
+/* セクションカード（アコーディオン外枠） */
 .editor-section {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
   box-shadow: var(--shadow);
   /* 内容が溢れても親を突き破らないよう制限する */
   min-width: 0;
+  overflow: hidden;
+}
+
+/* アコーディオン見出し行 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  transition: background-color var(--transition);
+}
+
+.section-header:hover {
+  background-color: var(--bg-overlay);
+}
+
+/* 閉じた状態は下辺のボーダーと角丸を調整 */
+.section-header--closed {
+  border-bottom: none;
+  border-radius: var(--radius-lg);
+}
+
+/* 見出しテキスト（既存の h2 スタイルと統一） */
+.section-header-title {
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* 開閉矢印 */
+.section-header-arrow {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* アコーディオン本体コンテンツ */
+.section-body {
+  padding: 20px 24px;
 }
 
 @media (max-width: 640px) {
   .editor-container {
     padding: 12px 12px;
   }
-  .editor-section {
+  .section-header {
+    padding: 12px 14px;
+  }
+  .section-body {
     padding: 14px 14px;
   }
 }

@@ -215,7 +215,8 @@ classDiagram
 graph TD
     Page["page.tsx\n(ルートページ)"]
     Header["Header\nタイトル表示"]
-    Editor["Editor\n◀ settingType state 保持 ▶"]
+    Editor["Editor\n◀ settingType state 保持・アコーディオン管理 ▶"]
+    DisplayToolbar["DisplayToolbar\n表示ボタン（sticky）"]
     EditorHead["EditorHead\nファイル操作・全体設定"]
     OperationForm["OperationForm\n運用設定フォーム"]
     StationList["StationList\n駅一覧テーブル"]
@@ -227,6 +228,7 @@ graph TD
 
     Page --> Header
     Page --> Editor
+    Editor --> DisplayToolbar
     Editor --> EditorHead
     Editor --> OperationForm
     Editor --> StationList
@@ -243,7 +245,51 @@ graph TD
     TransferLinePopup --> GenericItemList
 ```
 
-### 4.2 `GenericItemList` — 汎用テーブルコンポーネント
+### 4.2 セクションアコーディオン
+
+`Editor` 内の各セクション（ファイル操作・運用設定・駅設定・路線登録・アイコン登録）は、見出し行クリックで本体を開閉するアコーディオン形式とする。
+
+#### 動作仕様
+
+- 各セクションに `isOpen: boolean` state を持ち、初期値はすべて `true`（展開済み）
+- 見出し行（`.section-header`）をクリック/タップすると `isOpen` をトグルする
+- `isOpen === false` のとき本体（`.section-body`）を非表示にする（`display: none`）
+- 開閉状態を示す矢印アイコン（`▼` / `▶`）を見出し右端に表示する
+
+#### 実装方針
+
+- `Editor.tsx` の各 `editor-section` div を **`AccordionSection`** コンポーネントに置き換える
+- `AccordionSection` は `title: string` と `children` を受け取る汎用コンポーネントとして `app/components/AccordionSection.tsx` に定義する
+- 各子コンポーネント（`EditorHead` など）の内部 `<h2>` 見出しは不要になるため削除する
+
+#### CSS クラス
+
+| クラス | 役割 |
+|--------|------|
+| `.section-header` | クリック可能な見出し行（`cursor: pointer`） |
+| `.section-header-title` | 見出しテキスト（既存 `h2` スタイルを流用） |
+| `.section-header-arrow` | 開閉矢印（右端に配置） |
+| `.section-body` | 開閉対象の本体コンテンツ領域 |
+
+### 4.4 表示ツールバー（sticky ツールバー）
+
+`Editor` コンポーネント内に sticky ツールバーを設け、ヘッダー直下に固定表示する。
+
+- `position: sticky; top: [ヘッダー高さ]; z-index: 99` で画面スクロールに追従する
+- **「表示」ボタン**（`btn-primary`）のみを配置する
+- 表示タイプセレクタは `EditorHead` の元の位置に残す
+- `displayType` state は `EditorHead` で引き続き管理する
+- `openDisplay` 関数を `EditorHead` から `Editor` へ移動し、`displayType` を props で受け取る
+  - または `EditorHead` が `openDisplay` コールバックを受け取り、ボタンだけ外に切り出す方式でも可
+- `EditorHead` の `form-row` から「表示を開く」ボタンのみを撤去する
+
+| 要素 | 詳細 |
+|------|------|
+| 表示ボタン | `btn-primary`、テキスト「表示」、クリックで `openDisplay()` を呼ぶ |
+
+CSS クラス: `.display-toolbar`
+
+### 4.5 `GenericItemList` — 汎用テーブルコンポーネント
 
 `StationList`・`LineList`・`IconList` で共通している「テーブル描画＋行選択のハイライト」ロジックを一箇所に集約した汎用コンポーネント。
 
@@ -293,7 +339,7 @@ type GenericItemListProps<T> = {
 - `ColumnDef.cell` 関数によるカスタムセル描画（アイコン表示、カラーセルなど）
 - 追加フォーム・詳細設定パネルの表示
 
-### 4.3 `LineIconPickerPopup` — 路線記号追加ポップアップ
+### 4.6 `LineIconPickerPopup` — 路線記号追加ポップアップ
 
 `LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームに設置するアイコン選択ポップアップ。
 
@@ -330,7 +376,7 @@ type GenericItemListProps<T> = {
 
 ---
 
-### 4.4 `TransferLinePopup` — 接続路線追加ポップアップ
+### 4.7 `TransferLinePopup` — 接続路線追加ポップアップ
 
 `StationParamSetter` 内の「乗換路線」欄に配置するモーダルポップアップ。
 
@@ -398,7 +444,7 @@ type GenericItemListProps<T> = {
 | `.modal-title` | タイトル行 |
 | `.modal-footer` | ボタン行（右寄せ） |
 
-### 4.5 リスト並び替え・複数選択
+### 4.8 リスト並び替え・複数選択
 
 `StationList`・`LineList`・`IconList` の全リストに共通する「上に移動/下に移動/複数選択」操作を `app/modules/listOperations.ts` に集約する。各リストはこのモジュールの関数を呼び出して使用する。
 
@@ -471,7 +517,7 @@ export function moveDictItemsDown<T>(
 | 下に移動 | 選択行を1ステップ下へ |
 | 複数選択 | トグルボタン（`btn-toggle` クラス） |
 
-### 4.6 `OperationForm` — 運用タブ UI
+### 4.9 `OperationForm` — 運用タブ UI
 
 複数の運用を切り替えるUIをタブ形式で実装する。
 
@@ -544,7 +590,7 @@ isOperationUnused(operation, index, operationList, stationList) → boolean
 - タブラベルの先頭に `(未使用)` を付与
 - CSS クラス `.tab-btn--unused` を追加し、選択状態によらず暗い外観にする
 
-### 4.7 状態管理
+### 4.10 状態管理
 
 `Editor.tsx` が `settingType` の React state（`useState`）を保有し、`setting` と `setSetting` を全子コンポーネントへ props で渡す。各コンポーネントは変更時に `structuredClone(setting)` でディープコピーを作成してから値を書き換え `setSetting` を呼ぶ。
 
@@ -560,14 +606,14 @@ sequenceDiagram
     Component->>Editor: setSetting(_setting)
     Editor-->>Component: 再レンダリング (setting)
 
-    User->>EditorHead: 「表示を開く」ボタン
-    EditorHead->>localStorage: lcdStrage = JSON.stringify(setting)
-    EditorHead->>Display: window.open('./display.html')
+    User->>Editor: 「表示」ボタン（sticky ツールバー）
+    Editor->>localStorage: lcdStrage = JSON.stringify(setting)
+    Editor->>Display: window.open('./display.html')
     Display->>localStorage: JSON.parse(lcdStrage)
     Display-->>User: LCD画面アニメーション
 ```
 
-### 4.8 UI コンポーネント規約
+### 4.11 UI コンポーネント規約
 
 #### トグルスイッチ (`ToggleSwitch`)
 

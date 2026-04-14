@@ -185,7 +185,6 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
 
     return(
         <div>
-            <h2>路線登録</h2>
             {/* lineDict を { key, data } 配列に変換して渡す */}
             <GenericItemList
                 columns={lineColumns}

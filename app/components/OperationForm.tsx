@@ -110,7 +110,6 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
 
     return(
         <div>
-            <h2>運用設定</h2>
             <div className="form-row">
                 {/* 全運用一括適用トグルボタン */}
                 <button

@@ -143,7 +143,6 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
 
     return(
         <div>
-            <h2>アイコン登録</h2>
             {/* iconDict を { key, data } 配列に変換して渡す */}
             <GenericItemList
                 columns={iconColumns}

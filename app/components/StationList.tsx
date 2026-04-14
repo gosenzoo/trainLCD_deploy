@@ -222,7 +222,6 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     return (
         <div>
-            <h2>駅設定</h2>
             {/* 1-based の selectedIndexes を 0-based string key に変換して渡す */}
             <GenericItemList
                 columns={stationColumns}

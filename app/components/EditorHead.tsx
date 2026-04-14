@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
@@ -6,7 +6,10 @@ import ToggleSwitch from './ToggleSwitch'
 
 type editorHeadType = {
     setting: settingType,
-    setSetting: React.Dispatch<React.SetStateAction<settingType>>
+    setSetting: React.Dispatch<React.SetStateAction<settingType>>,
+    // 表示タイプ状態は Editor で管理し、props で受け取る
+    displayType: string,
+    setDisplayType: React.Dispatch<React.SetStateAction<string>>,
 }
 
 function mergeProperties<T extends object, U extends object>(A: T, B: U): T & U {
@@ -19,8 +22,7 @@ function mergeProperties<T extends object, U extends object>(A: T, B: U): T & U 
   return A as T & U;
 }
 
-const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
-    const [displayType, setDisplayType] = useState<string>("tokyu")
+const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType, setDisplayType}) => {
     const router = useRouter()
     let readData: settingType;
 
@@ -72,17 +74,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
     const displayTypeSelectChanged = (e: any) => {
         setDisplayType(e.target.value)
     }
-    const openDisplay = () => {
-        if(displayType === "JW-225"){ 
-            localStorage.setItem('lcdStrage', JSON.stringify(setting))
-            window.open('./Display_JW-225.html')
-        }
-        if(displayType === "tokyu"){ 
-            localStorage.setItem('lcdStrage', JSON.stringify(setting))
-            window.open(`./display.html`, '_blank', 'noopener')
-        }
-        if(displayType === "JE-E131"){ console.log("ないです") }
-    }
 
     const formUpdated = (e:any, field: infoMembers) => {
         if(!setting){
@@ -111,7 +102,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
 
     return(
         <div>
-            <h2>ファイル操作</h2>
             <div className="btn-group">
                 <button onClick={e => {
                     const lcdStrageItem = localStorage.getItem('lcdStrage');
@@ -176,12 +166,11 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
             </div>
             <div className="form-row">
                 <label>表示タイプ</label>
-                <select onChange={displayTypeSelectChanged}>
+                <select onChange={displayTypeSelectChanged} value={displayType}>
                     <option value="tokyu">東急</option>
                     <option value="JW-225">JR西日本 225系</option>
                     <option value="JE-E131">JR東日本 E131系</option>
                 </select>
-                <button onClick={openDisplay} className="btn-primary">表示を開く</button>
             </div>
         </div>
     )
