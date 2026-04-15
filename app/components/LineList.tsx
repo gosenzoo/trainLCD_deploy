@@ -8,7 +8,8 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
-import LineIconPickerPopup from './LineIconPickerPopup'
+import IconNewPopup from './IconNewPopup'
+import IconListPopup from './IconListPopup'
 
 type lineListProps = {
     setting: settingType,
@@ -18,8 +19,8 @@ type lineListProps = {
 const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
-    // 路線記号追加ポップアップの表示フラグ
-    const [isIconPickerOpen, setIsIconPickerOpen] = useState<boolean>(false)
+    // 路線記号ポップアップの表示モード（null: 非表示 / 'new': 新規追加 / 'list': リストから選択）
+    const [iconPickerMode, setIconPickerMode] = useState<'new' | 'list' | null>(null)
 
     const presetIconDict = loadPresetNumIconTexts()
 
@@ -145,7 +146,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
         },
     ]
 
-    // LineIconPickerPopup でアイコンが決定されたとき、選択中路線の lineIconKey に設定する
+    // アイコンが決定されたとき、選択中路線の lineIconKey に設定する
     const handleIconSelect = (key: string) => {
         setSetting(prev => {
             const _setting = structuredClone(prev)
@@ -154,7 +155,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             })
             return _setting
         })
-        setIsIconPickerOpen(false)
+        setIconPickerMode(null)
     }
 
     // 編集フォームに表示する対象：選択中の最後の行
@@ -201,19 +202,26 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                     }
                     return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
                 })()}
-                {/* アイコン一覧から lineIconKey を選択するポップアップを開くボタン */}
-                <button onClick={() => setIsIconPickerOpen(true)}>
-                    選択
-                </button>
+                {/* 新規追加ポップアップ / リストから選択ポップアップを開くボタン */}
+                <button onClick={() => setIconPickerMode('new')}>新規追加</button>
+                <button onClick={() => setIconPickerMode('list')}>リストから選択</button>
             </div>
 
-            {/* 路線記号追加ポップアップ（LineIconPickerPopup コンポーネント） */}
-            {isIconPickerOpen && (
-                <LineIconPickerPopup
+            {/* アイコン新規追加ポップアップ */}
+            {iconPickerMode === 'new' && (
+                <IconNewPopup
                     setting={setting}
                     setSetting={setSetting}
                     onSelect={handleIconSelect}
-                    onClose={() => setIsIconPickerOpen(false)}
+                    onClose={() => setIconPickerMode(null)}
+                />
+            )}
+            {/* アイコンをリストから選択ポップアップ */}
+            {iconPickerMode === 'list' && (
+                <IconListPopup
+                    setting={setting}
+                    onSelect={handleIconSelect}
+                    onClose={() => setIconPickerMode(null)}
                 />
             )}
             <div className="form-row">

@@ -647,8 +647,8 @@ tr:hover td {
   font-weight: 700;
 }
 
-/* 路線記号追加ポップアップ内テーブルコンテナ */
-#lineIconPickerContainer {
+/* IconListPopup テーブルコンテナ */
+#iconListPopupContainer {
   overflow: auto;
   width: fit-content;
   max-width: 100%;
@@ -658,18 +658,18 @@ tr:hover td {
   background: var(--bg-base);
 }
 
-#lineIconPickerTable {
+#iconListPopupTable {
   margin: 0;
   border-spacing: 0;
   width: max-content;
 }
 
-#lineIconPickerTable td {
+#iconListPopupTable td {
   border-bottom: 1px solid var(--border);
   background: var(--bg-base);
 }
 
-#lineIconPickerTable th {
+#iconListPopupTable th {
   border-bottom: 1px solid var(--border);
   background: var(--bg-overlay);
   position: sticky;
@@ -680,7 +680,7 @@ tr:hover td {
   color: var(--text-muted);
 }
 
-#lineIconPickerTable .selected {
+#iconListPopupTable .selected {
   background: var(--accent-dim) !important;
   color: var(--accent-hover) !important;
   font-weight: 700;

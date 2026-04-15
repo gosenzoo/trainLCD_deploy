@@ -8,7 +8,8 @@ import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import AccordionSection from './AccordionSection'
-import LineIconPickerPopup from './LineIconPickerPopup'
+import IconNewPopup from './IconNewPopup'
+import IconListPopup from './IconListPopup'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -30,8 +31,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const [newLineKana, setNewLineKana] = useState<string>('')
     const [newLineEng, setNewLineEng] = useState<string>('')
     const [newLineColor, setNewLineColor] = useState<string>('#000000')
-    // 路線記号追加ポップアップの表示フラグ（接続路線ポップアップ内から開く入れ子モーダル）
-    const [isIconPickerOpen, setIsIconPickerOpen] = useState<boolean>(false)
+    // 路線記号ポップアップの表示モード（null: 非表示 / 'new': 新規追加 / 'list': リストから選択）
+    const [iconPickerMode, setIconPickerMode] = useState<'new' | 'list' | null>(null)
     // 乗換路線リストの選択状態（路線IDリスト）
     const [transferSelectedKeys, setTransferSelectedKeys] = useState<string[]>([])
 
@@ -128,10 +129,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         }
     }
 
-    // LineIconPickerPopup でアイコンが決定されたとき、新規追加タブの路線記号にセットする
+    // アイコンが決定されたとき、新規追加タブの路線記号にセットする
     const handleIconSelect = (key: string) => {
         setNewLineIconKey(key)
-        setIsIconPickerOpen(false)
+        setIconPickerMode(null)
     }
 
     // 乗換路線リストの操作対象配列（targetStation の transfers をスペース分割したもの）
@@ -364,10 +365,9 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                             }
                                             return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
                                         })()}
-                                        {/* アイコン一覧から lineIconKey を選択するポップアップを開くボタン */}
-                                        <button onClick={() => setIsIconPickerOpen(true)}>
-                                            選択
-                                        </button>
+                                        {/* 新規追加ポップアップ / リストから選択ポップアップを開くボタン */}
+                                        <button onClick={() => setIconPickerMode('new')}>新規追加</button>
+                                        <button onClick={() => setIconPickerMode('list')}>リストから選択</button>
                                     </div>
                                     <div className="form-row">
                                         <label>路線名</label>
@@ -433,13 +433,22 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 </div>
             )}
 
-            {/* 路線記号追加ポップアップ（接続路線ポップアップ内から開くため isNested=true で z-index を上げる） */}
-            {isIconPickerOpen && (
-                <LineIconPickerPopup
+            {/* アイコン新規追加ポップアップ（接続路線ポップアップ内から開くため isNested=true で z-index を上げる） */}
+            {iconPickerMode === 'new' && (
+                <IconNewPopup
                     setting={setting}
                     setSetting={setSetting}
                     onSelect={handleIconSelect}
-                    onClose={() => setIsIconPickerOpen(false)}
+                    onClose={() => setIconPickerMode(null)}
+                    isNested={true}
+                />
+            )}
+            {/* アイコンをリストから選択ポップアップ（同じく入れ子モーダル） */}
+            {iconPickerMode === 'list' && (
+                <IconListPopup
+                    setting={setting}
+                    onSelect={handleIconSelect}
+                    onClose={() => setIconPickerMode(null)}
                     isNested={true}
                 />
             )}
