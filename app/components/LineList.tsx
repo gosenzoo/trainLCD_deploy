@@ -8,6 +8,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
+import LineIconPickerPopup from './LineIconPickerPopup'
 
 type lineListProps = {
     setting: settingType,
@@ -17,9 +18,8 @@ type lineListProps = {
 const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     const [selectedIndexes, setSelectedIndexes] = useState<string[]>([])
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
-    // 路線記号追加ポップアップの表示フラグと選択中アイコンキー
+    // 路線記号追加ポップアップの表示フラグ
     const [isIconPickerOpen, setIsIconPickerOpen] = useState<boolean>(false)
-    const [iconPickerSelectedKey, setIconPickerSelectedKey] = useState<string>('')
 
     const presetIconDict = loadPresetNumIconTexts()
 
@@ -145,38 +145,16 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
         },
     ]
 
-    // 路線記号追加ポップアップのアイコン一覧カラム定義
-    const iconPickerColumns: ColumnDef<string | iconParamsType>[] = [
-        {
-            header: 'ID',
-            isSelector: true,
-            cell: (_, key) => key,
-        },
-        {
-            header: 'アイコン',
-            // string なら <img>、iconParamsType なら SVG プリセットを描画する
-            cell: (iconObj) => {
-                if (typeof iconObj === 'string') {
-                    return iconObj ? <img src={iconObj} alt="" width="30px" height="30px" /> : null
-                } else if (iconObj) {
-                    const html = createNumIconFromPreset(presetIconDict, iconObj.presetType, iconObj.symbol, '', iconObj.color)?.outerHTML
-                    return html ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} /> : null
-                }
-                return null
-            },
-        },
-    ]
-
-    // 選択中のアイコンキーを選択中路線の lineIconKey にセットする
-    const applyIconPicker = () => {
-        if (!iconPickerSelectedKey) return
-        const _setting = structuredClone(setting)
-        selectedIndexes.forEach(key => {
-            if (_setting.lineDict[key]) _setting.lineDict[key].lineIconKey = iconPickerSelectedKey
+    // LineIconPickerPopup でアイコンが決定されたとき、選択中路線の lineIconKey に設定する
+    const handleIconSelect = (key: string) => {
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(lineKey => {
+                if (_setting.lineDict[lineKey]) _setting.lineDict[lineKey].lineIconKey = key
+            })
+            return _setting
         })
-        setSetting(_setting)
         setIsIconPickerOpen(false)
-        setIconPickerSelectedKey('')
     }
 
     // 編集フォームに表示する対象：選択中の最後の行
@@ -207,40 +185,36 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             </div>
             <div className="form-row">
                 <label>路線記号</label>
-                <input type="text" id="lineIconKeyInput" onChange={(e) => formUpdated(e, 'lineIconKey')}
-                    value={selectedLine?.lineIconKey ?? ''}
-                />
+                {/* テキストボックスの代わりに現在設定中のアイコンをプレビュー表示する */}
+                {(() => {
+                    const iconKey = selectedLine?.lineIconKey ?? ''
+                    const iconParams = iconKey ? setting.iconDict[iconKey] : undefined
+                    if (typeof iconParams === 'string') {
+                        return iconParams
+                            ? <img src={iconParams} alt={iconKey} width="30px" height="30px" />
+                            : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                    } else if (iconParams) {
+                        const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                        return html
+                            ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} />
+                            : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                    }
+                    return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                })()}
                 {/* アイコン一覧から lineIconKey を選択するポップアップを開くボタン */}
-                <button onClick={() => { setIconPickerSelectedKey(''); setIsIconPickerOpen(true) }}>
-                    路線記号追加
+                <button onClick={() => setIsIconPickerOpen(true)}>
+                    選択
                 </button>
             </div>
 
-            {/* 路線記号追加ポップアップ */}
+            {/* 路線記号追加ポップアップ（LineIconPickerPopup コンポーネント） */}
             {isIconPickerOpen && (
-                <div className="modal-backdrop" onClick={() => setIsIconPickerOpen(false)}>
-                    <div className="modal-dialog" onClick={e => e.stopPropagation()}>
-                        <p className="modal-title">路線記号を選択</p>
-                        <div className="modal-body">
-                            <GenericItemList
-                                columns={iconPickerColumns}
-                                rows={Object.entries(setting.iconDict).map(([key, iconObj]) => ({ key, data: iconObj }))}
-                                selectedKeys={iconPickerSelectedKey ? [iconPickerSelectedKey] : []}
-                                onRowClick={key => setIconPickerSelectedKey(key)}
-                                tableId="lineIconPickerTable"
-                                containerId="lineIconPickerContainer"
-                            />
-                        </div>
-                        <div className="modal-footer">
-                            <button onClick={() => setIsIconPickerOpen(false)}>閉じる</button>
-                            <button
-                                onClick={applyIconPicker}
-                                className="btn-primary"
-                                disabled={!iconPickerSelectedKey}
-                            >この記号を設定</button>
-                        </div>
-                    </div>
-                </div>
+                <LineIconPickerPopup
+                    setting={setting}
+                    setSetting={setSetting}
+                    onSelect={handleIconSelect}
+                    onClose={() => setIsIconPickerOpen(false)}
+                />
             )}
             <div className="form-row">
                 <label>路線名</label>

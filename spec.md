@@ -339,40 +339,116 @@ type GenericItemListProps<T> = {
 - `ColumnDef.cell` 関数によるカスタムセル描画（アイコン表示、カラーセルなど）
 - 追加フォーム・詳細設定パネルの表示
 
-### 4.6 `LineIconPickerPopup` — 路線記号追加ポップアップ
+### 4.6 `LineIconPickerPopup` — 路線記号アイコン選択ポップアップ群
 
-`LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームに設置するアイコン選択ポップアップ。
+`LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームの「路線記号」欄から呼び出す、2 つの独立したポップアップコンポーネント。
+
+#### 路線記号欄の表示仕様
+
+`LineList` の路線編集フォームおよび接続路線追加ポップアップ「新規追加」タブの「路線記号」欄は、テキスト入力ではなくアイコンプレビューで表示する。
+
+- **レイアウト（横並び）**: `路線記号` ラベル → アイコン画像エリア → `新規追加` ボタン → `リストから選択` ボタン
+- アイコン画像エリア: 現在 `lineIconKey` に設定されているアイコンを `iconDict` から引いて描画する
+  - `string`（base64）の場合: `<img>` で表示（30×30px）
+  - `iconParamsType` の場合: `createNumIconFromPreset` で SVG を描画（30×30px）
+  - 未設定・該当なしの場合: 空のプレースホルダー（最低幅 30px 程度）
+- テキストボックスは廃止する
 
 #### トリガー
 
-路線記号（`lineIconKey`）入力欄の横に置いた **「路線記号追加」ボタン** をクリックすると開く。
+路線記号欄の横に置いた 2 つのボタンから開く:
+- **「新規追加」ボタン** → `IconNewPopup` を開く
+- **「リストから選択」ボタン** → `IconListPopup` を開く
 
-#### ポップアップ内容
+---
 
-- **タイトル**: 路線記号を選択
-- **本体**: `GenericItemList` で `iconDict` の一覧を表示
-  - カラム定義: ID（`isSelector: true`）・アイコンプレビュー（`IconList` と同じ描画ロジック）
-  - 単一選択
-- **フッターボタン**:
-  - `この記号を設定` — 選択中のアイコンキーを選択中路線の `lineIconKey` にセットし、ポップアップを閉じる
-  - `閉じる` — 何もせずポップアップを閉じる
+#### 4.6.1 `IconNewPopup` — アイコン新規追加ポップアップ
 
-#### 状態管理
+**ファイル**: `app/components/IconNewPopup.tsx`
 
-| state | 型 | 置き場所 | 説明 |
-|-------|----|----------|------|
-| `isIconPickerOpen` | `boolean` | `LineList` / `StationParamSetter` | ポップアップ表示フラグ |
-| `iconPickerSelectedKey` | `string` | 同上 | 選択中のアイコンキー |
+- タイトル: `アイコン新規追加`
+- サブタブ: `設定で追加` / `画像で追加`（初期値: `設定で追加`）
+- **「設定で追加」サブタブ**:
+  | ラベル | 内容 |
+  |--------|------|
+  | プリセットから登録 | `iconIndexes` をもとにした `<select>` |
+  | アイコンの路線記号 | テキスト入力（例: `TY`） |
+  | 路線カラー | カラーピッカー |
+  - 「アイコン追加」ボタン（`btn-primary`）:
+    1. `iconParamsType` オブジェクトを生成し、`iconDict` の末尾に追加（キーは既存数値キーの最大値+1）
+    2. 追加したアイコンのキーを `onSelect` で親に通知してポップアップを閉じる
+- **「画像で追加」サブタブ**:
+  | ラベル | 内容 |
+  |--------|------|
+  | 画像アップロード | ファイル入力（base64 に変換して保持） |
+  - 「アイコン追加」ボタン（`btn-primary`）:
+    1. base64 文字列を `iconDict` の末尾に追加（キーは既存数値キーの最大値+1）
+    2. 追加したアイコンのキーを `onSelect` で親に通知してポップアップを閉じる
+- **フッターボタン**: `閉じる` のみ
 
-`StationParamSetter` の接続路線追加ポップアップ内に表示する場合も、同じ state・ロジックを `StationParamSetter` 内で管理する。
+**Props**:
+| prop | 型 | 説明 |
+|------|----|------|
+| `setting` | `settingType` | 設定オブジェクト（`iconDict` の参照に使用） |
+| `setSetting` | `Dispatch` | `iconDict` への追加時に使用 |
+| `onSelect` | `(key: string) => void` | アイコン追加・決定時のコールバック（キーを返す） |
+| `onClose` | `() => void` | ポップアップを閉じるコールバック |
+| `isNested` | `boolean?` | `true` のとき `.modal-backdrop-top` を使用（入れ子モーダル対応） |
+
+**内部状態**:
+| state | 型 | 説明 |
+|-------|----|------|
+| `newTab` | `'preset' \| 'image'` | サブタブ（初期値 `'preset'`） |
+| `presetType` | `string` | 設定で追加: プリセット種別 |
+| `presetSymbol` | `string` | 設定で追加: 路線記号 |
+| `presetColor` | `string` | 設定で追加: 路線カラー |
+| `imageData` | `string` | 画像で追加: base64 画像 |
+
+---
+
+#### 4.6.2 `IconListPopup` — アイコンをリストから選択ポップアップ
+
+**ファイル**: `app/components/IconListPopup.tsx`
+
+- タイトル: `アイコンをリストから選択`
+- `GenericItemList` で `iconDict` の一覧を表示（カラム: ID・アイコンプレビュー）、単一選択
+- 「アイコン選択」ボタン（`btn-primary`、未選択時は `disabled`）:
+  - 選択中のアイコンキーを `onSelect` で親に通知してポップアップを閉じる
+- **フッターボタン**: `閉じる` のみ
+
+**Props**:
+| prop | 型 | 説明 |
+|------|----|------|
+| `setting` | `settingType` | 設定オブジェクト（`iconDict` の一覧表示に使用） |
+| `onSelect` | `(key: string) => void` | アイコン決定時のコールバック（キーを返す） |
+| `onClose` | `() => void` | ポップアップを閉じるコールバック |
+| `isNested` | `boolean?` | `true` のとき `.modal-backdrop-top` を使用（入れ子モーダル対応） |
+
+**内部状態**:
+| state | 型 | 説明 |
+|-------|----|------|
+| `listSelectedKey` | `string` | 選択中のアイコンキー |
+
+---
+
+#### 呼び出し元の状態管理変更
+
+`LineList`・`StationParamSetter` の `isIconPickerOpen: boolean` を `iconPickerMode: 'new' | 'list' | null` に置き換える。
+- `null`: 非表示
+- `'new'`: `IconNewPopup` を表示
+- `'list'`: `IconListPopup` を表示
 
 #### CSS
 
-`StationParamSetter` の接続路線追加ポップアップ内から開く場合はポップアップが入れ子になるため、`.modal-backdrop` の `z-index: 1000` より高い `z-index: 1100` を持つ `.modal-backdrop-top` クラスを使用する。
+`StationParamSetter` の接続路線追加ポップアップ内から開く場合はポップアップが入れ子になるため、`isNested={true}` のとき `.modal-backdrop-top`（`z-index: 1100`）を使用する。
 
 | クラス | 役割 |
 |--------|------|
 | `.modal-backdrop-top` | 最前面に表示するオーバーレイ（`z-index: 1100`） |
+
+#### 移行方針
+
+既存の `LineIconPickerPopup.tsx` は `IconNewPopup.tsx` と `IconListPopup.tsx` に分割し、元ファイルは削除する。
 
 ---
 
@@ -408,22 +484,28 @@ type GenericItemListProps<T> = {
 #### ポップアップ内容
 
 - **タイトル**: 接続路線を追加
-- **本体**:
-  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線記号・路線名・路線カラー）
-  - ボタン行: `上に移動` / `下に移動` / `路線追加`（`btn-primary`） / `路線削除`（`btn-danger`） / `複数選択`（`btn-toggle`）
-    - 上下移動・追加・削除は LineList の同機能と同一ロジック（`listOperations.ts` 利用）
-    - 操作結果は `setting.lineDict` に即時反映される（LineList と同じデータを操作）
-  - 路線編集フォーム: 選択中の路線（`transferPopupSelectedKey` の末尾キー）に対して以下を編集可能
+- **タブ切り替え**: `新規追加` / `リストから選択`（初期値: `新規追加`）
+- **「新規追加」タブ**:
+  - 入力フォーム（新規路線用）:
     | ラベル | フィールド |
     |--------|-----------|
     | 路線記号 | `lineIconKey` |
     | 路線名 | `name` |
-    | 路線名かな | `kana`（変更時に `eng` を自動補完） |
+    | 路線名かな | `kana` |
     | 路線名英語 | `eng` |
     | 路線カラー | `color` |
-- **フッターボタン**:
-  - `この路線を追加` — 選択中の路線IDを対象駅の `transfers` フィールドにスペース区切りで追記し、ポップアップを閉じる
-  - `閉じる` — 何もせずポップアップを閉じる
+  - **「路線追加」ボタン（`btn-primary`）**:
+    1. フォームの値で `lineDict` の末尾に新しい路線を追加する（キーは既存最大値+1）
+    2. 追加した路線のIDを、選択中の全駅の `transfers` にスペース区切りで追記する（重複はスキップ）
+    3. ポップアップを閉じ、フォームをリセットする
+- **「リストから選択」タブ**:
+  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線記号・路線名・路線カラー）
+  - ボタン行: `複数選択`（`btn-toggle`）のみ
+  - **「路線追加」ボタン（`btn-primary`）**:
+    1. 選択中の路線キーを `lineDict` の並び順（上から）でソートして取得する
+    2. 選択中の全駅の `transfers` に順番にスペース区切りで追記する（重複はスキップ）
+    3. ポップアップを閉じる
+- **フッターボタン**: `閉じる` のみ（追加実行はタブ内ボタンで行う）
 
 #### 状態管理
 
@@ -432,8 +514,14 @@ type GenericItemListProps<T> = {
 | state | 型 | 説明 |
 |-------|----|------|
 | `isTransferPopupOpen` | `boolean` | ポップアップ表示フラグ |
-| `transferPopupSelectedKey` | `string[]` | ポップアップ内で選択中の路線キー（複数選択対応） |
-| `isPopupMultiSelect` | `boolean` | ポップアップ内複数選択モードフラグ |
+| `popupTab` | `'new' \| 'list'` | アクティブタブ（初期値 `'new'`） |
+| `transferPopupSelectedKey` | `string[]` | 「リストから選択」タブで選択中の路線キー |
+| `isPopupMultiSelect` | `boolean` | リストタブの複数選択モードフラグ |
+| `newLineIconKey` | `string` | 「新規追加」タブの路線記号入力値 |
+| `newLineName` | `string` | 「新規追加」タブの路線名入力値 |
+| `newLineKana` | `string` | 「新規追加」タブの路線名かな入力値 |
+| `newLineEng` | `string` | 「新規追加」タブの路線名英語入力値 |
+| `newLineColor` | `string` | 「新規追加」タブの路線カラー入力値（初期値 `#000000`） |
 
 #### 入れ子アコーディオン（詳細設定）
 

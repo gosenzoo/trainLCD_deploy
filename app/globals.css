@@ -569,6 +569,27 @@ tr:hover td {
   box-shadow: var(--shadow);
 }
 
+/* 縦いっぱいに表示するモーダルダイアログ修飾子（上下に余白を設けた全高表示） */
+.modal-dialog--tall {
+  height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
+}
+
+/* 縦いっぱいダイアログ内のタブ本体エリアは残り領域をすべて埋める */
+.modal-dialog--tall .tab-form-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 縦いっぱいダイアログ内の接続路線リストコンテナは残り領域を埋める（max-height 制約を解除） */
+.modal-dialog--tall #transferLinePopupContainer {
+  flex: 1;
+  max-height: none;
+  min-height: 0;
+}
+
 /* タイトル行 */
 .modal-title {
   font-family: 'BIZ UDGothic', sans-serif;
@@ -872,6 +893,16 @@ button.tab-btn.active.tab-btn--unused {
   z-index: 1;
   background: var(--bg-surface);
 }
+
+/* ============================================
+   フォーム無効（グレーアウト）
+   ============================================ */
+.form-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+}
+
 
 /* ============================================
    ページフッター
