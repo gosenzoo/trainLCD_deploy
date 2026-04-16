@@ -338,6 +338,13 @@ button.btn-danger:hover {
   background: rgba(248, 81, 73, 0.15);
 }
 
+/* アイコンボタン: テキストなし・正方形（幅=高さ） */
+button.btn-icon {
+  padding: 6px;
+  aspect-ratio: 1 / 1;
+  justify-content: center;
+}
+
 /* ボタングループ */
 .btn-group {
   display: flex;

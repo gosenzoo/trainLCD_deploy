@@ -8,6 +8,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
+import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 
 type stationListProps = {
@@ -236,10 +237,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 containerId="stationsTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
-                <button onClick={moveUp}>上に移動</button>
-                <button onClick={moveDown}>下に移動</button>
-                <button onClick={addStation} className="btn-primary">駅追加</button>
-                <button onClick={deleteStation} className="btn-danger">駅削除</button>
+                {/* 上矢印・下矢印・追加(+)・削除(ゴミ箱) をSVGアイコンで表示 */}
+                <button onClick={moveUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                <button onClick={moveDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                <button onClick={addStation} className="btn-icon btn-primary" title="駅追加"><IconPlus/></button>
+                <button onClick={deleteStation} className="btn-icon btn-danger" title="駅削除"><IconTrash/></button>
                 {/* 複数選択トグルボタン */}
                 <button
                     onClick={() => setIsMultiSelect(v => !v)}

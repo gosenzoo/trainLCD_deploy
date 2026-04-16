@@ -10,6 +10,7 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
+import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 
 type lineListProps = {
     setting: settingType,
@@ -174,10 +175,11 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 containerId="linesTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
-                <button onClick={moveUp}>上に移動</button>
-                <button onClick={moveDown}>下に移動</button>
-                <button onClick={addLine} className="btn-primary">路線追加</button>
-                <button onClick={deleteLine} className="btn-danger">路線削除</button>
+                {/* 上矢印・下矢印・追加(+)・削除(ゴミ箱) をSVGアイコンで表示 */}
+                <button onClick={moveUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                <button onClick={moveDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                <button onClick={addLine} className="btn-icon btn-primary" title="路線追加"><IconPlus/></button>
+                <button onClick={deleteLine} className="btn-icon btn-danger" title="路線削除"><IconTrash/></button>
                 {/* 複数選択トグルボタン */}
                 <button
                     onClick={() => setIsMultiSelect(v => !v)}

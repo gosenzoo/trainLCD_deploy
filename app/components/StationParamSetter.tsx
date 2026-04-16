@@ -10,6 +10,7 @@ import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import AccordionSection from './AccordionSection'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
+import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -318,9 +319,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 containerId="transferLineDisplayContainer"
             />
             <div className="btn-group" style={{marginTop: '4px', marginBottom: '6px'}}>
-                <button onClick={moveTransferUp}>上に移動</button>
-                <button onClick={moveTransferDown}>下に移動</button>
-                <button onClick={deleteTransfer} className="btn-danger">削除</button>
+                {/* 上矢印・下矢印・削除(ゴミ箱) をSVGアイコンで表示 */}
+                <button onClick={moveTransferUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                <button onClick={moveTransferDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                <button onClick={deleteTransfer} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
                 {/* 接続路線追加ボタン: クリックでポップアップを開く */}
                 <button onClick={() => { setTransferPopupSelectedKey([]); setIsPopupMultiSelect(false); setIsTransferPopupOpen(true) }}>
                     接続路線を追加

@@ -9,6 +9,7 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
+import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
 
 type iconListProps = {
     setting: settingType,
@@ -153,9 +154,10 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                 containerId="iconTableContainer"
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
-                <button onClick={moveUp}>上に移動</button>
-                <button onClick={moveDown}>下に移動</button>
-                <button onClick={iconDeleteButtonClicked} className="btn-danger">削除</button>
+                {/* 上矢印・下矢印・削除(ゴミ箱) をSVGアイコンで表示 */}
+                <button onClick={moveUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                <button onClick={moveDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                <button onClick={iconDeleteButtonClicked} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
                 {/* 複数選択トグルボタン */}
                 <button
                     onClick={() => setIsMultiSelect(v => !v)}
