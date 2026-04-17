@@ -270,38 +270,38 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             {activeSection === 'basic' && (<>
                 <label>駅名</label>
                 <input type="text" id="nameInput" onChange={(e) => formUpdated(e, 'name')}
-                    value={targetStation?.name}
+                    value={targetStation?.name ?? ''}
                 ></input>
                 <br></br>
                 <label>駅名かな</label>
                 <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
-                    value={targetStation?.kana}
+                    value={targetStation?.kana ?? ''}
                 ></input>
                 <br></br>
                 <label>駅名英語</label>
                 <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
-                    value={targetStation?.eng}
+                    value={targetStation?.eng ?? ''}
                 ></input>
                 <br></br>
                 <label>駅ナンバリング</label>
                 <input type="text" id="numberInput" onChange={(e) => formUpdated(e, 'number')}
-                    value={targetStation?.number}
+                    value={targetStation?.number ?? ''}
                 ></input>
                 <br></br>
                 <label>路線カラー</label>
                 <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'lineColor')}
-                    value={targetStation?.lineColor}
+                    value={targetStation?.lineColor ?? '#000000'}
                 ></input>
                 <br></br>
                 <label>ナンバリング記号</label>
-                <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey}>
+                <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey ?? ''}>
                     {numberIndexes.map(num => (
                         <option key={num.key} value={num.key}>{num.name}</option>
                     ))}
                 </select>
                 <br></br>
                 <label>ナンバリング表示形式</label>
-                <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType}>
+                <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType ?? '0'}>
                     <option value="0">テキスト</option>
                     <option value="1">アイコン</option>
                 </select>
@@ -454,7 +454,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 )}
                 <br></br>
                 <label>開くドア</label>
-                <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide}>
+                <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide ?? 'right'}>
                     <option value={'right'}>右</option>
                     <option value={'left'}>左</option>
                 </select>
@@ -465,17 +465,17 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             {activeSection === 'defaultLine' && (<>
                 <label>次区間所要時間(分)</label>
                 <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
-                    value={targetStation?.sectionTime}
+                    value={targetStation?.sectionTime ?? ''}
                 ></input>
                 <br></br>
                 <label>次区間路線ID</label>
                 <input type="text" id="lineIdInput" onChange={(e) => formUpdated(e, 'lineId')}
-                    value={targetStation?.lineId}
+                    value={targetStation?.lineId ?? ''}
                 ></input>
                 <br></br>
                 <label>乗換案内</label>
                 <textarea id="transferTextInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferText')}
-                    value={targetStation?.transferText}
+                    value={targetStation?.transferText ?? ''}
                 ></textarea>
                 <select onChange={(e) => {
                     if (!e.target.value) return;
@@ -494,7 +494,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <br></br>
                 <label>乗換案内(英語)</label>
                 <textarea id="transferTextEngInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferTextEng')}
-                    value={targetStation?.transferTextEng}
+                    value={targetStation?.transferTextEng ?? ''}
                 ></textarea>
                 <select onChange={(e) => {
                     if (!e.target.value) return;
@@ -536,22 +536,22 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             {activeSection === 'platform' && (<>
                 <label>ホーム乗換案内行ごと表示数</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
-                    value={targetStation?.transferCountLineP}
+                    value={targetStation?.transferCountLineP ?? ''}
                 ></input>
                 <br></br>
                 <label>スロット分割数</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}
-                    value={targetStation?.slotNum}
+                    value={targetStation?.slotNum ?? ''}
                 ></input>
                 <br></br>
                 <label>列車左端スロット</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'leftSlotInd')}
-                    value={targetStation?.leftSlotInd}
+                    value={targetStation?.leftSlotInd ?? ''}
                 ></input>
                 <br></br>
                 <label>ホーム向側列車の路線ID</label>
                 <input id="otherTrainIDInput" type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
-                    value={targetStation?.otherLineInd}
+                    value={targetStation?.otherLineInd ?? ''}
                 ></input>
                 <select onChange={e => {
                     if (!e.target.value) return;
@@ -570,12 +570,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <br></br>
                 <label>向側列車両数</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'otherCarNum')}
-                    value={targetStation?.otherCarNum}
+                    value={targetStation?.otherCarNum ?? ''}
                 ></input>
                 <br></br>
                 <label>向側列車左端スロット</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
-                    value={targetStation?.otherLeftSlotInd}
+                    value={targetStation?.otherLeftSlotInd ?? ''}
                 ></input>
                 <br></br>
             </>)}

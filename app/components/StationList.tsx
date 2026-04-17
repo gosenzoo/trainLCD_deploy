@@ -51,7 +51,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
         let _index = _setting.stationList.length
         if(selectedIndexes.length > 0){
-            _index = selectedIndexes[selectedIndexes.length - 1]
+            // 削除後などに古いインデックスが残っている場合に備えてリスト長でクランプする
+            _index = Math.min(selectedIndexes[selectedIndexes.length - 1], _setting.stationList.length)
         }
 
         let _number = ""
@@ -80,11 +81,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             otherCarNum: "0", otherLeftSlotInd: "0"
         })
         setSetting(_setting)
-        // 未選択時は末尾追加なので新しい末尾インデックス（1-based）を選択状態にする
-        const newIndex = selectedIndexes.length > 0
-            ? selectedIndexes[selectedIndexes.length - 1] + 1
-            : _setting.stationList.length
-        setSelectedIndexes([newIndex])
+        // splice の実際の挿入位置（0-based: _index）を 1-based に変換して選択する
+        setSelectedIndexes([_index + 1])
     }
 
     const deleteStation = () => {
@@ -94,7 +92,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             _setting.stationList.splice(ind - 1, 1)
         })
         setSetting(_setting)
-        setSelectedIndexes(isMultiSelect ? [] : [selectedIndexes[selectedIndexes.length - 1]])
+        // 削除後にリストが空になった場合は選択を解除する（古いインデックスが残らないように）
+        if (_setting.stationList.length === 0) {
+            setSelectedIndexes([])
+        } else {
+            setSelectedIndexes(isMultiSelect ? [] : [selectedIndexes[selectedIndexes.length - 1]])
+        }
     }
 
     const allSelectButtonClicked = () => {

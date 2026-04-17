@@ -99,6 +99,8 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             // base64 画像 URL をそのまま文字列として格納
             _setting.iconDict[newIconName] = newIconImage
             setSetting(_setting)
+            // 追加したアイコンを自動選択する
+            setSelectedIndexes([newIconName])
         }
         if(method === 'preset'){
             // プリセット情報をオブジェクトとして格納
@@ -109,6 +111,8 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             }
             _setting.iconDict[newIconName] = iconParams
             setSetting(_setting)
+            // 追加したアイコンを自動選択する
+            setSelectedIndexes([newIconName])
         }
     }
 

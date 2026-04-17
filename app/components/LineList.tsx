@@ -88,6 +88,8 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             color: ""
         }
         setSetting(_setting)
+        // 追加した路線を自動選択する
+        setSelectedIndexes([String(_index)])
     }
 
     const deleteLine = () => {

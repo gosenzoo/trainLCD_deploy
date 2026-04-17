@@ -638,6 +638,16 @@ export function moveDictItemsDown<T>(
 | 下に移動 | 選択行を1ステップ下へ |
 | 複数選択 | トグルボタン（`btn-toggle` クラス） |
 
+#### 要素追加時の自動選択
+
+全リストにおいて、要素を追加した直後に追加された行を自動選択状態にする。
+
+| リスト | 追加操作 | 自動選択キー |
+|--------|----------|-------------|
+| `StationList` | 駅追加ボタン（`addStation`） | 追加された駅の 1-based インデックス |
+| `LineList` | 路線追加ボタン（`addLine`） | 追加された路線の数値キー（文字列） |
+| `IconList` | アイコン追加ボタン（`iconAddButtonClicked`） | 登録名として入力した文字列（`newIconName`） |
+
 ### 4.9 `OperationForm` — 運用タブ UI
 
 複数の運用を切り替えるUIをタブ形式で実装する。
