@@ -211,7 +211,7 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                     {
                         numberIndexes.map(num => {
                             return(
-                                <option value={num.key}>{num.name}</option>
+                                <option key={num.key} value={num.key}>{num.name}</option>
                             )
                         })
                     }
