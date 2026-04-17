@@ -7,7 +7,6 @@ import GenericItemList, { ColumnDef } from './GenericItemList'
 import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
-import AccordionSection from './AccordionSection'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
 import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
@@ -15,10 +14,12 @@ import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
 type stationParamsSetterProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>,
-    selectedIndexes: number[]
+    selectedIndexes: number[],
+    // 表示するセクション（StationList のアクティブタブに連動）
+    activeSection: 'basic' | 'defaultLine' | 'platform'
 }
 
-const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes}) => {
+const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes, activeSection}) => {
     // 接続路線追加ポップアップの表示フラグ
     const [isTransferPopupOpen, setIsTransferPopupOpen] = useState<boolean>(false)
     // ポップアップ内アクティブタブ（新規追加 / リストから選択）
@@ -263,341 +264,322 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const isNoSelection = selectedIndexes.length === 0
 
     return (
-        <div>
-            {/* 詳細設定以外のフォーム部分: 駅未選択時にグレーアウト */}
-            <div className={isNoSelection ? 'form-disabled' : ''}>
-            <label>駅名</label>
-            <input type="text" id="nameInput" onChange={(e) => formUpdated(e, 'name')}
-                value={ targetStation?.name}
-            ></input>
-            <br></br>
-            <label>駅名かな</label>
-            <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
-                value={ targetStation?.kana}
-            ></input>
-            <br></br>
-            <label>駅名英語</label>
-            <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
-                value={ targetStation?.eng}
-            ></input>
-            <br></br>
-            <label>駅ナンバリング</label>
-            <input type="text" id="numberInput" onChange={(e) => formUpdated(e, 'number')}
-                value={ targetStation?.number}
-            ></input>
-            <br></br>
-            <label>路線カラー</label>
-            <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'lineColor')}
-                value={ targetStation?.lineColor}
-            ></input>
-            <br></br>
-            <label>ナンバリング記号</label>
-            <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey}>
-                {
-                    numberIndexes.map(num => {
-                        return(
-                            <option value={num.key}>{num.name}</option>
-                        )
-                    })
-                }
-            </select>
-            <br></br>
-            <label>ナンバリング表示形式</label>
-            <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType}>
-                <option value="0">テキスト</option>
-                <option value="1">アイコン</option>
-            </select>
-            <br></br>
-            <label>乗換路線</label>
-            {/* transfers に登録済みの路線を選択・操作可能なテーブルで表示する */}
-            <GenericItemList
-                columns={transferDisplayColumns}
-                rows={transfersArr.map(id => ({ key: id, data: setting.lineDict[id] }))}
-                selectedKeys={transferSelectedKeys}
-                onRowClick={key => setTransferSelectedKeys([key])}
-                tableId="transferLineDisplayTable"
-                containerId="transferLineDisplayContainer"
-            />
-            <div className="btn-group" style={{marginTop: '4px', marginBottom: '6px'}}>
-                {/* 上矢印・下矢印・削除(ゴミ箱) をSVGアイコンで表示 */}
-                <button onClick={moveTransferUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
-                <button onClick={moveTransferDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
-                <button onClick={deleteTransfer} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
-                {/* 接続路線追加ボタン: クリックでポップアップを開く */}
-                <button onClick={() => { setTransferPopupSelectedKey([]); setIsPopupMultiSelect(false); setIsTransferPopupOpen(true) }}>
-                    接続路線を追加
-                </button>
-            </div>
+        <div className={isNoSelection ? 'form-disabled' : ''}>
 
-            {/* 接続路線追加ポップアップ */}
-            {isTransferPopupOpen && (
-                <div className="modal-backdrop" onClick={() => setIsTransferPopupOpen(false)}>
-                    {/* modal-dialog--tall: タブ状態によらず縦いっぱいに固定表示 */}
-                <div className="modal-dialog modal-dialog--tall" onClick={e => e.stopPropagation()}>
-                        <p className="modal-title">接続路線を追加</p>
-                        {/* タブ切り替え */}
-                        <div className="operation-tabs" style={{margin: '0 0 0 0'}}>
-                            <button
-                                onClick={() => setPopupTab('new')}
-                                className={`tab-btn${popupTab === 'new' ? ' active' : ''}`}
-                            >新規追加</button>
-                            <button
-                                onClick={() => setPopupTab('list')}
-                                className={`tab-btn${popupTab === 'list' ? ' active' : ''}`}
-                            >リストから選択</button>
-                        </div>
-                        <div className="tab-form-body">
-                            {/* 新規追加タブ: 縦いっぱいダイアログ内で余白を埋めてコンテンツをスクロール可能にする */}
-                            {popupTab === 'new' && (
-                                <div style={{flex: 1, minHeight: 0, overflowY: 'auto'}}>
-                                    <div className="form-row">
-                                        <label>路線記号</label>
-                                        {/* テキストボックスの代わりに現在設定中のアイコンをプレビュー表示する */}
-                                        {(() => {
-                                            const iconParams = newLineIconKey ? setting.iconDict[newLineIconKey] : undefined
-                                            if (typeof iconParams === 'string') {
-                                                return iconParams
-                                                    ? <img src={iconParams} alt={newLineIconKey} width="30px" height="30px" />
-                                                    : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
-                                            } else if (iconParams) {
-                                                const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
-                                                return html
-                                                    ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} />
-                                                    : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
-                                            }
-                                            return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
-                                        })()}
-                                        {/* 新規追加ポップアップ / リストから選択ポップアップを開くボタン */}
-                                        <button onClick={() => setIconPickerMode('new')}>新規追加</button>
-                                        <button onClick={() => setIconPickerMode('list')}>リストから選択</button>
+            {/* ===== 駅基本設定タブ ===== */}
+            {activeSection === 'basic' && (<>
+                <label>駅名</label>
+                <input type="text" id="nameInput" onChange={(e) => formUpdated(e, 'name')}
+                    value={targetStation?.name}
+                ></input>
+                <br></br>
+                <label>駅名かな</label>
+                <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
+                    value={targetStation?.kana}
+                ></input>
+                <br></br>
+                <label>駅名英語</label>
+                <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
+                    value={targetStation?.eng}
+                ></input>
+                <br></br>
+                <label>駅ナンバリング</label>
+                <input type="text" id="numberInput" onChange={(e) => formUpdated(e, 'number')}
+                    value={targetStation?.number}
+                ></input>
+                <br></br>
+                <label>路線カラー</label>
+                <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'lineColor')}
+                    value={targetStation?.lineColor}
+                ></input>
+                <br></br>
+                <label>ナンバリング記号</label>
+                <select onChange={(e) => {formUpdated(e, 'numIconPresetKey')}} value={targetStation?.numIconPresetKey}>
+                    {numberIndexes.map(num => (
+                        <option key={num.key} value={num.key}>{num.name}</option>
+                    ))}
+                </select>
+                <br></br>
+                <label>ナンバリング表示形式</label>
+                <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType}>
+                    <option value="0">テキスト</option>
+                    <option value="1">アイコン</option>
+                </select>
+                <br></br>
+                <label>乗換路線</label>
+                {/* transfers に登録済みの路線を選択・操作可能なテーブルで表示する */}
+                <GenericItemList
+                    columns={transferDisplayColumns}
+                    rows={transfersArr.map(id => ({ key: id, data: setting.lineDict[id] }))}
+                    selectedKeys={transferSelectedKeys}
+                    onRowClick={key => setTransferSelectedKeys([key])}
+                    tableId="transferLineDisplayTable"
+                    containerId="transferLineDisplayContainer"
+                />
+                <div className="btn-group" style={{marginTop: '4px', marginBottom: '6px'}}>
+                    {/* 上矢印・下矢印・削除(ゴミ箱) をSVGアイコンで表示 */}
+                    <button onClick={moveTransferUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                    <button onClick={moveTransferDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                    <button onClick={deleteTransfer} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
+                    {/* 接続路線追加ボタン: クリックでポップアップを開く */}
+                    <button onClick={() => { setTransferPopupSelectedKey([]); setIsPopupMultiSelect(false); setIsTransferPopupOpen(true) }}>
+                        接続路線を追加
+                    </button>
+                </div>
+
+                {/* 接続路線追加ポップアップ */}
+                {isTransferPopupOpen && (
+                    <div className="modal-backdrop" onClick={() => setIsTransferPopupOpen(false)}>
+                        {/* modal-dialog--tall: タブ状態によらず縦いっぱいに固定表示 */}
+                        <div className="modal-dialog modal-dialog--tall" onClick={e => e.stopPropagation()}>
+                            <p className="modal-title">接続路線を追加</p>
+                            {/* タブ切り替え */}
+                            <div className="operation-tabs" style={{margin: '0 0 0 0'}}>
+                                <button
+                                    onClick={() => setPopupTab('new')}
+                                    className={`tab-btn${popupTab === 'new' ? ' active' : ''}`}
+                                >新規追加</button>
+                                <button
+                                    onClick={() => setPopupTab('list')}
+                                    className={`tab-btn${popupTab === 'list' ? ' active' : ''}`}
+                                >リストから選択</button>
+                            </div>
+                            <div className="tab-form-body">
+                                {/* 新規追加タブ: 縦いっぱいダイアログ内で余白を埋めてコンテンツをスクロール可能にする */}
+                                {popupTab === 'new' && (
+                                    <div style={{flex: 1, minHeight: 0, overflowY: 'auto'}}>
+                                        <div className="form-row">
+                                            <label>路線記号</label>
+                                            {/* テキストボックスの代わりに現在設定中のアイコンをプレビュー表示する */}
+                                            {(() => {
+                                                const iconParams = newLineIconKey ? setting.iconDict[newLineIconKey] : undefined
+                                                if (typeof iconParams === 'string') {
+                                                    return iconParams
+                                                        ? <img src={iconParams} alt={newLineIconKey} width="30px" height="30px" />
+                                                        : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                                                } else if (iconParams) {
+                                                    const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                                                    return html
+                                                        ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} />
+                                                        : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                                                }
+                                                return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                                            })()}
+                                            {/* 新規追加ポップアップ / リストから選択ポップアップを開くボタン */}
+                                            <button onClick={() => setIconPickerMode('new')}>新規追加</button>
+                                            <button onClick={() => setIconPickerMode('list')}>リストから選択</button>
+                                        </div>
+                                        <div className="form-row">
+                                            <label>路線名</label>
+                                            <input type="text" value={newLineName}
+                                                onChange={e => setNewLineName(e.target.value)} />
+                                        </div>
+                                        <div className="form-row">
+                                            <label>路線名かな</label>
+                                            <input type="text" value={newLineKana}
+                                                onChange={e => {
+                                                    setNewLineKana(e.target.value)
+                                                    // かな入力時にローマ字を自動補完
+                                                    setNewLineEng(kanaToAlphabet(e.target.value, 1))
+                                                }} />
+                                        </div>
+                                        <div className="form-row">
+                                            <label>路線名英語</label>
+                                            <input type="text" value={newLineEng}
+                                                onChange={e => setNewLineEng(e.target.value)} />
+                                        </div>
+                                        <div className="form-row">
+                                            <label>路線カラー</label>
+                                            <input type="color" value={newLineColor}
+                                                onChange={e => setNewLineColor(e.target.value)} />
+                                        </div>
+                                        <div className="btn-group" style={{marginTop: '8px'}}>
+                                            <button onClick={addNewLine} className="btn-primary">路線追加</button>
+                                        </div>
                                     </div>
-                                    <div className="form-row">
-                                        <label>路線名</label>
-                                        <input type="text" value={newLineName}
-                                            onChange={e => setNewLineName(e.target.value)} />
+                                )}
+                                {/* リストから選択タブ: 縦いっぱいダイアログ内でリストが残り領域を占める */}
+                                {popupTab === 'list' && (
+                                    <div style={{flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column'}}>
+                                        <GenericItemList
+                                            columns={lineColumns}
+                                            rows={Object.entries(setting.lineDict).map(([key, line]) => ({ key, data: line }))}
+                                            selectedKeys={transferPopupSelectedKey}
+                                            onRowClick={popupHandleRowClick}
+                                            tableId="transferLinePopupTable"
+                                            containerId="transferLinePopupContainer"
+                                        />
+                                        <div className="btn-group" style={{marginTop: '8px'}}>
+                                            {/* 複数選択ボタンのみ */}
+                                            <button
+                                                onClick={() => setIsPopupMultiSelect(v => !v)}
+                                                className={`btn-toggle${isPopupMultiSelect ? ' btn-toggle--active' : ''}`}
+                                            >複数選択</button>
+                                        </div>
+                                        <div className="btn-group">
+                                            <button
+                                                onClick={addTransferLineFromList}
+                                                className="btn-primary"
+                                                disabled={transferPopupSelectedKey.length === 0}
+                                            >路線追加</button>
+                                        </div>
                                     </div>
-                                    <div className="form-row">
-                                        <label>路線名かな</label>
-                                        <input type="text" value={newLineKana}
-                                            onChange={e => {
-                                                setNewLineKana(e.target.value)
-                                                // かな入力時にローマ字を自動補完
-                                                setNewLineEng(kanaToAlphabet(e.target.value, 1))
-                                            }} />
-                                    </div>
-                                    <div className="form-row">
-                                        <label>路線名英語</label>
-                                        <input type="text" value={newLineEng}
-                                            onChange={e => setNewLineEng(e.target.value)} />
-                                    </div>
-                                    <div className="form-row">
-                                        <label>路線カラー</label>
-                                        <input type="color" value={newLineColor}
-                                            onChange={e => setNewLineColor(e.target.value)} />
-                                    </div>
-                                    <div className="btn-group" style={{marginTop: '8px'}}>
-                                        <button onClick={addNewLine} className="btn-primary">路線追加</button>
-                                    </div>
-                                </div>
-                            )}
-                            {/* リストから選択タブ: 縦いっぱいダイアログ内でリストが残り領域を占める */}
-                            {popupTab === 'list' && (
-                                <div style={{flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column'}}>
-                                    <GenericItemList
-                                        columns={lineColumns}
-                                        rows={Object.entries(setting.lineDict).map(([key, line]) => ({ key, data: line }))}
-                                        selectedKeys={transferPopupSelectedKey}
-                                        onRowClick={popupHandleRowClick}
-                                        tableId="transferLinePopupTable"
-                                        containerId="transferLinePopupContainer"
-                                    />
-                                    <div className="btn-group" style={{marginTop: '8px'}}>
-                                        {/* 複数選択ボタンのみ */}
-                                        <button
-                                            onClick={() => setIsPopupMultiSelect(v => !v)}
-                                            className={`btn-toggle${isPopupMultiSelect ? ' btn-toggle--active' : ''}`}
-                                        >複数選択</button>
-                                    </div>
-                                    <div className="btn-group">
-                                        <button
-                                            onClick={addTransferLineFromList}
-                                            className="btn-primary"
-                                            disabled={transferPopupSelectedKey.length === 0}
-                                        >路線追加</button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button onClick={() => setIsTransferPopupOpen(false)}>閉じる</button>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button onClick={() => setIsTransferPopupOpen(false)}>閉じる</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* アイコン新規追加ポップアップ（接続路線ポップアップ内から開くため isNested=true で z-index を上げる） */}
-            {iconPickerMode === 'new' && (
-                <IconNewPopup
-                    setting={setting}
-                    setSetting={setSetting}
-                    onSelect={handleIconSelect}
-                    onClose={() => setIconPickerMode(null)}
-                    isNested={true}
-                />
-            )}
-            {/* アイコンをリストから選択ポップアップ（同じく入れ子モーダル） */}
-            {iconPickerMode === 'list' && (
-                <IconListPopup
-                    setting={setting}
-                    onSelect={handleIconSelect}
-                    onClose={() => setIconPickerMode(null)}
-                    isNested={true}
-                />
-            )}
-            <br></br>
-            <label>開くドア</label>
-            <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide}>
-                <option value={'right'}>右</option>
-                <option value={'left'}>左</option>
-            </select>
-            <br></br>
-            </div>{/* /form-disabled (詳細設定以外) */}
-            {/* 次区間所要時間以降の詳細設定を入れ子アコーディオンでまとめる（デフォルト閉じ） */}
-            {/* アコーディオン見出しはグレーアウト対象外。中身のみグレーアウトする */}
-            <AccordionSection title="詳細設定" defaultOpen={false}>
-            <div className={isNoSelection ? 'form-disabled' : ''}>
-            <label>次区間所要時間(分)</label>
-            <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
-                value={ targetStation?.sectionTime}
-            ></input>
-            <br></br>
-            <label>次区間路線ID</label>
-            <input type="text" id="lineIdInput" onChange={(e) => formUpdated(e, 'lineId')}
-                value={ targetStation?.lineId}
-            ></input>
-            <br></br>
-            <label>乗換案内</label>
-            <textarea id="transferTextInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferText')}
-                value={ targetStation?.transferText}
-            ></textarea>
-            <select onChange={(e) => {
-                if (!e.target.value) return;
-                let textArea = document.getElementById("transferTextInput") as HTMLTextAreaElement;
-                if(!textArea){ return; }
-                insertAtCaret(textArea, `:${e.target.value}:`);
-                targetStation.transferText = textArea.value;
-                // 選択をリセット（連続で同じ項目を挿入できるように）
-                e.target.value = '路線記号を追加';
-            }}>
-                <option>路線記号を追加</option>
-                {
-                    Object.keys(setting.iconDict).map((key, index) => {
-                        return(
-                            <option key={index} value={key}>
-                                {key}
-                            </option>
-                        )
-                    })
-                }
-            </select>
-            <br></br>
-            <label>乗換案内(英語)</label>
-            <textarea id="transferTextEngInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferTextEng')}
-                value={ targetStation?.transferTextEng }
-            ></textarea>
-            <select onChange={(e) => {
-                if (!e.target.value) return;
-                let textAreaEng = document.getElementById("transferTextEngInput") as HTMLTextAreaElement;
-                if(!textAreaEng){ return; }
-                insertAtCaret(textAreaEng, `:${e.target.value}:`);
-                targetStation.transferTextEng = textAreaEng.value;
-                // 選択をリセット（連続で同じ項目を挿入できるように）
-                e.target.value = '路線記号を追加';
-            }}>
-                <option>路線記号を追加</option>
-                {
-                    Object.keys(setting.iconDict).map((key, index) => {
-                        return(
-                            <option key={index} value={key}>
-                                {key}
-                            </option>
-                        )
-                    })
-                }
-            </select>
-            <br></br>
-            <button onClick={(e) => {
-                let transferText: string = "";
-                let transferTextEng :string = "";
-                targetStation.transfers.split(" ").forEach(id => {
-                    transferText += `:${setting.lineDict[id].lineIconKey}:`
-                    transferText += setting.lineDict[id].name;
-                    transferText += "\n";
-                    transferTextEng += `:${setting.lineDict[id].lineIconKey}:`
-                    transferTextEng += setting.lineDict[id].eng;
-                    transferTextEng += "\n";
-                });
+                {/* アイコン新規追加ポップアップ（接続路線ポップアップ内から開くため isNested=true で z-index を上げる） */}
+                {iconPickerMode === 'new' && (
+                    <IconNewPopup
+                        setting={setting}
+                        setSetting={setSetting}
+                        onSelect={handleIconSelect}
+                        onClose={() => setIconPickerMode(null)}
+                        isNested={true}
+                    />
+                )}
+                {/* アイコンをリストから選択ポップアップ（同じく入れ子モーダル） */}
+                {iconPickerMode === 'list' && (
+                    <IconListPopup
+                        setting={setting}
+                        onSelect={handleIconSelect}
+                        onClose={() => setIconPickerMode(null)}
+                        isNested={true}
+                    />
+                )}
+                <br></br>
+                <label>開くドア</label>
+                <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide}>
+                    <option value={'right'}>右</option>
+                    <option value={'left'}>左</option>
+                </select>
+                <br></br>
+            </>)}
 
-                let textArea = document.getElementById("transferTextInput") as HTMLTextAreaElement;
-                textArea.value = transferText;
-                let textAreaEng = document.getElementById("transferTextEngInput") as HTMLTextAreaElement;
-                textAreaEng.value = transferTextEng;
-                targetStation.transferText = transferText;
-                targetStation.transferTextEng = transferTextEng;
-            }}>登録路線情報を反映</button>
-            <br></br>
-            <label>ホーム乗換案内行ごと表示数</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
-                value={ targetStation?.transferCountLineP}
-            ></input>
-            <br></br>
-            <br></br>
-            <label>スロット分割数</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}
-                value={ targetStation?.slotNum}
-            ></input>
-            <br></br>
-            <label>列車左端スロット</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'leftSlotInd')}
-                value={ targetStation?.leftSlotInd}
-            ></input>
-            <br></br>
-            <label>ホーム向側列車の路線ID</label>
-            <input id="otherTrainIDInput" type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
-                value={ targetStation?.otherLineInd}
-            ></input>
-            <select onChange={e => {
-                if (!e.target.value) return;
-                let otherTrainIDInput = document.getElementById("otherTrainIDInput") as HTMLTextAreaElement;
-                if(!otherTrainIDInput){ return; }
-                otherTrainIDInput.value = e.target.value;
-                targetStation.otherLineInd = otherTrainIDInput.value;
-                // 選択をリセット（連続で同じ項目を挿入できるように）
-                e.target.value = '接続路線を追加';
-            }}>
-                <option>接続路線を追加</option>
-                {
-                    Object.keys(setting.lineDict).map((key, index) => {
-                        return(
-                            <option key={index} value={key}>
-                                {setting.lineDict[key].name}
-                            </option>
-                        )
-                    })
-                }
-            </select>
-            <br></br>
-            <label>向側列車両数</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'otherCarNum')}
-                value={ targetStation?.otherCarNum}
-            ></input>
-            <br></br>
-            <label>向側列車左端スロット</label>
-            <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
-                value={ targetStation?.otherLeftSlotInd}
-            ></input>
-            </div>{/* /form-disabled (詳細設定の中身) */}
-            </AccordionSection>
+            {/* ===== 路線図タブ (defaultLine) ===== */}
+            {activeSection === 'defaultLine' && (<>
+                <label>次区間所要時間(分)</label>
+                <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
+                    value={targetStation?.sectionTime}
+                ></input>
+                <br></br>
+                <label>次区間路線ID</label>
+                <input type="text" id="lineIdInput" onChange={(e) => formUpdated(e, 'lineId')}
+                    value={targetStation?.lineId}
+                ></input>
+                <br></br>
+                <label>乗換案内</label>
+                <textarea id="transferTextInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferText')}
+                    value={targetStation?.transferText}
+                ></textarea>
+                <select onChange={(e) => {
+                    if (!e.target.value) return;
+                    let textArea = document.getElementById("transferTextInput") as HTMLTextAreaElement;
+                    if(!textArea){ return; }
+                    insertAtCaret(textArea, `:${e.target.value}:`);
+                    targetStation.transferText = textArea.value;
+                    // 選択をリセット（連続で同じ項目を挿入できるように）
+                    e.target.value = '路線記号を追加';
+                }}>
+                    <option>路線記号を追加</option>
+                    {Object.keys(setting.iconDict).map((key, index) => (
+                        <option key={index} value={key}>{key}</option>
+                    ))}
+                </select>
+                <br></br>
+                <label>乗換案内(英語)</label>
+                <textarea id="transferTextEngInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferTextEng')}
+                    value={targetStation?.transferTextEng}
+                ></textarea>
+                <select onChange={(e) => {
+                    if (!e.target.value) return;
+                    let textAreaEng = document.getElementById("transferTextEngInput") as HTMLTextAreaElement;
+                    if(!textAreaEng){ return; }
+                    insertAtCaret(textAreaEng, `:${e.target.value}:`);
+                    targetStation.transferTextEng = textAreaEng.value;
+                    // 選択をリセット（連続で同じ項目を挿入できるように）
+                    e.target.value = '路線記号を追加';
+                }}>
+                    <option>路線記号を追加</option>
+                    {Object.keys(setting.iconDict).map((key, index) => (
+                        <option key={index} value={key}>{key}</option>
+                    ))}
+                </select>
+                <br></br>
+                <button onClick={() => {
+                    let transferText: string = "";
+                    let transferTextEng: string = "";
+                    targetStation.transfers.split(" ").forEach(id => {
+                        transferText += `:${setting.lineDict[id].lineIconKey}:`
+                        transferText += setting.lineDict[id].name;
+                        transferText += "\n";
+                        transferTextEng += `:${setting.lineDict[id].lineIconKey}:`
+                        transferTextEng += setting.lineDict[id].eng;
+                        transferTextEng += "\n";
+                    });
+                    let textArea = document.getElementById("transferTextInput") as HTMLTextAreaElement;
+                    textArea.value = transferText;
+                    let textAreaEng = document.getElementById("transferTextEngInput") as HTMLTextAreaElement;
+                    textAreaEng.value = transferTextEng;
+                    targetStation.transferText = transferText;
+                    targetStation.transferTextEng = transferTextEng;
+                }}>登録路線情報を反映</button>
+                <br></br>
+            </>)}
+
+            {/* ===== ホーム案内タブ (platform) ===== */}
+            {activeSection === 'platform' && (<>
+                <label>ホーム乗換案内行ごと表示数</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
+                    value={targetStation?.transferCountLineP}
+                ></input>
+                <br></br>
+                <label>スロット分割数</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}
+                    value={targetStation?.slotNum}
+                ></input>
+                <br></br>
+                <label>列車左端スロット</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'leftSlotInd')}
+                    value={targetStation?.leftSlotInd}
+                ></input>
+                <br></br>
+                <label>ホーム向側列車の路線ID</label>
+                <input id="otherTrainIDInput" type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
+                    value={targetStation?.otherLineInd}
+                ></input>
+                <select onChange={e => {
+                    if (!e.target.value) return;
+                    let otherTrainIDInput = document.getElementById("otherTrainIDInput") as HTMLTextAreaElement;
+                    if(!otherTrainIDInput){ return; }
+                    otherTrainIDInput.value = e.target.value;
+                    targetStation.otherLineInd = otherTrainIDInput.value;
+                    // 選択をリセット（連続で同じ項目を挿入できるように）
+                    e.target.value = '接続路線を追加';
+                }}>
+                    <option>接続路線を追加</option>
+                    {Object.keys(setting.lineDict).map((key, index) => (
+                        <option key={index} value={key}>{setting.lineDict[key].name}</option>
+                    ))}
+                </select>
+                <br></br>
+                <label>向側列車両数</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'otherCarNum')}
+                    value={targetStation?.otherCarNum}
+                ></input>
+                <br></br>
+                <label>向側列車左端スロット</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
+                    value={targetStation?.otherLeftSlotInd}
+                ></input>
+                <br></br>
+            </>)}
+
         </div>
     )
 }

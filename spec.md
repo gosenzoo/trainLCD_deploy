@@ -223,7 +223,7 @@ graph TD
     LineList["LineList\n路線一覧テーブル"]
     IconList["IconList\nアイコン一覧テーブル"]
     GenericItemList["GenericItemList\n汎用テーブル（行選択）"]
-    StationParamSetter["StationParamSetter\n選択駅の詳細設定（入れ子アコーディオンあり）"]
+    StationParamSetter["StationParamSetter\n選択駅の詳細設定（セクション切り替え式）"]
     MapComponent["MapComponent\nGoogle Mapsで座標設定"]
 
     Page --> Header
@@ -540,7 +540,32 @@ type GenericItemListProps<T> = {
 | `.modal-title` | タイトル行 |
 | `.modal-footer` | ボタン行（右寄せ） |
 
-### 4.8 リスト並び替え・複数選択
+### 4.8 駅設定エリアのタブ構成
+
+`StationList` エリア下部に表示するコンテンツを、4 つのタブで切り替える。
+
+#### タブ一覧
+
+| タブID | タブラベル | コンテンツ |
+|--------|-----------|-----------|
+| `basic` | 駅基本設定 | 駅名・かな・英語・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア |
+| `defaultLine` | 路線図 | 次区間所要時間・次区間路線ID・乗換案内（日英テキスト）・登録路線情報を反映ボタン |
+| `platform` | ホーム案内 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
+| `map` | マップ | 既存の MapComponent（現在開発中） |
+
+#### 実装方針
+
+- `StationList` の `TabType` を `'basic' | 'defaultLine' | 'platform' | 'map'` に変更する
+- タブボタン行を 4 ボタンに更新する
+- `StationParamSetter` に `activeSection: 'basic' | 'defaultLine' | 'platform'` prop を追加する
+  - `StationList` から現在のアクティブタブを渡し、`StationParamSetter` 内で表示するフォーム群を切り替える
+  - `map` タブは `StationParamSetter` ではなく `StationList` が直接 `MapComponent` をレンダリングする
+- 既存の `AccordionSection`（詳細設定）は廃止し、タブで代替する
+- グレーアウト（駅未選択時）は `basic` / `defaultLine` / `platform` セクションすべてに適用する
+
+---
+
+### 4.9 リスト並び替え・複数選択
 
 `StationList`・`LineList`・`IconList` の全リストに共通する「上に移動/下に移動/複数選択」操作を `app/modules/listOperations.ts` に集約する。各リストはこのモジュールの関数を呼び出して使用する。
 

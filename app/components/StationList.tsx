@@ -15,13 +15,14 @@ type stationListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
 }
-type TabType = 'stationParam' | 'mapComponent';
+// タブID: 表示アプリ側の命名に合わせる（defaultLine=路線図, platform=ホーム案内）
+type TabType = 'basic' | 'defaultLine' | 'platform' | 'map';
 
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
     const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
-    const [activeTab, setActiveTab] = useState<TabType>('stationParam')
+    const [activeTab, setActiveTab] = useState<TabType>('basic')
 
     const presetIconDict = loadPresetNumIconTexts()
 
@@ -215,12 +216,15 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'stationParam':
-                return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
-            case 'mapComponent':
+            // 駅基本設定・路線図・ホーム案内は StationParamSetter に activeSection を渡して表示内容を切り替える
+            case 'basic':
+            case 'defaultLine':
+            case 'platform':
+                return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} activeSection={activeTab} />
+            case 'map':
                 //return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
                 return <div style={{padding: '20px', border: '1px solid #ccc', marginTop: '10px'}}>マップコンポーネントは現在開発中です。</div>
-                default:
+            default:
                 return null
         }
     }
@@ -255,9 +259,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     className={`btn-toggle${isNumberDescending ? ' btn-toggle--active' : ''}`}
                 >ナンバリング補完降順</button>
             </div>
-            <div className="btn-group" style={{marginBottom: '0'}}>
-                <button onClick={() => setActiveTab('stationParam')}>駅パラメータ</button>
-                <button onClick={() => setActiveTab('mapComponent')}>マップ</button>
+            {/* 駅設定エリアのタブ切り替え（4タブ） */}
+            <div className="operation-tabs">
+                <button onClick={() => setActiveTab('basic')} className={`tab-btn${activeTab === 'basic' ? ' active' : ''}`}>駅基本設定</button>
+                <button onClick={() => setActiveTab('defaultLine')} className={`tab-btn${activeTab === 'defaultLine' ? ' active' : ''}`}>路線図</button>
+                <button onClick={() => setActiveTab('platform')} className={`tab-btn${activeTab === 'platform' ? ' active' : ''}`}>ホーム案内</button>
+                <button onClick={() => setActiveTab('map')} className={`tab-btn${activeTab === 'map' ? ' active' : ''}`}>マップ</button>
             </div>
             {renderContent()}
         </div>

@@ -338,10 +338,11 @@ button.btn-danger:hover {
   background: rgba(248, 81, 73, 0.15);
 }
 
-/* アイコンボタン: テキストなし・正方形（幅=高さ） */
+/* アイコンボタン: テキストなし・正方形（幅=高さ）
+ * line-height: 1 でコンテンツ高さを 1em に揃え、padding: 6px（上下左右均等）と合わせて正方形にする */
 button.btn-icon {
   padding: 6px;
-  aspect-ratio: 1 / 1;
+  line-height: 1;
   justify-content: center;
 }
 
