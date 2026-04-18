@@ -68,7 +68,10 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
     return (
         <div className={backdropClass} onClick={onClose}>
             <div className="modal-dialog" onClick={e => e.stopPropagation()}>
-                <p className="modal-title">アイコン新規追加</p>
+                <div className="modal-title-row">
+                    <p className="modal-title">アイコン新規追加</p>
+                    <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
+                </div>
                 {/* サブタブ */}
                 <div className="operation-tabs">
                     <button
@@ -137,9 +140,6 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
                             >アイコン追加</button>
                         </div>
                     </div>
-                </div>
-                <div className="modal-footer">
-                    <button onClick={onClose}>閉じる</button>
                 </div>
             </div>
         </div>

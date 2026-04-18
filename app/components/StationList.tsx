@@ -10,6 +10,7 @@ import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
+import StationPresetPopup from './StationPresetPopup'
 
 type stationListProps = {
     setting: settingType,
@@ -23,6 +24,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
     const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
     const [activeTab, setActiveTab] = useState<TabType>('basic')
+    // 駅プリセットポップアップの表示状態
+    const [isPresetPopupOpen, setIsPresetPopupOpen] = useState<boolean>(false)
 
     const presetIconDict = loadPresetNumIconTexts()
 
@@ -126,6 +129,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         _setting.stationList = newArr
         setSetting(_setting)
         setSelectedIndexes(newSelected.map(i => i + 1))
+    }
+
+    // プリセットポップアップから受け取った駅リストを stationList 末尾に追加する（暫定）
+    const handlePresetAdd = (stations: stationType[]) => {
+        const _setting = structuredClone(setting)
+        _setting.stationList.push(...stations)
+        setSetting(_setting)
     }
 
     const reverseButtonClilcked = () => {
@@ -234,6 +244,19 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     return (
         <div>
+            {/* 駅プリセットから追加ボタン（最上段） */}
+            <div style={{ marginBottom: '8px' }}>
+                <button onClick={() => setIsPresetPopupOpen(true)}>駅プリセットから追加</button>
+            </div>
+
+            {/* 駅プリセットポップアップ */}
+            {isPresetPopupOpen && (
+                <StationPresetPopup
+                    onAdd={handlePresetAdd}
+                    onClose={() => setIsPresetPopupOpen(false)}
+                />
+            )}
+
             {/* 1-based の selectedIndexes を 0-based string key に変換して渡す */}
             <GenericItemList
                 columns={stationColumns}

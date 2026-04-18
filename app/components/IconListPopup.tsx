@@ -53,7 +53,10 @@ const IconListPopup: React.FC<IconListPopupProps> = ({
     return (
         <div className={backdropClass} onClick={onClose}>
             <div className="modal-dialog" onClick={e => e.stopPropagation()}>
-                <p className="modal-title">アイコンをリストから選択</p>
+                <div className="modal-title-row">
+                    <p className="modal-title">アイコンをリストから選択</p>
+                    <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
+                </div>
                 <GenericItemList
                     columns={listColumns}
                     rows={Object.entries(setting.iconDict).map(([key, iconObj]) => ({ key, data: iconObj }))}
@@ -68,9 +71,6 @@ const IconListPopup: React.FC<IconListPopupProps> = ({
                         className="btn-primary"
                         disabled={!listSelectedKey}
                     >アイコン選択</button>
-                </div>
-                <div className="modal-footer">
-                    <button onClick={onClose}>閉じる</button>
                 </div>
             </div>
         </div>

@@ -332,7 +332,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <div className="modal-backdrop" onClick={() => setIsTransferPopupOpen(false)}>
                         {/* modal-dialog--tall: タブ状態によらず縦いっぱいに固定表示 */}
                         <div className="modal-dialog modal-dialog--tall" onClick={e => e.stopPropagation()}>
-                            <p className="modal-title">接続路線を追加</p>
+                            <div className="modal-title-row">
+                                <p className="modal-title">接続路線を追加</p>
+                                <button className="modal-close-btn" onClick={() => setIsTransferPopupOpen(false)} title="閉じる">×</button>
+                            </div>
                             {/* タブ切り替え */}
                             <div className="operation-tabs" style={{margin: '0 0 0 0'}}>
                                 <button
@@ -425,9 +428,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                         </div>
                                     </div>
                                 )}
-                            </div>
-                            <div className="modal-footer">
-                                <button onClick={() => setIsTransferPopupOpen(false)}>閉じる</button>
                             </div>
                         </div>
                     </div>

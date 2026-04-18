@@ -721,7 +721,156 @@ isOperationUnused(operation, index, operationList, stationList) → boolean
 - タブラベルの先頭に `(未使用)` を付与
 - CSS クラス `.tab-btn--unused` を追加し、選択状態によらず暗い外観にする
 
-### 4.10 状態管理
+### 4.10 駅プリセットから追加
+
+#### 概要
+
+CSVファイルで管理された路線・駅のプリセットデータから、任意の区間を選んで `stationList` に一括追加する機能。
+
+#### CSVファイル
+
+`public/csv/presetLines/` ディレクトリに配置し、クライアントから fetch で取得する。ユーザーが用意する。
+
+| ファイル | 列構成 |
+|----------|--------|
+| `public/csv/presetLines/stationDB.csv` | 駅ID, 駅名, 駅名かな, 駅名英語 |
+| `public/csv/presetLines/lineDB.csv` | 路線ID, 路線名, 路線名かな, 路線名英語, 路線カラー |
+| `public/csv/presetLines/lineConnectDB.csv` | 路線ID, 駅ID, 駅ナンバリング |
+
+- **駅ID**: 全駅にわたって一意な識別子
+- **路線ID**: 全路線にわたって一意な識別子
+- **lineConnectDB.csv**: 同一路線IDの行を上から順に抽出したとき、その順番がその路線上の駅のつながりを表す。駅の所属路線を求める際もこのファイルから導出する
+
+#### 駅IDの定義
+
+**駅ID** は stationDB.csv で全駅にわたって一意に定められた識別子。路線をまたいで同一駅を参照できる。
+
+#### ボタン配置
+
+`StationList` の最上段（`GenericItemList` より上）に「駅プリセットから追加」ボタンを配置する。クリックで `StationPresetPopup` が開く。
+
+#### `StationPresetPopup` コンポーネント
+
+**ファイル**: `app/components/StationPresetPopup.tsx`
+
+**Props**:
+
+```typescript
+type Props = {
+    onAdd: (stations: stationType[]) => void   // 追加確定時のコールバック
+    onClose: () => void
+}
+```
+
+**区間オブジェクト**:
+
+```typescript
+type StationSection = {
+    lineId: string    // 路線ID
+    prevIndex: number // 前駅の lineConnects 内位置インデックス（一意）
+    nextIndex: number // 次駅の lineConnects 内位置インデックス（一意）
+}
+```
+
+**前駅参照オブジェクト**:
+
+```typescript
+type PrevStationRef = {
+    station: PresetStation // 駅データ
+    lineId: string         // 選択された路線ID
+    index: number          // その路線の lineConnects 内位置インデックス
+}
+```
+
+**UI レイアウト**:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  駅プリセットから追加                                     │
+├──────────────────┬──────────────────┬───────────────────┤
+│  路線選択リスト  │  駅選択リスト    │  追加一覧リスト   │
+├──────────────────┴──────────────────┴───────────────────┤
+│                             [戻る]  [追加]                │
+└──────────────────────────────────────────────────────────┘
+```
+
+**状態遷移**:
+
+状態は `prevStation` の値から派生し、独立した状態変数としては管理しない。
+
+| 状態 | 条件 | 説明 |
+|------|------|------|
+| `firstStation` | `prevStation === null` | 開始駅を選ぶ前。全路線を表示する |
+| `continuing` | `prevStation !== null` | 2駅目以降を選択中。前駅の接続路線のみ表示する |
+
+**遷移トリガー**:
+
+| 操作 | 状態の遷移 | その他 |
+|------|-----------|--------|
+| 路線をクリック（任意の状態） | 変化なし | `selectedLineId` を更新（駅リストが切り替わる）。選択中路線をハイライト |
+| 駅をクリック（`firstStation`） | → `continuing` | クリックした駅を `prevStation` に設定。`selectedLineId` をリセット |
+| 駅をクリック（`continuing`） | 変化なし（`continuing` 維持） | 前駅→選択駅の区間を追加一覧に追加、選択駅を `prevStation` に更新。`selectedLineId` をリセット |
+| 駅をクリック（`prevStation` と同一駅） | — | クリック不可・グレーアウト表示 |
+| 「戻る」ボタン（`stagingList` が空のとき無効） | — | 末尾の区間を削除。残った区間がある場合は末尾区間の `nextStationId` の駅を `prevStation` に設定、ない場合は `prevStation` を `null` に戻す。`selectedLineId` もリセット |
+| 「追加」ボタン | — | 追加一覧の全区間に含まれる駅を順番に `stationType` に変換して `onAdd` へ渡し、ポップアップを閉じる |
+
+**「追加」ボタン押下時の駅抽出ロジック**:
+
+追加一覧の各 `StationSection` から駅を以下の手順で展開し、`stationType[]` として `onAdd` に渡す。
+
+1. 各区間 `{ lineId, prevStationId, nextStationId }` について、lineConnectDB から同一 `lineId` の行を上から順に抽出し、駅IDの順序リストを得る
+2. 順序リスト中の `prevStationId` と `nextStationId` のインデックスを求め、その間（両端含む）の駅IDを列挙する（`prevStationId` が後にある場合は逆順）
+3. 区間をまたいで同じ駅IDが重複する場合は除去する（連続区間の接続駅が重複しないよう処理）
+4. 列挙した駅IDで stationDB を引いて `toStationType` に変換する
+
+**路線選択リストの表示範囲**:
+
+| 状態 | 表示する路線 |
+|------|-------------|
+| `firstStation` | lineDB に存在する全路線 |
+| `continuing` | lineConnectDB で `prevStation.station.id` が含まれる全路線 |
+
+どちらの状態でも、選択中の路線（`selectedLineId`）はハイライト表示し、その他の路線は非表示にしない。
+
+**ガイダンステキスト**（ポップアップ最上部に表示）:
+
+| 条件 | 表示テキスト |
+|------|------------|
+| `prevStation === null && selectedLineId === null` | 開始駅の路線を選択してください |
+| `prevStation === null && selectedLineId !== null` | 開始駅を選択してください |
+| `prevStation !== null && selectedLineId === null` | 「{prevStation.name}」から続く路線を選択してください |
+| `prevStation !== null && selectedLineId !== null` | 「{prevStation.name}」の次の駅を選択してください |
+
+**追加一覧の表示**:
+
+駅選択リストと同形式のリストとして、路線選択・駅選択の右に並べて表示する。各区間を `前駅名 → 次駅名（路線名）` の形式で1行ずつ表示する。クリックによる削除機能はない。
+
+**`stationType` への変換**（CSVから取得できるフィールドのみ設定、その他は未定）:
+
+| stationType フィールド | 設定値 |
+|------------------------|--------|
+| `name` | 駅名（stationDB） |
+| `kana` | 駅名かな（stationDB） |
+| `eng` | 駅名英語（stationDB） |
+| `lineColor` | 路線カラー（lineDB から所属路線で引く） |
+| `number` | 空文字固定（CSVに列なし） |
+| その他フィールド | 未定（暫定デフォルト値） |
+
+**挿入位置**: 未定（暫定: `stationList` 末尾）
+
+#### 状態管理
+
+| state | 型 | 説明 |
+|-------|----|------|
+| `lines` | `PresetLine[]` | 全路線リスト（lineDB.csv） |
+| `allStations` | `PresetStation[]` | 全駅リスト（stationDB.csv） |
+| `lineConnects` | `PresetLineConnect[]` | 全路線接続データ（lineConnectDB.csv） |
+| `selectedLineId` | `string \| null` | 路線選択リストで選択中の路線ID |
+| `prevStation` | `PrevStationRef \| null` | 区間の開始駅（前駅）。`null` なら `firstStation` 状態、値があれば `continuing` 状態 |
+| `stagingList` | `StationSection[]` | 追加一覧（区間オブジェクトの配列） |
+| `loadError` | `string \| null` | CSV読み込みエラーメッセージ |
+
+### 4.11 状態管理
 
 `Editor.tsx` が `settingType` の React state（`useState`）を保有し、`setting` と `setSetting` を全子コンポーネントへ props で渡す。各コンポーネントは変更時に `structuredClone(setting)` でディープコピーを作成してから値を書き換え `setSetting` を呼ぶ。
 
