@@ -581,7 +581,7 @@ tr:hover td {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
+  padding: 24px;
   width: min(600px, 90vw);
   max-height: 70vh;
   display: flex;
@@ -592,8 +592,8 @@ tr:hover td {
 
 /* 縦いっぱいに表示するモーダルダイアログ修飾子（上下に余白を設けた全高表示） */
 .modal-dialog--tall {
-  height: calc(100vh - 40px);
-  max-height: calc(100vh - 40px);
+  height: calc(100vh - 80px);
+  max-height: calc(100vh - 80px);
 }
 
 /* 縦いっぱいダイアログ内のタブ本体エリアは残り領域をすべて埋める */
