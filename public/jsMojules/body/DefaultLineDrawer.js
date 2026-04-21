@@ -133,7 +133,7 @@ class DefaultLineDrawer{
             //ナンバリング文字表示の場合
             const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
 
-            stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+            stationParts.appendChild(this.textDrawer.create(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
 
             numIconTop = parseFloat(numRect.getAttribute("y"));
         }
@@ -160,7 +160,7 @@ class DefaultLineDrawer{
         let nameText = station.name;
         if(nameText.length === 1){ nameText = `${nameText}　`; } //駅名が1文字の場合、空文字を追加
         else if(nameText.length === 2){ nameText = `${nameText[0]}　${nameText[1]}`; } //駅名が2文字の場合、空文字を追加
-        stationParts.appendChild(this.textDrawer.createByAreaEl(nameText, stNameRect).element);
+        stationParts.appendChild(this.textDrawer.create(nameText, stNameRect).element);
 
         //乗換路線
         if((station.transfers.length > 0) || (station.transferText !== "")){
@@ -192,7 +192,7 @@ class DefaultLineDrawer{
             const transferTexts = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
             let y1 = this.params.top;
             for(let i = 0; i < transferCnt; i++){
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(lineTexts[i], this.params.left, y1, this.params.width, height, this.params.styleJson, "ja", this.params.textHeightRatio).element);
+                transferTexts.appendChild(this.textDrawer.create(lineTexts[i], { x: this.params.left, y: y1, width: this.params.width, height: height, styleJson: this.params.styleJson, lang: "ja", textHeightRatio: this.params.textHeightRatio }).element);
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加
@@ -201,7 +201,7 @@ class DefaultLineDrawer{
         //所要時間
         if(!isPass && !(station._dispTime < 0) && isDispTime){
             const timeTextRect = (mapSVG).querySelector("#body-defaultLine-timeText");
-            stationParts.appendChild(this.textDrawer.createByAreaEl(station._dispTime, timeTextRect).element);
+            stationParts.appendChild(this.textDrawer.create(station._dispTime, timeTextRect).element);
         }
 
         //指定位置に移動
@@ -233,7 +233,7 @@ class DefaultLineDrawer{
             //ナンバリング文字表示の場合
             const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
 
-            stationParts.appendChild(this.textDrawer.createByAreaEl(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+            stationParts.appendChild(this.textDrawer.create(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
 
             numIconTop = parseFloat(numRect.getAttribute("y"));
         }
@@ -270,7 +270,7 @@ class DefaultLineDrawer{
         stationNameEngRect.setAttribute("width", width);
         
         //駅名
-        stationParts.appendChild(this.textDrawer.createByAreaEl(station.eng, stationNameEngRect).element);
+        stationParts.appendChild(this.textDrawer.create(station.eng, stationNameEngRect).element);
 
         //乗換路線
         if((station.transfers.length > 0) || (station.transferTextEng !== "")){
@@ -303,7 +303,7 @@ class DefaultLineDrawer{
             let y1 = this.params.top;
             const transferLineEngRect = (this.mapSVG).querySelector("#body-defaultLine-transferLineEng");
             for(let i = 0; i < transferCnt; i++){
-                transferTexts.appendChild(this.textDrawer.createIconTextByArea(lineTexts[i], this.params.left, y1, this.params.width, height, JSON.parse(transferLineEngRect.getAttribute("data-style")), "ja", this.params.textHeightRatio).element);
+                transferTexts.appendChild(this.textDrawer.create(lineTexts[i], { x: this.params.left, y: y1, width: this.params.width, height: height, styleJson: JSON.parse(transferLineEngRect.getAttribute("data-style")), lang: "ja", textHeightRatio: this.params.textHeightRatio }).element);
                 y1 += height + lineSpan; //次の行のY座標を計算
             }
             stationParts.appendChild(transferTexts); //乗換路線を追加
@@ -312,7 +312,7 @@ class DefaultLineDrawer{
         //所要時間
         if(!isPass && !(station._dispTime < 0)){
             const timeTextRect = (mapSVG).querySelector("#body-defaultLine-timeText");
-            stationParts.appendChild(this.textDrawer.createByAreaEl(station._dispTime, timeTextRect).element);
+            stationParts.appendChild(this.textDrawer.create(station._dispTime, timeTextRect).element);
         }
 
         stationParts = moveSvgElementByBasePoint(stationParts, x, y);
@@ -463,7 +463,7 @@ class DefaultLineDrawer{
         //根本側路線名
         if(lineNameList[0] !== null){
             let lineNameStartTextRect = this.mapSVG.querySelector("#lineNameStartText");
-            let lineNameStartText = this.textDrawer.createByAreaEl(lineNameList[0][0], lineNameStartTextRect).element;
+            let lineNameStartText = this.textDrawer.create(lineNameList[0][0], lineNameStartTextRect).element;
             lineNameStartText.setAttribute("fill", lineNameList[0][2]);
             lineNameObj.appendChild(lineNameStartText);
         }
@@ -471,7 +471,7 @@ class DefaultLineDrawer{
         //先端側路線名
         if(lineNameList[lineNameList.length-1] !== null){
             let lineNameEndTextRect = this.mapSVG.querySelector("#lineNameEndText");
-            let lineNameEndText = this.textDrawer.createByAreaEl(lineNameList[lineNameList.length-1][0], lineNameEndTextRect).element;
+            let lineNameEndText = this.textDrawer.create(lineNameList[lineNameList.length-1][0], lineNameEndTextRect).element;
             lineNameEndText.setAttribute("fill", lineNameList[lineNameList.length-1][2]);
             lineNameObj.appendChild(lineNameEndText);
         }
@@ -487,7 +487,7 @@ class DefaultLineDrawer{
         //根本側路線名
         if(lineNameList[0] !== null){
             let lineNameStartTextRect = this.mapSVG.querySelector("#lineNameStartTextEng");
-            let lineNameStartText = this.textDrawer.createByAreaEl(lineNameList[0][1], lineNameStartTextRect).element;
+            let lineNameStartText = this.textDrawer.create(lineNameList[0][1], lineNameStartTextRect).element;
             lineNameStartText.setAttribute("fill", lineNameList[0][2]);
             lineNameEngObj.appendChild(lineNameStartText);
         }
@@ -495,7 +495,7 @@ class DefaultLineDrawer{
         //先端側路線名
         if(lineNameList[lineNameList.length-1] !== null){
             let lineNameEndTextRect = this.mapSVG.querySelector("#lineNameEndTextEng");
-            let lineNameEndText = this.textDrawer.createByAreaEl(lineNameList[lineNameList.length-1][1], lineNameEndTextRect).element;
+            let lineNameEndText = this.textDrawer.create(lineNameList[lineNameList.length-1][1], lineNameEndTextRect).element;
             lineNameEndText.setAttribute("fill", lineNameList[lineNameList.length-1][2]);
             lineNameEngObj.appendChild(lineNameEndText);
         }
@@ -508,7 +508,7 @@ class DefaultLineDrawer{
             let l = this.stationStartX * 2 - (parseInt(minuteTextRect.getAttribute("x")) - this.lenStartToEnd);
             minuteTextRect.setAttribute("x", `${l - parseInt(minuteTextRect.getAttribute("width"))}`)
         }
-        return this.textDrawer.createByAreaEl("(分)", minuteTextRect).element;
+        return this.textDrawer.create("(分)", minuteTextRect).element;
     }
     createMinuteEng(leftOrRight){
         let minuteTextRect = this.mapSVG.querySelector("#MinuteTextEng").cloneNode();
@@ -516,6 +516,6 @@ class DefaultLineDrawer{
             let l = this.stationStartX * 2 - (parseInt(minuteTextRect.getAttribute("x")) - this.lenStartToEnd);
             minuteTextRect.setAttribute("x", `${l - parseInt(minuteTextRect.getAttribute("width"))}`)
         }
-        return this.textDrawer.createByAreaEl("(min)", minuteTextRect).element;
+        return this.textDrawer.create("(min)", minuteTextRect).element;
     }
 }

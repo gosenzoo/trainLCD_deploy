@@ -135,13 +135,9 @@ class TransferWidget {
   calcWidthParams(){
     // アイコン長取得
     console.log(this.iconList)
-    const iconObj = this.textDrawer.createIconTextByArea(
+    const iconObj = this.textDrawer.create(
       this.iconList,
-      this.x,
-      this.y + this.posParams.iconOffset,
-      this.width,
-      this.posParams.height,
-      this.styleJsonTop
+      { x: this.x, y: this.y + this.posParams.iconOffset, width: this.width, height: this.posParams.height, styleJson: this.styleJsonTop }
     );
     this.iconWidth = iconObj.width;
     
@@ -162,13 +158,9 @@ class TransferWidget {
     const group = document.createElementNS(SVG_NS, "g");
 
     // 3. アイコン描画
-    const iconObj = this.textDrawer.createIconTextByArea(
+    const iconObj = this.textDrawer.create(
       this.iconList,
-      this.x,
-      this.y + this.posParams.iconOffset,
-      this.width,
-      this.posParams.height,
-      this.styleJsonTop
+      { x: this.x, y: this.y + this.posParams.iconOffset, width: this.width, height: this.posParams.height, styleJson: this.styleJsonTop }
     );
     group.appendChild(iconObj.element);
 
@@ -184,24 +176,16 @@ class TransferWidget {
     //console.log(this.width, this.iconWidth, this.textAreaWidth)
 
     // 上段テキスト
-    const topTextObj = this.textDrawer.createByArea(
+    const topTextObj = this.textDrawer.create(
       this.topText,
-      textBaseX,
-      topTextY,
-      maxTextWidth,
-      this.posParams.topTextAreaHeight,
-      this.styleJsonTop
+      { x: textBaseX, y: topTextY, width: maxTextWidth, height: this.posParams.topTextAreaHeight, styleJson: this.styleJsonTop }
     );
     group.appendChild(topTextObj.element);
 
     // 下段テキスト
-    const bottomTextObj = this.textDrawer.createByArea(
+    const bottomTextObj = this.textDrawer.create(
       this.bottomText,
-      textBaseX,
-      bottomTextY,
-      maxTextWidth,
-      this.posParams.bottomTextAreaHeight,
-      this.styleJsonBottom
+      { x: textBaseX, y: bottomTextY, width: maxTextWidth, height: this.posParams.bottomTextAreaHeight, styleJson: this.styleJsonBottom }
     );
     group.appendChild(bottomTextObj.element);
 

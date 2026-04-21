@@ -52,8 +52,8 @@ class HeaderDrawer{
         const trainTypeTextRect = trainType.querySelector("#trainTypeText"); //種別テキストを取得
         const trainTypeTextRectEng = trainType.querySelector("#trainTypeTextEng");
         trainType.appendChild(this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl(trainTypeText, trainTypeTextRect).element,
-            this.textDrawer.createByAreaEl(trainTypeEng, trainTypeTextRectEng).element
+            this.textDrawer.create(trainTypeText, trainTypeTextRect).element,
+            this.textDrawer.create(trainTypeEng, trainTypeTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]])); //種別テキストを追加
         trainTypeTextRect.remove(); //種別テキスト矩形を削除
         trainTypeTextRectEng.remove();
@@ -68,8 +68,8 @@ class HeaderDrawer{
         const trainTypeSubTextRect = trainType.querySelector("#trainTypeSubText"); //種別補足テキストを取得
         const trainTypeSubTextRectEng = trainType.querySelector("#trainTypeSubTextEng");
         trainType.appendChild(this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl(trainTypeSub, trainTypeSubTextRect).element,
-            this.textDrawer.createByAreaEl(trainTypeSubEng, trainTypeSubTextRectEng).element
+            this.textDrawer.create(trainTypeSub, trainTypeSubTextRect).element,
+            this.textDrawer.create(trainTypeSubEng, trainTypeSubTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]]));
         trainTypeSubTextRect.remove(); //種別補足テキスト矩形を削除
         trainTypeSubTextRectEng.remove();
@@ -85,9 +85,9 @@ class HeaderDrawer{
 
         // アニメーション付き駅名テキスト組み立て
         const stationNameText = this.animator.createKurukuruSVG([
-            this.textDrawer.createByAreaEl(name, stationNameTextRect).element,
-            this.textDrawer.createByAreaEl(kana, stationNameTextRect).element,
-            this.textDrawer.createByAreaEl(eng, stationNameTextEngRect).element
+            this.textDrawer.create(name, stationNameTextRect).element,
+            this.textDrawer.create(kana, stationNameTextRect).element,
+            this.textDrawer.create(eng, stationNameTextEngRect).element
         ], kuruTop, kuruBottom, [[4000, 500, 10]]);
 
         return stationNameText;
@@ -111,14 +111,14 @@ class HeaderDrawer{
         const carNum = (this.mapSVG).querySelector("#header-carNum").cloneNode(true); //種別SVGを複製
 
         const carNumText = carNum.querySelector("#carNumText");
-        carNum.appendChild(this.textDrawer.createByAreaEl(num, carNumText).element); //号車テキストを追加
+        carNum.appendChild(this.textDrawer.create(num, carNumText).element); //号車テキストを追加
         carNumText.remove(); //号車テキスト矩形を削除
 
         const carText = carNum.querySelector("#carText");
         const carTextEng = carNum.querySelector("#carTextEng");
         const carTexts = this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl("号車", carText).element,
-            this.textDrawer.createByAreaEl("Car No.", carTextEng).element
+            this.textDrawer.create("号車", carText).element,
+            this.textDrawer.create("Car No.", carTextEng).element
         ], [[8510, 500, 10], [4000, 500, 10]]);
         carNum.appendChild(carTexts); //「号車」テキストを追加
         carText.remove(); //「号車」テキスト矩形を削除
@@ -155,35 +155,35 @@ class HeaderDrawer{
             if(viaTextWidth + desTextWidth > maxWidth - textSpan){ //行先方面テキスト全体幅がmaxwidthを超える場合
                 const scale = (maxWidth - textSpan) / (viaTextWidth + desTextWidth);
                 
-                const viaTextObj = this.textDrawer.createByArea(viaText, startX, viaTextY, viaTextWidth * scale, viaTextHeight, viaStyle, "ja");
+                const viaTextObj = this.textDrawer.create(viaText, { x: startX, y: viaTextY, width: viaTextWidth * scale, height: viaTextHeight, styleJson: viaStyle, lang: "ja" });
                 destination.appendChild(viaTextObj.element);
                 x += viaTextObj.width + textSpan;
 
-                const desTextObj = this.textDrawer.createByArea(destinationText, x, desY, desTextWidth * scale, desTextHeight, desStyle, "ja");
+                const desTextObj = this.textDrawer.create(destinationText, { x: x, y: desY, width: desTextWidth * scale, height: desTextHeight, styleJson: desStyle, lang: "ja" });
                 destination.appendChild(desTextObj.element);
                 x += desTextObj.width + textSpan;
             }
             else{ //超えない場合
-                const viaTextObj = this.textDrawer.createByArea(viaText, startX, viaTextY, maxWidth, viaTextHeight, viaStyle, "ja");
+                const viaTextObj = this.textDrawer.create(viaText, { x: startX, y: viaTextY, width: maxWidth, height: viaTextHeight, styleJson: viaStyle, lang: "ja" });
                 destination.appendChild(viaTextObj.element);
                 x += viaTextObj.width + textSpan;
 
-                const desTextObj = this.textDrawer.createByArea(destinationText, x, desY, maxWidth, desTextHeight, desStyle, "ja");
+                const desTextObj = this.textDrawer.create(destinationText, { x: x, y: desY, width: maxWidth, height: desTextHeight, styleJson: desStyle, lang: "ja" });
                 destination.appendChild(desTextObj.element);
                 x += desTextObj.width + textSpan;
             }
         }
         //方面テキストが存在しない場合
         else{
-            const desTextObj = this.textDrawer.createByArea(destinationText, startX, desY, maxWidth, desTextHeight, desStyle, "ja");
+            const desTextObj = this.textDrawer.create(destinationText, { x: startX, y: desY, width: maxWidth, height: desTextHeight, styleJson: desStyle, lang: "ja" });
             destination.appendChild(desTextObj.element); //行先テキストを追加
             x += desTextObj.width + textSpan; //次のテキストの開始位置を更新
         }
         //「ゆき」テキストを描画
-        destination.appendChild(this.textDrawer.createByArea("ゆき", x, desY, yukiWidth, desTextHeight, desStyle, "ja").element);
+        destination.appendChild(this.textDrawer.create("ゆき", { x: x, y: desY, width: yukiWidth, height: desTextHeight, styleJson: desStyle, lang: "ja" }).element);
         
         const destinationEngRect = (this.mapSVG).querySelector("#header-destinationTextEng"); //行先英語テキストrectを取得
-        const eng = this.textDrawer.createByAreaEl(`for ${destinationEng}`, destinationEngRect).element;
+        const eng = this.textDrawer.create(`for ${destinationEng}`, destinationEngRect).element;
 
         const ret = this.animator.createFadeSVG([
             destination,
@@ -201,8 +201,8 @@ class HeaderDrawer{
         else if(type === 1){ text = "まもなく"; eng = "Next";}
         else if(type === 2){ text = "ただいま"; eng = "";}
         const runStateText = this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl(text, runStateTextRect).element,
-            this.textDrawer.createByAreaEl(eng, runStateTextRectEng).element
+            this.textDrawer.create(text, runStateTextRect).element,
+            this.textDrawer.create(eng, runStateTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]]);
 
         return runStateText;
@@ -213,15 +213,15 @@ class HeaderDrawer{
         const stopYukiTextRect = (this.mapSVG).querySelector("#header-stopYukiText"); //長時間停車テキストを複製
         const stopYukiTextRectEng = (this.mapSVG).querySelector("#header-stopYukiTextEng");
         longStopText.appendChild(this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl("ゆき", stopYukiTextRect).element,
-            this.textDrawer.createByAreaEl("for", stopYukiTextRectEng).element
+            this.textDrawer.create("ゆき", stopYukiTextRect).element,
+            this.textDrawer.create("for", stopYukiTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]]));
 
         const viaTextStopRect = (this.mapSVG).querySelector("#header-viaTextStop"); //方面テキストrectを取得
         const viaTextStopEngRect = (this.mapSVG).querySelector("#header-viaTextStopEng");
         longStopText.appendChild(this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl(drawParams.viaText, viaTextStopRect).element,
-            this.textDrawer.createByAreaEl("", viaTextStopEngRect).element
+            this.textDrawer.create(drawParams.viaText, viaTextStopRect).element,
+            this.textDrawer.create("", viaTextStopEngRect).element
         ], [[8510, 500, 10], [4000, 500, 10]])); //長時間停車中テキストを追加
 
         return longStopText;
@@ -238,8 +238,8 @@ class HeaderDrawer{
         else if(type === 2){ text = "終点"; eng = "";}
 
         terminalText.appendChild(this.animator.createFadeSVG([
-            this.textDrawer.createByAreaEl(text, runStateTerminalTextRect).element,
-            this.textDrawer.createByAreaEl(eng, runStateTerminalTextRectEng).element
+            this.textDrawer.create(text, runStateTerminalTextRect).element,
+            this.textDrawer.create(eng, runStateTerminalTextRectEng).element
         ], [[8510, 500, 10], [4000, 500, 10]]));
 
         return terminalText;

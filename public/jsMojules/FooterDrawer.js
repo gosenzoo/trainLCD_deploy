@@ -22,13 +22,13 @@ class FooterDrawer{
     }
     createEstimateTimeTextEng(text){
         const estimateTextEngRect = this.mapSVG.getElementById("footer-estimateTimeText").cloneNode(true); //テンプレートをクローン
-        const estimateTextEng = this.textDrawer.createByAreaEl(text, estimateTextEngRect).element;
+        const estimateTextEng = this.textDrawer.create(text, estimateTextEngRect).element;
         return estimateTextEng;
     }
 
     createStopText(text){
         const stopTextRect = this.mapSVG.getElementById("footer-stopText");
-        const stopText = this.textDrawer.createByAreaEl(text, stopTextRect).element;
+        const stopText = this.textDrawer.create(text, stopTextRect).element;
 
         return stopText;
     }

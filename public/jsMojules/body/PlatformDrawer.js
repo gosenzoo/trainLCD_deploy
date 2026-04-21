@@ -26,9 +26,9 @@ class PlatformDrawer{
 
             //テキスト
             const transferListText = this.mapSVG.getElementById("transferListTextRect");
-            group.appendChild(this.textDrawer.createByAreaEl("のりかえ", transferListText).element);
+            group.appendChild(this.textDrawer.create("のりかえ", transferListText).element);
             const transferListTextEng = this.mapSVG.getElementById("transferListTextEngRect");
-            group.appendChild(this.textDrawer.createByAreaEl("Transfer", transferListTextEng).element);
+            group.appendChild(this.textDrawer.create("Transfer", transferListTextEng).element);
             
             //行ごとの描画数を取得
             let transferCountLineP = drawParams.dispStation.transferCountLineP;

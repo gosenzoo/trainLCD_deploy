@@ -5,18 +5,45 @@ class TextDrawer{
         this.numIconDrawer = numIconDrawer;
     }
 
-    //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
-    createByAreaEl2(text, areaParams){
-        let textEl;
-        //縦書きなら
-        if(areaParams.axis === "vertical"){
-            textEl = this.createByAreaVertical(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.spacing, areaParams.base);
+    // 統合テキスト描画関数
+    // input が DOM Element の場合: 属性を読み取り axis・アイコン有無に応じて振り分け
+    // input がパラメータオブジェクトの場合: フィールドの内容に応じて振り分け
+    //   オブジェクトの形式: { x, y, width, height, styleJson, lang?, transform?, axis?, spacing?, base?, textHeightRatio? }
+    // テキストに ':' が含まれる場合はアイコン付きテキスト（createIconTextByArea）として処理
+    create(text, input){
+        if(input instanceof Element){
+            // Element から属性を読み取り
+            const x = parseFloat(input.getAttribute("x"));
+            const y = parseFloat(input.getAttribute("y"));
+            const width = parseFloat(input.getAttribute("width"));
+            const height = parseFloat(input.getAttribute("height"));
+            const styleJson = JSON.parse(input.getAttribute("data-style"));
+            const lang = input.getAttribute("lang");
+            const axis = input.getAttribute("axis");
+            const spacing = parseFloat(input.getAttribute("spacing"));
+            const base = input.getAttribute("base");
+            const transform = input.getAttribute("transform");
+            const textHeightRatio = parseFloat(input.getAttribute("data-text-height-ratio")) || 1;
+
+            if(axis === "vertical"){
+                return this.createByAreaVertical(text, x, y, width, height, styleJson, spacing, base);
+            }
+            if(text.includes(':')){
+                return this.createIconTextByArea(text, x, y, width, height, styleJson, lang, textHeightRatio);
+            }
+            return this.createByArea(text, x, y, width, height, styleJson, lang, transform);
         }
-        //横書きなら
         else{
-            textEl = this.createByArea(text, areaParams.x, areaParams.y, areaParams.width, areaParams.height, areaParams.styleJson, areaParams.lang);
+            // パラメータオブジェクト
+            const p = input;
+            if(p.axis === "vertical"){
+                return this.createByAreaVertical(text, p.x, p.y, p.width, p.height, p.styleJson, p.spacing, p.base);
+            }
+            if(text.includes(':')){
+                return this.createIconTextByArea(text, p.x, p.y, p.width, p.height, p.styleJson, p.lang, p.textHeightRatio);
+            }
+            return this.createByArea(text, p.x, p.y, p.width, p.height, p.styleJson, p.lang, p.transform);
         }
-        return textEl;
     }
 
     //矩形領域にフィットするよう文字を配置（領域はElementで渡す）

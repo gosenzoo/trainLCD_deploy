@@ -52,7 +52,7 @@ function createTrain(params) {
     Array.isArray(carLabels) &&
     carLabels.length === cars &&
     textDrawer &&
-    typeof textDrawer.createByArea === "function";
+    typeof textDrawer.create === "function";
 
   // ハイライト車両の高さ/奥行
   const hHeight = typeof highlight.height === "number" ? highlight.height : height;
@@ -264,13 +264,9 @@ function createTrain(params) {
       const styleJson = labelStyleNormal || {};
       const normalTextColor = styleJson.fill || "#000000";
 
-      const labelG = textDrawer.createByArea(
+      const labelG = textDrawer.create(
         labelText,
-        labelLeft,
-        labelTop,
-        labelWidth,
-        lh,
-        styleJson
+        { x: labelLeft, y: labelTop, width: labelWidth, height: lh, styleJson: styleJson }
       ).element;
       if (labelG) {
         carG.appendChild(labelG);
