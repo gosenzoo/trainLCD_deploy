@@ -15,6 +15,38 @@
 
 ---
 
+## visible 属性
+
+`visible` 属性は `lcdParts` とは独立して全ての要素に付与できる。DrawerがSVGをトラバースする際に評価され、`false` と評価された要素はその子孫も含めて出力に追加されない。
+
+### 式の文法
+
+```
+expr  = orExpr
+orExpr  = andExpr ( "||" andExpr )*
+andExpr = atom ( "&&" atom )*
+atom    = [ "!" ] varName
+varName = drawParams のキー名 | "true" | "false"
+```
+
+### 例
+
+| visible 値 | 意味 |
+|---|---|
+| `"isJapanese"` | drawParams.isJapanese が truthy のとき表示 |
+| `"!isEnglish"` | drawParams.isEnglish が falsy のとき表示 |
+| `"isJapanese && isStation"` | 両方 truthy のとき表示 |
+| `"isJapanese \|\| isEnglish"` | いずれか truthy のとき表示 |
+| `"nowStation.lineNumberType == 0"` | drawParams.nowStation.lineNumberType が 0 のとき表示 |
+| `"carNum == 3"` | drawParams.carNum が 3 のとき表示 |
+
+**優先順位**: `!` > `==` > `&&` > `||`
+
+- `==` の両辺はそれぞれ変数（ドット記法可）または数値定数
+- 両辺が数値に変換できる場合は数値比較、それ以外は文字列比較
+
+---
+
 ## 各パーツ詳細
 
 ### static
@@ -39,6 +71,26 @@
 | 文字色 | string | テキストの色（CSS色指定） |
 | 水平揃え | string | `left` / `center` / `right` |
 | 垂直揃え | string | `top` / `middle` / `bottom` |
+
+### lcdText 属性（テキスト内容テンプレート）
+
+描画するテキスト内容は `lcdText` 属性で指定するテンプレート文字列から生成する。  
+`#{変数名}` の形式で drawParams の値を埋め込める。
+
+```xml
+<!-- 変数のみ -->
+<rect lcdParts="textBox" lcdText="#{stationName}" ... />
+
+<!-- 固定文字＋変数 -->
+<rect lcdParts="textBox" lcdText="次は#{stationName}駅" ... />
+
+<!-- 複数変数 -->
+<rect lcdParts="textBox" lcdText="#{trainType} #{destination}行" ... />
+```
+
+- `#{変数名}` は `.` 区切りで入れ子オブジェクトを参照できる（例: `#{station.eng}` → `drawParams.station.eng`）
+- 参照先が存在しない場合は空文字として展開する
+- テンプレート展開後の文字列が空文字の場合はその要素を出力に追加しない
 
 ---
 

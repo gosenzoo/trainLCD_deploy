@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Drawer デバッグ</title>
+  <style>
+    body { margin: 0; background: #333; display: flex; justify-content: center; }
+    svg { width: 100%; max-width: 1920px; }
+  </style>
+</head>
+<body>
+  <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 350"></svg>
+
+  <script src="../jsMojules/utilClass/TextDrawer.js"></script>
+  <script src="Drawer.js"></script>
+  <script>
+    window.onload = async () => {
+      const drawer = new Drawer();
+      await drawer.load();
+
+      const svg = document.getElementById('display');
+      svg.appendChild(drawer.draw());
+    };
+  </script>
+</body>
+</html>

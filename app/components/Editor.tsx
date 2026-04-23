@@ -42,6 +42,8 @@ const Editor = () => {
         <div>
             {/* editor-container の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
             <div className="display-toolbar">
+                {/* デバッグ画面を別タブで開く */}
+                <button onClick={() => window.open('/lcdDisplay/index.html', '_blank')} className="btn-secondary">デバッグ</button>
                 <button onClick={openDisplay} className="btn-primary">表示</button>
             </div>
             <div className="editor-container">

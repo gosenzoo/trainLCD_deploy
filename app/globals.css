@@ -315,6 +315,19 @@ button:hover {
   color: var(--text-primary);
 }
 
+/* サブボタン（デバッグ等） */
+button.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+button.btn-secondary:hover {
+  background: var(--bg-overlay);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
 /* アクセントボタン（表示・追加系） */
 button.btn-primary {
   background: var(--accent);
