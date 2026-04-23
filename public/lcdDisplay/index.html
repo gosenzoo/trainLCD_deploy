@@ -4,23 +4,157 @@
   <meta charset="UTF-8">
   <title>Drawer デバッグ</title>
   <style>
-    body { margin: 0; background: #333; display: flex; justify-content: center; }
-    svg { width: 100%; max-width: 1920px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1e1e1e; color: #ccc; font-family: sans-serif; }
+
+    #svg-wrap { background: #333; display: flex; justify-content: center; }
+    svg { width: 100%; max-width: 1920px; display: block; }
+
+    #controls {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #controls h2 { margin: 0 0 4px; font-size: 14px; color: #aaa; }
+
+    #param-list {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 6px 12px;
+      align-items: start;
+    }
+    .param-label {
+      font-size: 13px;
+      color: #9cdcfe;
+      padding-top: 5px;
+      word-break: break-all;
+    }
+    .param-input {
+      background: #2d2d2d;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #d4d4d4;
+      font-size: 13px;
+      padding: 4px 8px;
+      width: 100%;
+    }
+    .param-input:focus { outline: none; border-color: #569cd6; }
+    textarea.param-input { resize: vertical; font-family: monospace; }
+    input[type="checkbox"].param-input {
+      width: auto;
+      padding: 0;
+      margin-top: 6px;
+      accent-color: #569cd6;
+    }
+
+    #redraw-btn {
+      align-self: flex-start;
+      padding: 8px 24px;
+      background: #0e639c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #redraw-btn:hover { background: #1177bb; }
   </style>
 </head>
 <body>
-  <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 350"></svg>
+  <div id="svg-wrap">
+    <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"></svg>
+  </div>
+
+  <div id="controls">
+    <h2>描画パラメータ</h2>
+    <div id="param-list"></div>
+    <button id="redraw-btn">再描画</button>
+  </div>
 
   <script src="../jsMojules/utilClass/TextDrawer.js"></script>
   <script src="Drawer.js"></script>
   <script>
+    const svg = document.getElementById('display');
+    const paramList = document.getElementById('param-list');
+    let drawer;
+
+    // drawParamsの各エントリを入力フィールドとして生成する
+    function buildControls(params) {
+      paramList.innerHTML = '';
+      for (const [key, val] of Object.entries(params)) {
+        const label = document.createElement('div');
+        label.className = 'param-label';
+        label.textContent = key;
+
+        let input;
+        if (typeof val === 'boolean') {
+          input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = val;
+          input.dataset.type = 'boolean';
+        } else if (typeof val === 'number') {
+          input = document.createElement('input');
+          input.type = 'number';
+          input.value = val;
+          input.dataset.type = 'number';
+        } else if (typeof val === 'object' && val !== null) {
+          input = document.createElement('textarea');
+          input.value = JSON.stringify(val, null, 2);
+          input.rows = Math.min(Object.keys(val).length + 2, 12);
+          input.dataset.type = 'json';
+        } else {
+          input = document.createElement('input');
+          input.type = 'text';
+          input.value = val ?? '';
+          input.dataset.type = 'string';
+        }
+        input.className = 'param-input';
+        input.dataset.key = key;
+
+        paramList.appendChild(label);
+        paramList.appendChild(input);
+      }
+    }
+
+    // 入力フィールドからdrawParamsを収集する
+    function collectParams() {
+      const params = {};
+      paramList.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.dataset.key;
+        switch (el.dataset.type) {
+          case 'boolean': params[key] = el.checked; break;
+          case 'number':  params[key] = Number(el.value); break;
+          case 'json':
+            try { params[key] = JSON.parse(el.value); }
+            catch { params[key] = {}; }
+            break;
+          default: params[key] = el.value;
+        }
+      });
+      return params;
+    }
+
+    // SVGをクリアして再描画する
+    function redraw() {
+      drawer.drawParams = collectParams();
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.appendChild(drawer.draw(svg));
+    }
+
     window.onload = async () => {
-      const drawer = new Drawer();
+      drawer = new Drawer();
       await drawer.load();
 
-      const svg = document.getElementById('display');
-      // defsをsvgに注入しつつコンテンツ<g>を取得
+      // lcdSVGのサイズをheaderSVGのviewBoxに合わせる
+      const viewBox = drawer.templateSVG.getAttribute('viewBox');
+      if (viewBox) svg.setAttribute('viewBox', viewBox);
+
+      // 初期描画とコントロール生成
       svg.appendChild(drawer.draw(svg));
+      buildControls(drawer.drawParams);
+
+      document.getElementById('redraw-btn').addEventListener('click', redraw);
     };
   </script>
 </body>
