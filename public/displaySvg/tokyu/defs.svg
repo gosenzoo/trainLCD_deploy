@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs id="defs">
+    <linearGradient id="tokyuBackGradient" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0.00%" stop-color="rgb(74, 75, 86)" />
+      <stop offset="47.31%" stop-color="rgb(37, 37, 41)" />
+      <stop offset="47.92%" stop-color="rgb(6, 6, 8)" />
+      <stop offset="52.06%" stop-color="rgb(7, 7, 7)" />
+      <stop offset="92.70%" stop-color="rgb(75, 74, 81)" />
+      <stop offset="93.05%" stop-color="rgb(166, 167, 172)" />
+      <stop offset="94.63%" stop-color="rgb(21, 21, 21)" />
+      <stop offset="95.16%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="96.73%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="96.99%" stop-color="rgb(255, 0, 0)" />
+      <stop offset="99.68%" stop-color="rgb(255, 0, 0)" />
+      <stop offset="100.00%" stop-color="rgb(255, 30, 30)" />
+    </linearGradient>
+    <linearGradient id="innerGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="51%" stop-color="rgb(220, 220, 220)" />
+      <stop offset="51.11%" stop-color="rgb(158, 158, 158)" />
+      <stop offset="81.11%" stop-color="rgb(201, 201, 201)" />
+      <stop offset="100%" stop-color="rgb(228, 228, 228)" />
+    </linearGradient>
+    <linearGradient id="outerGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+      <stop offset="17.78%" stop-color="rgb(228, 228, 228)" />
+      <stop offset="48.89%" stop-color="rgb(182, 182, 182)" />
+      <stop offset="51.11%" stop-color="rgb(158, 158, 158)" />
+      <stop offset="81.11%" stop-color="rgb(201, 201, 201)" />
+      <stop offset="100%" stop-color="rgb(228, 228, 228)" />
+    </linearGradient>
+    <linearGradient id="outlineGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgb(44, 44, 44)" />
+      <stop offset="100%" stop-color="rgb(211, 211, 211)" />
+    </linearGradient>
+
+    <filter id="outline">
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2" />
+      <feFlood flood-color="black" result="BLACK"/>
+      <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"/>
+      <feMerge>
+        <feMergeNode in="OUTLINE"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
+    </filter>
+    <filter id="dropShadow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="-4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
+    </filter>
+    <filter id="grayscale">
+      <fecolormatrix type="matrix" values="0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0 0 0 1 0"></fecolormatrix>
+    </filter>
+  </defs>
+</svg>

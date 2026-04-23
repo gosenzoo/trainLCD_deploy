@@ -1,11 +1,14 @@
 class LCDController{
-    constructor(setting, mapSVG, numIconPresets, displaySVG){
+    constructor(setting, defsSVG, headerSVG, defaultLineSVG, platformSVG, numIconPresets, displaySVG){
         for(let i = 0; i < setting.stationList.length; i++){
             setting.stationList[i]._id = i;
         }
         console.log(setting);
         this.setting = setting; //設定を保存
-        this.mapSVG = mapSVG; //フォーマットSVG
+        this.defsSVG = defsSVG; //グラデーション・フィルター定義SVG（全Drawer共通）
+        this.headerSVG = headerSVG; //ヘッダー・フッター用SVG
+        this.defaultLineSVG = defaultLineSVG; //標準路線図ボディ用SVG
+        this.platformSVG = platformSVG; //ホーム案内ボディ用SVG
         this.displaySVG = displaySVG; //描画先SVG
         this.animator = new Animator(); //アニメーターを初期化
         this.numIconDrawer = new NumIconDrawer(numIconPresets); //ナンバリング記号ドロワーを初期化
@@ -15,18 +18,18 @@ class LCDController{
         this.progressController = new ProgressController(this.setting.stationList.map(station => station.isPass), this.setting.info.isLoop);
         this.progressController.onLongStop = () => { this.setLCDToDisplay(); console.log("長時間停車!") }; //長時間停車イベント時にLCDを更新
         //ヘッダーコントローラーを初期化
-        this.headerController = new HeaderController(setting, new HeaderDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer)); //ヘッダーコントローラーを初期化
-        //フッターコントローラを初期化
-        this.footerController = new FooterController(setting, new FooterDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer)); //フッターコントローラーを初期化
-        
+        this.headerController = new HeaderController(setting, new HeaderDrawer(headerSVG, setting.iconDict, this.animator, this.numIconDrawer));
+        //フッターコントローラを初期化（フッターはdefaultLine.svgに含まれる）
+        this.footerController = new FooterController(setting, new FooterDrawer(defaultLineSVG, setting.iconDict, this.animator, this.numIconDrawer));
+
         //デフォルト線路コントローラーを初期化
-        this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
+        this.defaultLineController = new DefaultLineController(setting, new DefaultLineDrawer(defaultLineSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //全体路線コントローラを初期化
-        this.overLineController = new OverLineController(setting, new OverLineDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
+        this.overLineController = new OverLineController(setting, new OverLineDrawer(defaultLineSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //ホーム案内コントローラーを初期化
-        this.platformController = new PlatformController(setting, new PlatformDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
+        this.platformController = new PlatformController(setting, new PlatformDrawer(platformSVG, setting.iconDict, this.animator, this.numIconDrawer));
         //乗換案内画面コントローラーを初期化
-        this.transferController = new TrasnferController(setting, new TransferDrawer(mapSVG, setting.iconDict, this.animator, this.numIconDrawer));
+        this.transferController = new TrasnferController(setting, new TransferDrawer(platformSVG, setting.iconDict, this.animator, this.numIconDrawer));
 
         //[つぎは、まもなく、ただいま、駅通過中]の順
         this.pageList = [
@@ -66,9 +69,9 @@ class LCDController{
     createLCD(){
         const tempSVG = document.createElementNS("http://www.w3.org/2000/svg", "g"); //組み立て用ツリー
         
-        //仮描画先に、フォーマットSVGのフィルタと背景を追加
-        tempSVG.appendChild(mapSVG.getElementById("defs").cloneNode(true))
-        tempSVG.appendChild(mapSVG.getElementById("background").cloneNode(true));
+        //仮描画先に、defs.svgからフィルタ定義を、header.svgから背景を追加
+        tempSVG.appendChild(this.defsSVG.getElementById("defs").cloneNode(true))
+        tempSVG.appendChild(this.headerSVG.getElementById("background").cloneNode(true));
 
         //現在のoperationオブジェクトを取得
         const operation = this.getOperation(this.setting.operationList, this.progressController.progressParams.sectionInd);

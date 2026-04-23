@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <!-- defs は defs.svg に集約。url(./defs.svg#id) 形式で参照することでSVG単体プレビューに対応 -->
+  <!-- 背景 -->
+  <rect id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+  <!-- プラットフォーム -->
+  <g id="body-platform" style="isolation: isolate;" visibility="visible">
+    <g id="body-platform-transferList">
+      <rect id="transferListBack" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(./defs.svg#dropShadow2)"></rect>
+      <rect id="transferListTextRect" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
+      <rect id="transferListTextEngRect" x="32" y="942" width="203" height="36" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}'></rect>
+      <rect id="transferListAreaMulti" x="280" y="866" width="1600" height="128" fill="#999999"></rect>
+      <rect id="transferListArea" x="280" y="886" width="1600" height="88" fill="#5f5f5f"></rect>
+    </g>
+
+    <!-- 矢印 -->
+    <g id="body-platform-trainArrow" transform="translate(1778,752)" data-basePoint="0,0">
+      <polygon points="0,0 40,0 40,-16 75,18 40,52 40,36 00,36" stroke-width="7" stroke="#ffffff"/>
+      <polygon points="0,0 40,0 40,-16 75,18 40,52 40,36 00,36" fill="rgb(255, 0, 0)"/>
+    </g>
+  </g>
+
+  <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+  <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
+  <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+  <!-- <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
+</svg>

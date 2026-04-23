@@ -1,7 +1,18 @@
 let displaySVG;
 let settings;
-let mapSVG;
 let lcdController;
+
+// プレビュー用の外部参照 url(./defs.svg#id) をランタイム用のローカル参照 url(#id) に変換する
+function normalizeSVGDefsRefs(svgElement) {
+    const pattern = /url\(\.\/defs\.svg#([^)]+)\)/g;
+    svgElement.querySelectorAll('*').forEach(el => {
+        for (const attr of Array.from(el.attributes)) {
+            if (attr.value.includes('./defs.svg#')) {
+                el.setAttribute(attr.name, attr.value.replace(pattern, 'url(#$1)'));
+            }
+        }
+    });
+}
 
 let width, height
 
@@ -29,8 +40,17 @@ window.onload = async function(){
     displaySVG = document.getElementById("display");
     //〇localStrogeからsettings読み込み
     settings = JSON.parse(localStorage.getItem('lcdStrage'));
-    //〇フォーマットSVGの読み込み
-    mapSVG = await getSVGElementFromUrl(`/displaySvg/tokyu/header-body.svg`);
+    //〇フォーマットSVGの読み込み（defs・ヘッダー・標準路線図・ホーム案内を並列フェッチ）
+    const [defsSVG, headerSVG, defaultLineSVG, platformSVG] = await Promise.all([
+        getSVGElementFromUrl(`/displaySvg/tokyu/defs.svg`),
+        getSVGElementFromUrl(`/displaySvg/tokyu/header.svg`),
+        getSVGElementFromUrl(`/displaySvg/tokyu/defaultLine.svg`),
+        getSVGElementFromUrl(`/displaySvg/tokyu/platform.svg`),
+    ]);
+    //〇プレビュー用外部参照をランタイム用ローカル参照に正規化
+    normalizeSVGDefsRefs(headerSVG);
+    normalizeSVGDefsRefs(defaultLineSVG);
+    normalizeSVGDefsRefs(platformSVG);
     //〇アイコンフォーマットSVGの読み込み
     //各駅ナンバリング
     const _numIconKeyList = new Set();
@@ -64,7 +84,7 @@ window.onload = async function(){
     console.log(numIconPresets);
 
     //LCDControllerを召喚
-    lcdController = new LCDController(settings, mapSVG, numIconPresets, displaySVG);
+    lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, platformSVG, numIconPresets, displaySVG);
 
     //ユーザ操作を受け付けるイベントリスナーを設定
     window.addEventListener("keydown", (e) => keyDown(e, lcdController)); //キーダウン（PC）
@@ -72,8 +92,8 @@ window.onload = async function(){
     //ウィンドウサイズが変わると、サイズを合わせる関数を設定
     window.addEventListener("resize", () => resizeCanvas(displaySVG, width, height));
 
-    //displaySVGにviewBoxを設定
-    let viewBox = mapSVG.getAttribute("viewBox");
+    //displaySVGにviewBoxを設定（header.svgのviewBoxを基準とする）
+    let viewBox = headerSVG.getAttribute("viewBox");
     if(viewBox){
         let viewBoxValues = viewBox.split(" ");
         width = parseFloat(viewBoxValues[2]);

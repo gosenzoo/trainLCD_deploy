@@ -1060,6 +1060,67 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 | `JW-225` | `public/Display_JW-225.html` | JR西日本 225系 |
 | `JE-E131` | （未実装） | JR東日本 E131系 |
 
+### 表示SVGファイル構成と読み込み処理
+
+表示ロジックの明確化のため、入力SVGファイルをヘッダー・ボディ種別ごとに分割して管理する。
+
+#### ファイル分割方針
+
+`public/displaySvg/tokyu/` 以下の `header-body.svg`（1ファイル）を以下4ファイルに分割する。
+
+| ファイル名 | 含む要素 | 対応Drawer |
+|---|---|---|
+| `defs.svg` | `<defs id="defs">` （全グラデーション・フィルター） | — （全Drawer共通参照元） |
+| `header.svg` | `<rect id="background">` / `<g id="header">` | HeaderDrawer |
+| `defaultLine.svg` | `<g id="body-defaultLine">` / `<g id="footer">` | DefaultLineDrawer、OverLineDrawer、FooterDrawer |
+| `platform.svg` | `<g id="body-platform">` / `<image id="platform-jitubutu">` | PlatformDrawer、TransferDrawer |
+
+- グラデーション・フィルターはすべて `defs.svg` に集約し、他ファイルはJSで参照する
+- `defs` の取得元は `defs.svg`、`background` の取得元は `header.svg`
+- `viewBox` の基準は `header.svg` の値を使用する
+- `header.svg` / `defaultLine.svg` / `platform.svg` 内のグラデーション・フィルター参照は `url(./defs.svg#id)` 形式の外部参照で記述し、SVG単体プレビュー（ブラウザ・VSCode拡張等）で正しく描画されるようにする
+- ランタイムでは `display.js` の `normalizeSVGDefsRefs()` が外部参照 `url(./defs.svg#id)` をローカル参照 `url(#id)` に変換してから `LCDController` へ渡す
+
+#### 読み込み処理（`display.js`）
+
+4ファイルを並列フェッチして `LCDController` に渡す。
+
+```javascript
+const [defsSVG, headerSVG, defaultLineSVG, platformSVG] = await Promise.all([
+    getSVGElementFromUrl(`/displaySvg/tokyu/defs.svg`),
+    getSVGElementFromUrl(`/displaySvg/tokyu/header.svg`),
+    getSVGElementFromUrl(`/displaySvg/tokyu/defaultLine.svg`),
+    getSVGElementFromUrl(`/displaySvg/tokyu/platform.svg`),
+]);
+lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, platformSVG, numIconPresets, displaySVG);
+```
+
+グローバル変数 `mapSVG` は廃止し、各SVGは `LCDController` コンストラクタへの引数としてのみ渡す。
+
+#### `LCDController` コンストラクタ変更
+
+```
+変更前: constructor(setting, mapSVG, numIconPresets, displaySVG)
+変更後: constructor(setting, defsSVG, headerSVG, defaultLineSVG, platformSVG, numIconPresets, displaySVG)
+```
+
+各Drawerへ渡すSVG:
+
+| Drawer | 渡すSVG |
+|---|---|
+| `HeaderDrawer` | `headerSVG` |
+| `FooterDrawer` | `defaultLineSVG` |
+| `DefaultLineDrawer` | `defaultLineSVG` |
+| `OverLineDrawer` | `defaultLineSVG` |
+| `PlatformDrawer` | `platformSVG` |
+| `TransferDrawer` | `platformSVG` |
+
+`createLCD()` 内での取得元:
+- `defs` → `this.defsSVG`
+- `background` → `this.headerSVG`
+
+---
+
 ### 行先データのフォールバック（`LCDController.getOperation`）
 
 以下の 2 段階で末尾停車駅の情報を行先データに補完する。

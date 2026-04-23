@@ -1,0 +1,49 @@
+<svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <!-- defs は defs.svg に集約。url(./defs.svg#id) 形式で参照することでSVG単体プレビューに対応 -->
+  <!-- 背景 -->
+  <rect id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+  
+  <!-- ヘッダー -->
+  <g id="header" visibility="visible">
+    <!-- ヘッダー背景 -->
+    <rect id="header-back" x="0" y="0" width="1920" height="350" fill="url(./defs.svg#tokyuBackGradient)" filter="url(./defs.svg#dropShadow)" />
+    <!-- 号車表示 -->
+    <g id="header-carNum">
+      <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(./defs.svg#outlineGradient)" />
+      <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(./defs.svg#outerGradient)" />
+      <rect id="carNumText" x="1723" y="39" width="78" height="78" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "middle"}' lang="en" />
+      <rect id="carText" x="1822" y="80" width="78" height="38" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
+      <rect id="carTextEng" x="1575" y="35" width="125" height="38" fill="#99999950" data-style='{"fontWeight": "regular", "fontFamily": "sans-serif", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
+    </g>
+    <!-- 行先方面表示 -->
+    <rect id="header-viaText" x="431" y="51" width="275" height="62" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-destinationText" x="737" y="34" width="830" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-destinationTextEng" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-viaTextStop" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-viaTextStopEng" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-stopYukiText" x="1750" y="224" width="150" height="86" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
+    <rect id="header-stopYukiTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
+    <!-- 種別表示 -->
+    <g id="header-trainType">
+      <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(./defs.svg#outlineGradient)" />
+      <rect id="trainTypeBackColor" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
+      <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(./defs.svg#outerGradient)" style="mix-blend-mode: multiply;" />
+      <rect id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
+      <rect id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
+      <!-- 種別補足表示 -->
+      <rect id="trainTypeSubText" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+      <rect id="trainTypeSubTextEng" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+    </g>
+    <!-- ナンバリング -->
+    <rect id="header-numbering-rect" x="482" y="152" width="162" height="162" fill="#aeaeae" />
+    <!-- 駅名 -->
+    <rect id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
+    <rect id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
+    <!-- つぎは、まもなく、ただいま -->
+    <rect id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+    <rect id="header-runStateTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+    <rect id="header-runStateTerminalText" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
+    <rect id="header-runStateTerminalTextEng" x="45" y="200" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+  </g>
+
+</svg>

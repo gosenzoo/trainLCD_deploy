@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <!-- defs は defs.svg に集約。url(./defs.svg#id) 形式で参照することでSVG単体プレビューに対応 -->
+  <!-- 背景 -->
+  <rect id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+  <!-- 標準路線図ボディ -->
+  <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
+    <g filter="url(./defs.svg#outline)">
+      <!-- 路線ベース左端（始点） -->
+      <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(221, 221, 221)" />
+      <path id="lineStartEdge" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベース右端（終点） -->
+      <polygon id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
+              data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <path id="lineEndEdge" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベース中 -->
+      <rect id="lineBase" x="226" y="721" width="1468" height="87" fill="rgb(221, 221, 221)" />
+      <!-- 路線ベースはしょり -->
+      <path id="lineLeap1" d=" M 1484 721 L 1582 721 Q 1566 742.75, 1582 766.5 Q 1606 788.25, 1582 808 L 1486 808 Z "
+        fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+      <path id="lineLeap2" d=" M 1694 721 L 1602 721 Q 1578 740, 1600 764.5 Q 1615 780, 1602 808 L 1694 808 Z "
+        fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+      <!-- 路線ベース1影 -->
+      <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+              fill="url(./defs.svg#innerGradient)"
+              style="mix-blend-mode: multiply;" />
+      <!-- 路線ベース駅アイコン左端 -->
+      <rect id="stationStart" x="172" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース駅アイコン右端 -->
+      <rect id="stationEnd" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース通過駅アイコン -->
+      <polygon id="passStation" points="1256,738 1267,738 1296,764.5 1267,791 1256,791 1285,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
+      <!-- 路線ベース路線名テキスト始点側 -->
+      <rect id="lineNameStartText" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト先端側 -->
+      <rect id="lineNameEndText" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト始点側(英語) -->
+      <rect id="lineNameStartTextEng" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- 路線ベース路線名テキスト先端側(英語) -->
+      <rect id="lineNameEndTextEng" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}' />
+      <!-- (分) -->
+      <rect id="MinuteText" x="1770" y="752" width="60" height="44" fill="#ffffff" data-style='{"fill": "rgb(255, 255, 255)", "fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle", "textShadow": "1px 1px 1px rgb(50, 50, 50)"}' />
+      <!-- (min) -->
+      <rect id="MinuteTextEng" x="1760" y="752" width="70" height="44" fill="#ffffff" data-style='{"fill": "rgb(255, 255, 255)", "fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle", "textShadow": "1px 1px 1px rgb(50, 50, 50)"}' />
+      <!-- 路線ベース2影 -->
+      <polygon points="0,721 1840,721 1882,765 1840,808 0,808"
+              fill="url(./defs.svg#outerGradient)"
+              style="mix-blend-mode: multiply;" />
+    </g>
+    <g id="hereIcon" data-basePoint="228,721">
+      <polygon points="172,719 232,719 276,764.5 233,809 173,809 216,764.5" fill="white" />
+      <polygon points="180,721 228,721 270,764.5 227,809 179,809 222,764.5">
+        <animate
+        attributeName="fill"
+        values="red;blue"
+        dur="2s"
+        repeatCount="indefinite"
+        calcMode="discrete" />
+      </polygon>
+      <polygon points="180,721 228,721 270,764.5 227,809 179,809 222,764.5"
+              fill="url(./defs.svg#innerGradient)"
+              style="mix-blend-mode: multiply;" />
+    </g>
+    <g id="body-defaultLine-stationText" data-basePoint="1694,721">
+      <rect id="body-defaultLine-numRect" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+      <rect id="body-defaultLine-numIconRect" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
+      <rect id="body-defaultLine-transferArea" x="1594" y="813" width="200" height="180" fill="#99999950" />
+      <rect id="body-defaultLine-transferLine" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
+      <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
+      <rect id="body-defaultLine-stationName" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+      <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="333" height="70" fill="#99999950" transform="translate(1634, 680) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
+      <!-- 駅所要時間 -->
+      <rect id="body-defaultLine-timeText" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
+    </g>
+  </g>
+
+  <g id="footer" visibility="visible">
+    <!-- 時間は異なります(英語) -->
+    <rect id="footer-estimateTimeText" x="1396" y="1028" width="510" height="35" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "regular", "textAnchor": "end", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <rect id="footer-stopText" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+  </g>
+</svg>
