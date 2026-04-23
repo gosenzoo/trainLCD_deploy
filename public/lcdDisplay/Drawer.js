@@ -6,15 +6,19 @@ class Drawer {
         this.textDrawer = null;
     }
 
-    // 同フォルダの3ファイルを並列フェッチして初期化
+    // 同フォルダの4ファイルを並列フェッチして初期化
     async load() {
-        const [drawParams, iconList, templateSVG] = await Promise.all([
+        const [drawParams, iconList, templateSVG, defsSVG] = await Promise.all([
             fetch('./drawParams.json').then(r => r.json()),
             fetch('./iconList.json').then(r => r.json()),
-            this._fetchSVG('./headerSVG.svg')
+            this._fetchSVG('./headerSVG.svg'),
+            this._fetchSVG('./defs.svg')
         ]);
         this.drawParams = drawParams;
         this.iconList = iconList;
+        this.defsSVG = defsSVG;
+        // url(./defs.svg#id) → url(#id) に正規化してからテンプレートを保持
+        this._normalizeSVGDefsRefs(templateSVG);
         this.templateSVG = templateSVG;
         this.textDrawer = new TextDrawer(this.iconList, null);
     }
@@ -27,8 +31,26 @@ class Drawer {
         return parser.parseFromString(text, 'image/svg+xml').documentElement;
     }
 
-    // SVGをトラバースして<g>要素を返す
-    draw() {
+    // url(./defs.svg#id) をローカル参照 url(#id) に変換する
+    _normalizeSVGDefsRefs(svgElement) {
+        const pattern = /url\(\.\/defs\.svg#([^)]+)\)/g;
+        svgElement.querySelectorAll('*').forEach(el => {
+            for (const attr of Array.from(el.attributes)) {
+                if (attr.value.includes('./defs.svg#')) {
+                    el.setAttribute(attr.name, attr.value.replace(pattern, 'url(#$1)'));
+                }
+            }
+        });
+    }
+
+    // <defs>をtargetSVGの先頭に注入し、コンテンツ<g>を返す
+    draw(targetSVG) {
+        // defsをlcdSVGの最初の子として直接注入
+        const defsEl = this.defsSVG.getElementById('defs');
+        if (defsEl) {
+            targetSVG.insertBefore(defsEl.cloneNode(true), targetSVG.firstChild);
+        }
+
         const lcdGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         for (const child of this.templateSVG.children) {
             this._traverse(child, lcdGroup);

@@ -19,7 +19,8 @@
       await drawer.load();
 
       const svg = document.getElementById('display');
-      svg.appendChild(drawer.draw());
+      // defsをsvgに注入しつつコンテンツ<g>を取得
+      svg.appendChild(drawer.draw(svg));
     };
   </script>
 </body>
