@@ -4,6 +4,8 @@ class Drawer {
         this.iconList = null;
         this.templateSVG = null;
         this.textDrawer = null;
+        this.exprParser = new ExprParser();
+        this.debug = false; // trueにするとarrangeArea境界と末端要素境界を表示
     }
 
     // 同フォルダの4ファイルを並列フェッチして初期化
@@ -28,6 +30,7 @@ class Drawer {
         const res = await fetch(url);
         const text = await res.text();
         const parser = new DOMParser();
+        console.log(parser.parseFromString(text, 'image/svg+xml').documentElement);
         return parser.parseFromString(text, 'image/svg+xml').documentElement;
     }
 
@@ -62,7 +65,7 @@ class Drawer {
     _traverse(element, parent) {
         // visible属性がある場合、式を評価して非表示なら処理しない
         const visibleAttr = element.getAttribute('visible');
-        if (visibleAttr !== null && !this._evalExpr(visibleAttr)) return;
+        if (visibleAttr !== null && !this.exprParser.eval(visibleAttr, name => this._resolveValue(name))) return;
 
         const lcdParts = element.getAttribute('lcdParts');
         if (lcdParts === 'static') {
@@ -72,6 +75,21 @@ class Drawer {
             // lcdTextテンプレートを展開してテキスト要素を生成・追加
             const el = this._createText(element);
             if (el) parent.appendChild(el);
+        } else if (lcdParts === 'arrange') {
+            // arrangeObjで子要素を再帰的にオブジェクト化してレイアウト
+            const ctx = {
+                drawParams: this.drawParams,
+                args: {},
+                textDrawer: this.textDrawer,
+                exprParser: this.exprParser,
+                debug: this.debug,
+            };
+            const arrangeObj = new ArrangeObj(element, ctx);
+            console.log(arrangeObj);
+            // arrangeAreaのサイズ内に収まるよう圧縮を適用
+            arrangeObj.setSize(arrangeObj.width, arrangeObj.height);
+            const el = arrangeObj.getElement();
+            if (el) parent.appendChild(el);
         } else {
             // lcdPartsなし: 子要素へ再帰
             for (const child of element.children) {
@@ -80,40 +98,11 @@ class Drawer {
         }
     }
 
-    // visible式の評価（||が&&より低優先度）
-    _evalExpr(expr) {
-        for (const orPart of expr.split('||')) {
-            const andResult = orPart.split('&&').every(token => this._evalAtom(token.trim()));
-            if (andResult) return true;
-        }
-        return false;
-    }
-
-    // アトム（変数、否定、== 比較式）の評価
-    _evalAtom(token) {
-        token = token.trim();
-        if (token.startsWith('!')) return !this._resolveVar(token.slice(1).trim());
-
-        // == 等価演算子の処理
-        if (token.includes('==')) {
-            const [left, right] = token.split('==').map(s => s.trim());
-            const leftVal  = this._resolveValue(left);
-            const rightVal = this._resolveValue(right);
-            // 両辺が数値に変換できる場合は数値比較、それ以外は文字列比較
-            const leftNum  = Number(leftVal);
-            const rightNum = Number(rightVal);
-            if (!isNaN(leftNum) && !isNaN(rightNum) && String(leftVal) !== '' && String(rightVal) !== '') {
-                return leftNum === rightNum;
-            }
-            return String(leftVal ?? '') === String(rightVal ?? '');
-        }
-
-        return this._resolveVar(token);
-    }
-
-    // drawParamsからドット記法で値を解決し、生の値を返す
+    // drawParamsからドット記法で値を解決し、生の値を返す（true/false リテラルにも対応）
     _resolveValue(token) {
         token = token.trim();
+        if (token === 'true')  return true;
+        if (token === 'false') return false;
         // 数値定数
         const num = Number(token);
         if (token !== '' && !isNaN(num)) return num;
@@ -125,15 +114,6 @@ class Drawer {
             val = val[key];
         }
         return val;
-    }
-
-    // drawParamsから変数を解決してbooleanで返す
-    _resolveVar(name) {
-        name = name.trim();
-        if (name === 'true') return true;
-        if (name === 'false') return false;
-        const val = this._resolveValue(name);
-        return val !== undefined && val !== null ? !!val : false;
     }
 
     // lcdTextテンプレートを展開してTextDrawerでテキスト要素を生成

@@ -1,0 +1,100 @@
+  1. SVG属性名: verticalAlign, horizontalAlign, flexible, margin, minComRatio、また arrange の axis, interval
+  は、SVGのどの属性名で書きますか？（例: data-axis="x" か axis="x" か）
+⇒
+
+  2. arg 複製の配置: lcd-arg によって複製された ArrangeArea は、親の arrange の子として横/縦に並ぶのか、それとも親の
+  arrange 自体が複製されて兄弟として展開されますか？
+
+
+  3. static / numberingIcon のオブジェクト化: arrange の子要素として lcdParts="static" や lcdParts="numberingIcon"
+  が出てきた場合、これらもオブジェクト化が必要ですか？
+
+
+  4. minComRatio の動作: 圧縮の優先順位制御とは具体的にどういう処理ですか？（例：全子要素が minComRatio=0.5
+  の場合、最大で50%まで縮小可能で、スペースが不足したら全体を均等に縮小する、など）
+
+
+  5. 実際の大きさ設定 の戻り値: 設定した width, height と戻り値が異なるケースはありますか？
+
+
+
+１．共通フィールドのSVG属性名: verticalAlign, horizontalAlign, flexible, margin, minComRatio は SVG のどの属性名から読み込むか
+⇒
+verticalAlign:lcd-verAlign
+horizontalAlign:lcd-holAilgn
+flexible:lcd-flex
+margin:lcd-margin
+minComRatio:lcd-minComRatio
+です。
+
+２．ArrangeArea の axis, interval のSVG属性名: <g lcdParts="arrange"> のどの属性から読み込むか
+⇒
+axis:arrange-axis
+interval:arrange-interval
+です。
+
+３．arg 複製の配置: 配列分複製された ArrangeArea は、親の arrange の子として並ぶのか、それとも別の展開方法か
+⇒
+親のarrangeの子として並びます。単にsvgDom要素が複数個存在するのと同じです。
+
+４．static / numberingIcon のオブジェクト化: arrange の子として現れる場合、これらもオブジェクト化が必要か
+⇒
+まだ必要ありません。
+
+５．実際の大きさ設定 の戻り値: 設定した値と異なる場合があるか（たとえば minComRatio により最小サイズが保証される場合など）
+⇒
+あります。実際に設定された値を返してください。
+
+６．minComRatio の具体的な動作: 圧縮の優先順位制御のアルゴリズムをもう少し詳しく教えてほしい
+⇒
+同じarrange内の要素は、基本的には、並べた際の大きさと目的の大きさの比率を使って同じ圧縮率で圧縮されます。
+この圧縮率が最小圧縮率を下回る要素が出たら、その要素は最小圧縮率で止まり、ほかの要素を等圧縮率で圧縮します。
+これを繰り返し、全ての要素の圧縮率が最小圧縮率に達した場合、再びすべての要素を等圧縮率で圧縮していきます。
+
+
+質問（２回目）
+
+  1. $引数名 の展開範囲: lcdText 属性以外（例: visible、lcd-arg など）でも $引数名
+  は使えますか？またドット記法（$station.name のように）は使えますか？
+  ⇒これらは考慮しません。引数はいったん配列である前提です。
+
+  2. lcd-arg が複数引数のとき: lcd-arg="a, b" の場合、複製数は a と b
+  どちらの配列長で決まりますか？同じ長さが前提ですか？
+  ⇒複製するかは、子要素にlcd-arg="$a"など指定したときに決まります。この場合、この子要素がaの要素数だけ複製されます。
+  　別の子要素に$bを指定すると、その要素はbの要素数だけ複製されます。
+
+  3. flexible の具体的な動作: flexible=true のとき「実際の大きさ設定」で渡された width/height
+  をそのまま設定（アスペクト比を変える）、flexible=false
+  のときはアスペクト比を維持して収まるよう設定する、という理解で合っていますか？
+  ⇒たとえば、textBox横書き時の高さは、与えた範囲で決まりますよね。そして、横の範囲を実際の大きさ設定で狭くすると、
+  文字は横幅のみ圧縮され、高さは変わりませんよね。このような比率が変わる圧縮を許可するかの設定です。
+　許可する場合は「実際の大きさ設定」で渡されたwidth/heightで再描画した際に、はみ出した場合は横幅のみ圧縮します。
+　許可しない場合は、alignに対応する四つ角のどれか（または範囲中央）を基準として比率を変えずに全体を縮小します。
+　縦に並べる場合もしかりです。
+
+
+質問３
+
+  1. $引数名 の置換対象属性: lcd-arg="$a" で複製される際、属性値内の $a
+  はすべての属性で置換されますか？（lcdText・visible・その他カスタム属性すべて）
+  ⇒はい。また、.ドット表記で入れ子のオブジェクトであることも考慮します。（描画パラメータ直接参照時と同じ動き）
+
+  2. margin の適用方向: margin は verticalAlign と horizontalAlign のどちらの方向に適用されますか？（例:
+  verticalAlign="top" で上端から margin px 下げる、など）またはaxis方向のみ？
+  ⇒axis方向と逆方向のみです。例えば、axis="x",verticalAlign="top"の場合、上から margin px下げる、
+  　verticalAlign="bottom"の場合、下からmargin px上げる、のように。
+  　axis="y"なら、horizontalAlignの値によって左右に動かします。
+
+  追記事項
+  ・引数による複製について。<!-- この子要素は3つ複製され、$stations が各駅名に置換される -->
+  　引数の配列は、入れ子の配列も考慮します。（配列の中身が配列の場合もある）
+  　また、配列の中身の型は考慮しません。
+  　なので、svgの段階で置き換えるというよりは、対応する値をコンストラクタに渡してやるのがいいかと思います。
+  （コンストラクタに引数を追加する必要がありますね。）
+
+
+質問４
+
+１．margin について、verticalAlign="center"（axis="x" の場合）または horizontalAlign="center"（axis="y" の場合）のときは
+  margin はどう扱いますか？（無効・0として扱う、または中央から一方向へオフセットするなど）
+  ⇒無効とします。

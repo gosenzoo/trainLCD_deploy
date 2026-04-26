@@ -74,13 +74,24 @@
     <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"></svg>
   </div>
 
+  <div id="svg-toolbar" style="padding:8px 24px;display:flex;align-items:center;gap:16px;background:#2a2a2a;border-bottom:1px solid #444;">
+    <button id="redraw-btn">再描画</button>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+      <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
+      デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）
+    </label>
+  </div>
+
   <div id="controls">
     <h2>描画パラメータ</h2>
     <div id="param-list"></div>
-    <button id="redraw-btn">再描画</button>
   </div>
 
   <script src="../jsMojules/utilClass/TextDrawer.js"></script>
+  <script src="ExprParser.js"></script>
+  <script src="LcdPartsObj.js"></script>
+  <script src="TextBoxObj.js"></script>
+  <script src="ArrangeObj.js"></script>
   <script src="Drawer.js"></script>
   <script>
     const svg = document.getElementById('display');
@@ -146,6 +157,7 @@
     // SVGをクリアして再描画する
     function redraw() {
       drawer.drawParams = collectParams();
+      drawer.debug = document.getElementById('debug-chk').checked;
       while (svg.firstChild) svg.removeChild(svg.firstChild);
       svg.appendChild(drawer.draw(svg));
     }
@@ -163,7 +175,40 @@
       buildControls(drawer.drawParams);
 
       document.getElementById('redraw-btn').addEventListener('click', redraw);
+
+      // キーボードショートカット: L=langIdサイクル / R=runStateサイクル / T=isTerminal切替
+      document.addEventListener('keydown', e => {
+        // 入力欄にフォーカスがある場合は無視
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        const key = e.key.toUpperCase();
+        if (key === 'L') {
+          cycleNumberParam('langId', 0, 2);
+        } else if (key === 'R') {
+          cycleNumberParam('runState', 0, 2);
+        } else if (key === 'T') {
+          toggleBoolParam('isTerminal');
+        } else {
+          return; // 対象外キーは再描画しない
+        }
+        redraw();
+      });
     };
+
+    // 数値パラメータをmin～maxの範囲でサイクルさせる
+    function cycleNumberParam(key, min, max) {
+      const el = paramList.querySelector(`[data-key="${key}"]`);
+      if (!el) return;
+      const current = Number(el.value);
+      el.value = current >= max ? min : current + 1;
+    }
+
+    // boolean パラメータのチェック状態を反転する
+    function toggleBoolParam(key) {
+      const el = paramList.querySelector(`[data-key="${key}"]`);
+      if (!el) return;
+      el.checked = !el.checked;
+    }
   </script>
 </body>
 </html>

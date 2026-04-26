@@ -102,10 +102,21 @@ class TextDrawer{
         }
         //各パラメータを設定
         textElem.textContent = text;
-        if(styleJson.textAnchor === "middle"){ textElem.setAttribute("x", String(x + maxWidth / 2)); }
-        else if(styleJson.textAnchor === "start"){ textElem.setAttribute("x", String(x)); }
-        else if(styleJson.textAnchor === "end"){ textElem.setAttribute("x", String(x + maxWidth)); }
-        else{ textElem.setAttribute("x", String(x)); }
+
+        // text-anchor に依存せず自前でx座標を決定し、常に text-anchor="start" で描画する。
+        // CSS letter-spacing の末尾追加有無が Windows(Chrome) と iOS(Safari) で異なり、
+        // text-anchor="middle"/"end" の基準幅がブラウザ間でずれるため。
+        // textWidth は getTextWidth で計算した (n-1) 個分の spacing を含む幅を使う。
+        let textX;
+        if(styleJson.textAnchor === "middle"){
+            textX = x + maxWidth / 2 - textWidth / 2;
+        } else if(styleJson.textAnchor === "end"){
+            textX = x + maxWidth - textWidth;
+        } else {
+            textX = x;
+        }
+        styleJson.textAnchor = "start"; // style文字列生成前にstartへ変更
+        textElem.setAttribute("x", String(textX));
 
         let yOffset = height; 
         if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）

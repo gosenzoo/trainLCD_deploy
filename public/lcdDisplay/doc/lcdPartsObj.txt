@@ -1,0 +1,69 @@
+arrange要素は、配下の子要素を再帰的にオブジェクト化しながら配置する。
+単なる配置ではなく、子要素の描画後の大きさに合わせたサイズ調整が必要なため、全ノードをオブジェクト化して
+一連の処理を行う。
+以下に、各オブジェクトの仕様を記す。
+
+■共通項目
+フィールド
+・x,y,width,height 範囲
+・realX,realY,realWidth,realHeight 実際の範囲
+・verticalAlign="top" or "center" or "bottom" 縦方向どこにそろえるか
+・horizontalAlign="left" or "center" or "right" 横方向どこにそろえるか
+・flexible=bool 縦横比率を変えられるか。
+・margin 付く場所からの余白。topなら、上からいくつ下がるか。
+・minComRatio 最小圧縮率。これを超えると、より圧縮率の低いものが優先的に圧縮される。
+
+メソッド
+・コンストラクタ
+・座標設定 引数(x,y) 戻り値なし
+・実際の大きさ取得 引数なし 戻り値(width,height)
+・実際の大きさ設定 引数(width,height) 戻り値は、設定後の(width,height)
+・svg要素出力
+
+
+■arrangeArea
+フィールド
+・axis="x" or "y"   x方向y方向どちらに配置していくか
+・interval=数字
+・arg=引数(配列のみ受け取る)。配列の要素数だけ、そのarrangeAreaが複製される。引数がある要素の子要素は、属性値に"$引数名"で配列の要素を使える。
+・children 子要素のオブジェクトを格納
+
+メソッド
+・コンストラクタ
+　svgDomを受け取る。svgDomがlcdParts="arrage"であることを確認する。svgDom子要素の最初がrect lcdParts=arrangeAreaであることを確認し、そのx, y, width, height属性を見て、自分のフィールドに保存する。
+svgDomに"lcd-arg"属性があれば、その値に対応する描画パラメータを探し、配列なら「lcd-arg属性値と描画パラメータの値」を対応付けて保持する。
+なお、lcd-argは"引数名, 引数名,..."と、複数の値をとりうるので、各値について上記の処理を行う。
+最後に、svgDomの子要素オブジェクトを作成し、childrenフィールドに順番に格納する。この際、受け取ったsvgDomの子要素をすべて探索し、
+各要素のlcdPartsに対応するオブジェクトを生成する。
+・座標指定
+　引数で受け取った値をそのままフィールドに入れる。
+・実際の大きさ取得
+　子要素を順番に並べた際の全体のwidth,heightを返す。並べ方は、
+・svg要素出力
+　childrenにもつオブジェクトを、フィールドの範囲内に順番に並べたsvgを<g>にまとめてreturnする。
+並べ方は、axisに沿った方向（縦or横）に、axis方向のalignに詰めて、intervalの間隔をあけて並べる。
+
+
+
+■textBox
+フィールド
+・text テキストstring
+・style data-styleをそのまま
+
+メソッド
+・コンストラクタ
+　lcdParts="textBox"のdomを受け取る。x,y,width,heightをフィールドに格納する。text,styleも格納する。
+まず、textDrawerで従来の処理通り描画した際の範囲を取得する。その後、実際に描画された範囲（受け取った範囲は最大領域なので、文字数などによってこれより小さくなることがある）を
+x,y,width,heightに格納する。（この処理はTransferListWidget周りを参考にする）
+・実際の大きさ取得
+保持中の実際の範囲を返す
+・実際の大きさ設定
+受け取った範囲で再描画する。
+・svg要素出力
+
+
+
+
+
+
+
