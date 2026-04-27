@@ -1048,6 +1048,10 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 
 lcdDisplay システムの詳細仕様は `public/lcdDisplay/doc/` を参照。
 
+### 7.1 TextDrawer — fontWeight の正規化
+
+`textBox` の `data-style` に Canvas API で無効な値（`"regular"` 等）が `fontWeight` として指定された場合、`getTextWidth()` 内で Canvas に渡す前に `"normal"` に正規化する。これにより `textAnchor: "middle"` / `"end"` 時のテキスト幅計算が正しく行われ、位置ズレを防ぐ。
+
 | ドキュメント | 内容 |
 |---|---|
 | `doc/overview.md` | システム概要・入出力・内部アーキテクチャ |

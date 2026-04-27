@@ -255,8 +255,10 @@ class TextDrawer{
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
+        // "regular"はCanvas APIで無効な値のため"normal"に正規化する（textAnchor計算のズレ防止）
+        const fontWeight = styleJson.fontWeight === 'regular' ? 'normal' : (styleJson.fontWeight || 'normal');
         // フォントスタイルを正確に組み立て
-        ctx.font = `${styleJson.fontWeight} ${fontSize}px '${styleJson.fontFamily}'`;
+        ctx.font = `${fontWeight} ${fontSize}px '${styleJson.fontFamily}'`;
 
         const metrics = ctx.measureText(text);
         let width;
