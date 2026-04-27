@@ -8,6 +8,8 @@ class LcdPartsObj {
         this.realWidth = 0;
         this.realHeight = 0;
 
+        // visible属性を文字列のまま保持（getElementで評価）
+        this.visible         = svgDom.getAttribute('visible');
         this.verticalAlign   = svgDom.getAttribute('lcd-verAlign')    || 'top';
         this.horizontalAlign = svgDom.getAttribute('lcd-holAilgn')    || 'left';
         this.flexible        = svgDom.getAttribute('lcd-flex')        === 'true';

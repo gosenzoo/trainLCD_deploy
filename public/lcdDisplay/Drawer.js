@@ -46,7 +46,7 @@ class Drawer {
         });
     }
 
-    // <defs>をtargetSVGの先頭に注入し、コンテンツ<g>を返す
+    // <defs>をtargetSVGの先頭に注入し、オブジェクトツリーを構築してコンテンツ<g>を返す
     draw(targetSVG) {
         // defsをlcdSVGの最初の子として直接注入
         const defsEl = this.defsSVG.getElementById('defs');
@@ -54,48 +54,56 @@ class Drawer {
             targetSVG.insertBefore(defsEl.cloneNode(true), targetSVG.firstChild);
         }
 
-        const lcdGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        for (const child of this.templateSVG.children) {
-            this._traverse(child, lcdGroup);
-        }
-        return lcdGroup;
+        // オブジェクトツリーを構築してgetElementで描画
+        this.buildTree();
+        const resolveValue = name => this._resolveValue(name);
+        const ctx = { resolveValue, exprParser: this.exprParser };
+        return this.root.getElement(ctx) || document.createElementNS('http://www.w3.org/2000/svg', 'g');
     }
 
-    // 再帰トラバース。visible評価 → lcdParts分岐
-    _traverse(element, parent) {
-        // visible属性がある場合、式を評価して非表示なら処理しない
-        const visibleAttr = element.getAttribute('visible');
-        if (visibleAttr !== null && !this.exprParser.eval(visibleAttr, name => this._resolveValue(name))) return;
+    // テンプレートSVGからオブジェクトツリーを構築してthis.rootに設定する
+    buildTree() {
+        // ルートはSVG要素自体に対応するGroupObj（visible属性なし）
+        this.root = new GroupObj(null);
+        for (const child of this.templateSVG.children) {
+            const node = this._buildNode(child);
+            if (node) this.root.addChild(node);
+        }
+    }
 
-        const lcdParts = element.getAttribute('lcdParts');
-        if (lcdParts === 'static') {
-            // 要素をそのままコピーして追加
-            parent.appendChild(element.cloneNode(true));
+    // SVG要素をlcdPartsに応じてオブジェクトに変換する。
+    // lcdPartsなし → null（子孫ごとスキップ）
+    _buildNode(element) {
+        const lcdParts = element.getAttribute ? element.getAttribute('lcdParts') : null;
+        const tagName  = element.tagName ? element.tagName.toLowerCase() : '';
+
+        if (tagName === 'svg' || lcdParts === 'group') {
+            // グループとして子要素を再帰的にオブジェクト化
+            const group = new GroupObj(element);
+            for (const child of element.children) {
+                const node = this._buildNode(child);
+                if (node) group.addChild(node);
+            }
+            return group;
+        } else if (lcdParts === 'static') {
+            return new StaticObj(element);
         } else if (lcdParts === 'textBox') {
-            // lcdTextテンプレートを展開してテキスト要素を生成・追加
-            const el = this._createText(element);
-            if (el) parent.appendChild(el);
+            return new TextBoxObj(element, this.drawParams, {}, this.textDrawer);
         } else if (lcdParts === 'arrange') {
-            // arrangeObjで子要素を再帰的にオブジェクト化してレイアウト
-            const ctx = {
+            const arrangeCtx = {
                 drawParams: this.drawParams,
                 args: {},
                 textDrawer: this.textDrawer,
                 exprParser: this.exprParser,
                 debug: this.debug,
             };
-            const arrangeObj = new ArrangeObj(element, ctx);
-            console.log(arrangeObj);
+            const arrangeObj = new ArrangeObj(element, arrangeCtx);
             // arrangeAreaのサイズ内に収まるよう圧縮を適用
             arrangeObj.setSize(arrangeObj.width, arrangeObj.height);
-            const el = arrangeObj.getElement();
-            if (el) parent.appendChild(el);
-        } else {
-            // lcdPartsなし: 子要素へ再帰
-            for (const child of element.children) {
-                this._traverse(child, parent);
-            }
+            return arrangeObj;
         }
+        // lcdPartsなし（またはunknown値）: 子孫ごとスキップ
+        return null;
     }
 
     // drawParamsからドット記法で値を解決し、生の値を返す（true/false リテラルにも対応）
@@ -116,21 +124,4 @@ class Drawer {
         return val;
     }
 
-    // lcdTextテンプレートを展開してTextDrawerでテキスト要素を生成
-    _createText(rectEl) {
-        const lcdText = rectEl.getAttribute('lcdText');
-        if (!lcdText) return null;
-
-        // #{変数名}をdrawParamsの値で置換（ドット記法対応）
-        const text = lcdText.replace(/#\{([^}]+)\}/g, (_, varName) => {
-            const val = this._resolveValue(varName.trim());
-            return val !== undefined && val !== null ? String(val) : '';
-        });
-
-        // 展開後が空文字なら追加しない
-        if (text === '') return null;
-
-        const result = this.textDrawer.create(text, rectEl);
-        return result ? result.element : null;
-    }
 }

@@ -99,7 +99,12 @@ class TextBoxObj extends LcdPartsObj {
     }
 
     // 描画済み要素をtranslate／scale付きで返す
-    getElement() {
+    // ctx: { resolveValue, exprParser } | null — visible属性の評価に使用
+    getElement(ctx = null) {
+        // visible属性がある場合、式を評価して非表示なら null を返す
+        if (this.visible !== null && ctx && ctx.exprParser) {
+            if (!ctx.exprParser.eval(this.visible, ctx.resolveValue)) return null;
+        }
         if (!this._element) return null;
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 

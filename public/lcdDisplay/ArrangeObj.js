@@ -274,7 +274,12 @@ class ArrangeObj extends LcdPartsObj {
     }
 
     // 子要素をレイアウトしてSVG<g>を返す
-    getElement() {
+    // ctx: { resolveValue, exprParser } | null — ArrangeObj自身のvisible評価に使用
+    getElement(ctx = null) {
+        // ArrangeObj自身のvisible属性を評価（内部子要素は_createChildObjで構築時評価済み）
+        if (this.visible !== null && ctx && ctx.exprParser) {
+            if (!ctx.exprParser.eval(this.visible, ctx.resolveValue)) return null;
+        }
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const outer  = document.createElementNS(SVG_NS, 'g');
 

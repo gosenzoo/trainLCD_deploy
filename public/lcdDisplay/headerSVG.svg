@@ -4,7 +4,7 @@
   <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
   
   <!-- ヘッダー -->
-  <g id="header" visibility="visible">
+  <g lcdParts="group" id="header" visibility="visible">
     <!-- ヘッダー背景 -->
     <rect lcdParts="static" id="header-back" x="0" y="0" width="1920" height="350" fill="url(./defs.svg#tokyuBackGradient)" filter="url(./defs.svg#dropShadow)" />
     

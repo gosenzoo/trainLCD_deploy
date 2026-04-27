@@ -1048,6 +1048,67 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 
 lcdDisplay システムの詳細仕様は `public/lcdDisplay/doc/` を参照。
 
+### 7.2 オブジェクトツリーシステム
+
+全 lcdParts 要素をオブジェクト化してツリー構造で保持する描画パイプライン。可視/不可視アニメーションおよびパイプライン整理を目的とする。
+
+#### 新規 lcdParts 値
+
+| 値 | 対象 | 説明 |
+|---|---|---|
+| `group` | `<g>` 要素 | 子要素をツリーに保持するコンテナ。位置調整なし。 |
+
+#### クラス設計
+
+| クラス | 対象 | 親クラス | 主フィールド |
+|---|---|---|---|
+| `GroupObj` | トップ `<svg>` / `lcdParts="group"` | なし | `visible`, `children[]` |
+| `StaticObj` | `lcdParts="static"` | なし | `visible`, `_svgDom` |
+| `TextBoxObj` | `lcdParts="textBox"` | `LcdPartsObj` | `visible`（`LcdPartsObj` に追加） |
+| `ArrangeObj` | `lcdParts="arrange"` | `LcdPartsObj` | `visible`（同上） |
+
+**`GroupObj`**
+- `getElement(ctx)` — 自身の `visible` を評価し、非表示なら `null`、表示なら各子の `getElement(ctx)` を収めた `<g>` を返す
+- レイアウト・位置調整機能なし
+
+**`StaticObj`**
+- `getElement(ctx)` — 自身の `visible` を評価し、非表示なら `null`、表示なら `_svgDom.cloneNode(true)` を返す
+
+#### `visible` フィールド仕様
+
+全クラスに `visible: string|null` フィールドを追加する（SVG 属性の生の値を保持）。
+
+| 値 | 挙動 |
+|---|---|
+| `null` | 常に表示 |
+| 文字列 | `ExprParser.eval(visible, resolveValue)` で評価 |
+
+- `ctx = { resolveValue, exprParser }` を `getElement(ctx)` の引数として渡す
+- arrange 子要素の `visible` は従来通り `ArrangeObj._createChildObj()` で構築時に評価する（arrange 子のアニメーション対応は将来課題）
+
+> **効率化オプション（将来対応）**: 現状は生文字列を保持して描画ごとに `ExprParser.eval` でパース・評価する。高頻度な再評価が必要な場合は `ExprParser.compile(expr)` で AST を生成・保持し、文字列パースを構築時 1 回に限定できる。
+
+#### トラバーサル規則（`Drawer.buildTree()`）
+
+| 要素条件 | 生成オブジェクト |
+|---|---|
+| トップ `<svg>` | `GroupObj`（ルート） |
+| `lcdParts="group"` | `GroupObj`（子要素を再帰的に処理） |
+| `lcdParts="static"` | `StaticObj` |
+| `lcdParts="textBox"` | `TextBoxObj`（drawParams・args={} で構築） |
+| `lcdParts="arrange"` | `ArrangeObj`（`setSize()` まで完了） |
+| `lcdParts` なし | **スキップ（子孫ごと無視）** |
+
+#### `Drawer` 更新
+
+```
+buildTree()   →  templateSVG を走査しルート GroupObj を構築（this.root に格納）
+_buildNode()  →  要素 1 つをオブジェクト化する再帰関数（_traverse / _createText を置換）
+draw()        →  defs注入 → buildTree() → root.getElement(ctx) でSVG出力
+```
+
+---
+
 ### 7.1 TextDrawer — fontWeight の正規化
 
 `textBox` の `data-style` に Canvas API で無効な値（`"regular"` 等）が `fontWeight` として指定された場合、`getTextWidth()` 内で Canvas に渡す前に `"normal"` に正規化する。これにより `textAnchor: "middle"` / `"end"` 時のテキスト幅計算が正しく行われ、位置ズレを防ぐ。
