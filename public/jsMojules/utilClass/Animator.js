@@ -251,3 +251,121 @@ class Animator{
         return keyframesText;
     }
 }
+
+// テキスト遷移アニメーション用クラス（ワンショット・非ループ）
+// window.lcdAnimator としてグローバルに利用する
+class LcdAnimator {
+    constructor() {
+        // CSS @keyframes を document.head に1回だけ注入する
+        this._injectKeyframes();
+    }
+
+    _injectKeyframes() {
+        if (document.getElementById('lcd-animator-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'lcd-animator-styles';
+        style.textContent = `
+            @keyframes lcd-kuru-in {
+                from { transform: scaleY(0); opacity: 0; }
+                to   { transform: scaleY(1); opacity: 1; }
+            }
+            @keyframes lcd-kuru-out {
+                from { transform: scaleY(1); opacity: 1; }
+                to   { transform: scaleY(0); opacity: 0; }
+            }
+            @keyframes lcd-fade-in {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+            @keyframes lcd-fade-out {
+                from { opacity: 1; }
+                to   { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 進行中のアニメーション・タイマーをキャンセルする
+    _cancel(element) {
+        if (element._lcdAnimTimer != null) {
+            clearTimeout(element._lcdAnimTimer);
+            element._lcdAnimTimer = null;
+        }
+        element.style.animation = '';
+    }
+
+    // 発生アニメーションを element に適用する
+    // animType: "kuru" | "fade" | "nothing"
+    applyAppear(element, animType, transTime, gapTime, kuruTop, kuruBottom) {
+        this._cancel(element);
+
+        if (animType === 'nothing') {
+            // gapTime+transTime後に瞬間表示（他アニメーションの完了と同タイミングで切り替える）
+            element.style.visibility = 'hidden';
+            element._lcdAnimTimer = setTimeout(() => {
+                element.style.visibility = 'visible';
+                element._lcdAnimTimer = null;
+            }, gapTime + transTime);
+            return;
+        }
+
+        // 発生前の初期状態（非表示・変形開始点）を設定
+        element.style.visibility = 'visible';
+        if (animType === 'kuru') {
+            element.style.transformOrigin = `0px ${kuruTop}px`;
+            element.style.transform       = 'scaleY(0)';
+            element.style.opacity         = '0';
+        } else { // fade
+            element.style.opacity = '0';
+        }
+
+        const transTimeSec = transTime / 1000;
+        const animName = animType === 'kuru' ? 'lcd-kuru-in' : 'lcd-fade-in';
+
+        // gapTime[ms]後にCSSアニメーション開始
+        element._lcdAnimTimer = setTimeout(() => {
+            element._lcdAnimTimer = null;
+            element.style.animation = `${animName} ${transTimeSec}s linear forwards`;
+            element.addEventListener('animationend', () => {
+                // 完了後にスタイルをクリアして完全表示状態に戻す
+                element.style.animation       = '';
+                element.style.opacity         = '';
+                element.style.transform       = '';
+                element.style.transformOrigin = '';
+            }, { once: true });
+        }, gapTime);
+    }
+
+    // 消失アニメーションを element に適用する
+    applyDisappear(element, animType, transTime, gapTime, kuruTop, kuruBottom) {
+        this._cancel(element);
+
+        if (animType === 'nothing') {
+            // gapTime+transTime後に瞬間非表示（他アニメーションの完了と同タイミングで切り替える）
+            element._lcdAnimTimer = setTimeout(() => {
+                element.style.visibility  = 'hidden';
+                element._lcdAnimTimer = null;
+            }, gapTime + transTime);
+            return;
+        }
+
+        const transTimeSec = transTime / 1000;
+        let animName;
+        if (animType === 'kuru') {
+            element.style.transformOrigin = `0px ${kuruBottom}px`;
+            animName = 'lcd-kuru-out';
+        } else { // fade
+            animName = 'lcd-fade-out';
+        }
+
+        element.style.animation = `${animName} ${transTimeSec}s linear forwards`;
+        element.addEventListener('animationend', () => {
+            // 完了後にスタイルをクリアして非表示状態にする
+            element.style.animation       = '';
+            element.style.opacity         = '';
+            element.style.transform       = '';
+            element.style.transformOrigin = '';
+            element.style.visibility      = 'hidden';
+        }, { once: true });
+    }
+}

@@ -87,6 +87,7 @@
     <div id="param-list"></div>
   </div>
 
+  <script src="../jsMojules/utilClass/Animator.js"></script>
   <script src="../jsMojules/utilClass/TextDrawer.js"></script>
   <script src="ExprParser.js"></script>
   <script src="LcdPartsObj.js"></script>
@@ -165,6 +166,8 @@
     }
 
     window.onload = async () => {
+      // LcdAnimatorをグローバルシングルトンとして初期化（langChange時のアニメーションで使用）
+      window.lcdAnimator = new LcdAnimator();
       drawer = new Drawer();
       await drawer.load();
 
@@ -178,22 +181,31 @@
 
       document.getElementById('redraw-btn').addEventListener('click', redraw);
 
-      // キーボードショートカット: L=langIdサイクル / R=runStateサイクル / T=isTerminal切替
+      // キーボードショートカット: L=langIdサイクル（アニメーション遷移） / R=runStateサイクル / T=isTerminal切替
+      // L キーのアニメーション時間設定
+      const LANG_TRANS_MS = 500; // 遷移アニメーション時間[ms]
+      const LANG_GAP_MS   = 0;   // 遷移開始までの遅延[ms]
+
       document.addEventListener('keydown', e => {
         // 入力欄にフォーカスがある場合は無視
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         const key = e.key.toUpperCase();
         if (key === 'L') {
+          // langIdをサイクルさせ、drawParams.langIdのみ更新してアニメーション遷移
           cycleNumberParam('langId', 0, 2);
+          const el = paramList.querySelector('[data-key="langId"]');
+          if (el) drawer.drawParams.langId = Number(el.value);
+          drawer.langChange(LANG_TRANS_MS, LANG_GAP_MS);
         } else if (key === 'R') {
           cycleNumberParam('runState', 0, 2);
+          redraw();
         } else if (key === 'T') {
           toggleBoolParam('isTerminal');
+          redraw();
         } else {
           return; // 対象外キーは再描画しない
         }
-        redraw();
       });
     };
 

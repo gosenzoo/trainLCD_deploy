@@ -1109,6 +1109,154 @@ draw()        →  defs注入 → buildTree() → root.getElement(ctx) でSVG出
 
 ---
 
+### 7.3 テキスト遷移アニメーション
+
+#### 概要
+
+`Drawer.langChange(transTime, gapTime)` の呼び出しで、ツリー上の全オブジェクトが自身の `visible` を再評価し、前回との差分に応じて CSS アニメーションを適用する。`draw()` 実行後に呼ぶことを前提とし、`draw()` 内での再ビルドは行わない。
+
+drawParams の更新 → `langChange()` の呼び出し、という順序を使用側が守ること。
+
+#### アニメーション種別
+
+| 種別 | `lcd-animType` 値 | 消失動作 | 発生動作 |
+|---|---|---|---|
+| くるくる | `"kuru"` | kuruBottom基準でscaleY 1→0、opacity 1→0、transTime[ms] | kuruTop基準でscaleY 0→1、opacity 0→1、gapTime後にtransTime[ms] |
+| フェード | `"fade"` | opacity 1→0、transTime[ms] | opacity 0→1、gapTime後にtransTime[ms] |
+| なし | `"nothing"`（省略時デフォルト） | gapTime後に瞬間消滅 | gapTime後に瞬間出現 |
+
+タイムテーブル（消失・発生とも同じ基準時刻から開始）:
+
+```
+t=0               t=gapTime           t=gapTime+transTime
+|                 |                   |
+|--- 消失: transTime かけてアニメーション ----→|
+|--- gapTime無表示 ---|--- 発生: transTime ---→|
+```
+
+「アニメーションなし」では transTime は使わず、t=gapTime で両者が瞬間切替する。
+
+#### SVGテンプレート属性
+
+| 属性 | 説明 | デフォルト |
+|---|---|---|
+| `lcd-animType` | `"kuru"` / `"fade"` / `"nothing"` | `"nothing"` |
+| `lcd-kuruTop` | くるくる発生のtransform-origin Y座標（SVG座標） | オブジェクトの `y` 値 |
+| `lcd-kuruBottom` | くるくる消失のtransform-origin Y座標（SVG座標） | オブジェクトの `y + height` 値 |
+
+#### LcdAnimator クラス（新規）
+
+**ファイル**: `public/jsMojules/utilClass/Animator.js`（既存クラスとは別の新規クラスとして同ファイルに追記）
+
+```
+LcdAnimator
+├── constructor()
+│     — CSS @keyframes（lcd-kuru-in/out, lcd-fade-in/out）を document.head に1回注入
+├── applyAppear(element, animType, transTime, gapTime, kuruTop, kuruBottom)
+│     1. 進行中のアニメーション・タイマーをキャンセル
+│     2. visibility: visible に設定
+│     3. 種別に応じた初期状態を設定（kuru: scaleY=0+opacity=0、fade: opacity=0）
+│     4. gapTime[ms] 後に CSS animation を適用（nothing はsetTimeoutで visibility 設定のみ）
+│     5. animationend でスタイルをクリア（完全表示状態に戻す）
+└── applyDisappear(element, animType, transTime, gapTime, kuruTop, kuruBottom)
+      1. 進行中のアニメーション・タイマーをキャンセル
+      2. CSS animation を即座に適用（nothing は setTimeout で gapTime 後に visibility: hidden）
+      3. animationend で visibility: hidden を設定しスタイルをクリア
+```
+
+@keyframes は以下4つを定義する:
+- `lcd-kuru-in`: `scaleY(0)+opacity:0` → `scaleY(1)+opacity:1`
+- `lcd-kuru-out`: `scaleY(1)+opacity:1` → `scaleY(0)+opacity:0`
+- `lcd-fade-in`: `opacity:0` → `opacity:1`
+- `lcd-fade-out`: `opacity:1` → `opacity:0`
+
+`transform-origin` は CSS animation の前に element.style で直接設定する。
+
+**グローバルインスタンス**: `window.lcdAnimator = new LcdAnimator()` を `index.html` で初期化し、各オブジェクトから参照する。
+
+#### 各オブジェクトへの共通変更（フィールド追加）
+
+全クラス（GroupObj・StaticObj・TextBoxObj・ArrangeObj）に以下を追加する:
+
+| フィールド | 型 | 設定タイミング |
+|---|---|---|
+| `_domEl` | Element\|null | `getElement()` で生成した要素の参照 |
+| `_prevVisible` | boolean | `getElement()` または `_createChildObj()` での初回visible評価結果 |
+| `_resolveValue` | Function | visible再評価用（live参照） |
+| `_exprParser` | ExprParser | visible再評価用 |
+| `_animType` | string | コンストラクタで `lcd-animType` 属性から読み取り |
+| `_kuruTop` | number\|null | コンストラクタで `lcd-kuruTop` 属性から読み取り（null=デフォルト） |
+| `_kuruBottom` | number\|null | コンストラクタで `lcd-kuruBottom` 属性から読み取り（null=デフォルト） |
+
+`_animType` / `_kuruTop` / `_kuruBottom` は `LcdPartsObj` コンストラクタで読み取り、TextBoxObj・ArrangeObj が継承する。GroupObj・StaticObj はそれぞれのコンストラクタで読み取る。
+
+#### `getElement(ctx)` の変更
+
+全クラス共通:
+
+1. ctx が渡された場合: `this._resolveValue = ctx.resolveValue`、`this._exprParser = ctx.exprParser` を保存
+2. `this.visible` を評価（`_resolveValue` が既に設定されていれば ctx=null でも評価可能）
+3. 評価結果を `this._prevVisible` に保存
+4. DOM要素を生成し `this._domEl` に保存
+5. `_prevVisible === false` なら `this._domEl.style.visibility = 'hidden'` を設定
+6. **null を返さず** 常にDOM要素を返す
+
+ArrangeObj の `getElement()`:
+- 全 children（visible=false 含む）の `getElement()` を呼び出してDOM追加
+- 自身の visible 評価は ctx が渡された場合のみ（内部子要素は `_resolveValue` 保持済みのため ctx 不要）
+
+#### ArrangeObj の `_createChildObj()` 変更
+
+- **visible フィルタを削除** — visible=false でも子オブジェクトを常に生成する
+- 生成した子に `_resolveValue = LcdPartsObj.makeResolveValue(drawParams, args)` を設定（`drawParams` はDrawerの参照のため変更が自動反映）
+- 生成した子に `_exprParser = exprParser` を設定
+- 初回visible評価結果を `child._prevVisible` に設定
+
+#### ArrangeObj のレイアウト変更
+
+- **visible の値はレイアウトに影響しない** — visible=false の子も全サイズでレイアウト計算に参加する
+- `_childNaturalSizes` は全子要素（visible=false 含む）の getRealSize() から計算する
+
+#### `langChange()` の実装
+
+**Drawer**:
+```javascript
+langChange(transTime, gapTime) {
+    this.root.langChange(transTime, gapTime);
+}
+```
+
+**各オブジェクト** に `langChange(transTime, gapTime)` メソッドを追加:
+```
+1. this.visible が null → visible変化なし → 子要素への伝播のみ実施
+2. newVisible = this._exprParser.eval(this.visible, this._resolveValue)
+3. newVisible !== this._prevVisible の場合:
+   - false→true: lcdAnimator.applyAppear(this._domEl, type, transTime, gapTime, top, bottom)
+   - true→false: lcdAnimator.applyDisappear(this._domEl, type, transTime, gapTime, top, bottom)
+4. this._prevVisible = newVisible
+5. 子要素の langChange(transTime, gapTime) を呼び出し（GroupObj: this.children, ArrangeObj: this.children）
+```
+
+kuruTop/kuruBottom のデフォルト値:
+- `_kuruTop === null` → `this.y`
+- `_kuruBottom === null` → `this.y + this.height`
+- GroupObj・StaticObj で y/height が未定義の場合は `0` をフォールバック
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/jsMojules/utilClass/Animator.js` | 追記 | `LcdAnimator` クラスを追加 |
+| `public/lcdDisplay/LcdPartsObj.js` | 変更 | `_animType`/`_kuruTop`/`_kuruBottom` フィールド追加 |
+| `public/lcdDisplay/StaticObj.js` | 変更 | 上記フィールド＋`_domEl`/`_prevVisible`/`_resolveValue`/`_exprParser`、`getElement()` 変更、`langChange()` 追加 |
+| `public/lcdDisplay/GroupObj.js` | 変更 | 同上 |
+| `public/lcdDisplay/TextBoxObj.js` | 変更 | `_domEl`/`_prevVisible` 追加、`getElement()` 変更、`langChange()` 追加 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj()` visible フィルタ削除、レイアウト全参加、`getElement()` 変更、`langChange()` 追加 |
+| `public/lcdDisplay/Drawer.js` | 変更 | `langChange()` メソッド追加 |
+| `public/lcdDisplay/index.html` | 変更 | `LcdAnimator` インスタンス初期化（`window.lcdAnimator`）、スクリプトタグ追加 |
+
+---
+
 ### 7.1 TextDrawer — fontWeight の正規化
 
 `textBox` の `data-style` に Canvas API で無効な値（`"regular"` 等）が `fontWeight` として指定された場合、`getTextWidth()` 内で Canvas に渡す前に `"normal"` に正規化する。これにより `textAnchor: "middle"` / `"end"` 時のテキスト幅計算が正しく行われ、位置ズレを防ぐ。

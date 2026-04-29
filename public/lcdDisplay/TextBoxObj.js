@@ -29,6 +29,9 @@ class TextBoxObj extends LcdPartsObj {
 
         this._element      = null;
         this._uniformScale = 1;
+        // getElement()で再描画する際のサイズを保持する（setSize後に確定）
+        this._lastRenderWidth  = null;
+        this._lastRenderHeight = null;
 
         // 初回描画して自然サイズを確定
         this._render(this.width, this.height);
@@ -36,8 +39,12 @@ class TextBoxObj extends LcdPartsObj {
         this._naturalHeight = this.realHeight;
     }
 
-    // 指定サイズでTextDrawerを呼び出して再描画する（位置は常に原点）
+    // 指定サイズでTextDrawerを呼び出して再描画する
+    // 座標はthis.x/this.yを直接渡すことでtransformラッパーを不要にし、kuruアニメーション競合を防ぐ
     _render(width, height) {
+        this._lastRenderWidth  = width;
+        this._lastRenderHeight = height;
+
         // 空文字は描画しない（Drawer._createTextと同じ規則）
         if (!this.text) {
             this._element   = null;
@@ -48,8 +55,8 @@ class TextBoxObj extends LcdPartsObj {
         }
 
         const result = this._textDrawer.create(this.text, {
-            x: 0,
-            y: 0,
+            x: this.x,  // transformラッパーを使わないため実際の座標をTextDrawerに直接渡す
+            y: this.y,
             width,
             height,
             // TextDrawerがstyleJsonを直接変更する場合があるのでディープコピーを渡す
@@ -98,25 +105,74 @@ class TextBoxObj extends LcdPartsObj {
         return { width: this.realWidth, height: this.realHeight };
     }
 
-    // 描画済み要素をtranslate／scale付きで返す
+    // 描画済み要素を返す（transformなし、TextDrawerがx/yを直接設定済み）
     // ctx: { resolveValue, exprParser } | null — visible属性の評価に使用
+    // 空テキスト（_element=null）は null を返す。それ以外は visible=false でも要素を返す（アニメーション対応）
     getElement(ctx = null) {
-        // visible属性がある場合、式を評価して非表示なら null を返す
-        if (this.visible !== null && ctx && ctx.exprParser) {
-            if (!ctx.exprParser.eval(this.visible, ctx.resolveValue)) return null;
+        if (ctx) {
+            // resolveValue/exprParserはdebugのみのctxでは渡されないため、undefinedの場合は上書きしない
+            if (ctx.resolveValue !== undefined) this._resolveValue = ctx.resolveValue;
+            if (ctx.exprParser   !== undefined) this._exprParser   = ctx.exprParser;
         }
+
+        if (this.flexible) {
+            // setCoordinateで確定した座標で再描画（translate不使用でCSSアニメーションと競合しない）
+            const renderW = this._lastRenderWidth  != null ? this._lastRenderWidth  : this.width;
+            const renderH = this._lastRenderHeight != null ? this._lastRenderHeight : this.height;
+            this._render(renderW, renderH);
+        }
+
+        // 空テキストは描画要素なし
         if (!this._element) return null;
+
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
-        if (this._uniformScale !== 1) {
-            // flexible=false のとき: 原点でscaleしてからx,yへ移動
+        if (!this.flexible && this._uniformScale !== 1) {
+            // flexible=false かつ縮小スケールあり（レアケース）: (x,y)を中心にスケール
+            const s = this._uniformScale;
             g.setAttribute('transform',
-                `translate(${this.x}, ${this.y}) scale(${this._uniformScale})`);
-        } else {
-            g.setAttribute('transform', `translate(${this.x}, ${this.y})`);
+                `translate(${this.x * (1 - s)}, ${this.y * (1 - s)}) scale(${s})`);
+        }
+        // それ以外はtransform不要（TextDrawerがx/yを直接設定済み）
+
+        g.appendChild(this._element); // _renderで毎回新規生成されるため cloneNode 不要
+
+        // デバッグ境界矩形（ArrangeObj外のtextBox用。ArrangeObj配下は親が描画する）
+        if (ctx && ctx.debug) {
+            // textAnchorに応じてx座標をオフセット（テキスト実描画領域のstartを算出）
+            const anchor  = (this._style && this._style.textAnchor) || 'start';
+            const renderW = this._lastRenderWidth != null ? this._lastRenderWidth : this.width;
+            let dbgX;
+            if (anchor === 'middle') {
+                dbgX = this.x + (renderW - this.realWidth) / 2;
+            } else if (anchor === 'end') {
+                dbgX = this.x + renderW - this.realWidth;
+            } else {
+                dbgX = this.x;
+            }
+            const dbgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            dbgRect.setAttribute('x',              dbgX);
+            dbgRect.setAttribute('y',              this.y);
+            dbgRect.setAttribute('width',          this.realWidth);
+            dbgRect.setAttribute('height',         this.realHeight);
+            dbgRect.setAttribute('fill',           'none');
+            dbgRect.setAttribute('stroke',         '#ff4422');
+            dbgRect.setAttribute('stroke-width',   '1');
+            dbgRect.setAttribute('stroke-dasharray', '4,2');
+            dbgRect.setAttribute('pointer-events', 'none');
+            g.appendChild(dbgRect);
         }
 
-        g.appendChild(this._element.cloneNode(true));
+        // 表示/非表示を visibility で制御する（display:noneではなくanimation対応のため）
+        const isVisible   = this._evalVisible();
+        this._prevVisible = isVisible;
+        g.style.visibility = isVisible ? '' : 'hidden';
+        this._domEl = g;
         return g;
+    }
+
+    // visible を再評価してアニメーションを適用する
+    langChange(transTime, gapTime) {
+        this._applyVisibleAnim(transTime, gapTime);
     }
 }

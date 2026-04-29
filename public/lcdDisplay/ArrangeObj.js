@@ -70,25 +70,27 @@ class ArrangeObj extends LcdPartsObj {
     }
 
     // 子要素のlcdPartsに応じてオブジェクトを生成する
+    // Case A-2: visible属性は配置・生成に影響しない（全子要素を常に生成）
     _createChildObj(svgDom, drawParams, args, textDrawer, exprParser) {
-        // visible属性を評価して非表示なら生成しない
-        const visibleAttr = svgDom.getAttribute('visible');
-        if (visibleAttr !== null) {
-            const resolveValue = LcdPartsObj.makeResolveValue(drawParams, args);
-            if (!exprParser.eval(visibleAttr, resolveValue)) return null;
-        }
-
         const lcdParts = svgDom.getAttribute('lcdParts');
         // debug等のフラグを親ctxから引き継ぎ、drawParams/argsのみ上書き
         const childCtx = { ...this._ctx, drawParams, args };
 
+        let obj;
         if (lcdParts === 'arrange') {
-            return new ArrangeObj(svgDom, childCtx);
+            obj = new ArrangeObj(svgDom, childCtx);
         } else if (lcdParts === 'textBox') {
-            return new TextBoxObj(svgDom, drawParams, args, textDrawer);
+            obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         }
         // static / numberingIcon は現時点では未実装
-        return null;
+        if (!obj) return null;
+
+        // visible評価用のresolveValueとexprParserを構築時に設定する
+        // drawParamsは参照渡しなので、langChange時の変更に自動追従する
+        obj._resolveValue = LcdPartsObj.makeResolveValue(drawParams, args);
+        obj._exprParser   = exprParser;
+        obj._prevVisible  = obj._evalVisible();
+        return obj;
     }
 
     // 子要素の自然サイズから自身の自然サイズを算出する
@@ -275,21 +277,30 @@ class ArrangeObj extends LcdPartsObj {
 
     // 子要素をレイアウトしてSVG<g>を返す
     // ctx: { resolveValue, exprParser } | null — ArrangeObj自身のvisible評価に使用
+    // visible=false でも null を返さず visibility:hidden のノードを返す（アニメーション対応）
     getElement(ctx = null) {
-        // ArrangeObj自身のvisible属性を評価（内部子要素は_createChildObjで構築時評価済み）
-        if (this.visible !== null && ctx && ctx.exprParser) {
-            if (!ctx.exprParser.eval(this.visible, ctx.resolveValue)) return null;
+        if (ctx) {
+            // resolveValue/exprParserはdebugのみのctxでは渡されないため、undefinedの場合は上書きしない
+            if (ctx.resolveValue !== undefined) this._resolveValue = ctx.resolveValue;
+            if (ctx.exprParser   !== undefined) this._exprParser   = ctx.exprParser;
         }
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const outer  = document.createElementNS(SVG_NS, 'g');
 
-        // 絶対座標への移動とflexible=false時のscaleを外側gで適用
+        // flexible=false かつ縮小スケールあり（レアケース）: (x,y)を中心にスケール
+        // TextBoxObjと同様に translate を使わないことで、kuruアニメーションとCSSの競合を防ぐ
         if (this._uniformScale !== 1) {
+            const s = this._uniformScale;
             outer.setAttribute('transform',
-                `translate(${this.x}, ${this.y}) scale(${this._uniformScale})`);
-        } else {
-            outer.setAttribute('transform', `translate(${this.x}, ${this.y})`);
+                `translate(${this.x * (1 - s)}, ${this.y * (1 - s)}) scale(${s})`);
         }
+        // _uniformScale === 1 の場合はtransform不要（子要素が絶対座標で配置されるため）
+
+        // 表示/非表示を visibility で制御する（display:noneではなくanimation対応のため）
+        const isVisible   = this._evalVisible();
+        this._prevVisible = isVisible;
+        outer.style.visibility = isVisible ? '' : 'hidden';
+        this._domEl = outer;
 
         const inner        = document.createElementNS(SVG_NS, 'g');
         const isX          = this.axis === 'x';
@@ -315,8 +326,8 @@ class ArrangeObj extends LcdPartsObj {
         // firstRendered: 最初の描画要素かどうかを管理（先頭にintervalを入れないため）
         let firstRendered = true;
 
-        // デバッグ: 末端textBox要素の境界を後で描画するために収集
-        const debugLeafRects = [];
+        // デバッグフラグを子要素に伝播するctx（各TextBoxObj/ArrangeObjがgetElement内で自前の境界矩形を描画する）
+        const childCtx = { debug: this._ctx.debug };
 
         this.children.forEach(child => {
             const { width: cw, height: ch } = child.getRealSize();
@@ -326,11 +337,12 @@ class ArrangeObj extends LcdPartsObj {
 
             // 最初の描画要素でなければ前にintervalを挿入
             const axisPos = firstRendered ? axisCursor : axisCursor + this.interval;
-            const childX  = isX ? axisPos   : crossPos;
-            const childY  = isX ? crossPos  : axisPos;
+            // this.x/this.yを加算して絶対座標化（transformラッパーを使わないためkuruアニメーションと競合しない）
+            const childX  = this.x + (isX ? axisPos  : crossPos);
+            const childY  = this.y + (isX ? crossPos : axisPos);
 
             child.setCoordinate(childX, childY);
-            const el = child.getElement();
+            const el = child.getElement(childCtx);
 
             if (el) {
                 inner.appendChild(el);
@@ -339,39 +351,27 @@ class ArrangeObj extends LcdPartsObj {
                 firstRendered = false;
             }
             // 描画されなかった要素はaxisCursorもfirstRenderedも変更しない
-
-            // デバッグ: 末端のtextBox境界を収集（サイズ0は除外）
-            if (this._ctx.debug && child instanceof TextBoxObj && cw > 0 && ch > 0) {
-                debugLeafRects.push({ x: childX, y: childY, w: cw, h: ch });
-            }
         });
 
         outer.appendChild(inner);
 
-        // デバッグオーバーレイ: arrangeArea境界と末端要素境界を最前面に追加
+        // デバッグ: arrangeArea自身の境界矩形（青）を描画
+        // 末端テキスト要素の境界矩形は各TextBoxObjのgetElement内で描画されるため、ここでは不要
         if (this._ctx.debug) {
-            // arrangeAreaの境界: uniformScaleを逆補正したグループで本来のpx領域を表示
-            const scale = this._uniformScale > 0 ? this._uniformScale : 1;
-            const boundsGroup = document.createElementNS(SVG_NS, 'g');
-            if (scale !== 1) boundsGroup.setAttribute('transform', `scale(${1 / scale})`);
-            boundsGroup.appendChild(
-                ArrangeObj._makeDebugRect(SVG_NS, 0, 0, this.width, this.height, '#4488ff', '8,4', 2)
+            outer.appendChild(
+                ArrangeObj._makeDebugRect(SVG_NS, this.x, this.y, this.width, this.height, '#4488ff', '8,4', 2)
             );
-            outer.appendChild(boundsGroup);
-
-            // 末端textBox要素の境界（innerと同じ座標系）
-            if (debugLeafRects.length > 0) {
-                const leafGroup = document.createElementNS(SVG_NS, 'g');
-                debugLeafRects.forEach(r => {
-                    leafGroup.appendChild(
-                        ArrangeObj._makeDebugRect(SVG_NS, r.x, r.y, r.w, r.h, '#ff4422', '4,2', 1)
-                    );
-                });
-                inner.appendChild(leafGroup);
-            }
         }
 
         return outer;
+    }
+
+    // visible を再評価してアニメーションを適用し、子要素へ伝播する
+    langChange(transTime, gapTime) {
+        this._applyVisibleAnim(transTime, gapTime);
+        for (const child of this.children) {
+            if (child.langChange) child.langChange(transTime, gapTime);
+        }
     }
 
     // デバッグ用の矩形SVG要素を生成するヘルパー

@@ -23,6 +23,8 @@ class Drawer {
         this._normalizeSVGDefsRefs(templateSVG);
         this.templateSVG = templateSVG;
         this.textDrawer = new TextDrawer(this.iconList, null);
+        // defs要素をキャッシュしておく（draw()で参照渡しするため）
+        this._defsEl = defsSVG.getElementById('defs');
     }
 
     // SVGをDOMParserで取得
@@ -48,16 +50,16 @@ class Drawer {
 
     // <defs>をtargetSVGの先頭に注入し、オブジェクトツリーを構築してコンテンツ<g>を返す
     draw(targetSVG) {
-        // defsをlcdSVGの最初の子として直接注入
-        const defsEl = this.defsSVG.getElementById('defs');
-        if (defsEl) {
-            targetSVG.insertBefore(defsEl.cloneNode(true), targetSVG.firstChild);
+        // キャッシュしたdefs要素を参照渡しで注入（cloneNodeしない）
+        // redraw時にはSVGクリア後の孤立ノードになっているが再挿入可能
+        if (this._defsEl) {
+            targetSVG.insertBefore(this._defsEl, targetSVG.firstChild);
         }
 
         // オブジェクトツリーを構築してgetElementで描画
         this.buildTree();
         const resolveValue = name => this._resolveValue(name);
-        const ctx = { resolveValue, exprParser: this.exprParser };
+        const ctx = { resolveValue, exprParser: this.exprParser, debug: this.debug };
         return this.root.getElement(ctx) || document.createElementNS('http://www.w3.org/2000/svg', 'g');
     }
 
@@ -104,6 +106,12 @@ class Drawer {
         }
         // lcdPartsなし（またはunknown値）: 子孫ごとスキップ
         return null;
+    }
+
+    // オブジェクトツリー全体にlangChangeを伝播する
+    // drawParamsを更新したあとに呼び出すことで、変化した visible をアニメーションで遷移させる
+    langChange(transTime, gapTime) {
+        if (this.root) this.root.langChange(transTime, gapTime);
     }
 
     // drawParamsからドット記法で値を解決し、生の値を返す（true/false リテラルにも対応）

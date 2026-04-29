@@ -11,6 +11,19 @@ class LcdPartsObj {
         // visible属性を文字列のまま保持（getElementで評価）
         this.visible         = svgDom.getAttribute('visible');
         this.verticalAlign   = svgDom.getAttribute('lcd-verAlign')    || 'top';
+
+        // アニメーション属性（テキスト遷移アニメーション用）
+        this._animType   = svgDom.getAttribute('lcd-animType') || 'nothing';
+        const _kt        = parseFloat(svgDom.getAttribute('lcd-kuruTop'));
+        const _kb        = parseFloat(svgDom.getAttribute('lcd-kuruBottom'));
+        this._kuruTop    = isNaN(_kt) ? null : _kt;
+        this._kuruBottom = isNaN(_kb) ? null : _kb;
+
+        // アニメーション状態管理フィールド（getElement/langChangeで使用）
+        this._domEl        = null;
+        this._prevVisible  = true;
+        this._resolveValue = null;
+        this._exprParser   = null;
         this.horizontalAlign = svgDom.getAttribute('lcd-holAilgn')    || 'left';
         this.flexible        = svgDom.getAttribute('lcd-flex')        === 'true';
         this.margin          = parseFloat(svgDom.getAttribute('lcd-margin'))       || 0;
@@ -39,6 +52,27 @@ class LcdPartsObj {
     // 描画結果のSVG要素を返す（サブクラスでオーバーライド）
     getElement() {
         return null;
+    }
+
+    // visible属性を評価して真偽値を返す（_resolveValue未設定なら常にtrue）
+    _evalVisible() {
+        if (this.visible === null || !this._resolveValue || !this._exprParser) return true;
+        return !!this._exprParser.eval(this.visible, this._resolveValue);
+    }
+
+    // visible変化時にアニメーションを適用する（サブクラスで呼び出す想定のヘルパー）
+    _applyVisibleAnim(transTime, gapTime) {
+        if (this.visible === null || !this._domEl) return;
+        const newVisible = this._evalVisible();
+        if (newVisible === this._prevVisible) return;
+        const top    = this._kuruTop    !== null ? this._kuruTop    : this.y;
+        const bottom = this._kuruBottom !== null ? this._kuruBottom : this.y + this.height;
+        if (newVisible) {
+            window.lcdAnimator.applyAppear(this._domEl, this._animType, transTime, gapTime, top, bottom);
+        } else {
+            window.lcdAnimator.applyDisappear(this._domEl, this._animType, transTime, gapTime, top, bottom);
+        }
+        this._prevVisible = newVisible;
     }
 
     // $引数名（ドット記法対応）をargsから解決する
