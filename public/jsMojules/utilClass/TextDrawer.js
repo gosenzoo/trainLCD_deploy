@@ -306,8 +306,9 @@ class TextDrawer{
         const fontSize = 100; // 比率を安定させるために大きめ
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'black';
-        ctx.textBaseline = 'top';
+        // iOS SafariではctxにfontをセットするとtextBaselineがリセットされる場合があるため、font設定後に再設定する
         ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.textBaseline = 'top';
         if(lang == "en"){
             ctx.fillText('H', 50, 50);
         }
