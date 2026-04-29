@@ -56,17 +56,21 @@
       accent-color: #569cd6;
     }
 
-    #redraw-btn {
-      align-self: flex-start;
-      padding: 8px 24px;
+    .toolbar-btn {
+      padding: 6px 16px;
       background: #0e639c;
       color: #fff;
       border: none;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
     }
-    #redraw-btn:hover { background: #1177bb; }
+    .toolbar-btn:hover { background: #1177bb; }
+    #redraw-btn {
+      align-self: flex-start;
+      padding: 8px 24px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -74,8 +78,11 @@
     <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"></svg>
   </div>
 
-  <div id="svg-toolbar" style="padding:8px 24px;display:flex;align-items:center;gap:16px;background:#2a2a2a;border-bottom:1px solid #444;">
-    <button id="redraw-btn">再描画</button>
+  <div id="svg-toolbar" style="padding:8px 24px;display:flex;align-items:center;gap:12px;background:#2a2a2a;border-bottom:1px solid #444;">
+    <button id="redraw-btn" class="toolbar-btn">再描画</button>
+    <button id="lang-btn"     class="toolbar-btn">言語切替 [L]</button>
+    <button id="runstate-btn" class="toolbar-btn">runState [R]</button>
+    <button id="terminal-btn" class="toolbar-btn">isTerminal [T]</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
       デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）
@@ -186,26 +193,34 @@
       const LANG_TRANS_MS = 500; // 遷移アニメーション時間[ms]
       const LANG_GAP_MS   = 0;   // 遷移開始までの遅延[ms]
 
+      // 各操作を関数化してボタンとキーボードから共用する
+      function doLangCycle() {
+        cycleNumberParam('langId', 0, 2);
+        const el = paramList.querySelector('[data-key="langId"]');
+        if (el) drawer.drawParams.langId = Number(el.value);
+        drawer.langChange(LANG_TRANS_MS, LANG_GAP_MS);
+      }
+      function doRunStateCycle() {
+        cycleNumberParam('runState', 0, 2);
+        redraw();
+      }
+      function doTerminalToggle() {
+        toggleBoolParam('isTerminal');
+        redraw();
+      }
+
+      document.getElementById('lang-btn')    .addEventListener('click', doLangCycle);
+      document.getElementById('runstate-btn').addEventListener('click', doRunStateCycle);
+      document.getElementById('terminal-btn').addEventListener('click', doTerminalToggle);
+
       document.addEventListener('keydown', e => {
         // 入力欄にフォーカスがある場合は無視
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         const key = e.key.toUpperCase();
-        if (key === 'L') {
-          // langIdをサイクルさせ、drawParams.langIdのみ更新してアニメーション遷移
-          cycleNumberParam('langId', 0, 2);
-          const el = paramList.querySelector('[data-key="langId"]');
-          if (el) drawer.drawParams.langId = Number(el.value);
-          drawer.langChange(LANG_TRANS_MS, LANG_GAP_MS);
-        } else if (key === 'R') {
-          cycleNumberParam('runState', 0, 2);
-          redraw();
-        } else if (key === 'T') {
-          toggleBoolParam('isTerminal');
-          redraw();
-        } else {
-          return; // 対象外キーは再描画しない
-        }
+        if      (key === 'L') doLangCycle();
+        else if (key === 'R') doRunStateCycle();
+        else if (key === 'T') doTerminalToggle();
       });
     };
 
