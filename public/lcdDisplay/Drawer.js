@@ -25,6 +25,18 @@ class Drawer {
         this.textDrawer = new TextDrawer(this.iconList, null);
         // defs要素をキャッシュしておく（draw()で参照渡しするため）
         this._defsEl = defsSVG.getElementById('defs');
+
+        // drawParams.numIconPresetKeys に列挙されたプリセットSVGを並列フェッチしてNumIconDrawerを初期化
+        const presetKeys   = drawParams.numIconPresetKeys || [];
+        const numIconPresets = {};
+        await Promise.all(presetKeys.map(async key => {
+            try {
+                numIconPresets[key] = await this._fetchSVG(`/presetNumIcons/${key}.svg`);
+            } catch (e) {
+                console.warn(`numIcon preset not found: ${key}`);
+            }
+        }));
+        this.numIconDrawer = new NumIconDrawer(numIconPresets);
     }
 
     // SVGをDOMParserで取得
@@ -91,11 +103,14 @@ class Drawer {
             return new StaticObj(element);
         } else if (lcdParts === 'textBox') {
             return new TextBoxObj(element, this.drawParams, {}, this.textDrawer);
+        } else if (lcdParts === 'numbering') {
+            return new NumIconObj(element, this.drawParams, {}, this.numIconDrawer);
         } else if (lcdParts === 'arrange') {
             const arrangeCtx = {
                 drawParams: this.drawParams,
                 args: {},
                 textDrawer: this.textDrawer,
+                numIconDrawer: this.numIconDrawer,
                 exprParser: this.exprParser,
                 debug: this.debug,
             };

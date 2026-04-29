@@ -1,6 +1,7 @@
 {
   "langId": 0,
   "runState": 1,
+  "numIconPresetKeys": ["N_tokyu"],
   "isTerminal": false,
   "isNextStation": true,
   "trainType": "急行",
@@ -12,6 +13,8 @@
    "number": "G 12",
    "lineColor": "#8700f3",
    "numIconPresetKey": "N_tokyu",
+   "numIconSymbol": "G",
+   "numIconNumber": "12",
    "lineNumberType": "0",
    "transfers": "",
    "isPass": false,

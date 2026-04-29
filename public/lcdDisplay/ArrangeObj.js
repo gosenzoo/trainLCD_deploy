@@ -81,8 +81,9 @@ class ArrangeObj extends LcdPartsObj {
             obj = new ArrangeObj(svgDom, childCtx);
         } else if (lcdParts === 'textBox') {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
+        } else if (lcdParts === 'numbering') {
+            obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
         }
-        // static / numberingIcon は現時点では未実装
         if (!obj) return null;
 
         // visible評価用のresolveValueとexprParserを構築時に設定する

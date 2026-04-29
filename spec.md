@@ -1306,6 +1306,42 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 
 ---
 
+### 7.3 lcdParts="numbering" — NumIconObj の実装
+
+`rect` 要素の範囲内にナンバリングアイコン（路線記号＋番号）を表示する lcdParts。
+
+#### 属性仕様
+
+| 属性 | 説明 |
+|---|---|
+| `lcd-numKey` | NumIconDrawer のプリセットキー。`#{...}` / `$...` テンプレート展開対応 |
+| `symbolText` | 路線記号テキスト。テンプレート展開対応 |
+| `numberText` | 番号テキスト。テンプレート展開対応 |
+| `lineColor` | 路線カラー。テンプレート展開対応 |
+
+#### サイズ規則
+
+- `min(width, height)` を `naturalSize` とし、左/上詰めの正方形が描画範囲
+- `flexible = false` と同等: `setSize(w, h)` では `min(min(w,h), naturalSize)` を上限として縮小のみ（拡大しない）
+- `realWidth = realHeight`（常に正方形）
+
+#### デバッグ環境での読み込み
+
+`drawParams.json` に `numIconPresetKeys` 配列を追加し、`Drawer.load()` で drawParams ロード後に各キーの SVG プリセットを `/presetNumIcons/${key}.svg` から fetch して `NumIconDrawer` を初期化する。
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/NumIconObj.js` | 新規 | `NumIconObj` クラス（`LcdPartsObj` 継承） |
+| `public/lcdDisplay/Drawer.js` | 変更 | `load()` に numIconDrawer 初期化を追加、`_buildNode` に `numbering` 追加、`arrangeCtx` に `numIconDrawer` を追加 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj` に `numbering` 追加 |
+| `public/lcdDisplay/drawParams.json` | 変更 | `numIconPresetKeys` 配列を追加 |
+| `public/lcdDisplay/index.html` | 変更 | `NumIconObj.js` スクリプトタグ追加 |
+| `public/lcdDisplay/headerSVG.svg` | 変更 | テスト用 numbering 要素を追加 |
+
+---
+
 ### データ受け渡し
 
 ```
