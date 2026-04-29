@@ -257,8 +257,13 @@ class TextDrawer{
 
         // "regular"はCanvas APIで無効な値のため"normal"に正規化する（textAnchor計算のズレ防止）
         const fontWeight = styleJson.fontWeight === 'regular' ? 'normal' : (styleJson.fontWeight || 'normal');
-        // フォントスタイルを正確に組み立て
-        ctx.font = `${fontWeight} ${fontSize}px '${styleJson.fontFamily}'`;
+        // CSSのgenericフォントファミリー名（sans-serif等）はクォート不要。クォートすると
+        // iOS SafariでSVG描画と異なるフォントに解決されて幅測定がずれるため、named fontのみクォートする
+        const GENERIC_FAMILIES = new Set(['sans-serif', 'serif', 'monospace', 'cursive', 'fantasy', 'system-ui']);
+        const familyStr = GENERIC_FAMILIES.has(styleJson.fontFamily)
+            ? styleJson.fontFamily
+            : `'${styleJson.fontFamily}'`;
+        ctx.font = `${fontWeight} ${fontSize}px ${familyStr}`;
 
         const metrics = ctx.measureText(text);
         let width;
