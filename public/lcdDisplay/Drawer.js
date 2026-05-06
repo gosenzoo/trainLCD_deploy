@@ -82,6 +82,7 @@ class Drawer {
 
         // オブジェクトツリーを構築してgetElementで描画
         this.buildTree();
+        console.log(this.defaultLineRoot);
         const resolveValue = name => this._resolveValue(name);
         const ctx = { resolveValue, exprParser: this.exprParser, debug: this.debug };
 
@@ -122,7 +123,20 @@ class Drawer {
         if (tagName === 'svg' || lcdParts === 'group') {
             // グループとして子要素を再帰的にオブジェクト化
             const group = new GroupObj(element);
-            for (const child of element.children) {
+            // lcdParts="group"にlcd-color属性がある場合、配下のshape要素にfillを適用する（階層優先）
+            let domForChildren = element;
+            if (lcdParts === 'group') {
+                const lcdColorAttr = element.getAttribute('lcd-color');
+                if (lcdColorAttr) {
+                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, this.drawParams);
+                    const color = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+                    if (color) {
+                        domForChildren = element.cloneNode(true);
+                        StaticObj._applyColorToDOM(domForChildren, color, this.drawParams);
+                    }
+                }
+            }
+            for (const child of domForChildren.children) {
                 const node = this._buildNode(child);
                 if (node) group.addChild(node);
             }

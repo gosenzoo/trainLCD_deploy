@@ -46,6 +46,7 @@
               fill="url(./defs.svg#outerGradient)"
               style="mix-blend-mode: multiply;" />
     </g>
+    
     <g id="hereIcon" data-basePoint="228,721">
       <polygon points="172,719 232,719 276,764.5 233,809 173,809 216,764.5" fill="white" />
       <polygon points="180,721 228,721 270,764.5 227,809 179,809 222,764.5">

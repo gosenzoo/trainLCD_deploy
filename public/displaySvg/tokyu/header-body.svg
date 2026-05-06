@@ -99,7 +99,7 @@
   </g>
 
   <!-- 標準路線図ボディ -->
-  <g id="body-defaultLine" style="isolation: isolate;" visibility="hidden">
+  <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
     <g filter="url(#outline)">
       <!-- 路線ベース左端（始点） -->
       <rect id="lineStart" x="0" y="721" width="226" height="87" fill="rgb(221, 221, 221)" />
@@ -170,7 +170,7 @@
   </g>
 
   <!-- プラットフォーム -->
-  <g id="body-platform" style="isolation: isolate;" visibility="visible">
+  <g id="body-platform" style="isolation: isolate;" visibility="hidden">
     <g id="body-platform-transferList">
       <rect id="transferListBack" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(#dropShadow2)"></rect>
       <rect id="transferListTextRect" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
@@ -186,7 +186,7 @@
     </g>
   </g>
 
-  <g id="footer" visibility="visible">
+  <g id="footer" visibility="hidden">
     <!-- 時間は異なります(英語) -->
     <rect id="footer-estimateTimeText" x="1396" y="1028" width="510" height="35" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "regular", "textAnchor": "end", "fill": "rgb(0, 0, 0)"}' lang="en" />
     <rect id="footer-stopText" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
@@ -194,7 +194,7 @@
 
   <!-- <image href="./tokyu-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
   <!-- <image href="./seibu-sukusyo.png" x="0" y="5" width="1920" height="1080" opacity="0.2" /> -->
-  <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+  <!-- <image id="platform-jitubutu" href="./platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
   <!-- <image id="tokyu-okuHome" href="./displaySvg/tokyu/tokyu-okuHome.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
 </svg>
 

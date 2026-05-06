@@ -100,18 +100,17 @@ class LcdPartsObj {
     }
 
     // テンプレート文字列を展開する
-    // #{変数名} → drawParams参照、$変数名（ドット記法可）→ args参照
+    // #{$argName.field} → args参照、#{varName} → drawParams参照
     static resolveTemplate(template, drawParams, args) {
         if (!template) return '';
-        let result = template.replace(/#\{([^}]+)\}/g, (_, varName) => {
-            const val = LcdPartsObj.resolveDrawParam(varName.trim(), drawParams);
+        return template.replace(/#\{([^}]+)\}/g, (_, expr) => {
+            const trimmed = expr.trim();
+            // $で始まる場合はargs参照、それ以外はdrawParams参照
+            const val = trimmed.startsWith('$')
+                ? LcdPartsObj.resolveArgToken(trimmed, args)
+                : LcdPartsObj.resolveDrawParam(trimmed, drawParams);
             return val != null ? String(val) : '';
         });
-        result = result.replace(/\$(\w+(?:\.\w+)*)/g, (_, path) => {
-            const val = LcdPartsObj.resolveArgToken('$' + path, args);
-            return val != null ? String(val) : '';
-        });
-        return result;
     }
 
     // visible属性の評価用resolveValue（drawParamsとargsの両方を参照）

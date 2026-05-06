@@ -49,5 +49,136 @@
   "leftSectionType": 1,
   "rightSectionType": 0,
   "leftSectionColor": "rgb(0, 255, 0)",
-  "rightSectionColor": "rgb(0, 255, 0)"
+  "rightSectionColor": "rgb(0, 255, 0)",
+
+  "dispStationList": [
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": false,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "isPass": true,
+      "sectionTime": "",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    }
+  ]
 }

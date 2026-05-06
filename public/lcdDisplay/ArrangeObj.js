@@ -40,49 +40,8 @@ class ArrangeObj extends LcdPartsObj {
             });
         }
 
-        // 子要素を走査してchildrenを構築
-        Array.from(svgDom.children).forEach(child => {
-            // arrangeArea自体はスキップ
-            if (child.getAttribute('lcdParts') === 'arrangeArea') return;
-
-            // lcdParts="static" かつ lcd-color が配列 かつ staticArea あり → 色ごとにコピーして展開
-            if (child.getAttribute('lcdParts') === 'static') {
-                const colorAttr = child.getAttribute('lcd-color');
-                if (colorAttr) {
-                    const colorVal = StaticObj._resolveLcdColor(colorAttr, drawParams);
-                    if (Array.isArray(colorVal)) {
-                        const hasArea = Array.from(child.children).some(
-                            c => c.getAttribute && c.getAttribute('lcdParts') === 'staticArea'
-                        );
-                        if (hasArea) {
-                            colorVal.forEach(color => {
-                                const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
-                                if (obj) this.children.push(obj);
-                            });
-                            return; // 通常処理をスキップ
-                        }
-                    }
-                }
-            }
-
-            const childLcdArg = child.getAttribute('lcd-arg');
-            if (childLcdArg && childLcdArg.startsWith('$')) {
-                // $引数名 → 対応する配列の要素数だけ複製
-                const argName  = childLcdArg.slice(1).split('.')[0];
-                const argArray = this.arg[argName];
-                if (Array.isArray(argArray)) {
-                    argArray.forEach(element => {
-                        const childArgs = Object.assign({}, args, { [argName]: element });
-                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
-                        if (obj) this.children.push(obj);
-                    });
-                }
-            } else {
-                // 通常の子要素（複製なし）
-                const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
-                if (obj) this.children.push(obj);
-            }
-        });
+        // 子要素を走査してchildrenを構築（arrangeとgroupで共通のビルドロジックを使用）
+        this.children = this._buildContainerChildren(svgDom, drawParams, args, 'arrangeArea', this.arg);
 
         // 構築時の自然サイズを記録しておく
         this._childNaturalSizes = this.children.map(c => c.getRealSize());
@@ -102,13 +61,37 @@ class ArrangeObj extends LcdPartsObj {
         let obj;
         if (lcdParts === 'arrange') {
             obj = new ArrangeObj(svgDom, childCtx);
+            // Drawer._buildNodeと同様に、arrangeAreaのサイズ内に収まるよう初期圧縮を適用する
+            obj.setSize(obj.width, obj.height);
         } else if (lcdParts === 'textBox') {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         } else if (lcdParts === 'numbering') {
             obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
         } else if (lcdParts === 'static') {
-            // 範囲（staticArea）を持つ <g> の場合のみ配置調整に参加する（getRealSizeが{0,0}以外を返す）
             obj = new StaticObj(svgDom, drawParams, colorOverride);
+        } else if (lcdParts === 'group') {
+            // groupAreaを持つgroupは配置調整に参加する（getRealSizeがgroupArea寸法を返す）
+            const groupObj = new GroupObj(svgDom);
+            // colorOverrideがない場合、group自身のlcd-color属性をスカラーとして解決する
+            let effectiveColor = colorOverride;
+            if (effectiveColor === null) {
+                const lcdColorAttr = svgDom.getAttribute('lcd-color');
+                if (lcdColorAttr) {
+                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams);
+                    effectiveColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+                }
+            }
+            // 有効な色がある場合、svgDomをクローンして配下のshape要素にfillを適用する（階層優先）
+            let domForChildren = svgDom;
+            if (effectiveColor !== null) {
+                domForChildren = svgDom.cloneNode(true);
+                StaticObj._applyColorToDOM(domForChildren, effectiveColor, drawParams);
+            }
+            // 子要素を再帰ビルドして追加（arrange/group共通のビルドロジックを使用）
+            for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {})) {
+                groupObj.addChild(node);
+            }
+            obj = groupObj;
         }
         if (!obj) return null;
 
@@ -118,6 +101,71 @@ class ArrangeObj extends LcdPartsObj {
         obj._exprParser   = exprParser;
         obj._prevVisible  = obj._evalVisible();
         return obj;
+    }
+
+    // arrange・group 共通の子ビルドロジック
+    // skipLcdParts: スキップするlcdParts値（'arrangeArea' or 'groupArea'）
+    // parentArgMap: このコンテナが lcd-arg 宣言した配列マップ（{}の場合はdrawParamsへフォールバック）
+    _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}) {
+        const { textDrawer, exprParser } = this._ctx;
+        const children = [];
+
+        Array.from(svgDom.children).forEach(child => {
+            if (!child.getAttribute) return;
+            if (child.getAttribute('lcdParts') === skipLcdParts) return;
+
+            // lcdParts="group" かつ lcd-color が配列 かつ groupArea あり → 色ごとにコピーして展開
+            if (child.getAttribute('lcdParts') === 'group') {
+                const colorAttr = child.getAttribute('lcd-color');
+                if (colorAttr) {
+                    const colorVal = StaticObj._resolveLcdColor(colorAttr, drawParams);
+                    if (Array.isArray(colorVal)) {
+                        const hasArea = Array.from(child.children).some(
+                            c => c.getAttribute && c.getAttribute('lcdParts') === 'groupArea'
+                        );
+                        if (hasArea) {
+                            colorVal.forEach(color => {
+                                const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
+                                if (obj) children.push(obj);
+                            });
+                            return; // 通常処理をスキップ
+                        }
+                    }
+                }
+            }
+
+            // lcd-arg="argName:drawParamsVarName" → コロン区切りで引数名と変数名を分離してコピー展開
+            // コロンなしは無効として無視する
+            const childLcdArg = child.getAttribute('lcd-arg');
+            if (childLcdArg && childLcdArg.includes(':')) {
+                const colonIdx       = childLcdArg.indexOf(':');
+                const argName        = childLcdArg.slice(0, colonIdx).trim();
+                const drawParamsVarName = childLcdArg.slice(colonIdx + 1).trim();
+                // parentArgMap → $始まりならargs → それ以外はdrawParams の順で解決
+                let argArray;
+                if (parentArgMap[drawParamsVarName] !== undefined) {
+                    argArray = parentArgMap[drawParamsVarName];
+                } else if (drawParamsVarName.startsWith('$')) {
+                    argArray = LcdPartsObj.resolveArgToken(drawParamsVarName, args);
+                } else {
+                    argArray = LcdPartsObj.resolveDrawParam(drawParamsVarName, drawParams);
+                }
+                if (argName && Array.isArray(argArray)) {
+                    argArray.forEach(element => {
+                        const childArgs = Object.assign({}, args, { [argName]: element });
+                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
+                        if (obj) children.push(obj);
+                    });
+                    return; // 通常処理をスキップ
+                }
+            }
+
+            // 通常の子要素（複製なし）
+            const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
+            if (obj) children.push(obj);
+        });
+
+        return children;
     }
 
     // 子要素の自然サイズから自身の自然サイズを算出する

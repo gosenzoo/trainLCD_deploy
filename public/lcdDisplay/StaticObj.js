@@ -1,6 +1,5 @@
 // lcdParts="static" に対応するオブジェクトクラス
 // getElement は参照渡し。テンプレート保護のためクローンはコンストラクタで一度だけ行う。
-// <g>要素で指定した場合、直下の lcdParts="staticArea" を持つ rect が範囲を定義する。
 class StaticObj {
     constructor(svgDom, drawParams = null, colorOverride = null) {
         // visible属性を文字列のまま保持（getElementで評価）
@@ -36,41 +35,9 @@ class StaticObj {
         this.verticalAlign   = svgDom.getAttribute('lcd-verAlign')   || 'top';
         this.horizontalAlign = svgDom.getAttribute('lcd-holAlign')   || 'left';
 
-        // 範囲・拡大縮小関連フィールド（staticAreaが存在する場合のみ有効）
-        this._areaX         = 0;
-        this._areaY         = 0;
-        this._naturalWidth  = 0;
-        this._naturalHeight = 0;
-        this.realWidth      = 0;
-        this.realHeight     = 0;
-        this._snapshots     = null;
-
-        // <g>要素の場合、直下の staticArea から範囲を取得してスナップショットを記録
-        const tagName = svgDom.tagName ? svgDom.tagName.toLowerCase() : '';
-        if (tagName === 'g') {
-            const areaEl = Array.from(this._node.children).find(
-                c => c.getAttribute('lcdParts') === 'staticArea'
-            );
-            if (areaEl) {
-                this._areaX         = parseFloat(areaEl.getAttribute('x'))      || 0;
-                this._areaY         = parseFloat(areaEl.getAttribute('y'))      || 0;
-                this._naturalWidth  = parseFloat(areaEl.getAttribute('width'))  || 0;
-                this._naturalHeight = parseFloat(areaEl.getAttribute('height')) || 0;
-                this.realWidth      = this._naturalWidth;
-                this.realHeight     = this._naturalHeight;
-                // kuruアニメーション用にy/heightをstaticAreaの値で上書き
-                this.x      = this._areaX;
-                this.y      = this._areaY;
-                this.height = this._naturalHeight;
-                // staticAreaはレンダリング不要なのでクローンから削除
-                this._node.removeChild(areaEl);
-                // 残りの子孫要素の原始座標をスナップショットとして記録
-                this._snapshots = this._takeSnapshot(this._node);
-            }
-        }
-
-        // <g>要素配下のvisible属性を持つ子孫要素を収集する（staticArea削除後）
+        // <g>要素配下のvisible属性を持つ子孫要素を収集する
         this._visibleItems = [];
+        const tagName = svgDom.tagName ? svgDom.tagName.toLowerCase() : '';
         if (tagName === 'g') this._collectVisibleItems(this._node);
 
         // lcd-color属性によるfill設定
@@ -89,9 +56,9 @@ class StaticObj {
         }
     }
 
-    // 実際の描画サイズを返す（staticAreaなしの場合は {0, 0}）
+    // 実際の描画サイズを返す（StaticObjはサイズなし）
     getRealSize() {
-        return { width: this.realWidth, height: this.realHeight };
+        return { width: 0, height: 0 };
     }
 
     // 座標を更新する（ArrangeObjから呼ばれる）
@@ -100,18 +67,9 @@ class StaticObj {
         this.y = y;
     }
 
-    // 指定サイズへ拡大縮小する（staticAreaが定義されている場合のみ有効）
-    // sx = width/naturalWidth、sy = height/naturalHeight を子孫要素の座標属性に適用する
+    // StaticObjはサイズ変形をサポートしない（GroupObjのgroupAreaを使用すること）
     setSize(width, height) {
-        if (!this._naturalWidth || !this._naturalHeight || !this._snapshots) {
-            return { width: this.realWidth, height: this.realHeight };
-        }
-        const sx = width  / this._naturalWidth;
-        const sy = height / this._naturalHeight;
-        this._applyScale(this._areaX, this._areaY, sx, sy);
-        this.realWidth  = width;
-        this.realHeight = height;
-        return { width, height };
+        return { width: 0, height: 0 };
     }
 
     // lcd-color属性値を解決する静的メソッド
@@ -145,6 +103,26 @@ class StaticObj {
         for (const child of containerEl.children) walk(child);
     }
 
+    // containerEl配下の全shape要素にbaseColorを適用する静的メソッド（再帰・階層優先）
+    // 内側の要素が自身のlcd-color属性を持つ場合は階層が深い方を優先してcurrentColorを上書きする
+    static _applyColorToDOM(containerEl, baseColor, drawParams) {
+        const SHAPE_TAGS = new Set(['rect', 'circle', 'ellipse', 'polygon', 'polyline', 'line', 'path']);
+        const walk = (el, currentColor) => {
+            // 自身のlcd-color属性があれば解決してcurrentColorを上書き（内側が優先）
+            const ownColorAttr = el.getAttribute ? el.getAttribute('lcd-color') : null;
+            if (ownColorAttr) {
+                const resolved = StaticObj._resolveLcdColor(ownColorAttr, drawParams);
+                const ownColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+                if (ownColor) currentColor = ownColor;
+            }
+            if (SHAPE_TAGS.has(el.tagName ? el.tagName.toLowerCase() : '')) {
+                el.setAttribute('fill', currentColor);
+            }
+            for (const child of el.children) walk(child, currentColor);
+        };
+        for (const child of containerEl.children) walk(child, baseColor);
+    }
+
     // visible属性を持つ子孫要素を再帰的に収集して _visibleItems に格納する
     _collectVisibleItems(containerEl) {
         const walk = (el) => {
@@ -162,174 +140,6 @@ class StaticObj {
             const isVisible = !!this._exprParser.eval(expr, this._resolveValue);
             el.style.visibility = isVisible ? '' : 'hidden';
         }
-    }
-
-    // 子孫要素の原始座標をMap<Element, snap>として記録する
-    _takeSnapshot(containerEl) {
-        const snapshots = new Map();
-        const walk = (el) => {
-            const tag = el.tagName ? el.tagName.toLowerCase() : '';
-            let snap = null;
-            switch (tag) {
-                case 'rect':
-                    snap = {
-                        x:      parseFloat(el.getAttribute('x'))      || 0,
-                        y:      parseFloat(el.getAttribute('y'))      || 0,
-                        width:  parseFloat(el.getAttribute('width'))  || 0,
-                        height: parseFloat(el.getAttribute('height')) || 0,
-                        rx: el.hasAttribute('rx') ? parseFloat(el.getAttribute('rx')) : null,
-                        ry: el.hasAttribute('ry') ? parseFloat(el.getAttribute('ry')) : null,
-                    };
-                    break;
-                case 'polygon':
-                case 'polyline':
-                    snap = { points: el.getAttribute('points') || '' };
-                    break;
-                case 'line':
-                    snap = {
-                        x1: parseFloat(el.getAttribute('x1')) || 0,
-                        y1: parseFloat(el.getAttribute('y1')) || 0,
-                        x2: parseFloat(el.getAttribute('x2')) || 0,
-                        y2: parseFloat(el.getAttribute('y2')) || 0,
-                    };
-                    break;
-                case 'circle':
-                    snap = {
-                        cx: parseFloat(el.getAttribute('cx')) || 0,
-                        cy: parseFloat(el.getAttribute('cy')) || 0,
-                        r:  parseFloat(el.getAttribute('r'))  || 0,
-                    };
-                    break;
-                case 'ellipse':
-                    snap = {
-                        cx: parseFloat(el.getAttribute('cx')) || 0,
-                        cy: parseFloat(el.getAttribute('cy')) || 0,
-                        rx: parseFloat(el.getAttribute('rx')) || 0,
-                        ry: parseFloat(el.getAttribute('ry')) || 0,
-                    };
-                    break;
-                case 'path':
-                    snap = { d: el.getAttribute('d') || '' };
-                    break;
-            }
-            if (snap) snapshots.set(el, snap);
-            // <g>等は座標を持たないが子孫を再帰処理
-            for (const child of el.children) walk(child);
-        };
-        for (const child of containerEl.children) walk(child);
-        return snapshots;
-    }
-
-    // スナップショットの原始座標に (ox,oy) を原点としてsx/syを適用する
-    _applyScale(ox, oy, sx, sy) {
-        this._snapshots.forEach((snap, el) => {
-            const tag = el.tagName ? el.tagName.toLowerCase() : '';
-            switch (tag) {
-                case 'rect':
-                    el.setAttribute('x',      ox + (snap.x - ox) * sx);
-                    el.setAttribute('y',      oy + (snap.y - oy) * sy);
-                    el.setAttribute('width',  snap.width  * sx);
-                    el.setAttribute('height', snap.height * sy);
-                    if (snap.rx !== null) el.setAttribute('rx', snap.rx * sx);
-                    if (snap.ry !== null) el.setAttribute('ry', snap.ry * sy);
-                    break;
-                case 'polygon':
-                case 'polyline': {
-                    // points: "x1,y1 x2,y2 ..." を数値列として解析してsx/syを適用
-                    const nums   = snap.points.trim().split(/[\s,]+/).filter(s => s !== '').map(Number);
-                    const scaled = nums.map((v, i) =>
-                        i % 2 === 0 ? ox + (v - ox) * sx : oy + (v - oy) * sy
-                    );
-                    el.setAttribute('points', scaled.join(' '));
-                    break;
-                }
-                case 'line':
-                    el.setAttribute('x1', ox + (snap.x1 - ox) * sx);
-                    el.setAttribute('y1', oy + (snap.y1 - oy) * sy);
-                    el.setAttribute('x2', ox + (snap.x2 - ox) * sx);
-                    el.setAttribute('y2', oy + (snap.y2 - oy) * sy);
-                    break;
-                case 'circle':
-                    el.setAttribute('cx', ox + (snap.cx - ox) * sx);
-                    el.setAttribute('cy', oy + (snap.cy - oy) * sy);
-                    // 非均一スケール時はmin(sx,sy)でrを縮小して円形を維持
-                    el.setAttribute('r',  snap.r * Math.min(sx, sy));
-                    break;
-                case 'ellipse':
-                    el.setAttribute('cx', ox + (snap.cx - ox) * sx);
-                    el.setAttribute('cy', oy + (snap.cy - oy) * sy);
-                    el.setAttribute('rx', snap.rx * sx);
-                    el.setAttribute('ry', snap.ry * sy);
-                    break;
-                case 'path':
-                    el.setAttribute('d', StaticObj._scalePath(snap.d, ox, oy, sx, sy));
-                    break;
-            }
-        });
-    }
-
-    // pathのd属性をスケールする静的ヘルパー
-    // 絶対コマンド(大文字): 座標を原点(ox,oy)基準でスケール
-    // 相対コマンド(小文字): 差分値をそのままsx/sy倍（原点オフセット不要）
-    // Aコマンドのrx/ryはsx/sy倍、x-rotation・フラグはそのまま保持
-    static _scalePath(d, ox, oy, sx, sy) {
-        const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g);
-        if (!tokens) return d;
-
-        const isCmd  = t => /^[MmLlHhVvCcSsQqTtAaZz]$/.test(t);
-        const num    = i => parseFloat(tokens[i]);
-        const scaleX = (x, abs) => abs ? ox + (x - ox) * sx : x * sx;
-        const scaleY = (y, abs) => abs ? oy + (y - oy) * sy : y * sy;
-
-        const out = [];
-        let i = 0;
-        while (i < tokens.length) {
-            if (!isCmd(tokens[i])) { i++; continue; }
-            const cmd  = tokens[i++];
-            const abs  = cmd === cmd.toUpperCase();
-            const TYPE = cmd.toUpperCase();
-            out.push(cmd);
-
-            // 同一コマンドの暗黙的繰り返しも while でまとめて処理
-            while (i < tokens.length && !isCmd(tokens[i])) {
-                switch (TYPE) {
-                    case 'M': case 'L': case 'T':
-                        out.push(scaleX(num(i), abs), scaleY(num(i+1), abs));
-                        i += 2; break;
-                    case 'H':
-                        out.push(scaleX(num(i), abs));
-                        i += 1; break;
-                    case 'V':
-                        out.push(scaleY(num(i), abs));
-                        i += 1; break;
-                    case 'C':
-                        out.push(
-                            scaleX(num(i),   abs), scaleY(num(i+1), abs),
-                            scaleX(num(i+2), abs), scaleY(num(i+3), abs),
-                            scaleX(num(i+4), abs), scaleY(num(i+5), abs)
-                        ); i += 6; break;
-                    case 'S': case 'Q':
-                        out.push(
-                            scaleX(num(i),   abs), scaleY(num(i+1), abs),
-                            scaleX(num(i+2), abs), scaleY(num(i+3), abs)
-                        ); i += 4; break;
-                    case 'A':
-                        // rx ry x-rotation large-arc-flag sweep-flag x y
-                        out.push(
-                            num(i)   * sx,   // rx
-                            num(i+1) * sy,   // ry
-                            tokens[i+2],     // x-rotation（角度のためそのまま保持）
-                            tokens[i+3],     // large-arc-flag
-                            tokens[i+4],     // sweep-flag
-                            scaleX(num(i+5), abs),
-                            scaleY(num(i+6), abs)
-                        ); i += 7; break;
-                    default:
-                        i++; break;
-                }
-            }
-        }
-        return out.join(' ');
     }
 
     // visible属性を評価して真偽値を返す（_resolveValue未設定なら常にtrue）
@@ -355,17 +165,6 @@ class StaticObj {
 
         // 子孫要素のvisible属性を評価して表示・非表示を設定
         this._applyChildVisible();
-
-        // staticAreaが存在する場合: setCoordinateで指定された座標へtranslateで移動
-        if (this._snapshots) {
-            const dx = this.x - this._areaX;
-            const dy = this.y - this._areaY;
-            if (dx !== 0 || dy !== 0) {
-                this._node.setAttribute('transform', `translate(${dx}, ${dy})`);
-            } else {
-                this._node.removeAttribute('transform');
-            }
-        }
 
         this._domEl = this._node;
         return this._node;
