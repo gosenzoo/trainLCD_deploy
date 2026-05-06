@@ -1,7 +1,7 @@
 // lcdParts="static" に対応するオブジェクトクラス
 // getElement は参照渡し。テンプレート保護のためクローンはコンストラクタで一度だけ行う。
 class StaticObj {
-    constructor(svgDom, drawParams = null, colorOverride = null) {
+    constructor(svgDom, drawParams = null, colorOverride = null, args = {}) {
         // visible属性を文字列のまま保持（getElementで評価）
         this.visible = svgDom.getAttribute('visible');
         // テンプレート要素を保護しつつ参照渡しできるよう、構築時に一度だけクローン
@@ -41,12 +41,12 @@ class StaticObj {
         if (tagName === 'g') this._collectVisibleItems(this._node);
 
         // lcd-color属性によるfill設定
-        // colorOverrideが渡された場合はそれを優先し、なければlcd-color属性をdrawParamsで解決する
+        // colorOverrideが渡された場合はそれを優先し、なければlcd-color属性をdrawParams/argsで解決する
         const lcdColorAttr = svgDom.getAttribute('lcd-color');
         if (colorOverride !== null) {
             this._applyColor(colorOverride);
         } else if (lcdColorAttr && drawParams !== null) {
-            const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams);
+            const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
             if (Array.isArray(resolved)) {
                 // 配列の場合は先頭要素のみ使用（配列展開はArrangeObj側で処理）
                 if (resolved.length > 0) this._applyColor(resolved[0]);
@@ -73,11 +73,13 @@ class StaticObj {
     }
 
     // lcd-color属性値を解決する静的メソッド
-    // CSS色リテラル（#・rgb(等で始まる）はそのまま返し、それ以外はdrawParams変数名として解決する
-    static _resolveLcdColor(attr, drawParams) {
+    // CSS色リテラルはそのまま返し、$始まりはargs参照、それ以外はdrawParams変数名として解決する
+    static _resolveLcdColor(attr, drawParams, args = {}) {
         if (!attr) return null;
-        if (/^#|^rgb\(|^rgba\(|^hsl\(|^hsla\(/i.test(attr.trim())) return attr.trim();
-        return LcdPartsObj.resolveDrawParam(attr.trim(), drawParams);
+        const trimmed = attr.trim();
+        if (/^#|^rgb\(|^rgba\(|^hsl\(|^hsla\(/i.test(trimmed)) return trimmed;
+        if (trimmed.startsWith('$')) return LcdPartsObj.resolveArgToken(trimmed, args);
+        return LcdPartsObj.resolveDrawParam(trimmed, drawParams);
     }
 
     // this._nodeにcolorをfillとして適用する
@@ -105,13 +107,13 @@ class StaticObj {
 
     // containerEl配下の全shape要素にbaseColorを適用する静的メソッド（再帰・階層優先）
     // 内側の要素が自身のlcd-color属性を持つ場合は階層が深い方を優先してcurrentColorを上書きする
-    static _applyColorToDOM(containerEl, baseColor, drawParams) {
+    static _applyColorToDOM(containerEl, baseColor, drawParams, args = {}) {
         const SHAPE_TAGS = new Set(['rect', 'circle', 'ellipse', 'polygon', 'polyline', 'line', 'path']);
         const walk = (el, currentColor) => {
             // 自身のlcd-color属性があれば解決してcurrentColorを上書き（内側が優先）
             const ownColorAttr = el.getAttribute ? el.getAttribute('lcd-color') : null;
             if (ownColorAttr) {
-                const resolved = StaticObj._resolveLcdColor(ownColorAttr, drawParams);
+                const resolved = StaticObj._resolveLcdColor(ownColorAttr, drawParams, args);
                 const ownColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
                 if (ownColor) currentColor = ownColor;
             }

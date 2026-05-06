@@ -75,16 +75,17 @@ class ArrangeObj extends LcdPartsObj {
         } else if (lcdParts === 'numbering') {
             obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
         } else if (lcdParts === 'static') {
-            obj = new StaticObj(svgDom, drawParams, colorOverride);
+            // argsを渡してlcd-colorのargs参照（$argName[n]等）を解決可能にする
+            obj = new StaticObj(svgDom, drawParams, colorOverride, args);
         } else if (lcdParts === 'group') {
             // groupAreaを持つgroupは配置調整に参加する（getRealSizeがgroupArea寸法を返す）
             const groupObj = new GroupObj(svgDom);
-            // colorOverrideがない場合、group自身のlcd-color属性をスカラーとして解決する
+            // colorOverrideがない場合、group自身のlcd-color属性をスカラーとして解決する（args参照も対応）
             let effectiveColor = colorOverride;
             if (effectiveColor === null) {
                 const lcdColorAttr = svgDom.getAttribute('lcd-color');
                 if (lcdColorAttr) {
-                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams);
+                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
                     effectiveColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
                 }
             }
@@ -92,7 +93,7 @@ class ArrangeObj extends LcdPartsObj {
             let domForChildren = svgDom;
             if (effectiveColor !== null) {
                 domForChildren = svgDom.cloneNode(true);
-                StaticObj._applyColorToDOM(domForChildren, effectiveColor, drawParams);
+                StaticObj._applyColorToDOM(domForChildren, effectiveColor, drawParams, args);
             }
             // 子要素を再帰ビルドして追加（arrange/group共通のビルドロジックを使用）
             for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {})) {

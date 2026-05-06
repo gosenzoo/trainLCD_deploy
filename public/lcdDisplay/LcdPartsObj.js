@@ -75,10 +75,24 @@ class LcdPartsObj {
         this._prevVisible = newVisible;
     }
 
-    // $引数名（ドット記法対応）をargsから解決する
+    // ドット記法＋ブラケット記法のトークンをキー配列に展開する
+    // 例: "sectionColor[0]" → ["sectionColor", "0"]
+    // 例: "station.colors[1]" → ["station", "colors", "1"]
+    static _expandKeys(token) {
+        const keys = [];
+        for (const part of token.split('.')) {
+            // "[" と "]" で分割し、空文字を除外する
+            for (const seg of part.split(/[\[\]]/)) {
+                if (seg !== '') keys.push(seg);
+            }
+        }
+        return keys;
+    }
+
+    // $引数名（ドット記法・ブラケット記法対応）をargsから解決する
     static resolveArgToken(token, args) {
         if (!token.startsWith('$')) return undefined;
-        const keys = token.slice(1).split('.');
+        const keys = LcdPartsObj._expandKeys(token.slice(1));
         let val = args[keys[0]];
         for (let i = 1; i < keys.length; i++) {
             if (val == null) return undefined;
@@ -87,10 +101,10 @@ class LcdPartsObj {
         return val;
     }
 
-    // drawParamsをドット記法で解決する
+    // drawParamsをドット記法・ブラケット記法で解決する
     static resolveDrawParam(token, drawParams) {
         if (!token) return undefined;
-        const keys = token.split('.');
+        const keys = LcdPartsObj._expandKeys(token);
         let val = drawParams;
         for (const key of keys) {
             if (val == null) return undefined;

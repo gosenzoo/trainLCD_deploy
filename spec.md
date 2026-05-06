@@ -1501,8 +1501,9 @@ arrange 配下の group に `lcd-arg="argName:drawParamsVarName"`（または省
 |---|---|---|
 | CSS 色リテラル | `#FF0000`・`rgb(0,255,0)`・`rgba(...)`・`hsl(...)` など | そのまま `fill` に設定 |
 | drawParams 変数名 | `nowStation.lineColor`・`sectionColors` | ドット記法でdrawParamsを解決した値を使用 |
+| args 参照 | `$sectionColor`・`$sectionColor[0]` | args を解決した値を使用 |
 
-判定: `#`・`rgb(`・`rgba(`・`hsl(`・`hsla(` で始まる場合は色リテラル、それ以外は drawParams 変数名として扱う。
+判定: `#`・`rgb(`・`rgba(`・`hsl(`・`hsla(` で始まる場合は色リテラル、`$` で始まる場合は args 参照、それ以外は drawParams 変数名として扱う。
 
 #### 適用対象
 
@@ -1543,10 +1544,21 @@ drawParams 変数が配列の場合:
 
 #### 実装詳細
 
-- `StaticObj._resolveLcdColor(attr, drawParams)` 静的メソッド: 色リテラルかどうかを判定し、drawParams 変数なら `LcdPartsObj.resolveDrawParam` で解決して返す。
-- `StaticObj._applyColor(color)` / `_applyColorToShapes(containerEl, color)` メソッド: static 要素の fill 設定に使用。
-- `ArrangeObj._createChildObj()` の group ケース: `colorOverride` がある場合、またはgroup自身の `lcd-color` をスカラーに解決した場合、svgDomをcloneNodeしてクローンの全shape要素にfillを適用し、そのクローンの子から子オブジェクトを構築する。
-- `Drawer._buildNode()` の group ケース: group に `lcd-color` 属性がある場合は同様にクローン・fill適用して子ビルドに使用する。
+- `StaticObj._resolveLcdColor(attr, drawParams, args)` 静的メソッド: 色リテラル判定 → `$` プレフィックスなら `LcdPartsObj.resolveArgToken` で args を解決 → それ以外は `LcdPartsObj.resolveDrawParam` で drawParams を解決して返す。
+- `StaticObj._applyColorToDOM(containerEl, baseColor, drawParams, args)`: `args` パラメータを追加し、内側 `lcd-color` 解決時に `_resolveLcdColor(attr, drawParams, args)` を呼ぶ。
+- `StaticObj` コンストラクタ: `args` パラメータを追加し、`_resolveLcdColor(attr, drawParams, args)` に渡す。
+- `ArrangeObj._createChildObj()` の static ケース: `new StaticObj(svgDom, drawParams, colorOverride, args)` と `args` を渡す。
+- `ArrangeObj._createChildObj()` の group ケース: `_resolveLcdColor` / `_applyColorToDOM` の呼び出しに `args` を追加。
+- `Drawer._buildNode()` の group ケース: `_resolveLcdColor` / `_applyColorToDOM` の呼び出しに `args={}` を追加。
+
+#### ブラケット記法によるインデックスアクセス
+
+`resolveArgToken` / `resolveDrawParam` において、`[n]` 記法による配列インデックスアクセスをサポートする。
+
+- パース時に `[n]` を独立したキーとして分解する（例: `sectionColor[0]` → `['sectionColor', '0']`）
+- 配列に対して数値インデックスでアクセスする（`val[0]` など）
+- ドット記法との混在も可能（例: `$station.colors[1]`）
+- 実装: トークンを `.` で分割した後、各キーの末尾に `[n]` がある場合は `[n]` 部分を取り出して別キーとして扱う
 
 #### ファイル変更一覧
 

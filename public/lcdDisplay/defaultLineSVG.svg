@@ -17,15 +17,15 @@
             <polygon lcdParts="static" isDraw="leftSectionType == 2" points="226,721 80,721 38,765 80,808 226,808" fill="rgba(227,127,127,0.4)" />
         </g>
         <!-- 路線ベース中 -->
-        <g lcdParts="group" lcd-color="sectionColors">
+        <g lcdParts="group" lcd-arg="sectionColor:sectionColors">
             <rect lcdParts="groupArea" x="0" y="721" width="210" height="87" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 長方形 -->
-            <!-- <rect x="0" y="721" width="210" height="87" fill="rgba(227,127,127,0.4)" /> -->
+            <rect lcdParts="static" isDraw="$sectionColor.length == 1" lcd-color="$sectionColor[0]" x="0" y="721" width="210" height="87" fill="rgba(227,127,127,0.4)" />
             <!-- はしょり -->
             <!-- 路線ベースはしょり -->
-            <path lcdParts="static" id="lineLeap1" d=" M 0 721 L 96 721 Q 82 742.75, 96 766.5 Q 124 788.25, 96 808 L 0 808 Z "
+            <path lcdParts="static" isDraw="$sectionColor.length == 2" lcd-color="$sectionColor[0]" d=" M 0 721 L 96 721 Q 82 742.75, 96 766.5 Q 124 788.25, 96 808 L 0 808 Z "
                 fill="rgba(0,191,255,0.20)" stroke-width="2" data-basePoint="1484,721"/>
-            <path lcdParts="static" id="lineLeap2" d=" M 210 721 L 118 721 Q 94 740, 116 764.5 Q 131 780, 118 808 L 210 808 Z "
+            <path lcdParts="static" isDraw="$sectionColor.length == 2" lcd-color="$sectionColor[1]" d=" M 210 721 L 118 721 Q 94 740, 116 764.5 Q 131 780, 118 808 L 210 808 Z "
                 fill="rgba(0,191,255,0.20)" stroke-width="2" data-basePoint="1484,721"/>
         </g>
         <!-- 路線ベース右端 -->
