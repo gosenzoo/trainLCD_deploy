@@ -1342,6 +1342,133 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 
 ---
 
+### 7.4 Drawer — defaultLineSVG の読み込みとツリー統合
+
+デバッグ環境の `Drawer` に `defaultLineSVG.svg` のフェッチ・ツリー構築・出力統合を追加する。
+
+#### 仕様
+
+- `_fetchSVG()` に HTTP 非 2xx 時の `throw` を追加し、ファイルが存在しない場合を検出できるようにする。
+- `load()` で `./defaultLineSVG.svg` を `headerSVG.svg` と同様の手順（フェッチ→パース→`_normalizeSVGDefsRefs`）でフェッチする。ファイルが存在しない場合（`_fetchSVG` が throw した場合）は警告を出して `this.defaultLineSVG = null` とし、処理を続行する。
+- `buildTree()` で `this.defaultLineSVG` から `this.defaultLineRoot`（`GroupObj`）を構築する（`templateSVG` → `root` と同様の手順）。`defaultLineSVG` が `null` の場合は空の `GroupObj` のままにする。
+- `draw()` が返す `<g>` は **defaultLine のツリー → header のツリー** の順に子要素を結合して返す。
+- `langChange()` は `defaultLineRoot` → `root` の順に両 root へ伝播する。
+
+#### 変更ファイル
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/Drawer.js` | 変更 | `_fetchSVG` に `res.ok` チェック追加、`load()` に defaultLineSVG フェッチ追加、`buildTree()` に defaultLineRoot 構築追加、`draw()` を defaultLine+header 結合に変更、`langChange()` を両 root 伝播に変更 |
+
+---
+
+### 7.5 lcdParts="static" — `<g>` 要素への拡張と拡大縮小メソッドの追加
+
+`lcdParts="static"` を `<rect>` 以外に `<g>` 要素でも指定できるようにし、範囲定義と拡大縮小機能を追加する。
+
+#### `<g>` による指定
+
+`<g lcdParts="static">` の直下第一子に `lcdParts="staticArea"` を持つ `<rect>` を置く。このrectが静的要素の「範囲」を定義し、レンダリングはされない（arrangeArea と同様）。
+
+```svg
+<g lcdParts="static">
+  <rect lcdParts="staticArea" x="100" y="50" width="200" height="100" />
+  <rect x="105" y="55" width="190" height="90" fill="..." />
+  <polygon points="..." />
+</g>
+```
+
+#### 拡大縮小仕様
+
+- `setSize(width, height)` を呼ぶと、自然サイズ（staticArea の width/height）から指定サイズへの拡大率 `sx = width/naturalWidth`、`sy = height/naturalHeight` を算出する。
+- 拡大・縮小どちらも適用する（NumIconObj の縮小のみとは異なる）。
+- 原点は staticArea の左上 `(areaX, areaY)`。各子孫要素の座標を原点基準でスケールする。
+- スナップショット方式: コンストラクタで全子孫要素の原始座標を記録し、`setSize()` は常にスナップショットから再計算することで浮動小数点誤差の蓄積を防ぐ。
+
+#### 対応要素と適用する属性
+
+| 要素 | スケール対象属性 |
+|---|---|
+| `rect` | `x`・`y`（原点基準）、`width`・`height`（sx/sy 倍）、`rx`（sx 倍）・`ry`（sy 倍） |
+| `polygon` / `polyline` | `points` の各頂点を (x-ox)*sx+ox、(y-oy)*sy+oy で変換 |
+| `line` | `x1`・`x2`（原点基準 sx）、`y1`・`y2`（原点基準 sy） |
+| `circle` | `cx`（sx）、`cy`（sy）、`r`（min(sx,sy) — 円形を維持） |
+| `ellipse` | `cx`（sx）、`cy`（sy）、`rx`（sx）、`ry`（sy） |
+
+`<g>` 等、上記以外の要素は座標を持たないためスキップする。ネストされた `<g>` の子孫要素は再帰的にスナップショット・スケール対象となる。
+
+#### `getRealSize()` / `setSize()` の返値
+
+- staticArea が存在する場合: `setSize()` 後は指定サイズを返す。初期値は自然サイズ（staticArea の width/height）。
+- staticArea が存在しない場合（`<rect>` 指定など）: `getRealSize()` は `{ width: 0, height: 0 }` を返し、`setSize()` は何もしない。
+
+#### `setCoordinate(x, y)` の仕様
+
+- `this.x = x`、`this.y = y` を更新する（LcdPartsObj.setCoordinate と同様）。
+- staticArea が存在する場合: `getElement()` 内で `transform="translate(this.x - areaX, this.y - areaY)"` を `this._node`（`<g>` クローン）に適用することで位置を移動する。`setSize()` による属性スケールとは独立した操作で、組み合わせても正しく動作する。
+- staticArea が存在しない場合: `this.x / this.y` は更新されるが、レンダリングへの影響はない（既存動作を維持）。
+
+#### arrange 配下への対応
+
+範囲（staticArea）を持つ static 要素は ArrangeObj の子要素としても機能する。
+
+- `ArrangeObj._createChildObj()` に `lcdParts="static"` のケースを追加し、`new StaticObj(svgDom)` を生成する。
+- StaticObj のコンストラクタに ArrangeObj が参照するレイアウト属性フィールドを追加する（`fitX`・`fitY`・`flexible`・`minComRatio`・`margin`・`verticalAlign`・`horizontalAlign`）。これらは SVG 属性から読み取り、未指定時はデフォルト値を使用する。
+- `StaticObj.getElement()` の `_resolveValue` / `_exprParser` 更新を `!== undefined` チェック付きに修正する（ArrangeObj が `{ debug }` のみを渡す場合に上書きされないようにする）。
+- staticArea なしの `<rect>` 指定の static は `getRealSize()` が `{0, 0}` を返すため、arrange のレイアウトには参加しない。
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/StaticObj.js` | 変更 | `<g>` + staticArea 対応、`_takeSnapshot()`・`_applyScale()`・`setSize()`・`getRealSize()`・`setCoordinate()` を追加、レイアウト属性フィールドを追加、`getElement()` の undefined チェックを修正 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj()` に `lcdParts="static"` のケースを追加 |
+
+---
+
+### 7.6 lcdParts="static" — `lcd-color` 属性によるfill設定
+
+static 要素の子要素に `lcd-color` 属性を追加し、`fill` を動的に設定できるようにする。
+
+#### 値の記法
+
+| 記法 | 例 | 動作 |
+|---|---|---|
+| CSS 色リテラル | `#FF0000`・`rgb(0,255,0)`・`rgba(...)`・`hsl(...)` など | そのまま `fill` に設定 |
+| drawParams 変数名 | `nowStation.lineColor`・`sectionColors` | ドット記法でdrawParamsを解決した値を使用 |
+
+判定: `#`・`rgb(`・`rgba(`・`hsl(`・`hsla(` で始まる場合は色リテラル、それ以外は drawParams 変数名として扱う。
+
+#### 適用対象
+
+- 図形要素（`rect`・`polygon` 等）に `lcd-color` がある場合: その要素自身の `fill` に設定する。
+- `<g>` 要素に `lcd-color` がある場合: 配下の全図形要素の `fill` に一括設定する。
+
+#### 配列値の扱い
+
+drawParams 変数が配列の場合:
+
+- **arrange 配下かつ staticArea あり**: 配列要素ごとに static オブジェクトをコピーし、各コピーに対応する色を適用する。コピーは arrange の通常レイアウト（敷き詰め）で配置される。
+- **上記以外**（standalone、または staticArea なし）: 配列の最初の要素の色のみを使用し、コピーしない。
+
+#### 実装詳細
+
+- `StaticObj` コンストラクタに `drawParams`（第2引数）と `colorOverride`（第3引数、省略可）を追加する。
+- `StaticObj._resolveLcdColor(attr, drawParams)` 静的メソッド: 色リテラルかどうかを判定し、drawParams 変数なら `LcdPartsObj.resolveDrawParam` で解決して返す。
+- `StaticObj._applyColor(color)` メソッド: `<g>` なら子孫図形要素全て、それ以外なら要素自身の `fill` に設定する。
+- `ArrangeObj` コンストラクタのループで、`lcdParts="static"` かつ `lcd-color` が配列に解決される場合は、要素ごとに `_createChildObj` へ `colorOverride` を渡して複数生成する。`_createChildObj` はこの `colorOverride` を `StaticObj` コンストラクタへ中継する。
+- `Drawer._buildNode()` も `new StaticObj(element, this.drawParams)` に変更する。
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/StaticObj.js` | 変更 | コンストラクタに `drawParams`・`colorOverride` 追加、`_resolveLcdColor()`・`_applyColor()`・`_applyColorToShapes()` 追加 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | コンストラクタループに lcd-color 配列展開を追加、`_createChildObj()` に `colorOverride` 引数を追加 |
+| `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode()` で `new StaticObj(element, this.drawParams)` に変更 |
+
+---
+
 ### データ受け渡し
 
 ```

@@ -18,6 +18,9 @@ class GroupObj {
         this.y      = svgDom ? (parseFloat(svgDom.getAttribute('y'))      || 0) : 0;
         this.height = svgDom ? (parseFloat(svgDom.getAttribute('height')) || 0) : 0;
 
+        // filter属性を保持（getElementで出力<g>に移す）
+        this._filter = svgDom ? svgDom.getAttribute('filter') : null;
+
         // アニメーション状態管理フィールド
         this._domEl        = null;
         this._prevVisible  = true;
@@ -47,6 +50,7 @@ class GroupObj {
         this._prevVisible = isVisible;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        if (this._filter) g.setAttribute('filter', this._filter);
 
         // 表示/非表示を visibility で制御する（display:noneではなくanimation対応のため）
         g.style.visibility = isVisible ? '' : 'hidden';

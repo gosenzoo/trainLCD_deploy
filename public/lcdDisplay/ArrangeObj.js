@@ -15,6 +15,9 @@ class ArrangeObj extends LcdPartsObj {
         this.children = [];
         this._uniformScale = 1;
 
+        // filter属性を保持（getElementで出力<g>に移す）
+        this._filter = svgDom.getAttribute('filter');
+
         // arrangeAreaのrectから領域を取得
         const areaRect = Array.from(svgDom.children).find(
             c => c.getAttribute('lcdParts') === 'arrangeArea'
@@ -41,6 +44,26 @@ class ArrangeObj extends LcdPartsObj {
         Array.from(svgDom.children).forEach(child => {
             // arrangeArea自体はスキップ
             if (child.getAttribute('lcdParts') === 'arrangeArea') return;
+
+            // lcdParts="static" かつ lcd-color が配列 かつ staticArea あり → 色ごとにコピーして展開
+            if (child.getAttribute('lcdParts') === 'static') {
+                const colorAttr = child.getAttribute('lcd-color');
+                if (colorAttr) {
+                    const colorVal = StaticObj._resolveLcdColor(colorAttr, drawParams);
+                    if (Array.isArray(colorVal)) {
+                        const hasArea = Array.from(child.children).some(
+                            c => c.getAttribute && c.getAttribute('lcdParts') === 'staticArea'
+                        );
+                        if (hasArea) {
+                            colorVal.forEach(color => {
+                                const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
+                                if (obj) this.children.push(obj);
+                            });
+                            return; // 通常処理をスキップ
+                        }
+                    }
+                }
+            }
 
             const childLcdArg = child.getAttribute('lcd-arg');
             if (childLcdArg && childLcdArg.startsWith('$')) {
@@ -71,7 +94,7 @@ class ArrangeObj extends LcdPartsObj {
 
     // 子要素のlcdPartsに応じてオブジェクトを生成する
     // Case A-2: visible属性は配置・生成に影響しない（全子要素を常に生成）
-    _createChildObj(svgDom, drawParams, args, textDrawer, exprParser) {
+    _createChildObj(svgDom, drawParams, args, textDrawer, exprParser, colorOverride = null) {
         const lcdParts = svgDom.getAttribute('lcdParts');
         // debug等のフラグを親ctxから引き継ぎ、drawParams/argsのみ上書き
         const childCtx = { ...this._ctx, drawParams, args };
@@ -83,6 +106,9 @@ class ArrangeObj extends LcdPartsObj {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         } else if (lcdParts === 'numbering') {
             obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
+        } else if (lcdParts === 'static') {
+            // 範囲（staticArea）を持つ <g> の場合のみ配置調整に参加する（getRealSizeが{0,0}以外を返す）
+            obj = new StaticObj(svgDom, drawParams, colorOverride);
         }
         if (!obj) return null;
 
@@ -287,6 +313,7 @@ class ArrangeObj extends LcdPartsObj {
         }
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const outer  = document.createElementNS(SVG_NS, 'g');
+        if (this._filter) outer.setAttribute('filter', this._filter);
 
         // flexible=false かつ縮小スケールあり（レアケース）: (x,y)を中心にスケール
         // TextBoxObjと同様に translate を使わないことで、kuruアニメーションとCSSの競合を防ぐ

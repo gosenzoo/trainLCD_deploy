@@ -1,0 +1,55 @@
+<svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+    <!-- 背景 -->
+    <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+
+    <!-- 路線ベース -->
+    <g lcdParts="arrange" arrange-axis="x" arrange-interval="0" filter="url(./defs.svg#outline)">
+        <rect lcdParts="arrangeArea" x="0" y="721" width="1920" height="87" fill="rgba(221, 221, 221, 0.2)" />
+
+        <!-- 路線ベース左端 -->
+        <g lcdParts="static" lcd-color="leftSectionColor">
+            <rect lcdParts="staticArea" x="0" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
+            <!-- 前から続いている場合 -->
+            <rect visible="leftSectionType == 0" x="0" y="721" width="226" height="87" fill="rgba(227,127,127,0.4)" />
+            <!-- 前から続いていない場合 -->
+            <path visible="leftSectionType == 1" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" />
+        </g>
+        <!-- 路線ベース中 -->
+        <g lcdParts="static" lcd-color="sectionColors">
+            <rect lcdParts="staticArea" x="0" y="721" width="210" height="87" fill="rgba(221, 221, 221, 0.2)" />
+            <!-- 長方形 -->
+            <!-- <rect x="0" y="721" width="210" height="87" fill="rgba(227,127,127,0.4)" /> -->
+            <!-- はしょり -->
+            <!-- 路線ベースはしょり -->
+            <path id="lineLeap1" d=" M 0 721 L 96 721 Q 82 742.75, 96 766.5 Q 124 788.25, 96 808 L 0 808 Z "
+                fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+            <path id="lineLeap2" d=" M 210 721 L 118 721 Q 94 740, 116 764.5 Q 131 780, 118 808 L 210 808 Z "
+                fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+        </g>
+        <!-- 路線ベース右端 -->
+        <g lcdParts="static" lcd-color="rightSectionColor">
+            <rect lcdParts="staticArea" x="1694" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
+            <!-- 後に続いている場合 -->
+            <polygon visible="rightSectionType == 0" id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
+                data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" />
+            <!-- 後に続いていない場合 -->
+            <path visible="rightSectionType == 1" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" />
+        </g>
+    </g>
+    <!-- 路線ベース1影 -->
+    <polygon lcdParts="static" points="0,721 1840,721 1882,765 1840,808 0,808"
+            fill="url(./defs.svg#innerGradient)"
+            style="mix-blend-mode: multiply;" />
+
+    <!-- 標準路線図ボディ -->
+    <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
+        <g filter="url(#outline)">
+        
+        <!-- 路線ベースはしょり -->
+        <path id="lineLeap1" d=" M 1484 721 L 1582 721 Q 1566 742.75, 1582 766.5 Q 1606 788.25, 1582 808 L 1486 808 Z "
+            fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+        <path id="lineLeap2" d=" M 1694 721 L 1602 721 Q 1578 740, 1600 764.5 Q 1615 780, 1602 808 L 1694 808 Z "
+            fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+        </g>
+    </g>
+</svg>

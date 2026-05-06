@@ -8,7 +8,7 @@ class Drawer {
         this.debug = false; // trueにするとarrangeArea境界と末端要素境界を表示
     }
 
-    // 同フォルダの4ファイルを並列フェッチして初期化
+    // 同フォルダのファイルを並列フェッチして初期化
     async load() {
         const [drawParams, iconList, templateSVG, defsSVG] = await Promise.all([
             fetch('./drawParams.json').then(r => r.json()),
@@ -22,6 +22,17 @@ class Drawer {
         // url(./defs.svg#id) → url(#id) に正規化してからテンプレートを保持
         this._normalizeSVGDefsRefs(templateSVG);
         this.templateSVG = templateSVG;
+
+        // defaultLineSVG.svgをフェッチ（存在しない場合はnullとして続行）
+        try {
+            const defaultLineSVG = await this._fetchSVG('./defaultLineSVG.svg');
+            this._normalizeSVGDefsRefs(defaultLineSVG);
+            this.defaultLineSVG = defaultLineSVG;
+        } catch (e) {
+            console.warn('defaultLineSVG.svg not found, skipping');
+            this.defaultLineSVG = null;
+        }
+
         this.textDrawer = new TextDrawer(this.iconList, null);
         // defs要素をキャッシュしておく（draw()で参照渡しするため）
         this._defsEl = defsSVG.getElementById('defs');
@@ -39,9 +50,10 @@ class Drawer {
         this.numIconDrawer = new NumIconDrawer(numIconPresets);
     }
 
-    // SVGをDOMParserで取得
+    // SVGをDOMParserで取得（HTTP非2xxの場合はthrow）
     async _fetchSVG(url) {
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`fetch failed: ${res.status} ${url}`);
         const text = await res.text();
         const parser = new DOMParser();
         console.log(parser.parseFromString(text, 'image/svg+xml').documentElement);
@@ -72,11 +84,27 @@ class Drawer {
         this.buildTree();
         const resolveValue = name => this._resolveValue(name);
         const ctx = { resolveValue, exprParser: this.exprParser, debug: this.debug };
-        return this.root.getElement(ctx) || document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+        // defaultLine → header の順に同一<g>へ結合して返す
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        const defaultLineEl = this.defaultLineRoot.getElement(ctx);
+        if (defaultLineEl) g.appendChild(defaultLineEl);
+        const headerEl = this.root.getElement(ctx);
+        if (headerEl) g.appendChild(headerEl);
+        return g;
     }
 
     // テンプレートSVGからオブジェクトツリーを構築してthis.rootに設定する
     buildTree() {
+        // defaultLineSVGのツリーを構築（ファイルが存在する場合のみ子要素を追加）
+        this.defaultLineRoot = new GroupObj(null);
+        if (this.defaultLineSVG) {
+            for (const child of this.defaultLineSVG.children) {
+                const node = this._buildNode(child);
+                if (node) this.defaultLineRoot.addChild(node);
+            }
+        }
+
         // ルートはSVG要素自体に対応するGroupObj（visible属性なし）
         this.root = new GroupObj(null);
         for (const child of this.templateSVG.children) {
@@ -100,7 +128,7 @@ class Drawer {
             }
             return group;
         } else if (lcdParts === 'static') {
-            return new StaticObj(element);
+            return new StaticObj(element, this.drawParams);
         } else if (lcdParts === 'textBox') {
             return new TextBoxObj(element, this.drawParams, {}, this.textDrawer);
         } else if (lcdParts === 'numbering') {
@@ -126,6 +154,7 @@ class Drawer {
     // オブジェクトツリー全体にlangChangeを伝播する
     // drawParamsを更新したあとに呼び出すことで、変化した visible をアニメーションで遷移させる
     langChange(transTime, gapTime) {
+        if (this.defaultLineRoot) this.defaultLineRoot.langChange(transTime, gapTime);
         if (this.root) this.root.langChange(transTime, gapTime);
     }
 

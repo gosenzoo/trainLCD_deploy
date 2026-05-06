@@ -35,5 +35,19 @@
    "otherLeftSlotInd": "0"
   },
   "destination": "中央林間",
-  "destinationEng": "Chuo-Rinkan"
+  "destinationEng": "Chuo-Rinkan",
+
+  "sectionColors": [
+    "rgb(255, 255, 0)",
+    "rgb(0, 255, 0)",
+    "rgb(0, 255, 0)",
+    "rgb(0, 0, 255)",
+    "rgb(255, 0, 255)",
+    "rgb(255, 0, 0)",
+    "rgb(255, 127, 0)"
+  ],
+  "leftSectionType": 1,
+  "rightSectionType": 0,
+  "leftSectionColor": "rgb(0, 255, 0)",
+  "rightSectionColor": "rgb(0, 255, 0)"
 }
