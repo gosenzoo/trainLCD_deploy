@@ -9,10 +9,12 @@
         <!-- 路線ベース左端 -->
         <g lcdParts="group" lcd-color="leftSectionColor">
             <rect lcdParts="groupArea" x="0" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
-            <!-- 前から続いている場合 -->
-            <rect lcdParts="static" visible="leftSectionType == 0" x="0" y="721" width="226" height="87" fill="rgba(227,127,127,0.4)" />
-            <!-- 前から続いていない場合 -->
-            <path lcdParts="static" visible="leftSectionType == 1" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" />
+            <!-- 0:終端 -->
+            <path lcdParts="static" isDraw="leftSectionType == 0" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" />
+            <!-- 1:端に届く -->
+            <rect lcdParts="static" isDraw="leftSectionType == 1" x="0" y="721" width="226" height="87" fill="rgba(227,127,127,0.4)" />
+            <!-- 2:矢印 -->
+            <polygon lcdParts="static" isDraw="leftSectionType == 2" points="226,721 80,721 38,765 80,808 226,808" fill="rgba(227,127,127,0.4)" />
         </g>
         <!-- 路線ベース中 -->
         <g lcdParts="group" lcd-color="sectionColors">
@@ -22,24 +24,23 @@
             <!-- はしょり -->
             <!-- 路線ベースはしょり -->
             <path lcdParts="static" id="lineLeap1" d=" M 0 721 L 96 721 Q 82 742.75, 96 766.5 Q 124 788.25, 96 808 L 0 808 Z "
-                fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+                fill="rgba(0,191,255,0.20)" stroke-width="2" data-basePoint="1484,721"/>
             <path lcdParts="static" id="lineLeap2" d=" M 210 721 L 118 721 Q 94 740, 116 764.5 Q 131 780, 118 808 L 210 808 Z "
-                fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
+                fill="rgba(0,191,255,0.20)" stroke-width="2" data-basePoint="1484,721"/>
         </g>
         <!-- 路線ベース右端 -->
         <g lcdParts="group" lcd-color="rightSectionColor">
             <rect lcdParts="groupArea" x="1694" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
-            <!-- 後に続いている場合 -->
-            <polygon lcdParts="static" visible="rightSectionType == 0" id="lineEnd" points="1694,721 1840,721 1882,765 1840,808 1694,808"
-                data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" />
-            <!-- 後に続いていない場合 -->
-            <path lcdParts="static" visible="rightSectionType == 1" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" />
+            <!-- 0:終端 -->
+            <path lcdParts="static" isDraw="rightSectionType == 0" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" />
+            <!-- 1:端に届く -->
+            <rect lcdParts="static" isDraw="rightSectionType == 1" x="1694" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
+            <!-- 2:矢印 -->
+            <polygon lcdParts="static" isDraw="rightSectionType == 2" points="1694,721 1840,721 1882,765 1840,808 1694,808" fill="rgba(221, 221, 221, 0.4)" />
         </g>
     </g>
     <!-- 路線ベース1影 -->
-    <polygon lcdParts="static" points="0,721 1840,721 1882,765 1840,808 0,808"
-            fill="url(./defs.svg#innerGradient)"
-            style="mix-blend-mode: multiply;" />
+    <rect lcdParts="static" x="0" y="721" width="1920" height="87" fill="url(./defs.svg#innerGradient)" style="mix-blend-mode: multiply;" />
 
     <!-- 駅パーツ -->
     <g lcdParts="arrange" arrange-interval="13">
@@ -52,15 +53,19 @@
                 <!-- 駅名 -->
                 <rect lcdParts="textBox" lcdText="#{$dispStation.name}" lcd-holAilgn="center" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
                 <!-- ナンバリング -->
-                <rect lcdParts="textBox" lcdText="TY-09" lcd-minComRatio="1" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-                <!-- <rect id="body-defaultLine-numIconRect" x="1663" y="655" width="62" height="62" fill="#96a9ff" /> -->
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAilgn="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
             </g>
 
-            <!-- 停車駅アイコン -->
-            <rect lcdParts="static" visible="!$dispStation.isPass" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
-            <!-- 通過駅アイコン -->
-            <polygon lcdParts="static" visible="$dispStation.isPass" points="1676,738 1687,738 1716,764.5 1687,791 1676,791 1705,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
-            
+            <!-- 0:停車駅アイコン -->
+            <rect lcdParts="static" isDraw="$dispStation.stationIconType == 0" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
+            <!-- 1:右向き通過駅アイコン -->
+            <polygon lcdParts="static" isDraw="$dispStation.stationIconType == 1" points="1676,738 1687,738 1716,764.5 1687,791 1676,791 1705,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
+            <!-- 2:左向き通過駅アイコン -->
+            <polygon lcdParts="static" isDraw="$dispStation.stationIconType == 2" points="1712,738 1701,738 1672,764.5 1701,791 1712,791 1683,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
+            <!-- 駅所要時間 -->
+            <rect lcdParts="textBox" lcdText="#{$dispStation.sectionTime}" isDraw="$dispStation.stationIconType == 0" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
+
             <!-- 乗換路線 -->
             <g lcdParts="arrange" arrange-axis="y" arrange-interval="3">
                 <rect lcdParts="arrangeArea" x="1594" y="813" width="200" height="180" fill="#99999950" />
@@ -71,20 +76,8 @@
             <rect id="body-defaultLine-transferLineEng" x="1594" y="813" width="200" height="31" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' data-textHeightRatio="0.95" />
             
             <rect id="body-defaultLine-stationNameEng" x="0" y="0" width="333" height="70" fill="#99999950" transform="translate(1634, 680) rotate(-60)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
-            <!-- 駅所要時間 -->
-            <rect id="body-defaultLine-timeText" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
         </g>
     </g>
-
-    <!-- 標準路線図ボディ -->
-    <g id="body-defaultLine" style="isolation: isolate;" visibility="visible">
-        <g filter="url(#outline)">
-        
-        <!-- 路線ベースはしょり -->
-        <path id="lineLeap1" d=" M 1484 721 L 1582 721 Q 1566 742.75, 1582 766.5 Q 1606 788.25, 1582 808 L 1486 808 Z "
-            fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
-        <path id="lineLeap2" d=" M 1694 721 L 1602 721 Q 1578 740, 1600 764.5 Q 1615 780, 1602 808 L 1694 808 Z "
-            fill="rgba(0,191,255,0.47)" stroke-width="2" data-basePoint="1484,721"/>
-        </g>
-    </g>
+    <!-- 路線ベース2影 -->
+    <rect lcdParts="static" x="0" y="721" width="1920" height="87" fill="url(./defs.svg#outerGradient)" style="mix-blend-mode: multiply;" />
 </svg>

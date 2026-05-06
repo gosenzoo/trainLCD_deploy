@@ -1086,6 +1086,21 @@ lcdDisplay システムの詳細仕様は `public/lcdDisplay/doc/` を参照。
 - `ctx = { resolveValue, exprParser }` を `getElement(ctx)` の引数として渡す
 - arrange 子要素の `visible` は従来通り `ArrangeObj._createChildObj()` で構築時に評価する（arrange 子のアニメーション対応は将来課題）
 
+#### `isDraw` 属性仕様
+
+`isDraw` は **構築時に静的評価** され、false の場合はオブジェクトをツリーに追加しない（`null` を返す）。`visible` との違い:
+
+| 属性 | false 時の挙動 | langChange 対応 | レイアウト参加 |
+|---|---|---|---|
+| `visible` | visibility:hidden で非表示（DOM に残る） | あり | する |
+| `isDraw` | ツリーに追加しない（オブジェクト自体を生成しない） | なし（静的） | しない |
+
+- SVG 属性名・オブジェクトフィールド名ともに `isDraw`
+- 値の構文・評価方法は `visible` と同一（`ExprParser.eval(isDraw, resolveValue)`）
+- 評価は `ArrangeObj._createChildObj()` および `Drawer._buildNode()` の **オブジェクト生成直前** に行い、false なら `null` を返してスキップする
+- `resolveValue` の構築には `LcdPartsObj.makeResolveValue(drawParams, args)` を使用（args も参照可能）
+- `isDraw` は各クラスのフィールドとしては保持しない（評価結果のみ使用）
+
 > **効率化オプション（将来対応）**: 現状は生文字列を保持して描画ごとに `ExprParser.eval` でパース・評価する。高頻度な再評価が必要な場合は `ExprParser.compile(expr)` で AST を生成・保持し、文字列パースを構築時 1 回に限定できる。
 
 #### トラバーサル規則（`Drawer.buildTree()`）

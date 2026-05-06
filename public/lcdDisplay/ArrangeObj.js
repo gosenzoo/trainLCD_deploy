@@ -54,6 +54,13 @@ class ArrangeObj extends LcdPartsObj {
     // 子要素のlcdPartsに応じてオブジェクトを生成する
     // Case A-2: visible属性は配置・生成に影響しない（全子要素を常に生成）
     _createChildObj(svgDom, drawParams, args, textDrawer, exprParser, colorOverride = null) {
+        // isDraw属性が静的評価でfalseならツリーに追加しない
+        const isDrawAttr = svgDom.getAttribute('isDraw');
+        if (isDrawAttr !== null) {
+            const resolveValue = LcdPartsObj.makeResolveValue(drawParams, args);
+            if (!exprParser.eval(isDrawAttr, resolveValue)) return null;
+        }
+
         const lcdParts = svgDom.getAttribute('lcdParts');
         // debug等のフラグを親ctxから引き継ぎ、drawParams/argsのみ上書き
         const childCtx = { ...this._ctx, drawParams, args };

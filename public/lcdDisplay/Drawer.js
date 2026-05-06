@@ -117,6 +117,13 @@ class Drawer {
     // SVG要素をlcdPartsに応じてオブジェクトに変換する。
     // lcdPartsなし → null（子孫ごとスキップ）
     _buildNode(element) {
+        // isDraw属性が静的評価でfalseならツリーに追加しない
+        const isDrawAttr = element.getAttribute ? element.getAttribute('isDraw') : null;
+        if (isDrawAttr !== null) {
+            const resolveValue = LcdPartsObj.makeResolveValue(this.drawParams, {});
+            if (!this.exprParser.eval(isDrawAttr, resolveValue)) return null;
+        }
+
         const lcdParts = element.getAttribute ? element.getAttribute('lcdParts') : null;
         const tagName  = element.tagName ? element.tagName.toLowerCase() : '';
 

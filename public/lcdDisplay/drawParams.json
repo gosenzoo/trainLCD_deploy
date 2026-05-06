@@ -18,7 +18,6 @@
    "lineNumberType": "0",
    "transfers": "",
    "isPass": false,
-   "sectionTime": "",
    "lineId": "4",
    "coordinate": [
     null,
@@ -37,6 +36,8 @@
   "destination": "中央林間",
   "destinationEng": "Chuo-Rinkan",
 
+  "leftSectionType": 2,
+  "rightSectionType": 2,
   "sectionColors": [
     "rgb(255, 255, 0)",
     "rgb(0, 255, 0)",
@@ -46,8 +47,6 @@
     "rgb(255, 0, 0)",
     "rgb(255, 127, 0)"
   ],
-  "leftSectionType": 1,
-  "rightSectionType": 0,
   "leftSectionColor": "rgb(0, 255, 0)",
   "rightSectionColor": "rgb(0, 255, 0)",
 
@@ -61,8 +60,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -77,8 +76,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -93,8 +92,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -109,8 +108,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -125,8 +124,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -141,8 +140,24 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": false,
-      "sectionTime": "",
+      "stationIconType": "0",
+      "sectionTime": "20",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ]
+    },
+    {
+      "name": "金月洞",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "1",
+      "stationIconType": "2",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
@@ -157,24 +172,8 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ]
-    },
-    {
-      "name": "金月洞",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
-      "isPass": true,
-      "sectionTime": "",
+      "stationIconType": "1",
+      "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
         ":O:大井町線"
