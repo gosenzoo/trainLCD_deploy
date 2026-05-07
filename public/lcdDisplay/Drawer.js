@@ -100,18 +100,28 @@ class Drawer {
         // defaultLineSVGのツリーを構築（ファイルが存在する場合のみ子要素を追加）
         this.defaultLineRoot = new GroupObj(null);
         if (this.defaultLineSVG) {
-            for (const child of this.defaultLineSVG.children) {
+            // SVGルート直接子の mulShadow を収集してインスタンス変数に保持する
+            // _buildNode 内の arrange/group ケースで shadowId 照合に使用する
+            const dlChildArr = Array.from(this.defaultLineSVG.children).filter(c => c.getAttribute);
+            this._activeShadowMap = MulShadowUtil.collectShadowMap(dlChildArr);
+            for (const child of dlChildArr) {
+                if (child.getAttribute('lcdParts') === 'mulShadow') continue;
                 const node = this._buildNode(child);
                 if (node) this.defaultLineRoot.addChild(node);
             }
+            this._activeShadowMap = null;
         }
 
         // ルートはSVG要素自体に対応するGroupObj（visible属性なし）
         this.root = new GroupObj(null);
-        for (const child of this.templateSVG.children) {
+        const tmChildArr = Array.from(this.templateSVG.children).filter(c => c.getAttribute);
+        this._activeShadowMap = MulShadowUtil.collectShadowMap(tmChildArr);
+        for (const child of tmChildArr) {
+            if (child.getAttribute('lcdParts') === 'mulShadow') continue;
             const node = this._buildNode(child);
             if (node) this.root.addChild(node);
         }
+        this._activeShadowMap = null;
     }
 
     // SVG要素をlcdPartsに応じてオブジェクトに変換する。
@@ -143,10 +153,20 @@ class Drawer {
                     }
                 }
             }
-            for (const child of domForChildren.children) {
+            // 子要素の mulShadow を収集して _activeShadowMap にマージし、子ループ後に復元する
+            const childArr = Array.from(domForChildren.children).filter(c => c.getAttribute);
+            const localShadowMap = MulShadowUtil.collectShadowMap(childArr);
+            const prevShadowMap = this._activeShadowMap;
+            if (Object.keys(localShadowMap).length > 0) {
+                this._activeShadowMap = { ...(prevShadowMap || {}), ...localShadowMap };
+            }
+            for (const child of childArr) {
+                // mulShadow 自体はオブジェクト生成せずスキップ
+                if (child.getAttribute('lcdParts') === 'mulShadow') continue;
                 const node = this._buildNode(child);
                 if (node) group.addChild(node);
             }
+            this._activeShadowMap = prevShadowMap;
             return group;
         } else if (lcdParts === 'static') {
             return new StaticObj(element, this.drawParams);
@@ -155,6 +175,10 @@ class Drawer {
         } else if (lcdParts === 'numbering') {
             return new NumIconObj(element, this.drawParams, {}, this.numIconDrawer);
         } else if (lcdParts === 'arrange') {
+            // shadowId（カンマ区切り可）を解析して _activeShadowMap に一致する影リストを activeShadows に渡す
+            const shadowIdAttr  = element.getAttribute('shadowId');
+            const rootShadowMap = this._activeShadowMap || {};
+            const activeShadows = MulShadowUtil.resolveShadows(shadowIdAttr, rootShadowMap);
             const arrangeCtx = {
                 drawParams: this.drawParams,
                 args: {},
@@ -162,6 +186,10 @@ class Drawer {
                 numIconDrawer: this.numIconDrawer,
                 exprParser: this.exprParser,
                 debug: this.debug,
+                defsEl: this._defsEl,
+                activeShadows: activeShadows.length > 0 ? activeShadows : null,
+                // ルートレベルのshadowMapを子孫ArrangeObjに引き継ぐ（深くネストされた要素のshadowId解決に使用）
+                rootShadowMap,
             };
             const arrangeObj = new ArrangeObj(element, arrangeCtx);
             // arrangeAreaのサイズ内に収まるよう圧縮を適用

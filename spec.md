@@ -1570,6 +1570,80 @@ drawParams 変数が配列の場合:
 
 ---
 
+### 7.7 lcdParts="mulShadow" — グラデーション乗算影
+
+#### 概要
+
+`lcdParts="mulShadow"` は影指定専用の新しい lcdParts 値（`<rect>` 要素）。自身は描画されず、`shadowId` 属性で対応付けた対象要素の fill に対してグラデーション乗算結果を構築時に直接適用する（CSS `mix-blend-mode` を使わない）。
+
+#### 属性
+
+| 属性 | 対象要素 | 値 | 説明 |
+|---|---|---|---|
+| `lcdParts="mulShadow"` | 影指定 rect | — | 影指定要素。自身は描画しない |
+| `fill="url(#gradientId)"` | 影指定 rect | SVG グラデーション参照 | 乗算に使うグラデーションを defs から参照 |
+| `x, y, width, height` | 影指定 rect | 数値 | グラデーションの絶対座標変換に使用する rect の範囲 |
+| `shadowId="N"` | 影指定 rect | 文字列 | この影の識別子 |
+| `shadowId="id1, id2, ..."` | 対象要素 | カンマ区切り文字列 | 適用する影をカンマ区切りで複数指定可能 |
+
+- `shadowId` は影指定 rect と対象要素の両方に付ける
+- 対象要素の `shadowId` はカンマ区切りで複数指定でき、指定した順に逐次乗算して1つのグラデーションに統合する
+- 対象が `<g>` の場合、配下の全 shape 要素（rect・path 等）に適用する
+
+#### グラデーション座標の変換
+
+影指定 rect のグラデーション（`fill="url(#...)"` で参照）は `gradientUnits="objectBoundingBox"` の % 形式で定義する。適用時に rect の絶対座標へ変換する。
+
+```
+mulShadow rect: x=rx, y=ry, width=rw, height=rh
+元グラデーション (objectBoundingBox): x1%, y1%, x2%, y2%
+
+変換後 (userSpaceOnUse):
+  abs_x1 = rx + x1% * rw
+  abs_y1 = ry + y1% * rh
+  abs_x2 = rx + x2% * rw
+  abs_y2 = ry + y2% * rh
+```
+
+変換後の絶対座標は全対象シェイプで共通に使用する。
+
+#### 乗算計算と新グラデーション生成（複数影の統合）
+
+対象シェイプごとに以下を実行する:
+
+1. シェイプの現在の fill（ソリッドカラー）をパース → base color Cb (R, G, B)
+2. 先頭 shadow のグラデーション軸（絶対座標変換後の x1,y1→x2,y2）を出力グラデーションの座標系とする
+3. 全 shadow のストップ絶対位置を先頭軸に射影してオフセットリストをマージ（ソート済み）
+4. 各オフセット t で全 shadow を**逐次乗算**（CSS multiply + source-over, αb=1 前提）:
+   ```
+   result(t) = Cb × f1(t) × f2(t) × ...   where fi(t) = αi(t) × Ci(t)/255 + (1 - αi(t))
+   異なる軸の shadow は先頭軸上の点を各軸に射影して ti を求めて補間する
+   ```
+5. 統合後のストップ列で新 `linearGradient` を defs に1つだけ動的生成（ID は自動採番）
+6. シェイプの `fill` を `url(#新ID)` に設定
+
+#### 処理パイプライン（プリパス）
+
+`_buildContainerChildren`（ArrangeObj）および `Drawer._buildNode`（group ケース）の子要素ループ前にプリパスを実行する:
+
+1. 子要素から `lcdParts="mulShadow"` を収集 → `{ shadowId, gradientId, rect }` のリスト
+2. `shadowId` が一致する対象要素をクローンし、グラデーション乗算を適用
+3. 以降の処理ではクローンを元 svgDom の代わりに使用
+4. `lcdParts="mulShadow"` 自体はオブジェクト生成せずスキップ
+
+#### ctx への defsEl 追加
+
+動的生成 `linearGradient` の挿入先として、`_ctx` に `defsEl`（SVG defs DOM 要素）を追加する。`Drawer` は `this._defsEl` を ctx に含めて渡す。
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_buildContainerChildren` にプリパス追加、新静的メソッド群追加、`_ctx` に `defsEl` を追加 |
+| `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode` の group ケースにプリパス追加、ctx に `defsEl` を追加 |
+
+---
+
 ### データ受け渡し
 
 ```

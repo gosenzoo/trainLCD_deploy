@@ -77,6 +77,11 @@ class ArrangeObj extends LcdPartsObj {
         } else if (lcdParts === 'static') {
             // argsを渡してlcd-colorのargs参照（$argName[n]等）を解決可能にする
             obj = new StaticObj(svgDom, drawParams, colorOverride, args);
+            // activeShadows がある場合、lcd-color適用後のfillに統合乗算グラデーションを適用する
+            const { activeShadows, defsEl } = this._ctx;
+            if (activeShadows && activeShadows.length > 0 && defsEl) {
+                MulShadowUtil.applyMulShadow(obj._node, activeShadows, defsEl);
+            }
         } else if (lcdParts === 'group') {
             // groupAreaを持つgroupは配置調整に参加する（getRealSizeがgroupArea寸法を返す）
             const groupObj = new GroupObj(svgDom);
@@ -115,12 +120,28 @@ class ArrangeObj extends LcdPartsObj {
     // skipLcdParts: スキップするlcdParts値（'arrangeArea' or 'groupArea'）
     // parentArgMap: このコンテナが lcd-arg 宣言した配列マップ（{}の場合はdrawParamsへフォールバック）
     _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}) {
-        const { textDrawer, exprParser } = this._ctx;
+        const { textDrawer, exprParser, defsEl } = this._ctx;
         const children = [];
 
-        Array.from(svgDom.children).forEach(child => {
-            if (!child.getAttribute) return;
+        // mulShadow 要素を収集して shadowId → shadow情報 のマップを作成する
+        // 実際の乗算適用は _createChildObj の static ケースで行う（lcd-color適用後に実施するため）
+        const childArr = Array.from(svgDom.children).filter(c => c.getAttribute);
+        const localShadowMap = MulShadowUtil.collectShadowMap(childArr);
+        // ローカルマップとルートレベルのshadowMapをマージする（ローカル優先）
+        // これにより、SVGルート直接子の mulShadow をネストされた要素からも参照できる
+        const effectiveShadowMap = { ...(this._ctx.rootShadowMap || {}), ...localShadowMap };
+
+        childArr.forEach(child => {
             if (child.getAttribute('lcdParts') === skipLcdParts) return;
+            // mulShadow 自体はオブジェクト生成せずスキップ
+            if (child.getAttribute('lcdParts') === 'mulShadow') return;
+
+            // shadowId（カンマ区切り可）を effectiveShadowMap で解析して影リストを取得し、
+            // activeShadows を一時的に上書きして子ツリーに伝播する
+            const shadowIdAttr = child.getAttribute('shadowId');
+            const localShadows = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
+            const prevActiveShadows = this._ctx.activeShadows;
+            if (localShadows.length > 0) this._ctx.activeShadows = localShadows;
 
             // lcdParts="group" かつ lcd-color が配列 かつ groupArea あり → 色ごとにコピーして展開
             if (child.getAttribute('lcdParts') === 'group') {
@@ -136,6 +157,7 @@ class ArrangeObj extends LcdPartsObj {
                                 const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
                                 if (obj) children.push(obj);
                             });
+                            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
                             return; // 通常処理をスキップ
                         }
                     }
@@ -164,6 +186,7 @@ class ArrangeObj extends LcdPartsObj {
                         const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
                         if (obj) children.push(obj);
                     });
+                    if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
                     return; // 通常処理をスキップ
                 }
             }
@@ -171,6 +194,9 @@ class ArrangeObj extends LcdPartsObj {
             // 通常の子要素（複製なし）
             const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
             if (obj) children.push(obj);
+
+            // activeShadow を元に戻す
+            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
         });
 
         return children;
