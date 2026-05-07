@@ -26,10 +26,16 @@ class ExprParser {
             if (expr[i] === '=' && i + 1 < len && expr[i + 1] === '=') {
                 tokens.push({ type: 'EQ' }); i += 2; continue;
             }
-            // 識別子または数値定数
+            // 四則演算子
+            if (expr[i] === '+') { tokens.push({ type: 'PLUS'  }); i++; continue; }
+            if (expr[i] === '-') { tokens.push({ type: 'MINUS' }); i++; continue; }
+            if (expr[i] === '*') { tokens.push({ type: 'MUL'   }); i++; continue; }
+            if (expr[i] === '/') { tokens.push({ type: 'DIV'   }); i++; continue; }
+            // 識別子または数値定数（四則演算子でも区切る）
             let j = i;
             while (j < len && expr[j] !== ' ' && expr[j] !== '(' && expr[j] !== ')' && expr[j] !== '!'
-                   && !(expr[j] === '=' && j + 1 < len && expr[j + 1] === '=')) {
+                   && !(expr[j] === '=' && j + 1 < len && expr[j + 1] === '=')
+                   && expr[j] !== '+' && expr[j] !== '-' && expr[j] !== '*' && expr[j] !== '/') {
                 j++;
             }
             const word = expr.slice(i, j);
@@ -116,5 +122,59 @@ class ExprParser {
         };
 
         return !!parseOr();
+    }
+
+    // 算術式を評価して数値を返す（slotNum/slotPoint等の数値属性用）
+    // +, -, *, / と括弧・変数参照・単項マイナスに対応する
+    // eval()がboolean固定であるのに対し、このメソッドは生の数値を返す
+    evalNumber(expr, resolveValue) {
+        const tokens = this.tokenize(expr);
+        let pos = 0;
+        const peek    = () => tokens[pos];
+        const consume = () => tokens[pos++];
+
+        // 加減算: mulExpr (('+' | '-') mulExpr)*
+        const parseAdd = () => {
+            let result = parseMul();
+            while (peek().type === 'PLUS' || peek().type === 'MINUS') {
+                const op = consume().type;
+                const right = parseMul();
+                result = op === 'PLUS' ? result + right : result - right;
+            }
+            return result;
+        };
+
+        // 乗除算: unary (('*' | '/') unary)*
+        const parseMul = () => {
+            let result = parseUnary();
+            while (peek().type === 'MUL' || peek().type === 'DIV') {
+                const op = consume().type;
+                const right = parseUnary();
+                result = op === 'MUL' ? result * right : (right !== 0 ? result / right : NaN);
+            }
+            return result;
+        };
+
+        // 単項マイナス: '-' unary | primary
+        const parseUnary = () => {
+            if (peek().type === 'MINUS') { consume(); return -parseUnary(); }
+            return parsePrimary();
+        };
+
+        // primary: '(' addExpr ')' | NUMBER | IDENT
+        const parsePrimary = () => {
+            const tok = peek();
+            if (tok.type === 'LPAREN') {
+                consume();
+                const result = parseAdd();
+                if (peek().type === 'RPAREN') consume();
+                return result;
+            }
+            if (tok.type === 'NUMBER') { consume(); return tok.value; }
+            if (tok.type === 'IDENT')  { consume(); return Number(resolveValue(tok.value)); }
+            return NaN;
+        };
+
+        return parseAdd();
     }
 }

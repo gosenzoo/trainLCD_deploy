@@ -70,6 +70,8 @@ class ArrangeObj extends LcdPartsObj {
             obj = new ArrangeObj(svgDom, childCtx);
             // Drawer._buildNodeと同様に、arrangeAreaのサイズ内に収まるよう初期圧縮を適用する
             obj.setSize(obj.width, obj.height);
+        } else if (lcdParts === 'slot') {
+            obj = new SlotObj(svgDom, childCtx);
         } else if (lcdParts === 'textBox') {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         } else if (lcdParts === 'numbering') {

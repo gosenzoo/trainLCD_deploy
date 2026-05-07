@@ -10,7 +10,6 @@
    "name": "金月洞",
    "kana": "きんげつどう",
    "eng": "Kingetsudō",
-   "number": "G 12",
    "lineColor": "#8700f3",
    "numIconPresetKey": "N_tokyu",
    "numIconSymbol": "G",
@@ -19,10 +18,6 @@
    "transfers": "",
    "isPass": false,
    "lineId": "4",
-   "coordinate": [
-    null,
-    null
-   ],
    "transferText": "",
    "transferTextEng": "",
    "doorSide": "left",
@@ -35,6 +30,8 @@
   },
   "destination": "中央林間",
   "destinationEng": "Chuo-Rinkan",
+
+
 
   "leftSectionType": 2,
   "rightSectionType": 2,
@@ -49,6 +46,9 @@
   ],
   "leftSectionColor": "rgb(0, 255, 0)",
   "rightSectionColor": "rgb(0, 255, 0)",
+  "drawPos": 6,
+  "leftLineName": "田園都市線",
+  "rightLineName": "東横線",
 
   "dispStationList": [
     {
@@ -112,7 +112,7 @@
       "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
-        ":O:大井町線"
+        ":D:田園都市線"
       ]
     },
     {
@@ -128,7 +128,7 @@
       "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
-        ":O:大井町線"
+        ":s::k::n:地下鉄線"
       ]
     },
     {

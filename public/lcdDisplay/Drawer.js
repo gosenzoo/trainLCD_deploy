@@ -195,6 +195,23 @@ class Drawer {
             // arrangeAreaのサイズ内に収まるよう圧縮を適用
             arrangeObj.setSize(arrangeObj.width, arrangeObj.height);
             return arrangeObj;
+        } else if (lcdParts === 'slot') {
+            // slotはarrangeと同じコンテキストを使用する
+            const shadowIdAttr  = element.getAttribute('shadowId');
+            const rootShadowMap = this._activeShadowMap || {};
+            const activeShadows = MulShadowUtil.resolveShadows(shadowIdAttr, rootShadowMap);
+            const slotCtx = {
+                drawParams: this.drawParams,
+                args: {},
+                textDrawer: this.textDrawer,
+                numIconDrawer: this.numIconDrawer,
+                exprParser: this.exprParser,
+                debug: this.debug,
+                defsEl: this._defsEl,
+                activeShadows: activeShadows.length > 0 ? activeShadows : null,
+                rootShadowMap,
+            };
+            return new SlotObj(element, slotCtx);
         }
         // lcdPartsなし（またはunknown値）: 子孫ごとスキップ
         return null;

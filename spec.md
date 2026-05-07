@@ -1644,6 +1644,83 @@ mulShadow rect: x=rx, y=ry, width=rw, height=rh
 
 ---
 
+### 7.8 lcdParts="slot" — スロット配置
+
+#### 概要
+
+`lcdParts="slot"` は `<g>` 要素に付与するコンテナ。slotArea で定義した領域を等間隔の `slotNum` 点に区切り、子要素を `slotPoint` 属性で指定した位置に配置する。
+
+#### 属性
+
+| 属性 | 対象要素 | 値 | 説明 |
+|---|---|---|---|
+| `lcdParts="slot"` | `<g>` | — | スロット配置コンテナ |
+| `slotNum` | slot `<g>` | 数値または式（デフォルト: 1） | スロット数。drawParams / args の値を参照する式を記述可能 |
+| `axis` | slot `<g>` | `"x"`（デフォルト）/ `"y"` | 主軸方向（x: 横、y: 縦） |
+| `lcdParts="slotArea"` | slot 直接子 `<rect>` | — | スロット領域の範囲を定義する |
+| `slotPoint` | slot 直接子要素 | 数値または式（0 始まり） | 配置先スロット番号。drawParams / args の値を参照する式を記述可能 |
+
+#### 動的評価
+
+`slotNum` および `slotPoint` は `ExprParser.evalNumber()` で評価される。
+
+- **`slotNum`**: slot `<g>` 要素が属するスコープの `drawParams` と `args` を使用して評価する。
+- **`slotPoint`**: 各子要素のオブジェクト構築時点のスコープで評価する。`lcd-arg` 展開がある場合は、展開後の `args`（例: `$dispStation`）を使用して要素ごとに個別に評価する。
+
+評価結果は整数に丸めて使用する。評価結果が数値でない場合や範囲外の場合はその子要素をスキップする。
+
+#### ExprParser.evalNumber() — 数値式評価メソッド
+
+`ExprParser` に `evalNumber(expr, resolveValue)` メソッドを追加する。`eval()` が boolean 固定であるのに対し、`evalNumber()` は数値を返す。
+
+対応する構文:
+
+| 種別 | 例 |
+|---|---|
+| 数値リテラル | `3`, `0`, `-1` |
+| 変数参照 | `numStations`, `$dispStation.slotIndex` |
+| 加減算 | `numStations + 1`, `count - 2` |
+| 乗除算 | `total * 2`, `width / 3` |
+| 括弧 | `(a + b) * 2` |
+| 単項マイナス | `-n` |
+
+演算子の優先順位は通常の算術規則（`*`/`/` > `+`/`-`）に従う。変数は `resolveValue` で解決する。ゼロ除算の場合は `NaN` を返す。
+
+変更ファイル: `public/lcdDisplay/ExprParser.js`（`evalNumber` メソッド追加、`tokenize` に `+`・`-`・`*`・`/` トークン追加）
+
+#### スロット位置の計算
+
+slotArea の主軸方向の先頭座標を S、長さを L とする。
+
+| slotNum | 位置 |
+|---|---|
+| 1 | S + L/2（中心のみ） |
+| N > 1 | 位置_i = S + i / (N-1) × L　（i = 0 … N-1） |
+
+例: slotNum=2 → 両端（S と S+L）、slotNum=3 → 両端＋中心（S, S+L/2, S+L）
+
+#### 子要素の配置ルール
+
+- **主軸**: 子要素の中心が slotPoint に対応するスロット座標と一致するように移動する
+- **交差軸**: slotArea の交差軸方向中心に揃える
+- `slotPoint` 属性のない要素はスキップする
+- `getRealSize()` で非ゼロサイズを返すオブジェクトのみ対象とする（path / polygon 単体は不可）
+
+#### 対応子要素
+
+arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `static`, `textBox`, `numbering`
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/SlotObj.js` | 新規作成 | SlotObj クラス |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj` に `slot` ケース追加 |
+| `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode` に `slot` ケース追加 |
+| `public/lcdDisplay/index.html` | 変更 | `SlotObj.js` の `<script>` タグ追加 |
+
+---
+
 ### データ受け渡し
 
 ```
