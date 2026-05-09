@@ -186,7 +186,7 @@
     </g>
   </g>
 
-  <g id="footer" visibility="hidden">
+  <g id="footer" visibility="visible">
     <!-- 時間は異なります(英語) -->
     <rect id="footer-estimateTimeText" x="1396" y="1028" width="510" height="35" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "regular", "textAnchor": "end", "fill": "rgb(0, 0, 0)"}' lang="en" />
     <rect id="footer-stopText" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />

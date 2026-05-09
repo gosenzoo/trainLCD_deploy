@@ -1062,17 +1062,208 @@ lcdDisplay システムの詳細仕様は `public/lcdDisplay/doc/` を参照。
 
 | クラス | 対象 | 親クラス | 主フィールド |
 |---|---|---|---|
-| `GroupObj` | トップ `<svg>` / `lcdParts="group"` | なし | `visible`, `children[]` |
-| `StaticObj` | `lcdParts="static"` | なし | `visible`, `_svgDom` |
-| `TextBoxObj` | `lcdParts="textBox"` | `LcdPartsObj` | `visible`（`LcdPartsObj` に追加） |
-| `ArrangeObj` | `lcdParts="arrange"` | `LcdPartsObj` | `visible`（同上） |
+| `LcdPartsObj` | 基底 | なし | `visible`, `noFilter`, `colorOverride`, 各種レイアウト属性 |
+| `GObj` | `<g>` 系コンテナ共通 | `LcdPartsObj` | `_filter`、filter 分割ヘルパー |
+| `GroupObj` | トップ `<svg>` / `lcdParts="group"` | `GObj` | `children[]`, `transform` |
+| `ArrangeObj` | `lcdParts="arrange"` | `GObj` | 配置ロジック |
+| `SlotObj` | `lcdParts="slot"` | `GObj` | スロット配置ロジック |
+| `StaticObj` | `lcdParts="static"` | `LcdPartsObj` | `_node`（クローンSVG要素） |
+| `TextBoxObj` | `lcdParts="textBox"` | `LcdPartsObj` | テキスト描画 |
+
+**`GObj`（新規）**
+
+`<g>` に対応するコンテナクラスの共通基底。`GroupObj` / `ArrangeObj` / `SlotObj` が継承する。
+
+- `_filter` — SVG の `filter` 属性値を保持
+- `_createFilteredG()` — `_filter` がある場合にフィルター用サブ `<g>` を生成して返す（ない場合は `null`）
+- `_finalizeFilterSplit(container, filteredG)` — 子要素の描画後、`filteredG` に要素があれば `container` の先頭に挿入する（フィルター対象が非フィルター対象の下に描画されるよう順序を保証）
+
+各クラスの `getElement()` は以下のパターンで `GObj` のヘルパーを使用する:
+```javascript
+const filteredG = this._createFilteredG();
+// ... 子要素ループ内:
+if (filteredG && !child.noFilter) filteredG.appendChild(el);
+else                               container.appendChild(el);
+// ループ後:
+this._finalizeFilterSplit(container, filteredG);
+```
 
 **`GroupObj`**
-- `getElement(ctx)` — 自身の `visible` を評価し、非表示なら `null`、表示なら各子の `getElement(ctx)` を収めた `<g>` を返す
-- レイアウト・位置調整機能なし
+- `GObj` を継承（従来は独立クラス）
+- `LcdPartsObj` が重複して持っていたフィールド（`visible`, `fitX/Y`, `margin` 等）を削除し、`super()` で初期化
+- `getElement()` でフィルター分割を使用
 
 **`StaticObj`**
-- `getElement(ctx)` — 自身の `visible` を評価し、非表示なら `null`、表示なら `_svgDom.cloneNode(true)` を返す
+- `LcdPartsObj` を継承（従来は独立クラス）
+- `LcdPartsObj` が重複して持っていたフィールド（`visible`, `_animType`, `fitX/Y`, `_domEl` 等）とメソッド（`_evalVisible()`, `setCoordinate()`, `getRealSize()`, `setSize()`）を削除し、`super()` で初期化
+- `langChange()` は `_applyVisibleAnim()` を呼び出すよう簡略化
+- コンストラクタシグネチャ `(svgDom, drawParams, colorOverride, args)` は変更しない（呼び出し側との互換性維持）
+
+#### `colorOverride` フィールドとツリー伝播
+
+全ノードクラス（`LcdPartsObj` を継承するすべてのクラス）が `colorOverride` フィールドを持つ。
+
+**コンストラクタシグネチャへの追加:**
+
+| クラス | 追加引数 |
+|---|---|
+| `LcdPartsObj` | 第4引数 `colorOverride = null` |
+| `GObj` | 第4引数 `colorOverride = null`（`super()` に渡す） |
+| `GroupObj` | 第2引数 `colorOverride = null`（`super(svgDom, null, null, colorOverride)` に渡す） |
+| `ArrangeObj` | 第3引数 `colorOverride = null`（`super(svgDom, drawParams, args, colorOverride)` に渡す） |
+| `SlotObj` | 第3引数 `colorOverride = null`（同上） |
+| `StaticObj` | コンストラクタの第3引数 `colorOverride` を `super(svgDom, drawParams, args, colorOverride)` に渡す |
+
+**ツリー伝播ルール（`_createChildObj` 内）:**
+
+1. 呼び出し側から渡された `colorOverride`（配列展開の個別色）が最優先
+2. null の場合は `this.colorOverride`（このコンテナ自身が継承した色）をフォールバックとする
+3. これを `effectiveColor` として全子タイプ（arrange / slot / group / static）のコンストラクタに渡す
+
+```javascript
+const effectiveColor = colorOverride ?? this.colorOverride;
+// static: new StaticObj(svgDom, drawParams, effectiveColor, args)
+// group:  new GroupObj(svgDom, effectiveColor)（group自身のlcd-colorが優先）
+// arrange: new ArrangeObj(svgDom, childCtx, effectiveColor)
+// slot:   new SlotObj(svgDom, childCtx, effectiveColor)
+```
+
+**`_buildContainerChildren` への追加引数:**
+
+`parentColorOverride = null` を末尾に追加し、ループ内の `_createChildObj` 呼び出しに渡す。  
+グループ子要素のビルド時は、DOM カラーリング（`_applyColorToDOM`）後にそのグループの実効色（`domColor`）を `parentColorOverride` として渡すことで、グループの色が孫要素にも正しく伝播する。
+
+#### `lcd-noFilter` 属性
+
+| 属性 | 対象 | 値 | 説明 |
+|---|---|---|---|
+| `lcd-noFilter` | 任意の lcdParts 子要素 | `"true"` | 最も近い祖先の `filter` 付きコンテナの影響外に配置する |
+
+`lcd-noFilter="true"` が付いた子要素は、祖先コンテナのどこかに `filter` が存在する場合でも、そのフィルターの影響外に配置される。位置は **`noFilterSink` パターン**（後述）によって座標が保証される。
+
+##### `noFilterSink` パターン（任意の深さの noFilter 対応）
+
+直接の親だけでなく、任意の深さの祖先コンテナの `filter` を回避するための仕組み。
+
+**動作原理:**
+
+1. **`filter` を持つ `GObj` 系コンテナ（ArrangeObj / SlotObj）の `getElement()` が `noFilterSink = []` を生成**し、`ctx` に追加して子へ渡す。
+2. **中間コンテナ（GroupObj）は `ctx.noFilterSink` を受け取り、自身の SVG transform でラップしたプロキシ sink を生成して子へ渡す。**  
+   プロキシの `push(el)` は `<g transform="...">el</g>` にラップしてから親 sink に転送するため、座標が各段の transform を引き継いだ状態で保持される。
+3. **`noFilter=true` の要素は `getElement()` の戻り値を親コンテナに渡す代わりに `ctx.noFilterSink.push(el)` を呼ぶ。**
+4. **フィルター付きコンテナが描画後に `sink` の中身を `outer <g>` に追加する** → フィルター外・正しい座標に配置される。
+
+**SVG 出力イメージ:**
+
+```
+ArrangeObj(filter="outline")  →  outer <g>
+  ├─ <g transform="A">              ← 中間 GroupObj の transform ラッパー（noFilter要素用）
+  │    └─ <TextBoxObj/>             ← noFilter=true（フィルター外・正しい座標）
+  └─ filteredG <g filter="outline">
+       └─ <g transform="A">        ← GroupObj の通常描画
+            └─ 他の shapes...       ← フィルター適用
+```
+
+**`ctx` の追加フィールド:**
+
+```javascript
+ctx = {
+    resolveValue,   // 既存
+    exprParser,     // 既存
+    noFilterSink,   // undefined | Array — undefined=フィルター祖先なし、Array=浮き上がり先
+}
+```
+
+**`GObj` に集約する4つのヘルパー:**
+
+```javascript
+// filter持ちコンテナ用: this._filterがある場合のみnoFilterSink付きのchildCtxを生成する
+// 戻り値: { childCtx, sink } — sinkはnullならfilterなし(変更不要)
+_openSink(ctx) {
+    if (!this._filter) return { childCtx: ctx, sink: null };
+    const sink = [];
+    return { childCtx: { ...(ctx || {}), noFilterSink: sink }, sink };
+}
+
+// _openSinkで生成したsinkの要素をgに追加する（フィルター外配置）
+_closeSink(sink, g) {
+    if (!sink) return;
+    for (const el of sink) g.appendChild(el);
+}
+
+// 中間コンテナ（GroupObj）用: ctx.noFilterSinkを受け取り、transformWrappedなプロキシsinkを生成する
+// transformStrがない、またはctx.noFilterSinkがない場合はそのまま返す
+// 戻り値: { childCtx, flushProxy } — flushProxy()でproxySinkの内容を親sinkへ転送する
+_proxyChildSink(ctx, transformStr) {
+    if (!ctx || !ctx.noFilterSink) return { childCtx: ctx, flushProxy: null };
+    if (!transformStr) return { childCtx: ctx, flushProxy: null };
+    const parentSink = ctx.noFilterSink;
+    const proxySink = [];
+    const flushProxy = () => {
+        if (!proxySink.length) return;
+        const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        w.setAttribute('transform', transformStr);
+        for (const el of proxySink) w.appendChild(el);
+        parentSink.push(w);
+    };
+    return { childCtx: { ...ctx, noFilterSink: proxySink }, flushProxy };
+}
+
+// 子要素の配置先を振り分ける（全GObj系getElement()の子ループ内で使用）
+// noFilter=true かつ noFilterSink あり → sink に push（フィルター外へ浮き上がり）
+// noFilter=false かつ filteredG あり    → filteredG に追加（フィルター適用）
+// それ以外                             → container に追加
+_placeChild(el, child, filteredG, container, childCtx) {
+    if (child.noFilter && childCtx && childCtx.noFilterSink) {
+        childCtx.noFilterSink.push(el);
+    } else if (filteredG && !child.noFilter) {
+        filteredG.appendChild(el);
+    } else {
+        container.appendChild(el);
+    }
+}
+```
+
+**各クラスの `getElement()` での呼び出しパターン:**
+
+`ArrangeObj` / `SlotObj`（filter 保持コンテナ）:
+```javascript
+const { childCtx, sink } = this._openSink(ctx);
+const filteredG = this._createFilteredG();
+for (const child of ...) {
+    const el = child.getElement(childCtx);
+    if (!el) continue;
+    this._placeChild(el, child, filteredG, outer, childCtx);
+}
+this._finalizeFilterSplit(outer, filteredG);
+this._closeSink(sink, outer);
+```
+
+`GroupObj`（中間コンテナ / transform 持ち）:
+```javascript
+const transformStr = this._hasGroupArea ? `translate(...)scale(...)` : null;
+const { childCtx, flushProxy } = this._proxyChildSink(ctx, transformStr);
+const filteredG = this._createFilteredG();
+for (const child of this.children) {
+    const el = child.getElement(childCtx);
+    if (!el) continue;
+    this._placeChild(el, child, filteredG, g, childCtx);
+}
+this._finalizeFilterSplit(g, filteredG);
+if (flushProxy) flushProxy();
+```
+
+#### ファイル変更一覧（GObj 追加・colorOverride 伝播・StaticObj 継承・noFilterSink）
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/GObj.js` | 新規作成 | `GObj` クラス（`LcdPartsObj` 継承）、`_createFilteredG`・`_finalizeFilterSplit`・`_openSink`・`_closeSink`・`_proxyChildSink`・`_placeChild` |
+| `public/lcdDisplay/LcdPartsObj.js` | 変更 | `noFilter` / `colorOverride` プロパティ追加、`svgDom=null` ガード追加 |
+| `public/lcdDisplay/GroupObj.js` | 変更 | `GObj` 継承、重複フィールド削除、`_proxyChildSink` / `_placeChild` を使用 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `GObj` 継承、`_openSink` / `_closeSink` / `_placeChild` を使用、`colorOverride` 伝播 |
+| `public/lcdDisplay/SlotObj.js` | 変更 | 同上 |
+| `public/lcdDisplay/StaticObj.js` | 変更 | `LcdPartsObj` 継承へ変更、重複フィールド・メソッド削除 |
+| `public/lcdDisplay/index.html` | 変更 | `GObj.js` の `<script>` タグ追加（`LcdPartsObj.js` の直後）|
 
 #### `visible` フィールド仕様
 
@@ -1250,6 +1441,16 @@ _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {
 3. `lcd-arg="argName:drawParamsVarName"` の子: `argName` が参照時の名前、`drawParamsVarName` が drawParams / parentArgMap 上の変数名。`parentArgMap[drawParamsVarName]` → `LcdPartsObj.resolveDrawParam(drawParamsVarName, drawParams)` の順で解決し、配列なら要素数分コピー。コロンを含まない値は無効として無視する。
 4. それ以外: `_createChildObj` を1回呼んで単一オブジェクトを生成
 
+#### `arrangeDirection` 属性
+
+| 属性 | 対象 | 値 | デフォルト | 説明 |
+|---|---|---|---|---|
+| `arrangeDirection` | `lcdParts="arrange"` | `0` / `1` | `0` | `getElement()` での子要素の配置順。`0` = SVG 記述順（先頭から）、`1` = 逆順（末尾から） |
+
+`arrangeDirection=1` のとき、`getElement()` 内の子要素ループで `[...this.children].reverse()` した順序で配置する。サイズ計算（`setSize()`）は従来どおり SVG 記述順で行うため、各子要素の `getRealSize()` は正しく返る。軸方向の積算（`axisCursor`）は変わらず先頭から開始し、逆順に並んだ子要素を順に配置していく。
+
+変更ファイル: `public/lcdDisplay/GObj.js`（`arrangeDirection` フィールド追加）、`public/lcdDisplay/ArrangeObj.js`（`getElement()` に逆順処理追加）
+
 **lcd-arg の設定側と参照側の書き分け:**
 
 | 用途 | 属性 / 書き方 | 例 |
@@ -1369,6 +1570,26 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 | `public/jsMojules/utilClass/TextDrawer.js` | バグ修正 | `getTextWidth` で generic フォントファミリーをクォートしない |
 | `public/lcdDisplay/index.html` | 変更 | `<html lang="ja">` → `<html>`（`lang` 属性を削除して本番と同じ `sans-serif` フォント解決にする） |
 | `public/lcdDisplay/index.html` | 変更 | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` 追加（既適用） |
+
+---
+
+### 7.2b lcdDisplay デバッグ画面 ツールバー仕様
+
+`public/lcdDisplay/index.html` のツールバー（`#svg-toolbar`）に配置するボタンとキーボードショートカットの一覧。
+
+| ボタン | キー | 対象パラメータ | 動作 |
+|---|---|---|---|
+| 言語切替 | `L` | `langId` | 0→1→2→0 サイクル（`langChange()` アニメーション遷移） |
+| runState | `R` | `runState` | 0→1→2→0 サイクル（再描画） |
+| isTerminal | `T` | `isTerminal` | boolean トグル（再描画） |
+| direction | `M` | `direction` | 0→1→0 トグル（再描画） |
+| isDrawTime | `E` | `isDrawTime` | boolean トグル（再描画） |
+| isDrawLineName | `N` | `isDrawLineName` | boolean トグル（再描画） |
+| isDrawNextStation | `S` | `isDrawNextStation` | boolean トグル（再描画） |
+
+入力欄（`INPUT`・`TEXTAREA`）にフォーカスがある場合はキーボードショートカットを無視する。
+
+変更ファイル: `public/lcdDisplay/index.html`（ボタン追加、`doDirectionToggle` 関数追加、`M` キーハンドラ追加）
 
 ---
 
@@ -1493,7 +1714,7 @@ arrange 配下の group に `lcd-arg="argName:drawParamsVarName"`（または省
 
 ### 7.6 lcd-color 属性によるfill設定
 
-`lcdParts="static"` および `lcdParts="group"` 要素に `lcd-color` 属性を追加し、`fill` を動的に設定できるようにする。
+`lcdParts="static"` / `lcdParts="group"` / `lcdParts="textBox"` 要素に `lcd-color` 属性を追加し、`fill` を動的に設定できるようにする。
 
 #### 値の記法
 
@@ -1509,6 +1730,7 @@ arrange 配下の group に `lcd-arg="argName:drawParamsVarName"`（または省
 
 - `lcdParts="static"` の図形要素（`rect` 等）に `lcd-color` がある場合: その要素自身の `fill` に設定する。
 - `lcdParts="static"` の `<g>` 要素、または `lcdParts="group"` に `lcd-color` がある場合: 配下の全図形要素の `fill` に一括設定する。
+- `lcdParts="textBox"` に `lcd-color` がある場合: `data-style` の `fill` に設定し、テキスト色として反映する。スカラー値のみ対応（配列の場合は先頭要素を使用）。
 
 #### スカラー値の適用
 
@@ -1517,6 +1739,7 @@ drawParams 変数がスカラー（単一色）の場合、またはCSS色リテ
 - `lcdParts="static"`: StaticObj コンストラクタで `this._node` に直接適用する。
 - `lcdParts="group"` の場合: 子要素ビルド前にsvgDomをクローンし、クローン内の全shape要素にfillを適用してから各子オブジェクトを構築する。これにより static・textBox 等あらゆる子タイプに対して色が反映される。
   - ArrangeObj._createChildObj（group ケース）と Drawer._buildNode（group ケース）の両方で処理する。
+- `lcdParts="textBox"`: TextBoxObj コンストラクタで `lcd-color` 属性を `StaticObj._resolveLcdColor` で解決し、`this._style.fill` に設定する（TextDrawer に渡す styleJson に反映される）。
 
 #### lcd-color の階層優先ルール
 
@@ -1688,6 +1911,27 @@ mulShadow rect: x=rx, y=ry, width=rw, height=rh
 
 変更ファイル: `public/lcdDisplay/ExprParser.js`（`evalNumber` メソッド追加、`tokenize` に `+`・`-`・`*`・`/` トークン追加）
 
+#### ExprParser.eval() — 不等号演算子の追加
+
+`eval()` の `parseComparison` に以下の比較演算子を追加する。
+
+| 記法 | トークン | 意味 |
+|---|---|---|
+| `!=` | `NEQ` | 不等 |
+| `<`  | `LT`  | より小さい |
+| `>`  | `GT`  | より大きい |
+| `<=` | `LTE` | 以下 |
+| `>=` | `GTE` | 以上 |
+
+**数値比較の規則**: 両辺が数値に変換できる場合は数値比較、それ以外は文字列比較（`==` と同一の規則）。
+
+**`tokenize()` の変更点**:
+- `!=` を `!` より先にチェックして `NEQ` トークンを生成する（`!` 単体は引き続き `NOT`）
+- `<=`・`>=` を `<`・`>` より先にチェックする
+- 識別子スキャンの終端文字に `<`・`>` を追加する
+
+変更ファイル: `public/lcdDisplay/ExprParser.js`（`tokenize` にトークン追加、`parseComparison` に演算子追加）
+
 #### スロット位置の計算
 
 slotArea の主軸方向の先頭座標を S、長さを L とする。
@@ -1718,6 +1962,103 @@ arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `s
 | `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj` に `slot` ケース追加 |
 | `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode` に `slot` ケース追加 |
 | `public/lcdDisplay/index.html` | 変更 | `SlotObj.js` の `<script>` タグ追加 |
+
+---
+
+### 7.9 lcd-funcDef / lcd-funcCall — SVG内関数定義と呼び出し
+
+#### 概要
+
+入力SVG内に「関数定義」と「関数呼び出し」を記述できる仕組み。定義側で描画内容を再利用可能なまとまりとして宣言し、呼び出し側でその内容を任意の矩形領域に非均等伸縮して配置する。ツリーシステム構築前の事前プロセスとして DOM を書き換えるため、既存のオブジェクトツリー処理はそのまま使用する。
+
+---
+
+#### 定義側: `lcd-funcDef`
+
+```svg
+<g lcd-funcDef="[関数名]">
+  <rect lcdParts="funcArea" x="…" y="…" width="…" height="…" />
+  <!-- コンテンツ要素（あらゆるlcdParts要素を記述可能） -->
+</g>
+```
+
+| 項目 | 仕様 |
+|---|---|
+| 対象要素 | SVG直下の **トップレベル `<g>`** のみ有効。ネストされた配下にある `lcd-funcDef` は無視する |
+| `lcdParts="funcArea"` | 定義領域の基準矩形。直接子 `<rect>` に付与する。この rect の x/y/width/height を「元サイズ」として使用する |
+| コンテンツ要素 | funcArea 以外のすべての直接・間接子要素 |
+| 表示 | 非表示・非レンダリング。ツリーシステムは funcDef `<g>` を処理しない |
+
+---
+
+#### 呼び出し側: `lcd-funcCall`
+
+```svg
+<rect lcd-funcCall="[関数名]" x="…" y="…" width="…" height="…" />
+```
+
+| 項目 | 仕様 |
+|---|---|
+| 対象要素 | SVG内の任意の場所に配置可能な `<rect>` |
+| rect の役割 | 配置先領域（target area）を x/y/width/height で指定する。この rect 自体はレンダリングされない |
+| 同名関数の複数呼び出し | 可能。毎回独立したクローンを展開する |
+
+---
+
+#### 事前プロセスの動作
+
+`Drawer.buildTree()` 呼び出し前に `Drawer._resolveFuncCalls(svgDoc)` を実行し、SVG DOM を書き換える。
+
+1. **funcDef の収集**: SVGルートの直接子 `<g>` で `lcd-funcDef` 属性を持つものをすべて走査し、`funcName → { funcAreaRect, contentNodes[] }` のマップを構築する。`contentNodes` は funcArea rect を除いた残りの子ノード（テキストノードを含む）のリスト。収集後、funcDef `<g>` 自体は SVG DOM から取り除く。
+
+2. **funcCall の解決**: SVG DOM 全体（書き換え後）を走査し、`lcd-funcCall` 属性を持つ `<rect>` をすべて列挙する。各 funcCall rect に対して以下を実行する:
+   - **スケール計算**: funcArea の width/height を元サイズ、funcCall rect の width/height を目標サイズとして非均等スケールを計算する。
+     ```
+     sx = callWidth  / funcAreaWidth
+     sy = callHeight / funcAreaHeight
+     ```
+   - **オフセット計算**: funcArea の左上 (ax, ay) が funcCall rect の左上 (cx, cy) に対応するよう移動量を計算する。
+     ```
+     tx = cx - ax*sx
+     ty = cy - ay*sy
+     ```
+   - **クローン生成・インライン展開**: `contentNodes` の各ノードを `cloneNode(true)` で深コピーし、**座標属性を直接書き換え**てスケール・移動を適用する（`_scaleNode`）。transform 属性は使用しない。
+   - **DOM置換**: スケール済みクローンを funcCall `<rect>` の直前に `insertBefore` で挿入し、rect を `removeChild` で除去する。**ラッパー `<g>` は使用しない**（`lcdParts` なしの `<g>` に包むと ArrangeObj が子要素としてスキップするため）。
+
+3. **結果**: 置換後の SVG DOM をそのまま `buildTree()` に渡す。ツリーシステムは展開済みの通常要素として処理する。
+
+---
+
+#### ファイル変更一覧
+
+#### `_scaleNode(el, sx, sy, tx, ty)` の動作
+
+SVG要素の座標属性を再帰的に直接書き換える。transform ではなく属性値を変換するため、`filter` 等の効果がスケール後座標に正しく適用される。
+
+- `transform="translate(a,b)"` 属性がある場合: tx/ty にbake-in（`tx' = a*sx+tx`）して transform を除去し、子を再帰処理する
+- 上記以外の transform（rotate 等）がある場合: `translate(tx,ty) scale(sx,sy)` を前合成して終了（子再帰不要）
+- `transform` なし: 要素種別に応じて座標属性を書き換え、子要素を再帰処理する
+
+| 要素 | 書き換える属性 |
+|---|---|
+| `rect`, `image`, `foreignObject` | `x`, `y`, `width`, `height` |
+| `circle` | `cx`, `cy`, `r`（min(sx,sy) でスケール） |
+| `ellipse` | `cx`, `cy`, `rx`, `ry` |
+| `line` | `x1`, `y1`, `x2`, `y2` |
+| `text`, `tspan` | `x`, `y`, `dx`, `dy` |
+| `use` | `x`, `y`, `width`, `height` |
+| `polygon`, `polyline` | `points` 各座標値 |
+| `path` | `d` 属性（`_scalePath` で変換） |
+
+#### `_scalePath(d, sx, sy, tx, ty)` の動作
+
+SVGパスの `d` 属性を非均等スケール変換する。絶対コマンド（大文字）は sx/sy+tx/ty、相対コマンド（小文字）は sx/sy のみ適用する。`A`/`a` コマンドの x-rotation・largeArcFlag・sweepFlag はスケールしない。
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/Drawer.js` | 変更 | `_resolveFuncCalls(svgElement)`・`_scaleNode(el, sx, sy, tx, ty)`・`_scalePath(d, sx, sy, tx, ty)` を追加。`load()` の正規化処理直後に `_resolveFuncCalls` を呼び出す |
 
 ---
 

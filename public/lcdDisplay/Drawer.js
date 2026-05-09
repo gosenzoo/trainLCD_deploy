@@ -19,14 +19,16 @@ class Drawer {
         this.drawParams = drawParams;
         this.iconList = iconList;
         this.defsSVG = defsSVG;
-        // url(./defs.svg#id) → url(#id) に正規化してからテンプレートを保持
+        // url(./defs.svg#id) → url(#id) に正規化し、funcDef/funcCallを事前展開してからテンプレートを保持
         this._normalizeSVGDefsRefs(templateSVG);
+        this._resolveFuncCalls(templateSVG);
         this.templateSVG = templateSVG;
 
         // defaultLineSVG.svgをフェッチ（存在しない場合はnullとして続行）
         try {
             const defaultLineSVG = await this._fetchSVG('./defaultLineSVG.svg');
             this._normalizeSVGDefsRefs(defaultLineSVG);
+            this._resolveFuncCalls(defaultLineSVG);
             this.defaultLineSVG = defaultLineSVG;
         } catch (e) {
             console.warn('defaultLineSVG.svg not found, skipping');
@@ -58,6 +60,206 @@ class Drawer {
         const parser = new DOMParser();
         console.log(parser.parseFromString(text, 'image/svg+xml').documentElement);
         return parser.parseFromString(text, 'image/svg+xml').documentElement;
+    }
+
+    // SVG内のlcd-funcDefを収集し、lcd-funcCallをインライン展開する（buildTree前の事前処理）
+    // funcDef <g> は収集後にDOMから除去し、funcCall <rect> は展開済み <g> に置換する
+    _resolveFuncCalls(svgElement) {
+        // ステップ1: トップレベルの lcd-funcDef <g> を収集してDOMから除去
+        const funcDefMap = {}; // 関数名 → { areaX, areaY, areaWidth, areaHeight, contentNodes[] }
+        for (const child of Array.from(svgElement.children)) {
+            const funcName = child.getAttribute ? child.getAttribute('lcd-funcDef') : null;
+            if (!funcName) continue;
+
+            // funcArea rectとコンテンツノードを分離
+            let areaRect = null;
+            const contentNodes = [];
+            for (const node of Array.from(child.childNodes)) {
+                if (
+                    node.nodeType === Node.ELEMENT_NODE &&
+                    node.getAttribute && node.getAttribute('lcdParts') === 'funcArea'
+                ) {
+                    areaRect = node;
+                } else {
+                    contentNodes.push(node);
+                }
+            }
+
+            if (areaRect) {
+                funcDefMap[funcName] = {
+                    areaX:      parseFloat(areaRect.getAttribute('x')      || '0'),
+                    areaY:      parseFloat(areaRect.getAttribute('y')      || '0'),
+                    areaWidth:  parseFloat(areaRect.getAttribute('width')  || '0'),
+                    areaHeight: parseFloat(areaRect.getAttribute('height') || '0'),
+                    contentNodes,
+                };
+            }
+            // funcDef <g> 自体はレンダリング不要なのでDOMから除去
+            svgElement.removeChild(child);
+        }
+
+        // funcDefが1件もなければ即return（querySelectorAll不要）
+        if (Object.keys(funcDefMap).length === 0) return;
+
+        // ステップ2: SVG全体から lcd-funcCall rect を列挙して展開
+        for (const rect of Array.from(svgElement.querySelectorAll('[lcd-funcCall]'))) {
+            const funcName = rect.getAttribute('lcd-funcCall');
+            const def = funcDefMap[funcName];
+            if (!def) continue;
+
+            const cx = parseFloat(rect.getAttribute('x')      || '0');
+            const cy = parseFloat(rect.getAttribute('y')      || '0');
+            const cw = parseFloat(rect.getAttribute('width')  || '0');
+            const ch = parseFloat(rect.getAttribute('height') || '0');
+
+            // 非均等スケール（x・y独立）を計算
+            const sx = def.areaWidth  > 0 ? cw / def.areaWidth  : 1;
+            const sy = def.areaHeight > 0 ? ch / def.areaHeight : 1;
+            // funcAreaの左上をcallRectの左上に合わせるtranslateを計算
+            const tx = cx - def.areaX * sx;
+            const ty = cy - def.areaY * sy;
+
+            // コンテンツのdeepCloneを座標属性直接書き換えでスケールし、
+            // ラッパーを挟まず親要素にインライン展開してrectと置換する
+            // （ラッパー<g>で包むとlcdPartsなし要素になりArrangeObjにスキップされるため）
+            const parent = rect.parentNode;
+            for (const node of def.contentNodes) {
+                const cloned = node.cloneNode(true);
+                if (cloned.nodeType === Node.ELEMENT_NODE) {
+                    this._scaleNode(cloned, sx, sy, tx, ty);
+                }
+                parent.insertBefore(cloned, rect);
+            }
+            parent.removeChild(rect);
+        }
+    }
+
+    // SVG要素の座標属性を直接書き換えてスケール・移動を適用する（再帰）
+    // transformではなく属性値を変換するため、filter等の効果がスケール後座標に正しく適用される
+    // translate(a,b) 形式のtransform属性はbake-inして除去する
+    // 解析困難なtransform（rotate等）はtranslate+scaleを前合成して終了（子再帰不要）
+    _scaleNode(el, sx, sy, tx, ty) {
+        const existingTransform = el.getAttribute ? el.getAttribute('transform') : null;
+        let csx = sx, csy = sy, ctx = tx, cty = ty;
+
+        if (existingTransform !== null) {
+            // translate(a,b) のみ解析してtx/tyにbake-in、transformを除去して子再帰へ
+            const m = existingTransform.trim().match(/^translate\(\s*([-\d.e+]+)[,\s]\s*([-\d.e+]+)\s*\)$/);
+            if (m) {
+                ctx = parseFloat(m[1]) * sx + tx;
+                cty = parseFloat(m[2]) * sy + ty;
+                el.removeAttribute('transform');
+            } else {
+                // 解析困難なtransformはスケール変換を前合成してリターン（子はtransform管理）
+                el.setAttribute('transform', `translate(${tx},${ty}) scale(${sx},${sy}) ${existingTransform}`);
+                return;
+            }
+        }
+
+        const tag = (el.tagName || '').replace(/^svg:/, '').toLowerCase();
+        const sa  = (name, fn) => { const v = el.getAttribute(name); if (v !== null && v !== '') el.setAttribute(name, fn(parseFloat(v))); };
+        const scX = v => v * csx + ctx;
+        const scY = v => v * csy + cty;
+        const scW = v => v * csx;
+        const scH = v => v * csy;
+
+        if (tag === 'rect' || tag === 'image' || tag === 'foreignobject') {
+            sa('x', scX); sa('y', scY); sa('width', scW); sa('height', scH);
+        } else if (tag === 'circle') {
+            sa('cx', scX); sa('cy', scY);
+            sa('r', v => v * Math.min(csx, csy));
+        } else if (tag === 'ellipse') {
+            sa('cx', scX); sa('cy', scY); sa('rx', scW); sa('ry', scH);
+        } else if (tag === 'line') {
+            sa('x1', scX); sa('y1', scY); sa('x2', scX); sa('y2', scY);
+        } else if (tag === 'text' || tag === 'tspan') {
+            sa('x', scX); sa('y', scY); sa('dx', scW); sa('dy', scH);
+        } else if (tag === 'use') {
+            sa('x', scX); sa('y', scY); sa('width', scW); sa('height', scH);
+        } else if (tag === 'polygon' || tag === 'polyline') {
+            const pts = el.getAttribute('points');
+            if (pts) {
+                const nums = pts.trim().split(/[\s,]+/).map(parseFloat);
+                el.setAttribute('points', nums.map((v, i) => i % 2 === 0 ? v * csx + ctx : v * csy + cty).join(' '));
+            }
+        } else if (tag === 'path') {
+            const d = el.getAttribute('d');
+            if (d) el.setAttribute('d', this._scalePath(d, csx, csy, ctx, cty));
+        }
+
+        // 子要素に再帰（<g>等コンテナ向け）
+        for (const child of Array.from(el.children)) {
+            this._scaleNode(child, csx, csy, ctx, cty);
+        }
+    }
+
+    // SVGパスのd属性を非均等スケール変換する
+    // 絶対コマンドはsx/sy+tx/tyを適用し、相対コマンドはsx/syのみ適用する
+    _scalePath(d, sx, sy, tx, ty) {
+        const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?/g) || [];
+        const out = [];
+        let i = 0;
+        const isNum = () => i < tokens.length && /^[-+]?[0-9.]/.test(tokens[i]);
+        const n    = () => parseFloat(tokens[i++]);
+        const raw  = () => tokens[i++]; // フラグ等スケールしない値をそのまま取得
+
+        while (i < tokens.length) {
+            const cmd = tokens[i++];
+            switch (cmd) {
+                // 絶対 x,y ペア×N
+                case 'M': case 'L': case 'T':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx+tx},${n()*sy+ty}`);
+                    break;
+                // 相対 dx,dy ペア×N
+                case 'm': case 'l': case 't':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx},${n()*sy}`);
+                    break;
+                case 'H': out.push(cmd); while (isNum()) out.push(n()*sx+tx); break;
+                case 'h': out.push(cmd); while (isNum()) out.push(n()*sx);    break;
+                case 'V': out.push(cmd); while (isNum()) out.push(n()*sy+ty); break;
+                case 'v': out.push(cmd); while (isNum()) out.push(n()*sy);    break;
+                // 絶対 C: x1,y1 x2,y2 x,y ×N
+                case 'C':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx+tx},${n()*sy+ty} ${n()*sx+tx},${n()*sy+ty} ${n()*sx+tx},${n()*sy+ty}`);
+                    break;
+                case 'c':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx},${n()*sy} ${n()*sx},${n()*sy} ${n()*sx},${n()*sy}`);
+                    break;
+                // 絶対 S,Q: xy×2 ×N
+                case 'S': case 'Q':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx+tx},${n()*sy+ty} ${n()*sx+tx},${n()*sy+ty}`);
+                    break;
+                case 's': case 'q':
+                    out.push(cmd);
+                    while (isNum()) out.push(`${n()*sx},${n()*sy} ${n()*sx},${n()*sy}`);
+                    break;
+                // 絶対 A: rx ry xRot largeArcFlag sweepFlag x y ×N
+                case 'A':
+                    out.push(cmd);
+                    while (isNum()) {
+                        const rx = n()*sx, ry = n()*sy;
+                        const rot = raw(), laf = raw(), sf = raw();
+                        out.push(`${rx},${ry} ${rot} ${laf},${sf} ${n()*sx+tx},${n()*sy+ty}`);
+                    }
+                    break;
+                case 'a':
+                    out.push(cmd);
+                    while (isNum()) {
+                        const rx = n()*sx, ry = n()*sy;
+                        const rot = raw(), laf = raw(), sf = raw();
+                        out.push(`${rx},${ry} ${rot} ${laf},${sf} ${n()*sx},${n()*sy}`);
+                    }
+                    break;
+                case 'Z': case 'z': out.push(cmd); break;
+                default: out.push(cmd);
+            }
+        }
+        return out.join(' ');
     }
 
     // url(./defs.svg#id) をローカル参照 url(#id) に変換する

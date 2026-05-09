@@ -1,42 +1,18 @@
 // lcdParts="group" または <svg> ルートに対応するオブジェクトクラス
 // 子 LcdPartsObj / StaticObj / GroupObj を保持し、getElement で連結して返す。
 // groupArea を持つ場合、SVG transform で配下の全子要素をまとめてスケールする。
-class GroupObj {
+// GObj（LcdPartsObj継承）を基底クラスとして filter 分割描画機能を活用する。
+class GroupObj extends GObj {
     // svgDom: 対応するDOM要素（ルートの場合は null）
-    constructor(svgDom) {
-        // visible属性を文字列のまま保持（getElementで評価）
-        this.visible  = svgDom ? svgDom.getAttribute('visible') : null;
+    constructor(svgDom, colorOverride = null) {
+        // GObj→LcdPartsObjの初期化（visible/noFilter/colorOverride等の属性読み取り。drawParams/argsはnull可）
+        super(svgDom, null, null, colorOverride);
+
         this.children = [];
 
-        // アニメーション属性の読み取り
-        this._animType   = svgDom ? (svgDom.getAttribute('lcd-animType') || 'nothing') : 'nothing';
-        const _kt        = svgDom ? parseFloat(svgDom.getAttribute('lcd-kuruTop'))    : NaN;
-        const _kb        = svgDom ? parseFloat(svgDom.getAttribute('lcd-kuruBottom')) : NaN;
-        this._kuruTop    = isNaN(_kt) ? null : _kt;
-        this._kuruBottom = isNaN(_kb) ? null : _kb;
-
-        // kuruデフォルト値算出用のy/height（groupAreaで上書きされる場合あり）
+        // LcdPartsObjのy/heightは0初期化のため、svgDom属性値で上書きする（kuruデフォルト値に使用）
         this.y      = svgDom ? (parseFloat(svgDom.getAttribute('y'))      || 0) : 0;
         this.height = svgDom ? (parseFloat(svgDom.getAttribute('height')) || 0) : 0;
-
-        // filter属性を保持（getElementで出力<g>に移す）
-        this._filter = svgDom ? svgDom.getAttribute('filter') : null;
-
-        // アニメーション状態管理フィールド
-        this._domEl        = null;
-        this._prevVisible  = true;
-        this._resolveValue = null;
-        this._exprParser   = null;
-
-        // arrangeの配下で使用されるレイアウト属性（LcdPartsObjと同じ属性名で読み取る）
-        this.fitX            = svgDom ? svgDom.getAttribute('lcd-fitX')      === 'true' : false;
-        this.fitY            = svgDom ? svgDom.getAttribute('lcd-fitY')      === 'true' : false;
-        this.flexible        = svgDom ? svgDom.getAttribute('lcd-flex')      === 'true' : false;
-        const mcr            = svgDom ? parseFloat(svgDom.getAttribute('lcd-minComRatio')) : NaN;
-        this.minComRatio     = isNaN(mcr) ? 0 : mcr;
-        this.margin          = svgDom ? (parseFloat(svgDom.getAttribute('lcd-margin')) || 0) : 0;
-        this.verticalAlign   = svgDom ? (svgDom.getAttribute('lcd-verAlign') || 'top')  : 'top';
-        this.horizontalAlign = svgDom ? (svgDom.getAttribute('lcd-holAlign') || 'left') : 'left';
 
         // groupArea関連フィールド
         this._hasGroupArea  = false;
@@ -44,7 +20,6 @@ class GroupObj {
         this._areaY         = 0;
         this._naturalWidth  = 0;
         this._naturalHeight = 0;
-        this.x              = 0;
         this.realWidth      = 0;
         this.realHeight     = 0;
         this._sx            = 1;
@@ -81,12 +56,6 @@ class GroupObj {
         return { width: this.realWidth, height: this.realHeight };
     }
 
-    // 座標を更新する（ArrangeObjから呼ばれる）
-    setCoordinate(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
     // 指定サイズへ拡大縮小する（groupAreaが定義されている場合のみ有効）
     // スケールは getElement の SVG transform で適用する（子要素の属性は書き換えない）
     setSize(width, height) {
@@ -98,12 +67,6 @@ class GroupObj {
         this.realWidth  = width;
         this.realHeight = height;
         return { width, height };
-    }
-
-    // visible属性を評価して真偽値を返す（_resolveValue未設定なら常にtrue）
-    _evalVisible() {
-        if (this.visible === null || !this._resolveValue || !this._exprParser) return true;
-        return !!this._exprParser.eval(this.visible, this._resolveValue);
     }
 
     // ctx: { resolveValue, exprParser } | null
@@ -119,44 +82,38 @@ class GroupObj {
         this._prevVisible = isVisible;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        if (this._filter) g.setAttribute('filter', this._filter);
-
-        // 表示/非表示を visibility で制御する（display:noneではなくanimation対応のため）
+        // filterはfilteredGに移すため gには設定しない（lcd-noFilter子がfilterを回避できるようにする）
         g.style.visibility = isVisible ? '' : 'hidden';
         this._domEl = g;
 
         // groupAreaがある場合、translate+scaleでまとめてスケール・位置移動する
         // 式: translate(x - areaX*sx, y - areaY*sy) scale(sx, sy)
+        let transformStr = null;
         if (this._hasGroupArea) {
             const tx = this.x - this._areaX * this._sx;
             const ty = this.y - this._areaY * this._sy;
-            g.setAttribute('transform', `translate(${tx},${ty}) scale(${this._sx},${this._sy})`);
+            transformStr = `translate(${tx},${ty}) scale(${this._sx},${this._sy})`;
+            g.setAttribute('transform', transformStr);
         }
 
-        // 各子にctxを伝播してvisible評価を行う
+        // ctx.noFilterSinkがある場合、transformをラップしたプロキシsinkを生成して子へ渡す
+        const { childCtx, flushProxy } = this._proxyChildSink(ctx, transformStr);
+
+        const filteredG = this._createFilteredG();
         for (const child of this.children) {
-            const el = child.getElement(ctx);
-            if (el) g.appendChild(el);
+            const el = child.getElement(childCtx);
+            if (!el) continue;
+            this._placeChild(el, child, filteredG, g, childCtx);
         }
+        this._finalizeFilterSplit(g, filteredG);
+        // proxySinkの要素をtransformラッパーで包んで親sinkへ転送する
+        if (flushProxy) flushProxy();
         return g;
     }
 
     // visible を再評価してアニメーションを適用し、子要素へ伝播する
     langChange(transTime, gapTime) {
-        if (this.visible !== null && this._domEl) {
-            const newVisible = this._evalVisible();
-            if (newVisible !== this._prevVisible) {
-                const top    = this._kuruTop    !== null ? this._kuruTop    : this.y;
-                const bottom = this._kuruBottom !== null ? this._kuruBottom : this.y + this.height;
-                if (newVisible) {
-                    window.lcdAnimator.applyAppear(this._domEl, this._animType, transTime, gapTime, top, bottom);
-                } else {
-                    window.lcdAnimator.applyDisappear(this._domEl, this._animType, transTime, gapTime, top, bottom);
-                }
-                this._prevVisible = newVisible;
-            }
-        }
-        // 子要素へ伝播
+        this._applyVisibleAnim(transTime, gapTime);
         for (const child of this.children) {
             if (child.langChange) child.langChange(transTime, gapTime);
         }

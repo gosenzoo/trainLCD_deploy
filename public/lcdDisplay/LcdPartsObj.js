@@ -1,6 +1,6 @@
 // lcdPartsオブジェクトの基底クラス
 class LcdPartsObj {
-    constructor(svgDom, drawParams, args) {
+    constructor(svgDom, drawParams, args, colorOverride = null) {
         this.x = 0;
         this.y = 0;
         this.width = 0;
@@ -8,14 +8,17 @@ class LcdPartsObj {
         this.realWidth = 0;
         this.realHeight = 0;
 
+        // svgDomがnullの場合（GroupObj(null)等のルートコンテナ）に備えてnullガード
+        const attr = (name) => svgDom ? svgDom.getAttribute(name) : null;
+
         // visible属性を文字列のまま保持（getElementで評価）
-        this.visible         = svgDom.getAttribute('visible');
-        this.verticalAlign   = svgDom.getAttribute('lcd-verAlign')    || 'top';
+        this.visible         = attr('visible');
+        this.verticalAlign   = attr('lcd-verAlign')    || 'top';
 
         // アニメーション属性（テキスト遷移アニメーション用）
-        this._animType   = svgDom.getAttribute('lcd-animType') || 'nothing';
-        const _kt        = parseFloat(svgDom.getAttribute('lcd-kuruTop'));
-        const _kb        = parseFloat(svgDom.getAttribute('lcd-kuruBottom'));
+        this._animType   = attr('lcd-animType') || 'nothing';
+        const _kt        = parseFloat(attr('lcd-kuruTop'));
+        const _kb        = parseFloat(attr('lcd-kuruBottom'));
         this._kuruTop    = isNaN(_kt) ? null : _kt;
         this._kuruBottom = isNaN(_kb) ? null : _kb;
 
@@ -24,13 +27,17 @@ class LcdPartsObj {
         this._prevVisible  = true;
         this._resolveValue = null;
         this._exprParser   = null;
-        this.horizontalAlign = svgDom.getAttribute('lcd-holAilgn')    || 'left';
-        this.flexible        = svgDom.getAttribute('lcd-flex')        === 'true';
-        this.margin          = parseFloat(svgDom.getAttribute('lcd-margin'))       || 0;
-        const mcr            = parseFloat(svgDom.getAttribute('lcd-minComRatio'));
+        this.horizontalAlign = attr('lcd-holAilgn')    || 'left';
+        this.flexible        = attr('lcd-flex')        === 'true';
+        this.margin          = parseFloat(attr('lcd-margin'))       || 0;
+        const mcr            = parseFloat(attr('lcd-minComRatio'));
         this.minComRatio     = isNaN(mcr) ? 0 : mcr;
-        this.fitX            = svgDom.getAttribute('lcd-fitX') === 'true';
-        this.fitY            = svgDom.getAttribute('lcd-fitY') === 'true';
+        this.fitX            = attr('lcd-fitX') === 'true';
+        this.fitY            = attr('lcd-fitY') === 'true';
+        // lcd-noFilter属性: 親<g>のfilterの影響範囲外に配置する（trueで親filteredGをバイパス）
+        this.noFilter        = attr('lcd-noFilter') === 'true';
+        // 親コンテナから継承した色オーバーライド（null=指定なし）
+        this.colorOverride   = colorOverride;
     }
 
     // 座標設定（引数をそのままフィールドへ）

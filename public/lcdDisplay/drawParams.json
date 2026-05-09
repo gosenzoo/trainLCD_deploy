@@ -33,22 +33,33 @@
 
 
 
-  "leftSectionType": 2,
-  "rightSectionType": 2,
-  "sectionColors": [
-    ["rgb(255, 255, 0)"],
-    ["rgb(0, 255, 0)"],
-    ["rgb(0, 255, 0)"],
-    ["rgb(0, 0, 255)"],
-    ["rgb(255, 0, 255)"],
-    ["rgb(255, 0, 0)"],
-    ["rgb(255, 127, 0)", "rgb(255, 255, 0)"]
+  "direction": 0,
+  "sections": [
+    {"color1": "rgb(200, 200, 200)", "color2": "rgb(200, 200, 200)", "type": 0, "lineName": "", "lineNameColor": "rgb(255, 255, 0)"},
+    {"color1": "rgb(200, 200, 200)", "color2": "rgb(0, 255, 0)", "type": 0, "lineName": "", "lineNameColor": "rgb(0, 255, 0)"},
+    {"color1": "rgb(0, 255, 0)", "color2": "rgb(0, 255, 0)", "type": 1, "lineName": "", "lineNameColor": "rgb(0, 255, 0)"},
+    {"color1": "rgb(0, 0, 255)", "color2": "rgb(0, 0, 255)", "type": 0, "lineName": "", "lineNameColor": "rgb(0, 0, 255)"},
+    {"color1": "rgb(255, 0, 255)", "color2": "rgb(255, 0, 255)", "type": 0, "lineName": "新横浜線", "lineNameColor": "rgb(255, 0, 255)"},
+    {"color1": "rgb(255, 0, 0)", "color2": "rgb(255, 0, 0)", "type": 0, "lineName": "", "lineNameColor": "rgb(255, 0, 0)"},
+    {"color1": "rgb(255, 127, 0)", "color2": "rgb(255, 255, 0)", "type": 1, "lineName": "", "lineNameColor": "rgb(255, 127, 0)"}
   ],
-  "leftSectionColor": "rgb(0, 255, 0)",
-  "rightSectionColor": "rgb(0, 255, 0)",
-  "drawPos": 6,
-  "leftLineName": "田園都市線",
-  "rightLineName": "東横線",
+  "rootSection": {
+    "color": "rgb(200, 200, 200)",
+    "type": 1,
+    "lineName": "田園都市線",
+    "lineNameColor": "rgb(0, 255, 0)"
+  },
+  "arrowSection": {
+    "color": "rgb(255, 0, 255)",
+    "type": 1,
+    "lineName": "東横線",
+    "lineNameColor": "rgb(255, 0, 255)"
+  },
+  "drawPos": 3,
+  
+  "isDrawNextStation": true,
+  "isDrawTime": true,
+  "isDrawLineName": true,
 
   "dispStationList": [
     {
@@ -68,7 +79,7 @@
       ]
     },
     {
-      "name": "金月洞",
+      "name": "金洞",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -84,7 +95,7 @@
       ]
     },
     {
-      "name": "金月洞",
+      "name": "金",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -156,7 +167,7 @@
       "numIconSymbol": "G",
       "numIconNumber": "12",
       "lineNumberType": "1",
-      "stationIconType": "2",
+      "stationIconType": "1",
       "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",

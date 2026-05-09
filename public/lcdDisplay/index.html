@@ -81,9 +81,13 @@
 
   <div id="svg-toolbar" style="padding:8px 24px;display:flex;align-items:center;gap:12px;background:#2a2a2a;border-bottom:1px solid #444;">
     <button id="redraw-btn" class="toolbar-btn">再描画</button>
-    <button id="lang-btn"     class="toolbar-btn">言語切替 [L]</button>
-    <button id="runstate-btn" class="toolbar-btn">runState [R]</button>
-    <button id="terminal-btn" class="toolbar-btn">isTerminal [T]</button>
+    <button id="lang-btn"       class="toolbar-btn">言語切替 [L]</button>
+    <button id="runstate-btn"   class="toolbar-btn">runState [R]</button>
+    <button id="terminal-btn"   class="toolbar-btn">isTerminal [T]</button>
+    <button id="direction-btn"   class="toolbar-btn">direction [M]</button>
+    <button id="isdrawtime-btn"    class="toolbar-btn">isDrawTime [E]</button>
+    <button id="isdrawlinename-btn"      class="toolbar-btn">isDrawLineName [N]</button>
+    <button id="isdawnextstation-btn" class="toolbar-btn">isDrawNextStation [S]</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
       デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）
@@ -100,6 +104,7 @@
   <script src="../jsMojules/utilClass/NumIconDrawer.js"></script>
   <script src="ExprParser.js"></script>
   <script src="LcdPartsObj.js"></script>
+  <script src="GObj.js"></script>
   <script src="StaticObj.js"></script>
   <script src="GroupObj.js"></script>
   <script src="TextBoxObj.js"></script>
@@ -213,10 +218,30 @@
         toggleBoolParam('isTerminal');
         redraw();
       }
+      function doDirectionToggle() {
+        cycleNumberParam('direction', 0, 1);
+        redraw();
+      }
+      function doIsDrawTimeToggle() {
+        toggleBoolParam('isDrawTime');
+        redraw();
+      }
+      function doIsDrawLineNameToggle() {
+        toggleBoolParam('isDrawLineName');
+        redraw();
+      }
+      function doIsDrawNextStationToggle() {
+        toggleBoolParam('isDrawNextStation');
+        redraw();
+      }
 
-      document.getElementById('lang-btn')    .addEventListener('click', doLangCycle);
-      document.getElementById('runstate-btn').addEventListener('click', doRunStateCycle);
-      document.getElementById('terminal-btn').addEventListener('click', doTerminalToggle);
+      document.getElementById('lang-btn')            .addEventListener('click', doLangCycle);
+      document.getElementById('runstate-btn')        .addEventListener('click', doRunStateCycle);
+      document.getElementById('terminal-btn')        .addEventListener('click', doTerminalToggle);
+      document.getElementById('direction-btn')       .addEventListener('click', doDirectionToggle);
+      document.getElementById('isdrawtime-btn')      .addEventListener('click', doIsDrawTimeToggle);
+      document.getElementById('isdrawlinename-btn')  .addEventListener('click', doIsDrawLineNameToggle);
+      document.getElementById('isdawnextstation-btn').addEventListener('click', doIsDrawNextStationToggle);
 
       document.addEventListener('keydown', e => {
         // 入力欄にフォーカスがある場合は無視
@@ -226,6 +251,10 @@
         if      (key === 'L') doLangCycle();
         else if (key === 'R') doRunStateCycle();
         else if (key === 'T') doTerminalToggle();
+        else if (key === 'M') doDirectionToggle();
+        else if (key === 'E') doIsDrawTimeToggle();
+        else if (key === 'N') doIsDrawLineNameToggle();
+        else if (key === 'S') doIsDrawNextStationToggle();
       });
     };
 

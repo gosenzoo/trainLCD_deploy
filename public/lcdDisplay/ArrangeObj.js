@@ -1,9 +1,10 @@
 // lcdParts="arrange" に対応するオブジェクトクラス
-class ArrangeObj extends LcdPartsObj {
+// GObj（LcdPartsObj継承）を基底クラスとして filter 分割描画機能を活用する
+class ArrangeObj extends GObj {
     // ctx: { drawParams, args, textDrawer, exprParser }
-    constructor(svgDom, ctx) {
+    constructor(svgDom, ctx, colorOverride = null) {
         const { drawParams, args, textDrawer, exprParser } = ctx;
-        super(svgDom, drawParams, args);
+        super(svgDom, drawParams, args, colorOverride);
 
         this._ctx        = ctx;
         this._drawParams = drawParams;
@@ -14,9 +15,7 @@ class ArrangeObj extends LcdPartsObj {
         this.arg      = {}; // { 引数名: 配列 }
         this.children = [];
         this._uniformScale = 1;
-
-        // filter属性を保持（getElementで出力<g>に移す）
-        this._filter = svgDom.getAttribute('filter');
+        // _filterはGObjコンストラクタで設定済みのため、ここでは重複初期化しない
 
         // arrangeAreaのrectから領域を取得
         const areaRect = Array.from(svgDom.children).find(
@@ -65,20 +64,23 @@ class ArrangeObj extends LcdPartsObj {
         // debug等のフラグを親ctxから引き継ぎ、drawParams/argsのみ上書き
         const childCtx = { ...this._ctx, drawParams, args };
 
+        // 明示的colorOverrideがない場合、このコンテナの保持色を引き継ぐ
+        const effectiveColor = colorOverride ?? this.colorOverride;
+
         let obj;
         if (lcdParts === 'arrange') {
-            obj = new ArrangeObj(svgDom, childCtx);
+            obj = new ArrangeObj(svgDom, childCtx, effectiveColor);
             // Drawer._buildNodeと同様に、arrangeAreaのサイズ内に収まるよう初期圧縮を適用する
             obj.setSize(obj.width, obj.height);
         } else if (lcdParts === 'slot') {
-            obj = new SlotObj(svgDom, childCtx);
+            obj = new SlotObj(svgDom, childCtx, effectiveColor);
         } else if (lcdParts === 'textBox') {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         } else if (lcdParts === 'numbering') {
             obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
         } else if (lcdParts === 'static') {
             // argsを渡してlcd-colorのargs参照（$argName[n]等）を解決可能にする
-            obj = new StaticObj(svgDom, drawParams, colorOverride, args);
+            obj = new StaticObj(svgDom, drawParams, effectiveColor, args);
             // activeShadows がある場合、lcd-color適用後のfillに統合乗算グラデーションを適用する
             const { activeShadows, defsEl } = this._ctx;
             if (activeShadows && activeShadows.length > 0 && defsEl) {
@@ -86,24 +88,25 @@ class ArrangeObj extends LcdPartsObj {
             }
         } else if (lcdParts === 'group') {
             // groupAreaを持つgroupは配置調整に参加する（getRealSizeがgroupArea寸法を返す）
-            const groupObj = new GroupObj(svgDom);
-            // colorOverrideがない場合、group自身のlcd-color属性をスカラーとして解決する（args参照も対応）
-            let effectiveColor = colorOverride;
-            if (effectiveColor === null) {
+            // DOM色の優先度: 明示的colorOverride > lcd-color属性 > 親から継承(this.colorOverride)
+            let domColor = colorOverride;
+            if (domColor === null) {
                 const lcdColorAttr = svgDom.getAttribute('lcd-color');
                 if (lcdColorAttr) {
                     const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
-                    effectiveColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+                    domColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
                 }
             }
+            if (domColor === null) domColor = this.colorOverride;
+            const groupObj = new GroupObj(svgDom, domColor);
             // 有効な色がある場合、svgDomをクローンして配下のshape要素にfillを適用する（階層優先）
             let domForChildren = svgDom;
-            if (effectiveColor !== null) {
+            if (domColor !== null) {
                 domForChildren = svgDom.cloneNode(true);
-                StaticObj._applyColorToDOM(domForChildren, effectiveColor, drawParams, args);
+                StaticObj._applyColorToDOM(domForChildren, domColor, drawParams, args);
             }
-            // 子要素を再帰ビルドして追加（arrange/group共通のビルドロジックを使用）
-            for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {})) {
+            // domColorをparentColorOverrideとして渡し、グループ内子要素に色を伝播する
+            for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {}, domColor)) {
                 groupObj.addChild(node);
             }
             obj = groupObj;
@@ -121,7 +124,8 @@ class ArrangeObj extends LcdPartsObj {
     // arrange・group 共通の子ビルドロジック
     // skipLcdParts: スキップするlcdParts値（'arrangeArea' or 'groupArea'）
     // parentArgMap: このコンテナが lcd-arg 宣言した配列マップ（{}の場合はdrawParamsへフォールバック）
-    _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}) {
+    // parentColorOverride: このコンテナの実効色（lcd-arg展開・通常子に伝播する）
+    _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}, parentColorOverride = null) {
         const { textDrawer, exprParser, defsEl } = this._ctx;
         const children = [];
 
@@ -185,7 +189,8 @@ class ArrangeObj extends LcdPartsObj {
                 if (argName && Array.isArray(argArray)) {
                     argArray.forEach(element => {
                         const childArgs = Object.assign({}, args, { [argName]: element });
-                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
+                        // parentColorOverrideを渡して祖先からの色継承を維持する
+                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);
                         if (obj) children.push(obj);
                     });
                     if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
@@ -194,7 +199,8 @@ class ArrangeObj extends LcdPartsObj {
             }
 
             // 通常の子要素（複製なし）
-            const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
+            // parentColorOverrideを渡して祖先からの色継承を維持する
+            const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, parentColorOverride);
             if (obj) children.push(obj);
 
             // activeShadow を元に戻す
@@ -397,7 +403,7 @@ class ArrangeObj extends LcdPartsObj {
         }
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const outer  = document.createElementNS(SVG_NS, 'g');
-        if (this._filter) outer.setAttribute('filter', this._filter);
+        // filterはfilteredGに移すため outerには設定しない（lcd-noFilter子がfilterを回避できるようにする）
 
         // flexible=false かつ縮小スケールあり（レアケース）: (x,y)を中心にスケール
         // TextBoxObjと同様に translate を使わないことで、kuruアニメーションとCSSの競合を防ぐ
@@ -414,7 +420,10 @@ class ArrangeObj extends LcdPartsObj {
         outer.style.visibility = isVisible ? '' : 'hidden';
         this._domEl = outer;
 
-        const inner        = document.createElementNS(SVG_NS, 'g');
+        // noFilterSinkを生成する（this._filterがある場合のみ）、filterなしの場合は既存sinkを引き継ぐ
+        const { childCtx: sinkCtx, sink } = this._openSink(ctx);
+        // filterがある場合は filteredG を生成し、noFilter要素はouterから外してfilterを回避する
+        const filteredG    = this._createFilteredG();
         const isX          = this.axis === 'x';
         const axisAvail    = isX ? this.width  : this.height;
         const crossAvail   = isX ? this.height : this.width;
@@ -438,10 +447,14 @@ class ArrangeObj extends LcdPartsObj {
         // firstRendered: 最初の描画要素かどうかを管理（先頭にintervalを入れないため）
         let firstRendered = true;
 
-        // デバッグフラグを子要素に伝播するctx（各TextBoxObj/ArrangeObjがgetElement内で自前の境界矩形を描画する）
+        // デバッグフラグとnoFilterSinkを子要素に伝播するctx
         const childCtx = { debug: this._ctx.debug };
+        if (sinkCtx && sinkCtx.noFilterSink) childCtx.noFilterSink = sinkCtx.noFilterSink;
 
-        this.children.forEach(child => {
+        // arrangeDirection=1の場合は配置順を逆にする（サイズ計算は記述順のまま）
+        const orderedChildren = this.arrangeDirection === 1 ? [...this.children].reverse() : this.children;
+
+        orderedChildren.forEach(child => {
             const { width: cw, height: ch } = child.getRealSize();
             const childAxisSize  = isX ? cw : ch;
             const childCrossSize = isX ? ch : cw;
@@ -457,7 +470,8 @@ class ArrangeObj extends LcdPartsObj {
             const el = child.getElement(childCtx);
 
             if (el) {
-                inner.appendChild(el);
+                // 子要素を振り分け: noFilter+sink→sink、filter適用対象→filteredG、その他→outer
+                this._placeChild(el, child, filteredG, outer, childCtx);
                 // intervalは描画された要素の後ろに積算（次の要素の前に使う）
                 axisCursor = axisPos + childAxisSize;
                 firstRendered = false;
@@ -465,7 +479,9 @@ class ArrangeObj extends LcdPartsObj {
             // 描画されなかった要素はaxisCursorもfirstRenderedも変更しない
         });
 
-        outer.appendChild(inner);
+        // filteredGをouterの先頭に挿入し、sinkの要素（フィルター外配置）をouterに追加する
+        this._finalizeFilterSplit(outer, filteredG);
+        this._closeSink(sink, outer);
 
         // デバッグ: arrangeArea自身の境界矩形（青）を描画
         // 末端テキスト要素の境界矩形は各TextBoxObjのgetElement内で描画されるため、ここでは不要

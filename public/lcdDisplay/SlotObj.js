@@ -1,10 +1,11 @@
 // lcdParts="slot" に対応するオブジェクトクラス
 // slotAreaで定義した領域をslotNum個のスロットに等分し、子要素をslotPoint番号の位置に配置する
-class SlotObj extends LcdPartsObj {
+// GObj（LcdPartsObj継承）を基底クラスとして filter 分割描画機能を活用する
+class SlotObj extends GObj {
     // ctx: { drawParams, args, textDrawer, numIconDrawer, exprParser, debug, defsEl, activeShadows, rootShadowMap }
-    constructor(svgDom, ctx) {
+    constructor(svgDom, ctx, colorOverride = null) {
         const { drawParams, args } = ctx;
-        super(svgDom, drawParams, args);
+        super(svgDom, drawParams, args, colorOverride);
 
         this._ctx        = ctx;
         this._drawParams = drawParams;
@@ -143,38 +144,44 @@ class SlotObj extends LcdPartsObj {
         const lcdParts = svgDom.getAttribute('lcdParts');
         const childCtx = { ...this._ctx, drawParams, args };
 
+        // 明示的colorOverrideがない場合、このコンテナの保持色を引き継ぐ
+        const effectiveColor = colorOverride ?? this.colorOverride;
+
         let obj;
         if (lcdParts === 'arrange') {
-            obj = new ArrangeObj(svgDom, childCtx);
+            obj = new ArrangeObj(svgDom, childCtx, effectiveColor);
             obj.setSize(obj.width, obj.height);
         } else if (lcdParts === 'slot') {
-            obj = new SlotObj(svgDom, childCtx);
+            obj = new SlotObj(svgDom, childCtx, effectiveColor);
         } else if (lcdParts === 'textBox') {
             obj = new TextBoxObj(svgDom, drawParams, args, textDrawer);
         } else if (lcdParts === 'numbering') {
             obj = new NumIconObj(svgDom, drawParams, args, this._ctx.numIconDrawer);
         } else if (lcdParts === 'static') {
-            obj = new StaticObj(svgDom, drawParams, colorOverride, args);
+            obj = new StaticObj(svgDom, drawParams, effectiveColor, args);
             const { activeShadows, defsEl } = this._ctx;
             if (activeShadows && activeShadows.length > 0 && defsEl) {
                 MulShadowUtil.applyMulShadow(obj._node, activeShadows, defsEl);
             }
         } else if (lcdParts === 'group') {
-            const groupObj = new GroupObj(svgDom);
-            let effectiveColor = colorOverride;
-            if (effectiveColor === null) {
+            // DOM色の優先度: 明示的colorOverride > lcd-color属性 > 親から継承(this.colorOverride)
+            let domColor = colorOverride;
+            if (domColor === null) {
                 const lcdColorAttr = svgDom.getAttribute('lcd-color');
                 if (lcdColorAttr) {
                     const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
-                    effectiveColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+                    domColor = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
                 }
             }
+            if (domColor === null) domColor = this.colorOverride;
+            const groupObj = new GroupObj(svgDom, domColor);
             let domForChildren = svgDom;
-            if (effectiveColor !== null) {
+            if (domColor !== null) {
                 domForChildren = svgDom.cloneNode(true);
-                StaticObj._applyColorToDOM(domForChildren, effectiveColor, drawParams, args);
+                StaticObj._applyColorToDOM(domForChildren, domColor, drawParams, args);
             }
-            for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {})) {
+            // domColorをparentColorOverrideとして渡し、グループ内子要素に色を伝播する
+            for (const node of this._buildContainerChildren(domForChildren, drawParams, args, 'groupArea', {}, domColor)) {
                 groupObj.addChild(node);
             }
             obj = groupObj;
@@ -188,7 +195,7 @@ class SlotObj extends LcdPartsObj {
     }
 
     // groupの子要素ビルドに使用するコンテナ共通ロジック（ArrangeObj._buildContainerChildrenと同一）
-    _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}) {
+    _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {}, parentColorOverride = null) {
         const { textDrawer, exprParser } = this._ctx;
         const children = [];
 
@@ -241,7 +248,8 @@ class SlotObj extends LcdPartsObj {
                 if (argName && Array.isArray(argArray)) {
                     argArray.forEach(element => {
                         const childArgs = Object.assign({}, args, { [argName]: element });
-                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
+                        // parentColorOverrideを渡して祖先からの色継承を維持する
+                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);
                         if (obj) children.push(obj);
                     });
                     if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
@@ -249,7 +257,8 @@ class SlotObj extends LcdPartsObj {
                 }
             }
 
-            const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
+            // parentColorOverrideを渡して祖先からの色継承を維持する
+            const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, parentColorOverride);
             if (obj) children.push(obj);
 
             if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
@@ -276,6 +285,7 @@ class SlotObj extends LcdPartsObj {
         }
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const outer  = document.createElementNS(SVG_NS, 'g');
+        // filterはfilteredGに移すため outerには設定しない（lcd-noFilter子がfilterを回避できるようにする）
 
         const isVisible   = this._evalVisible();
         this._prevVisible = isVisible;
@@ -292,7 +302,13 @@ class SlotObj extends LcdPartsObj {
             ? [S + L / 2]
             : Array.from({ length: N }, (_, i) => S + (i / (N - 1)) * L);
 
-        const childCtx = { debug: this._ctx.debug };
+        // noFilterSinkを生成する（this._filterがある場合のみ）、filterなしの場合は既存sinkを引き継ぐ
+        const { childCtx: sinkCtx, sink } = this._openSink(ctx);
+        // filterがある場合は filteredG を生成し、noFilter要素はouterから外してfilterを回避する
+        const filteredG = this._createFilteredG();
+        // デバッグフラグとnoFilterSinkを子要素に伝播するctx
+        const childCtx  = { debug: this._ctx.debug };
+        if (sinkCtx && sinkCtx.noFilterSink) childCtx.noFilterSink = sinkCtx.noFilterSink;
 
         this._slotChildren.forEach(({ slotPoint, obj }) => {
             if (slotPoint < 0 || slotPoint >= slotPositions.length) return;
@@ -317,8 +333,15 @@ class SlotObj extends LcdPartsObj {
 
             obj.setCoordinate(childX, childY);
             const el = obj.getElement(childCtx);
-            if (el) outer.appendChild(el);
+            if (!el) return;
+
+            // 子要素を振り分け: noFilter+sink→sink、filter適用対象→filteredG、その他→outer
+            this._placeChild(el, obj, filteredG, outer, childCtx);
         });
+
+        // filteredGをouterの先頭に挿入し、sinkの要素（フィルター外配置）をouterに追加する
+        this._finalizeFilterSplit(outer, filteredG);
+        this._closeSink(sink, outer);
 
         // デバッグ: slotArea境界矩形（緑）を描画
         if (this._ctx.debug) {

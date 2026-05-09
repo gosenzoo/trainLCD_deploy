@@ -1,39 +1,17 @@
 // lcdParts="static" に対応するオブジェクトクラス
 // getElement は参照渡し。テンプレート保護のためクローンはコンストラクタで一度だけ行う。
-class StaticObj {
+// LcdPartsObjを継承し、共通フィールド・メソッドはsuper()経由で取得する。
+class StaticObj extends LcdPartsObj {
     constructor(svgDom, drawParams = null, colorOverride = null, args = {}) {
-        // visible属性を文字列のまま保持（getElementで評価）
-        this.visible = svgDom.getAttribute('visible');
+        // LcdPartsObjの初期化（visible, noFilter, colorOverride, アニメーション属性等を設定）
+        super(svgDom, drawParams, args, colorOverride);
+
         // テンプレート要素を保護しつつ参照渡しできるよう、構築時に一度だけクローン
         this._node = svgDom.cloneNode(true);
 
-        // アニメーション属性の読み取り
-        this._animType   = svgDom.getAttribute('lcd-animType') || 'nothing';
-        const _kt        = parseFloat(svgDom.getAttribute('lcd-kuruTop'));
-        const _kb        = parseFloat(svgDom.getAttribute('lcd-kuruBottom'));
-        this._kuruTop    = isNaN(_kt) ? null : _kt;
-        this._kuruBottom = isNaN(_kb) ? null : _kb;
-
-        // kuruデフォルト値算出用のy/height
-        this.x      = 0;
+        // kuruデフォルト値算出用のy/height（LcdPartsObjはこれらをsvgDom属性から読み取らないため明示設定）
         this.y      = parseFloat(svgDom.getAttribute('y'))      || 0;
         this.height = parseFloat(svgDom.getAttribute('height')) || 0;
-
-        // アニメーション状態管理フィールド
-        this._domEl        = null;
-        this._prevVisible  = true;
-        this._resolveValue = null;
-        this._exprParser   = null;
-
-        // arrangeの配下で使用されるレイアウト属性（LcdPartsObjと同じ属性名で読み取る）
-        this.fitX            = svgDom.getAttribute('lcd-fitX')        === 'true';
-        this.fitY            = svgDom.getAttribute('lcd-fitY')        === 'true';
-        this.flexible        = svgDom.getAttribute('lcd-flex')        === 'true';
-        const mcr            = parseFloat(svgDom.getAttribute('lcd-minComRatio'));
-        this.minComRatio     = isNaN(mcr) ? 0 : mcr;
-        this.margin          = parseFloat(svgDom.getAttribute('lcd-margin')) || 0;
-        this.verticalAlign   = svgDom.getAttribute('lcd-verAlign')   || 'top';
-        this.horizontalAlign = svgDom.getAttribute('lcd-holAlign')   || 'left';
 
         // <g>要素配下のvisible属性を持つ子孫要素を収集する
         this._visibleItems = [];
@@ -41,10 +19,11 @@ class StaticObj {
         if (tagName === 'g') this._collectVisibleItems(this._node);
 
         // lcd-color属性によるfill設定
-        // colorOverrideが渡された場合はそれを優先し、なければlcd-color属性をdrawParams/argsで解決する
+        // colorOverride（this.colorOverride）が渡された場合はそれを優先し、
+        // なければlcd-color属性をdrawParams/argsで解決する
         const lcdColorAttr = svgDom.getAttribute('lcd-color');
-        if (colorOverride !== null) {
-            this._applyColor(colorOverride);
+        if (this.colorOverride !== null) {
+            this._applyColor(this.colorOverride);
         } else if (lcdColorAttr && drawParams !== null) {
             const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
             if (Array.isArray(resolved)) {
@@ -59,12 +38,6 @@ class StaticObj {
     // 実際の描画サイズを返す（StaticObjはサイズなし）
     getRealSize() {
         return { width: 0, height: 0 };
-    }
-
-    // 座標を更新する（ArrangeObjから呼ばれる）
-    setCoordinate(x, y) {
-        this.x = x;
-        this.y = y;
     }
 
     // StaticObjはサイズ変形をサポートしない（GroupObjのgroupAreaを使用すること）
@@ -144,12 +117,6 @@ class StaticObj {
         }
     }
 
-    // visible属性を評価して真偽値を返す（_resolveValue未設定なら常にtrue）
-    _evalVisible() {
-        if (this.visible === null || !this._resolveValue || !this._exprParser) return true;
-        return !!this._exprParser.eval(this.visible, this._resolveValue);
-    }
-
     // ctx: { resolveValue, exprParser } | null
     // visible=false でも null を返さず visibility:hidden のノードを返す（アニメーション対応）
     getElement(ctx = null) {
@@ -176,17 +143,6 @@ class StaticObj {
     langChange(transTime, gapTime) {
         // 子孫要素のvisible属性を再評価（langIdなど描画パラメータ変化に追従）
         this._applyChildVisible();
-
-        if (this.visible === null || !this._domEl) return;
-        const newVisible = this._evalVisible();
-        if (newVisible === this._prevVisible) return;
-        const top    = this._kuruTop    !== null ? this._kuruTop    : this.y;
-        const bottom = this._kuruBottom !== null ? this._kuruBottom : this.y + this.height;
-        if (newVisible) {
-            window.lcdAnimator.applyAppear(this._domEl, this._animType, transTime, gapTime, top, bottom);
-        } else {
-            window.lcdAnimator.applyDisappear(this._domEl, this._animType, transTime, gapTime, top, bottom);
-        }
-        this._prevVisible = newVisible;
+        this._applyVisibleAnim(transTime, gapTime);
     }
 }

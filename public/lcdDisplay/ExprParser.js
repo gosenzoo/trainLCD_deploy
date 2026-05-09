@@ -20,22 +20,36 @@ class ExprParser {
             if (expr.startsWith('or', i) && (i + 2 >= len || expr[i + 2] === ' ' || expr[i + 2] === ')')) {
                 tokens.push({ type: 'OR' }); i += 2; continue;
             }
+            // !=（NEQ）は !（NOT）より先にチェックする
+            if (expr[i] === '!' && i + 1 < len && expr[i + 1] === '=') {
+                tokens.push({ type: 'NEQ' }); i += 2; continue;
+            }
             if (expr[i] === '!') { tokens.push({ type: 'NOT' }); i++; continue; }
             if (expr[i] === '(') { tokens.push({ type: 'LPAREN' }); i++; continue; }
             if (expr[i] === ')') { tokens.push({ type: 'RPAREN' }); i++; continue; }
             if (expr[i] === '=' && i + 1 < len && expr[i + 1] === '=') {
                 tokens.push({ type: 'EQ' }); i += 2; continue;
             }
+            // 不等号（<=, >= は <, > より先にチェックする）
+            if (expr[i] === '<' && i + 1 < len && expr[i + 1] === '=') {
+                tokens.push({ type: 'LTE' }); i += 2; continue;
+            }
+            if (expr[i] === '>' && i + 1 < len && expr[i + 1] === '=') {
+                tokens.push({ type: 'GTE' }); i += 2; continue;
+            }
+            if (expr[i] === '<') { tokens.push({ type: 'LT' }); i++; continue; }
+            if (expr[i] === '>') { tokens.push({ type: 'GT' }); i++; continue; }
             // 四則演算子
             if (expr[i] === '+') { tokens.push({ type: 'PLUS'  }); i++; continue; }
             if (expr[i] === '-') { tokens.push({ type: 'MINUS' }); i++; continue; }
             if (expr[i] === '*') { tokens.push({ type: 'MUL'   }); i++; continue; }
             if (expr[i] === '/') { tokens.push({ type: 'DIV'   }); i++; continue; }
-            // 識別子または数値定数（四則演算子でも区切る）
+            // 識別子または数値定数（演算子・不等号でも区切る）
             let j = i;
             while (j < len && expr[j] !== ' ' && expr[j] !== '(' && expr[j] !== ')' && expr[j] !== '!'
                    && !(expr[j] === '=' && j + 1 < len && expr[j + 1] === '=')
-                   && expr[j] !== '+' && expr[j] !== '-' && expr[j] !== '*' && expr[j] !== '/') {
+                   && expr[j] !== '+' && expr[j] !== '-' && expr[j] !== '*' && expr[j] !== '/'
+                   && expr[j] !== '<' && expr[j] !== '>') {
                 j++;
             }
             const word = expr.slice(i, j);
@@ -96,19 +110,32 @@ class ExprParser {
             return parseComparison();
         };
 
-        // 比較式: value (== value)?
+        // 比較式: value (== | != | < | > | <= | >= value)?
         const parseComparison = () => {
             const leftVal = parseValue();
-            if (peek().type === 'EQ') {
+            const opType  = peek().type;
+            if (opType === 'EQ' || opType === 'NEQ' || opType === 'LT' || opType === 'GT' || opType === 'LTE' || opType === 'GTE') {
                 consume();
                 const rightVal = parseValue();
                 const leftNum  = Number(leftVal);
                 const rightNum = Number(rightVal);
                 // 両辺が数値に変換できる場合は数値比較、それ以外は文字列比較
                 if (!isNaN(leftNum) && !isNaN(rightNum) && String(leftVal) !== '' && String(rightVal) !== '') {
-                    return leftNum === rightNum;
+                    if (opType === 'EQ')  return leftNum === rightNum;
+                    if (opType === 'NEQ') return leftNum !== rightNum;
+                    if (opType === 'LT')  return leftNum  <  rightNum;
+                    if (opType === 'GT')  return leftNum  >  rightNum;
+                    if (opType === 'LTE') return leftNum  <= rightNum;
+                    if (opType === 'GTE') return leftNum  >= rightNum;
                 }
-                return String(leftVal ?? '') === String(rightVal ?? '');
+                const leftStr  = String(leftVal  ?? '');
+                const rightStr = String(rightVal ?? '');
+                if (opType === 'EQ')  return leftStr === rightStr;
+                if (opType === 'NEQ') return leftStr !== rightStr;
+                if (opType === 'LT')  return leftStr  <  rightStr;
+                if (opType === 'GT')  return leftStr  >  rightStr;
+                if (opType === 'LTE') return leftStr  <= rightStr;
+                if (opType === 'GTE') return leftStr  >= rightStr;
             }
             return !!leftVal;
         };

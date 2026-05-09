@@ -27,6 +27,14 @@ class TextBoxObj extends LcdPartsObj {
             this._style = {};
         }
 
+        // lcd-color属性があればdrawParamsとargsで解決してテキスト色（fill）として適用する
+        const lcdColorAttr = svgDom.getAttribute('lcd-color');
+        if (lcdColorAttr) {
+            const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
+            const color = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
+            if (color) this._style.fill = color;
+        }
+
         this._element      = null;
         this._uniformScale = 1;
         // getElement()で再描画する際のサイズを保持する（setSize後に確定）
