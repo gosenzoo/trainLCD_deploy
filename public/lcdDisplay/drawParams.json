@@ -6,6 +6,8 @@
   "isNextStation": true,
   "trainType": "急行",
   "trainTypeEng": "Express",
+  "trainTypeSubText": "八戸から各停",
+  "trainTypeSubTextEng": "Local from Hachinohe",
   "nowStation": {
    "name": "金月洞",
    "kana": "きんげつどう",
@@ -28,8 +30,11 @@
    "otherCarNum": "0",
    "otherLeftSlotInd": "0"
   },
-  "destination": "中央林間",
+  "nextStopName": "七戸十和田",
+  "viaText": "東北新幹線直通",
+  "destination": "新青森",
   "destinationEng": "Chuo-Rinkan",
+  "carNumber": 3,
 
 
 

@@ -225,7 +225,7 @@
 
     <!-- フッター -->
     <!-- 次の停車駅 -->
-    <rect lcdParts="textBox" lcdText="多摩川を出ますと【武蔵小杉】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+    <rect lcdParts="textBox" lcdText="#{nowStation.name}を出ますと【#{nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
     <!-- 時間は異なります(日本語) -->
     <rect lcdParts="textBox" lcdText="運転状況により、" visible="langId != 2" isDraw="isDrawTime" x="1528" y="998" width="400" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
     <rect lcdParts="textBox" lcdText="多少時間は異なります。" visible="langId != 2" isDraw="isDrawTime" x="1528" y="1038" width="400" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
