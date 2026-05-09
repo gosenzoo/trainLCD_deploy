@@ -2062,6 +2062,125 @@ SVGパスの `d` 属性を非均等スケール変換する。絶対コマンド
 
 ---
 
+### 7.10 transform — 要素変換
+
+ツリーシステム上の要素に SVG 標準の `transform` 属性による変換を付与する機能。入力 SVG 要素に記述された `transform` 属性を、`getElement()` の出力に対してそのまま反映する。
+
+#### 対象要素
+
+| クラス | ファイル |
+|---|---|
+| `TextBoxObj` | `TextBoxObj.js` |
+| `ArrangeObj` | `ArrangeObj.js` |
+| `GroupObj` | `GroupObj.js` |
+| `NumIconObj` | `NumIconObj.js` |
+| `SlotObj` | `SlotObj.js` |
+| `StaticObj` | `StaticObj.js` |
+
+#### 実装方法
+
+`LcdPartsObj`（基底クラス）のコンストラクタで `transform` 属性を読み取り、`_transform` フィールドに保持する。各対象クラスはそれぞれの `getElement()` の末尾で `_wrapTransform(el)` を呼ぶ。
+
+##### `_wrapTransform(el)` — 変換ラッパー生成
+
+`_transform` が未指定または空の場合は `el` をそのまま返す。指定されている場合は以下の処理を行う：
+
+1. `<g transform="（_transform の値）">` 要素を生成し、`el` を子として追加する
+2. ラッパー `<g>` を返す
+
+既存の `el` に設定されている `transform` 属性は変更しない。
+
+##### コンストラクタでの読み取り
+
+`LcdPartsObj` のコンストラクタで以下を読み取る：
+
+```js
+this._transform = attr('transform') || null;  // null なら変換なし
+```
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/LcdPartsObj.js` | 変更 | コンストラクタで `_transform` を読み取る。`_wrapTransform(el)` メソッドを追加 |
+| `public/lcdDisplay/TextBoxObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+| `public/lcdDisplay/GroupObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+| `public/lcdDisplay/NumIconObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+| `public/lcdDisplay/SlotObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+| `public/lcdDisplay/StaticObj.js` | 変更 | `getElement()` 末尾で `_wrapTransform` を呼び出す |
+
+---
+
+### 7.11 ページシステム — lcdDisplay デバッグ環境
+
+ボディ部分を複数の SVG ページに切り替えられる仕組み。ヘッダーは固定、ボディのみ切り替える。
+
+#### フォルダ構成
+
+```
+public/lcdDisplay/
+  pageInput/
+    tokyu/
+      header/
+        headerSVG.svg        （ヘッダー定義、<defs> を含む）
+      body/
+        defaultLineSVG.svg   （ボディ定義、<defs> を含む）
+        （追加ページ）.svg   （同様に <defs> を含む）
+  drawParams.json            （移動なし）
+  iconList.json              （移動なし）
+  defs.svg                   （廃止）
+```
+
+`defs.svg` は廃止する。グラデーション・フィルター等の defs 要素は各 SVG ファイルが独自の `<defs>` セクションとして保持する。
+
+#### drawParams.Pages
+
+```json
+"Pages": ["defaultLineSVG.svg", ...]
+```
+
+- 要素はファイル名のみ（パスなし）。`pageInput/tokyu/body/` 以下を基準とする
+- 空配列または未定義の場合はボディ部分を何も表示しない
+
+#### defs の出力処理
+
+描画時に header SVG と body SVG それぞれの `<defs>` 直下の子要素を収集し、重複を除外して出力 SVG の `<defs>` に注入する。
+
+- 重複判定は `id` 属性値による。同名 id が複数存在する場合は最初に現れた方を採用し、後続を捨てる
+- `id` を持たない defs 子要素はすべて出力に含める
+
+#### 初期化時のプリフェッチ
+
+`load()` 時に `drawParams.Pages` の全要素を並列フェッチし、正規化・funcCall 展開まで済ませてキャッシュする。`pageReload()` はキャッシュ済みの SVG を使用するため追加フェッチは発生しない。
+
+#### pageReload() の動作
+
+1. `drawParams.Pages` の現在インデックスを 1 進める（末尾の次は先頭に戻る）
+2. キャッシュ済みの body SVG を取り出す
+3. ツリーを再構築して再描画する
+4. `drawParams.Pages` が空または未定義の場合は body を空にして再描画する
+
+#### デバッグ環境のトリガー
+
+| 操作 | 動作 |
+|---|---|
+| 「ページ切替」ボタン | `pageReload()` を呼び出して再描画 |
+| `P` キー | 同上（入力欄フォーカス中は無効） |
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/pageInput/tokyu/header/headerSVG.svg` | 新規（移動） | `headerSVG.svg` を移動し `<defs>` を追加 |
+| `public/lcdDisplay/pageInput/tokyu/body/defaultLineSVG.svg` | 新規（移動） | `defaultLineSVG.svg` を移動し `<defs>` を追加 |
+| `public/lcdDisplay/defs.svg` | 廃止 | 各 SVG ファイルへ内容を移管 |
+| `public/lcdDisplay/drawParams.json` | 変更 | `Pages` フィールドを追加 |
+| `public/lcdDisplay/Drawer.js` | 変更 | 読み込みパスを新構成に変更。defs 収集・重複除外・注入処理を追加。`pageReload()` メソッドを追加 |
+| `public/lcdDisplay/index.html` | 変更 | 「ページ切替 [P]」ボタンを追加。`P` キーハンドラを追加 |
+
+---
+
 ### データ受け渡し
 
 ```

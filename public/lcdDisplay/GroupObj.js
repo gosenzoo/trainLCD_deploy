@@ -108,7 +108,7 @@ class GroupObj extends GObj {
         this._finalizeFilterSplit(g, filteredG);
         // proxySinkの要素をtransformラッパーで包んで親sinkへ転送する
         if (flushProxy) flushProxy();
-        return g;
+        return this._wrapTransform(g);
     }
 
     // visible を再評価してアニメーションを適用し、子要素へ伝播する

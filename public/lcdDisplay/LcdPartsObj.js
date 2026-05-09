@@ -36,6 +36,8 @@ class LcdPartsObj {
         this.fitY            = attr('lcd-fitY') === 'true';
         // lcd-noFilter属性: 親<g>のfilterの影響範囲外に配置する（trueで親filteredGをバイパス）
         this.noFilter        = attr('lcd-noFilter') === 'true';
+        // transform属性: getElement出力をラッパー<g>で包んで変換を付与する（null=変換なし）
+        this._transform      = attr('transform') || null;
         // 親コンテナから継承した色オーバーライド（null=指定なし）
         this.colorOverride   = colorOverride;
     }
@@ -59,6 +61,16 @@ class LcdPartsObj {
     // 描画結果のSVG要素を返す（サブクラスでオーバーライド）
     getElement() {
         return null;
+    }
+
+    // transform属性が指定されている場合、elをラッパー<g transform="...">で包んで返す
+    // 指定なしの場合はelをそのまま返す（_domElはelを指したまま、アニメーションに影響しない）
+    _wrapTransform(el) {
+        if (!this._transform) return el;
+        const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        wrapper.setAttribute('transform', this._transform);
+        wrapper.appendChild(el);
+        return wrapper;
     }
 
     // visible属性を評価して真偽値を返す（_resolveValue未設定なら常にtrue）

@@ -88,6 +88,7 @@
     <button id="isdrawtime-btn"    class="toolbar-btn">isDrawTime [E]</button>
     <button id="isdrawlinename-btn"      class="toolbar-btn">isDrawLineName [N]</button>
     <button id="isdawnextstation-btn" class="toolbar-btn">isDrawNextStation [S]</button>
+    <button id="page-btn"            class="toolbar-btn">ページ切替 [P]</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
       デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）
@@ -234,6 +235,10 @@
         toggleBoolParam('isDrawNextStation');
         redraw();
       }
+      function doPageCycle() {
+        drawer.pageReload();
+        redraw();
+      }
 
       document.getElementById('lang-btn')            .addEventListener('click', doLangCycle);
       document.getElementById('runstate-btn')        .addEventListener('click', doRunStateCycle);
@@ -242,6 +247,7 @@
       document.getElementById('isdrawtime-btn')      .addEventListener('click', doIsDrawTimeToggle);
       document.getElementById('isdrawlinename-btn')  .addEventListener('click', doIsDrawLineNameToggle);
       document.getElementById('isdawnextstation-btn').addEventListener('click', doIsDrawNextStationToggle);
+      document.getElementById('page-btn')            .addEventListener('click', doPageCycle);
 
       document.addEventListener('keydown', e => {
         // 入力欄にフォーカスがある場合は無視
@@ -255,6 +261,7 @@
         else if (key === 'E') doIsDrawTimeToggle();
         else if (key === 'N') doIsDrawLineNameToggle();
         else if (key === 'S') doIsDrawNextStationToggle();
+        else if (key === 'P') doPageCycle();
       });
     };
 

@@ -136,7 +136,7 @@ class StaticObj extends LcdPartsObj {
         this._applyChildVisible();
 
         this._domEl = this._node;
-        return this._node;
+        return this._wrapTransform(this._node);
     }
 
     // visible を再評価してアニメーションを適用し、子孫要素のvisibleも再評価する

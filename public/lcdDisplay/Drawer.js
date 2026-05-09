@@ -6,38 +6,40 @@ class Drawer {
         this.textDrawer = null;
         this.exprParser = new ExprParser();
         this.debug = false; // trueにするとarrangeArea境界と末端要素境界を表示
+        this._bodySVGCache = null;   // ページキャッシュ（filename → SVGElement）
+        this._currentPageIndex = 0;  // 現在のページインデックス
     }
 
     // 同フォルダのファイルを並列フェッチして初期化
     async load() {
-        const [drawParams, iconList, templateSVG, defsSVG] = await Promise.all([
+        const [drawParams, iconList, templateSVG] = await Promise.all([
             fetch('./drawParams.json').then(r => r.json()),
             fetch('./iconList.json').then(r => r.json()),
-            this._fetchSVG('./headerSVG.svg'),
-            this._fetchSVG('./defs.svg')
+            this._fetchSVG('./pageInput/tokyu/header/headerSVG.svg'),
         ]);
         this.drawParams = drawParams;
         this.iconList = iconList;
-        this.defsSVG = defsSVG;
         // url(./defs.svg#id) → url(#id) に正規化し、funcDef/funcCallを事前展開してからテンプレートを保持
         this._normalizeSVGDefsRefs(templateSVG);
         this._resolveFuncCalls(templateSVG);
         this.templateSVG = templateSVG;
 
-        // defaultLineSVG.svgをフェッチ（存在しない場合はnullとして続行）
-        try {
-            const defaultLineSVG = await this._fetchSVG('./defaultLineSVG.svg');
-            this._normalizeSVGDefsRefs(defaultLineSVG);
-            this._resolveFuncCalls(defaultLineSVG);
-            this.defaultLineSVG = defaultLineSVG;
-        } catch (e) {
-            console.warn('defaultLineSVG.svg not found, skipping');
-            this.defaultLineSVG = null;
-        }
+        // drawParams.Pagesに列挙された全bodySVGを並列フェッチしてキャッシュ
+        this._bodySVGCache = new Map();
+        this._currentPageIndex = 0;
+        const pages = drawParams.Pages || [];
+        await Promise.all(pages.map(async filename => {
+            try {
+                const bodySVG = await this._fetchSVG(`./pageInput/tokyu/body/${filename}`);
+                this._normalizeSVGDefsRefs(bodySVG);
+                this._resolveFuncCalls(bodySVG);
+                this._bodySVGCache.set(filename, bodySVG);
+            } catch (e) {
+                console.warn(`body SVG not found: ${filename}`);
+            }
+        }));
 
         this.textDrawer = new TextDrawer(this.iconList, null);
-        // defs要素をキャッシュしておく（draw()で参照渡しするため）
-        this._defsEl = defsSVG.getElementById('defs');
 
         // drawParams.numIconPresetKeys に列挙されたプリセットSVGを並列フェッチしてNumIconDrawerを初期化
         const presetKeys   = drawParams.numIconPresetKeys || [];
@@ -50,6 +52,21 @@ class Drawer {
             }
         }));
         this.numIconDrawer = new NumIconDrawer(numIconPresets);
+    }
+
+    // 現在のページのbodySVGを返す（Pagesが空またはキャッシュ未ヒットはnull）
+    get currentBodySVG() {
+        const pages = (this.drawParams && this.drawParams.Pages) || [];
+        if (pages.length === 0 || !this._bodySVGCache) return null;
+        const filename = pages[this._currentPageIndex % pages.length];
+        return this._bodySVGCache.get(filename) || null;
+    }
+
+    // ページを1つ進める（Pagesの末尾に達したら先頭に戻る）
+    pageReload() {
+        const pages = (this.drawParams && this.drawParams.Pages) || [];
+        if (pages.length === 0) return;
+        this._currentPageIndex = (this._currentPageIndex + 1) % pages.length;
     }
 
     // SVGをDOMParserで取得（HTTP非2xxの場合はthrow）
@@ -262,7 +279,7 @@ class Drawer {
         return out.join(' ');
     }
 
-    // url(./defs.svg#id) をローカル参照 url(#id) に変換する
+    // url(./defs.svg#id) をローカル参照 url(#id) に変換する（後方互換のため維持）
     _normalizeSVGDefsRefs(svgElement) {
         const pattern = /url\(\.\/defs\.svg#([^)]+)\)/g;
         svgElement.querySelectorAll('*').forEach(el => {
@@ -274,10 +291,29 @@ class Drawer {
         });
     }
 
+    // headerSVGとcurrentBodySVGのdefsを収集し、ID先着順で重複除外した<defs>要素を返す
+    _collectDefs() {
+        const defsEl = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const seenIds = new Set();
+        const sources = [this.templateSVG, this.currentBodySVG].filter(Boolean);
+        for (const svg of sources) {
+            const defs = svg.querySelector('defs');
+            if (!defs) continue;
+            for (const child of Array.from(defs.children)) {
+                const id = child.getAttribute('id');
+                // 同じIDのdefsは同一のものとみなし、先に出た側のみ使用する
+                if (id && seenIds.has(id)) continue;
+                if (id) seenIds.add(id);
+                defsEl.appendChild(child.cloneNode(true));
+            }
+        }
+        return defsEl;
+    }
+
     // <defs>をtargetSVGの先頭に注入し、オブジェクトツリーを構築してコンテンツ<g>を返す
     draw(targetSVG) {
-        // キャッシュしたdefs要素を参照渡しで注入（cloneNodeしない）
-        // redraw時にはSVGクリア後の孤立ノードになっているが再挿入可能
+        // header+bodyのdefsを収集してtargetSVGに注入（buildTree内でthis._defsElを参照するため先に設定）
+        this._defsEl = this._collectDefs();
         if (this._defsEl) {
             targetSVG.insertBefore(this._defsEl, targetSVG.firstChild);
         }
@@ -299,15 +335,18 @@ class Drawer {
 
     // テンプレートSVGからオブジェクトツリーを構築してthis.rootに設定する
     buildTree() {
-        // defaultLineSVGのツリーを構築（ファイルが存在する場合のみ子要素を追加）
+        // currentBodySVGのツリーを構築（ページが存在する場合のみ子要素を追加）
         this.defaultLineRoot = new GroupObj(null);
-        if (this.defaultLineSVG) {
+        const bodySVG = this.currentBodySVG;
+        if (bodySVG) {
             // SVGルート直接子の mulShadow を収集してインスタンス変数に保持する
             // _buildNode 内の arrange/group ケースで shadowId 照合に使用する
-            const dlChildArr = Array.from(this.defaultLineSVG.children).filter(c => c.getAttribute);
+            const dlChildArr = Array.from(bodySVG.children).filter(c => c.getAttribute);
             this._activeShadowMap = MulShadowUtil.collectShadowMap(dlChildArr);
             for (const child of dlChildArr) {
                 if (child.getAttribute('lcdParts') === 'mulShadow') continue;
+                // defs要素はオブジェクト化しない（_buildNodeでもnull返るが明示的にスキップ）
+                if (child.tagName && child.tagName.toLowerCase() === 'defs') continue;
                 const node = this._buildNode(child);
                 if (node) this.defaultLineRoot.addChild(node);
             }
@@ -320,6 +359,8 @@ class Drawer {
         this._activeShadowMap = MulShadowUtil.collectShadowMap(tmChildArr);
         for (const child of tmChildArr) {
             if (child.getAttribute('lcdParts') === 'mulShadow') continue;
+            // defs要素はオブジェクト化しない
+            if (child.tagName && child.tagName.toLowerCase() === 'defs') continue;
             const node = this._buildNode(child);
             if (node) this.root.addChild(node);
         }

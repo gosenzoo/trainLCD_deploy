@@ -350,7 +350,7 @@ class SlotObj extends GObj {
             );
         }
 
-        return outer;
+        return this._wrapTransform(outer);
     }
 
     // visible を再評価してアニメーションを適用し、子要素へ伝播する

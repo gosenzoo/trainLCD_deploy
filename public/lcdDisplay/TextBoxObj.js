@@ -176,7 +176,7 @@ class TextBoxObj extends LcdPartsObj {
         this._prevVisible = isVisible;
         g.style.visibility = isVisible ? '' : 'hidden';
         this._domEl = g;
-        return g;
+        return this._wrapTransform(g);
     }
 
     // visible を再評価してアニメーションを適用する
