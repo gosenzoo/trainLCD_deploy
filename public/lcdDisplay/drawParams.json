@@ -60,7 +60,7 @@
     "lineName": "田園都市線",
     "lineNameEng": "Den-en-toshi Line",
     "lineNameColor": "rgb(0, 255, 0)",
-    "isConnect": false
+    "isConnect": true
   },
   "arrowSection": {
     "color": "rgb(255, 0, 255)",
@@ -68,7 +68,7 @@
     "lineName": "東横線",
     "lineNameEng": "Tōyoko Line",
     "lineNameColor": "rgb(255, 0, 255)",
-    "isConnect": false
+    "isConnect": true
   },
   "drawPos": 3,
   "stationFrameNum": 8,

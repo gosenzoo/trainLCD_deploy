@@ -38,13 +38,21 @@ class GObj extends LcdPartsObj {
     }
 
     // _openSinkで生成したsinkの要素をgに追加する（フィルター外配置）
-    _closeSink(sink, g) {
+    // noFilterZ='down' のエントリはfilteredGの前に挿入し、'up' はgの末尾に追加する
+    _closeSink(sink, g, filteredG) {
         if (!sink) return;
-        for (const el of sink) g.appendChild(el);
+        for (const { el, noFilterZ } of sink) {
+            if (noFilterZ === 'down' && filteredG && filteredG.parentNode === g) {
+                g.insertBefore(el, filteredG);
+            } else {
+                g.appendChild(el);
+            }
+        }
     }
 
     // 中間コンテナ（GroupObj）用: ctx.noFilterSinkをプロキシsinkで差し替えたchildCtxとflushProxyを返す
-    // transformStrがある場合: proxySinkの要素をtransformラッパーで包んで親sinkへ転送する
+    // transformStrがある場合: proxySinkの要素をnoFilterZごとにグループ化してtransformラッパーで包み、
+    // 親sinkへ {el, noFilterZ} として転送する
     // transformStrがない、またはctx.noFilterSinkがない場合はctxをそのまま返す
     _proxyChildSink(ctx, transformStr) {
         if (!ctx || !ctx.noFilterSink) return { childCtx: ctx, flushProxy: null };
@@ -53,21 +61,29 @@ class GObj extends LcdPartsObj {
         const proxySink  = [];
         const flushProxy = () => {
             if (!proxySink.length) return;
-            const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            w.setAttribute('transform', transformStr);
-            for (const el of proxySink) w.appendChild(el);
-            parentSink.push(w);
+            // noFilterZの値ごとにグループ化し、それぞれtransformラッパーを生成して親sinkへ転送する
+            const groups = {};
+            for (const { el, noFilterZ } of proxySink) {
+                if (!groups[noFilterZ]) groups[noFilterZ] = [];
+                groups[noFilterZ].push(el);
+            }
+            for (const [noFilterZ, els] of Object.entries(groups)) {
+                const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                w.setAttribute('transform', transformStr);
+                for (const el of els) w.appendChild(el);
+                parentSink.push({ el: w, noFilterZ });
+            }
         };
         return { childCtx: { ...ctx, noFilterSink: proxySink }, flushProxy };
     }
 
     // 子要素の配置先を振り分ける（全GObj系getElement()の子ループ内で使用）
-    // noFilter=true かつ noFilterSink あり → sinkへ push（祖先フィルター外へ浮き上がり）
+    // noFilter=true かつ noFilterSink あり → sinkへ {el, noFilterZ} をpush（祖先フィルター外へ浮き上がり）
     // noFilter=false かつ filteredG あり    → filteredGへ追加（フィルター適用）
     // それ以外                             → containerへ追加
     _placeChild(el, child, filteredG, container, childCtx) {
         if (child.noFilter && childCtx && childCtx.noFilterSink) {
-            childCtx.noFilterSink.push(el);
+            childCtx.noFilterSink.push({ el, noFilterZ: child.noFilterZ || 'up' });
         } else if (filteredG && !child.noFilter) {
             filteredG.appendChild(el);
         } else {

@@ -142,12 +142,15 @@ class ArrangeObj extends GObj {
             // mulShadow 自体はオブジェクト生成せずスキップ
             if (child.getAttribute('lcdParts') === 'mulShadow') return;
 
-            // shadowId（カンマ区切り可）を effectiveShadowMap で解析して影リストを取得し、
-            // activeShadows を一時的に上書きして子ツリーに伝播する
+            // shadowId属性を持つ要素はactiveShadowsを上書きする（空文字=""は影を明示的に無効化）
+            // 属性がない場合のみ祖先のactiveShadowsを継承する
             const shadowIdAttr = child.getAttribute('shadowId');
-            const localShadows = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
             const prevActiveShadows = this._ctx.activeShadows;
-            if (localShadows.length > 0) this._ctx.activeShadows = localShadows;
+            const shadowChanged = child.hasAttribute('shadowId');
+            if (shadowChanged) {
+                const localShadows = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
+                this._ctx.activeShadows = localShadows.length > 0 ? localShadows : null;
+            }
 
             // lcdParts="group" かつ lcd-color が配列 かつ groupArea あり → 色ごとにコピーして展開
             if (child.getAttribute('lcdParts') === 'group') {
@@ -163,7 +166,7 @@ class ArrangeObj extends GObj {
                                 const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
                                 if (obj) children.push(obj);
                             });
-                            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                             return; // 通常処理をスキップ
                         }
                     }
@@ -195,7 +198,7 @@ class ArrangeObj extends GObj {
                         const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);
                         if (obj) children.push(obj);
                     });
-                    if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                    if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                     return; // 通常処理をスキップ
                 }
             }
@@ -205,8 +208,8 @@ class ArrangeObj extends GObj {
             const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, parentColorOverride);
             if (obj) children.push(obj);
 
-            // activeShadow を元に戻す
-            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+            // activeShadows を元に戻す
+            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
         });
 
         return children;
@@ -483,7 +486,7 @@ class ArrangeObj extends GObj {
 
         // filteredGをouterの先頭に挿入し、sinkの要素（フィルター外配置）をouterに追加する
         this._finalizeFilterSplit(outer, filteredG);
-        this._closeSink(sink, outer);
+        this._closeSink(sink, outer, filteredG);
 
         // デバッグ: arrangeArea自身の境界矩形（青）を描画
         // 末端テキスト要素の境界矩形は各TextBoxObjのgetElement内で描画されるため、ここでは不要

@@ -75,11 +75,15 @@ class SlotObj extends GObj {
             // "auto"かどうかを判定（数値式とautoを分岐）
             const isAuto = slotPointAttr.trim() === 'auto';
 
-            // shadowId処理（mulShadow乗算影の伝播）
+            // shadowId属性を持つ要素はactiveShadowsを上書きする（空文字=""は影を明示的に無効化）
+            // 属性がない場合のみ祖先のactiveShadowsを継承する
             const shadowIdAttr      = child.getAttribute('shadowId');
-            const localShadows      = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
             const prevActiveShadows = this._ctx.activeShadows;
-            if (localShadows.length > 0) this._ctx.activeShadows = localShadows;
+            const shadowChanged     = child.hasAttribute('shadowId');
+            if (shadowChanged) {
+                const localShadows = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
+                this._ctx.activeShadows = localShadows.length > 0 ? localShadows : null;
+            }
 
             // group lcd-color配列展開: 色ごとにコピーして追加
             if (child.getAttribute('lcdParts') === 'group') {
@@ -106,7 +110,7 @@ class SlotObj extends GObj {
                                     });
                                 }
                             }
-                            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                             return;
                         }
                     }
@@ -142,7 +146,7 @@ class SlotObj extends GObj {
                             if (obj) fixedItems.push({ slotPoint, obj });
                         }
                     });
-                    if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                    if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                     return;
                 }
             }
@@ -159,7 +163,7 @@ class SlotObj extends GObj {
                 }
             }
 
-            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
         });
 
         // slotPoint="auto" 要素に空きスロットを順番に割り当てる
@@ -262,10 +266,15 @@ class SlotObj extends GObj {
             if (child.getAttribute('lcdParts') === skipLcdParts) return;
             if (child.getAttribute('lcdParts') === 'mulShadow') return;
 
-            const shadowIdAttr    = child.getAttribute('shadowId');
-            const localShadows    = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
+            // shadowId属性を持つ要素はactiveShadowsを上書きする（空文字=""は影を明示的に無効化）
+            // 属性がない場合のみ祖先のactiveShadowsを継承する
+            const shadowIdAttr      = child.getAttribute('shadowId');
             const prevActiveShadows = this._ctx.activeShadows;
-            if (localShadows.length > 0) this._ctx.activeShadows = localShadows;
+            const shadowChanged     = child.hasAttribute('shadowId');
+            if (shadowChanged) {
+                const localShadows = MulShadowUtil.resolveShadows(shadowIdAttr, effectiveShadowMap);
+                this._ctx.activeShadows = localShadows.length > 0 ? localShadows : null;
+            }
 
             if (child.getAttribute('lcdParts') === 'group') {
                 const colorAttr = child.getAttribute('lcd-color');
@@ -280,7 +289,7 @@ class SlotObj extends GObj {
                                 const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
                                 if (obj) children.push(obj);
                             });
-                            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                             return;
                         }
                     }
@@ -309,7 +318,7 @@ class SlotObj extends GObj {
                         const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);
                         if (obj) children.push(obj);
                     });
-                    if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+                    if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
                     return;
                 }
             }
@@ -318,7 +327,7 @@ class SlotObj extends GObj {
             const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, parentColorOverride);
             if (obj) children.push(obj);
 
-            if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
+            if (shadowChanged) this._ctx.activeShadows = prevActiveShadows;
         });
 
         return children;
@@ -405,7 +414,7 @@ class SlotObj extends GObj {
 
         // filteredGをouterの先頭に挿入し、sinkの要素（フィルター外配置）をouterに追加する
         this._finalizeFilterSplit(outer, filteredG);
-        this._closeSink(sink, outer);
+        this._closeSink(sink, outer, filteredG);
 
         // デバッグ: slotArea境界矩形（緑）を描画
         if (this._ctx.debug) {

@@ -19,12 +19,10 @@ class StaticObj extends LcdPartsObj {
         if (tagName === 'g') this._collectVisibleItems(this._node);
 
         // lcd-color属性によるfill設定
-        // colorOverride（this.colorOverride）が渡された場合はそれを優先し、
-        // なければlcd-color属性をdrawParams/argsで解決する
+        // 自身のlcd-color属性を最優先し、なければcolorOverride（親から伝播）をフォールバックとする
         const lcdColorAttr = svgDom.getAttribute('lcd-color');
-        if (this.colorOverride !== null) {
-            this._applyColor(this.colorOverride);
-        } else if (lcdColorAttr && drawParams !== null) {
+        if (lcdColorAttr && drawParams !== null) {
+            // 自身のlcd-colorが親のcolorOverrideより優先される
             const resolved = StaticObj._resolveLcdColor(lcdColorAttr, drawParams, args);
             if (Array.isArray(resolved)) {
                 // 配列の場合は先頭要素のみ使用（配列展開はArrangeObj側で処理）
@@ -32,6 +30,9 @@ class StaticObj extends LcdPartsObj {
             } else if (resolved) {
                 this._applyColor(resolved);
             }
+        } else if (this.colorOverride !== null) {
+            // 自身のlcd-colorがない場合のみ親から伝播した色を使用する
+            this._applyColor(this.colorOverride);
         }
     }
 
@@ -50,7 +51,8 @@ class StaticObj extends LcdPartsObj {
     static _resolveLcdColor(attr, drawParams, args = {}) {
         if (!attr) return null;
         const trimmed = attr.trim();
-        if (/^#|^rgb\(|^rgba\(|^hsl\(|^hsla\(/i.test(trimmed)) return trimmed;
+        // url(#...)形式のグラデーション参照もリテラルとしてそのまま返す
+        if (/^#|^rgb\(|^rgba\(|^hsl\(|^hsla\(|^url\(/i.test(trimmed)) return trimmed;
         if (trimmed.startsWith('$')) return LcdPartsObj.resolveArgToken(trimmed, args);
         return LcdPartsObj.resolveDrawParam(trimmed, drawParams);
     }

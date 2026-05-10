@@ -36,6 +36,8 @@ class LcdPartsObj {
         this.fitY            = attr('lcd-fitY') === 'true';
         // lcd-noFilter属性: 親<g>のfilterの影響範囲外に配置する（trueで親filteredGをバイパス）
         this.noFilter        = attr('lcd-noFilter') === 'true';
+        // noFilterZ属性: フィルター外配置時のz-order。'up'=filteredGより手前（デフォルト）、'down'=背後
+        this.noFilterZ       = attr('noFilterZ') || 'up';
         // transform属性: getElement出力をラッパー<g>で包んで変換を付与する（null=変換なし）
         this._transform      = attr('transform') || null;
         // 親コンテナから継承した色オーバーライド（null=指定なし）

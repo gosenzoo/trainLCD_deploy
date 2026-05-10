@@ -1138,8 +1138,10 @@ const effectiveColor = colorOverride ?? this.colorOverride;
 | 属性 | 対象 | 値 | 説明 |
 |---|---|---|---|
 | `lcd-noFilter` | 任意の lcdParts 子要素 | `"true"` | 最も近い祖先の `filter` 付きコンテナの影響外に配置する |
+| `noFilterZ` | `lcd-noFilter="true"` の要素 | `"up"`（デフォルト）/ `"down"` | フィルター外配置時の z-order。`"up"` = filteredG より上（手前）、`"down"` = filteredG より下（背後） |
 
-`lcd-noFilter="true"` が付いた子要素は、祖先コンテナのどこかに `filter` が存在する場合でも、そのフィルターの影響外に配置される。位置は **`noFilterSink` パターン**（後述）によって座標が保証される。
+`lcd-noFilter="true"` が付いた子要素は、祖先コンテナのどこかに `filter` が存在する場合でも、そのフィルターの影響外に配置される。位置は **`noFilterSink` パターン**（後述）によって座標が保証される。  
+`noFilterZ="down"` を指定すると、フィルター付きグループ（filteredG）より **前（DOM上で先）** に挿入されるため、filteredG の内容が手前に重なる。
 
 ##### `noFilterSink` パターン（任意の深さの noFilter 対応）
 
@@ -1170,9 +1172,11 @@ ArrangeObj(filter="outline")  →  outer <g>
 ctx = {
     resolveValue,   // 既存
     exprParser,     // 既存
-    noFilterSink,   // undefined | Array — undefined=フィルター祖先なし、Array=浮き上がり先
+    noFilterSink,   // undefined | Array<{el, noFilterZ}> — undefined=フィルター祖先なし、Array=浮き上がり先
 }
 ```
+
+noFilterSink の各エントリは `{ el, noFilterZ }` オブジェクトで、`el` が配置する SVG 要素、`noFilterZ` が `"up"` または `"down"` を示す。
 
 **`GObj` に集約する4つのヘルパー:**
 
@@ -1186,14 +1190,22 @@ _openSink(ctx) {
 }
 
 // _openSinkで生成したsinkの要素をgに追加する（フィルター外配置）
-_closeSink(sink, g) {
+// noFilterZ="down" のエントリは filteredG の前に挿入し、"up" は g の末尾に追加する
+_closeSink(sink, g, filteredG) {
     if (!sink) return;
-    for (const el of sink) g.appendChild(el);
+    for (const { el, noFilterZ } of sink) {
+        if (noFilterZ === 'down' && filteredG && filteredG.parentNode === g) {
+            g.insertBefore(el, filteredG);
+        } else {
+            g.appendChild(el);
+        }
+    }
 }
 
 // 中間コンテナ（GroupObj）用: ctx.noFilterSinkを受け取り、transformWrappedなプロキシsinkを生成する
 // transformStrがない、またはctx.noFilterSinkがない場合はそのまま返す
 // 戻り値: { childCtx, flushProxy } — flushProxy()でproxySinkの内容を親sinkへ転送する
+// noFilterZごとにグループ化してラップし、親sinkに {el: wrapperG, noFilterZ} として転送する
 _proxyChildSink(ctx, transformStr) {
     if (!ctx || !ctx.noFilterSink) return { childCtx: ctx, flushProxy: null };
     if (!transformStr) return { childCtx: ctx, flushProxy: null };
@@ -1201,21 +1213,29 @@ _proxyChildSink(ctx, transformStr) {
     const proxySink = [];
     const flushProxy = () => {
         if (!proxySink.length) return;
-        const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        w.setAttribute('transform', transformStr);
-        for (const el of proxySink) w.appendChild(el);
-        parentSink.push(w);
+        // noFilterZ値ごとにグループ化し、それぞれtransformラッパーを生成して親sinkへ転送する
+        const groups = {};
+        for (const { el, noFilterZ } of proxySink) {
+            if (!groups[noFilterZ]) groups[noFilterZ] = [];
+            groups[noFilterZ].push(el);
+        }
+        for (const [noFilterZ, els] of Object.entries(groups)) {
+            const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            w.setAttribute('transform', transformStr);
+            for (const el of els) w.appendChild(el);
+            parentSink.push({ el: w, noFilterZ });
+        }
     };
     return { childCtx: { ...ctx, noFilterSink: proxySink }, flushProxy };
 }
 
 // 子要素の配置先を振り分ける（全GObj系getElement()の子ループ内で使用）
-// noFilter=true かつ noFilterSink あり → sink に push（フィルター外へ浮き上がり）
+// noFilter=true かつ noFilterSink あり → sink に {el, noFilterZ} をpush（フィルター外へ浮き上がり）
 // noFilter=false かつ filteredG あり    → filteredG に追加（フィルター適用）
 // それ以外                             → container に追加
 _placeChild(el, child, filteredG, container, childCtx) {
     if (child.noFilter && childCtx && childCtx.noFilterSink) {
-        childCtx.noFilterSink.push(el);
+        childCtx.noFilterSink.push({ el, noFilterZ: child.noFilterZ || 'up' });
     } else if (filteredG && !child.noFilter) {
         filteredG.appendChild(el);
     } else {
@@ -1236,7 +1256,7 @@ for (const child of ...) {
     this._placeChild(el, child, filteredG, outer, childCtx);
 }
 this._finalizeFilterSplit(outer, filteredG);
-this._closeSink(sink, outer);
+this._closeSink(sink, outer, filteredG);
 ```
 
 `GroupObj`（中間コンテナ / transform 持ち）:
@@ -1258,11 +1278,11 @@ if (flushProxy) flushProxy();
 | ファイル | 変更種別 | 内容 |
 |---|---|---|
 | `public/lcdDisplay/GObj.js` | 新規作成 | `GObj` クラス（`LcdPartsObj` 継承）、`_createFilteredG`・`_finalizeFilterSplit`・`_openSink`・`_closeSink`・`_proxyChildSink`・`_placeChild` |
-| `public/lcdDisplay/LcdPartsObj.js` | 変更 | `noFilter` / `colorOverride` プロパティ追加、`svgDom=null` ガード追加 |
+| `public/lcdDisplay/LcdPartsObj.js` | 変更 | `noFilter` / `colorOverride` / `noFilterZ` プロパティ追加、`svgDom=null` ガード追加 |
 | `public/lcdDisplay/GroupObj.js` | 変更 | `GObj` 継承、重複フィールド削除、`_proxyChildSink` / `_placeChild` を使用 |
 | `public/lcdDisplay/ArrangeObj.js` | 変更 | `GObj` 継承、`_openSink` / `_closeSink` / `_placeChild` を使用、`colorOverride` 伝播 |
 | `public/lcdDisplay/SlotObj.js` | 変更 | 同上 |
-| `public/lcdDisplay/StaticObj.js` | 変更 | `LcdPartsObj` 継承へ変更、重複フィールド・メソッド削除 |
+| `public/lcdDisplay/StaticObj.js` | 変更 | `LcdPartsObj` 継承へ変更、重複フィールド・メソッド削除、自身の `lcd-color` を `colorOverride` より優先する判定順に変更 |
 | `public/lcdDisplay/index.html` | 変更 | `GObj.js` の `<script>` タグ追加（`LcdPartsObj.js` の直後）|
 
 #### `visible` フィールド仕様
@@ -1732,10 +1752,13 @@ arrange 配下の group に `lcd-arg="argName:drawParamsVarName"`（または省
 | 記法 | 例 | 動作 |
 |---|---|---|
 | CSS 色リテラル | `#FF0000`・`rgb(0,255,0)`・`rgba(...)`・`hsl(...)` など | そのまま `fill` に設定 |
+| SVG グラデーション参照 | `url(#gradientId)` | そのまま `fill` に設定（defs に定義されたグラデーションを参照） |
 | drawParams 変数名 | `nowStation.lineColor`・`sectionColors` | ドット記法でdrawParamsを解決した値を使用 |
 | args 参照 | `$sectionColor`・`$sectionColor[0]` | args を解決した値を使用 |
 
-判定: `#`・`rgb(`・`rgba(`・`hsl(`・`hsla(` で始まる場合は色リテラル、`$` で始まる場合は args 参照、それ以外は drawParams 変数名として扱う。
+判定: `#`・`rgb(`・`rgba(`・`hsl(`・`hsla(`・`url(` で始まる場合は色リテラル（または参照値）としてそのまま使用、`$` で始まる場合は args 参照、それ以外は drawParams 変数名として扱う。
+
+- `url(#...)` 指定時は mulShadow の乗算処理は適用されない（グラデーションfillはRGBパースができないためスキップ）
 
 #### 適用対象
 
@@ -1769,6 +1792,24 @@ drawParams 変数がスカラー（単一色）の場合、またはCSS色リテ
 </g>
 ```
 
+**`lcdParts="static"` 要素の自身の `lcd-color` とコンテキスト伝播色（`colorOverride`）の優先順位:**
+
+`lcdParts="static"` 要素が自身に `lcd-color` 属性を持つ場合、親グループから伝播された `colorOverride` より **自身の `lcd-color` を優先する**。  
+`colorOverride` は自身の `lcd-color` を持たない `static` 要素にのみ適用される（フォールバック）。
+
+```
+例:
+<g lcdParts="group" lcd-color="rootSection.color">
+  <rect lcdParts="static" />               ← rootSection.color が適用される（colorOverride）
+  <rect lcdParts="static" lcd-color="#555555" />  ← #555555 が優先（自身のlcd-colorが勝つ）
+</g>
+```
+
+**StaticObj コンストラクタの判定順序:**
+1. 自身の `lcd-color` 属性が存在する → `_resolveLcdColor` で解決して適用
+2. 自身の `lcd-color` がなく `colorOverride` がある → `colorOverride` を適用
+3. どちらもない → 色変更なし
+
 #### 配列値の扱い
 
 drawParams 変数が配列の場合:
@@ -1778,7 +1819,7 @@ drawParams 変数が配列の場合:
 
 #### 実装詳細
 
-- `StaticObj._resolveLcdColor(attr, drawParams, args)` 静的メソッド: 色リテラル判定 → `$` プレフィックスなら `LcdPartsObj.resolveArgToken` で args を解決 → それ以外は `LcdPartsObj.resolveDrawParam` で drawParams を解決して返す。
+- `StaticObj._resolveLcdColor(attr, drawParams, args)` 静的メソッド: 色リテラル・グラデーション参照判定（`#`・`rgb(`・`rgba(`・`hsl(`・`hsla(`・`url(` で始まる場合はそのまま返す） → `$` プレフィックスなら `LcdPartsObj.resolveArgToken` で args を解決 → それ以外は `LcdPartsObj.resolveDrawParam` で drawParams を解決して返す。
 - `StaticObj._applyColorToDOM(containerEl, baseColor, drawParams, args)`: `args` パラメータを追加し、内側 `lcd-color` 解決時に `_resolveLcdColor(attr, drawParams, args)` を呼ぶ。
 - `StaticObj` コンストラクタ: `args` パラメータを追加し、`_resolveLcdColor(attr, drawParams, args)` に渡す。
 - `ArrangeObj._createChildObj()` の static ケース: `new StaticObj(svgDom, drawParams, colorOverride, args)` と `args` を渡す。
@@ -1819,10 +1860,23 @@ drawParams 変数が配列の場合:
 | `x, y, width, height` | 影指定 rect | 数値 | グラデーションの絶対座標変換に使用する rect の範囲 |
 | `shadowId="N"` | 影指定 rect | 文字列 | この影の識別子 |
 | `shadowId="id1, id2, ..."` | 対象要素 | カンマ区切り文字列 | 適用する影をカンマ区切りで複数指定可能 |
+| `shadowId=""` | 対象要素 | 空文字列 | 祖先から伝播された影を明示的に無効化する |
 
 - `shadowId` は影指定 rect と対象要素の両方に付ける
 - 対象要素の `shadowId` はカンマ区切りで複数指定でき、指定した順に逐次乗算して1つのグラデーションに統合する
 - 対象が `<g>` の場合、配下の全 shape 要素（rect・path 等）に適用する
+
+**`shadowId` による上書きルール:**
+
+子要素が `shadowId` 属性を**明示的に持つ**場合（空文字含む）、祖先から伝播されてきた `activeShadows` を上書きする。
+
+| 子の `shadowId` | 動作 |
+|---|---|
+| 属性なし | 祖先の影をそのまま継承（従来通り） |
+| `shadowId="someId"` | 指定したIDの影を使用（祖先の影を上書き） |
+| `shadowId=""` | 影を無効化（祖先の影を上書きして影なしにする） |
+
+この上書きは当該要素とその子孫全体に適用される（上書き後の `activeShadows` が子ツリーへ伝播する）。
 
 #### グラデーション座標の変換
 
@@ -1873,7 +1927,8 @@ mulShadow rect: x=rx, y=ry, width=rw, height=rh
 
 | ファイル | 変更種別 | 内容 |
 |---|---|---|
-| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_buildContainerChildren` にプリパス追加、新静的メソッド群追加、`_ctx` に `defsEl` を追加 |
+| `public/lcdDisplay/ArrangeObj.js` | 変更 | `_buildContainerChildren` にプリパス追加、新静的メソッド群追加、`_ctx` に `defsEl` を追加、`shadowId` 上書きロジック追加 |
+| `public/lcdDisplay/SlotObj.js` | 変更 | `shadowId` 上書きロジック追加 |
 | `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode` の group ケースにプリパス追加、ctx に `defsEl` を追加 |
 
 ---
