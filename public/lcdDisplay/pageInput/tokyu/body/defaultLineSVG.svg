@@ -185,12 +185,12 @@
     <rect lcdParts="mulShadow" shadowId="inner" x="0" y="721" width="1920" height="87" fill="url(#innerGradient)" style="mix-blend-mode: multiply;" />
 
     <!-- 駅パーツ -->
-    <g lcdParts="slot" isDraw="direction == 0" interval="13" slotNum="stationFrameNum" slotStart="end" setPoint="center">
-        <rect lcdParts="slotArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
+    <g lcdParts="slot" isDraw="direction == 0" interval="13" slotNum="stationFrameNum" slotStart="end" setPoint="edge">
+        <rect lcdParts="slotArea" x="226" y="359" width="1468" height="634" fill="#55555520" />
         <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:dispStationList" argOrder="1" slotPoint="auto" x="1594" y="359" width="200" height="634" fill="#99999930" />
     </g>
-    <g lcdParts="slot" isDraw="direction == 1" interval="13" slotNum="stationFrameNum" slotStart="start" setPoint="center">
-        <rect lcdParts="slotArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
+    <g lcdParts="slot" isDraw="direction == 1" interval="13" slotNum="stationFrameNum" slotStart="start" setPoint="edge">
+        <rect lcdParts="slotArea" x="226" y="359" width="1468" height="634" fill="#55555520" />
         <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:dispStationList" argOrder="1" slotPoint="auto" x="1594" y="359" width="200" height="634" fill="#99999930" />
     </g>
     <!-- 路線ベース2影 -->
