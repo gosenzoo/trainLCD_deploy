@@ -46,7 +46,7 @@
 
   "direction": 0,
   "sections": [
-    {"color1": "rgb(200, 200, 200)", "color2": "rgb(200, 200, 200)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(255, 255, 0)"},
+    {"color1": "rgb(200, 200, 200)", "color2": "rgb(200, 200, 200)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
     {"color1": "rgb(200, 200, 200)", "color2": "rgb(0, 255, 0)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
     {"color1": "rgb(0, 255, 0)", "color2": "rgb(0, 255, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
     {"color1": "rgb(0, 0, 255)", "color2": "rgb(0, 0, 255)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 0, 255)"},
@@ -56,19 +56,22 @@
   ],
   "rootSection": {
     "color": "rgb(200, 200, 200)",
-    "type": 1,
+    "type": 0,
     "lineName": "田園都市線",
     "lineNameEng": "Den-en-toshi Line",
-    "lineNameColor": "rgb(0, 255, 0)"
+    "lineNameColor": "rgb(0, 255, 0)",
+    "isConnect": false
   },
   "arrowSection": {
     "color": "rgb(255, 0, 255)",
-    "type": 1,
+    "type": 0,
     "lineName": "東横線",
     "lineNameEng": "Tōyoko Line",
-    "lineNameColor": "rgb(255, 0, 255)"
+    "lineNameColor": "rgb(255, 0, 255)",
+    "isConnect": false
   },
   "drawPos": 3,
+  "stationFrameNum": 8,
   
   "isDrawNextStation": true,
   "isDrawTime": true,
@@ -81,7 +84,28 @@
 
   "dispStationList": [
     {
-      "name": "金月洞",
+      "name": "東京",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudō",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "stationIconType": "0", 
+      "sectionTime": "20",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ],
+      "transfersTextEng": [
+        ":M:Keihin-Tohoku Line",
+        ":O:Ōimachi Line"
+      ],
+      "isGray": true
+    },
+    {
+      "name": "上野",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -98,50 +122,11 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":O:Ōimachi Line"
-      ]
-    },
-    {
-      "name": "金洞",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
       ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ]
+      "isGray": false
     },
     {
-      "name": "金",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ]
-    },
-    {
-      "name": "金月洞",
+      "name": "尾久",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -158,10 +143,11 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":D:Den-en-toshi Line"
-      ]
+      ],
+      "isGray": false
     },
     {
-      "name": "金月洞",
+      "name": "赤羽",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -178,10 +164,11 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":s::k::n:Subway Line"
-      ]
+      ],
+      "isGray": false
     },
     {
-      "name": "金月洞",
+      "name": "浦和",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "lineColor": "#8700f3",
@@ -198,10 +185,11 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":O:Ōimachi Line"
-      ]
+      ],
+      "isGray": false
     },
     {
-      "name": "金月洞",
+      "name": "さいたま新都心",
       "kana": "きんげつどう",
       "eng": "Kinge",
       "lineColor": "#8700f3",
@@ -218,10 +206,11 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":O:Ōimachi Line"
-      ]
+      ],
+      "isGray": false
     },
     {
-      "name": "金月洞",
+      "name": "大宮",
       "kana": "きんげつどう",
       "eng": "Kingetsudōooooooooo",
       "lineColor": "#8700f3",
@@ -238,7 +227,29 @@
       "transfersTextEng": [
         ":M:Keihin-Tohoku Line",
         ":O:Ōimachi Line"
-      ]
+      ],
+      "isGray": false
+    },
+    {
+      "name": "土呂",
+      "kana": "きんげつどう",
+      "eng": "Kingetsudōooooooooo",
+      "lineColor": "#8700f3",
+      "numIconPresetKey": "N_tokyu",
+      "numIconSymbol": "G",
+      "numIconNumber": "12",
+      "lineNumberType": "0",
+      "stationIconType": "1",
+      "sectionTime": "20",
+      "transfersText": [
+        ":M:京浜東北線",
+        ":O:大井町線"
+      ],
+      "transfersTextEng": [
+        ":M:Keihin-Tohoku Line",
+        ":O:Ōimachi Line"
+      ],
+      "isGray": false
     }
   ]
 }

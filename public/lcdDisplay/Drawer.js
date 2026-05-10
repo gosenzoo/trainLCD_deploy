@@ -118,8 +118,26 @@ class Drawer {
         // funcDefが1件もなければ即return（querySelectorAll不要）
         if (Object.keys(funcDefMap).length === 0) return;
 
-        // ステップ2: SVG全体から lcd-funcCall rect を列挙して展開
-        for (const rect of Array.from(svgElement.querySelectorAll('[lcd-funcCall]'))) {
+        // ステップ2: 各funcDefのcontentNodes内のfuncCallを展開する（ネストfuncCall対応）
+        // 全funcDef収集後に実行するため、funcDef同士の相互参照が可能
+        for (const def of Object.values(funcDefMap)) {
+            // contentNodesを一時<g>に格納してquerySelectorAllを使えるようにする
+            const tempG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            for (const node of def.contentNodes) tempG.appendChild(node);
+            this._expandFuncCallsInContainer(tempG, funcDefMap);
+            def.contentNodes = Array.from(tempG.childNodes);
+        }
+
+        // ステップ3: SVG全体のlcd-funcCallを展開する
+        this._expandFuncCallsInContainer(svgElement, funcDefMap);
+    }
+
+    // コンテナ内のすべてのlcd-funcCall rectを展開する（スケール・属性コピー・DOM置換）
+    _expandFuncCallsInContainer(container, funcDefMap) {
+        // 除外する属性セット（位置・形状・funcCall名はコピー対象外）
+        const SKIP_ATTRS = new Set(['lcd-funcCall', 'x', 'y', 'width', 'height', 'fill']);
+
+        for (const rect of Array.from(container.querySelectorAll('[lcd-funcCall]'))) {
             const funcName = rect.getAttribute('lcd-funcCall');
             const def = funcDefMap[funcName];
             if (!def) continue;
@@ -136,6 +154,11 @@ class Drawer {
             const tx = cx - def.areaX * sx;
             const ty = cy - def.areaY * sy;
 
+            // 呼び出し元rectからコピーする追加属性を収集する
+            const extraAttrs = Array.from(rect.attributes)
+                .filter(a => !SKIP_ATTRS.has(a.name))
+                .map(a => ({ name: a.name, value: a.value }));
+
             // コンテンツのdeepCloneを座標属性直接書き換えでスケールし、
             // ラッパーを挟まず親要素にインライン展開してrectと置換する
             // （ラッパー<g>で包むとlcdPartsなし要素になりArrangeObjにスキップされるため）
@@ -144,6 +167,10 @@ class Drawer {
                 const cloned = node.cloneNode(true);
                 if (cloned.nodeType === Node.ELEMENT_NODE) {
                     this._scaleNode(cloned, sx, sy, tx, ty);
+                    // 呼び出し元の追加属性をトップレベルクローン要素にコピーする（既存属性は上書き）
+                    for (const { name, value } of extraAttrs) {
+                        cloned.setAttribute(name, value);
+                    }
                 }
                 parent.insertBefore(cloned, rect);
             }

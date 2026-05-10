@@ -72,7 +72,7 @@
 | `lcd-fitY` | boolean | `false` | 同上、y方向版。 |
 | `lcd-flex` | boolean | textBox=`true`、arrange=`false` | `true` で再描画による圧縮、`false` で均等縮小。 |
 | `lcd-verAlign` | string | `top` | x軸arrange内でのcross方向（縦）の揃え位置。`top` / `middle` / `bottom`。 |
-| `lcd-holAilgn` | string | `left` | y軸arrange内でのcross方向（横）の揃え位置。`left` / `center` / `right`。 |
+| `lcd-holAlign` | string | `left` | y軸arrange内でのcross方向（横）の揃え位置。`left` / `center` / `right`。 |
 | `lcd-margin` | number | `0` | cross方向の揃えで使うマージン（px）。`top`/`bottom`/`left`/`right` 揃え時のみ有効。 |
 | `lcd-minComRatio` | number | `0` | 圧縮の最小比率（0〜1）。この比率を下限として確保する。 |
 

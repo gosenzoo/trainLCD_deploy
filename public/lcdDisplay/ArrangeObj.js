@@ -187,7 +187,9 @@ class ArrangeObj extends GObj {
                     argArray = LcdPartsObj.resolveDrawParam(drawParamsVarName, drawParams);
                 }
                 if (argName && Array.isArray(argArray)) {
-                    argArray.forEach(element => {
+                    // argOrder="1"の場合は配列を逆順にして展開する
+                    const orderedArray = child.getAttribute('argOrder') === '1' ? [...argArray].reverse() : argArray;
+                    orderedArray.forEach(element => {
                         const childArgs = Object.assign({}, args, { [argName]: element });
                         // parentColorOverrideを渡して祖先からの色継承を維持する
                         const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);

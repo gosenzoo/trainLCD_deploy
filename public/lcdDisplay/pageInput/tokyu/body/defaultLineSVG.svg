@@ -50,7 +50,7 @@
             <feDropShadow dx="0" dy="-4" stdDeviation="4" flood-color="black" flood-opacity="0.5"/>
         </filter>
         <filter id="grayscale">
-            <fecolormatrix type="matrix" values="0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0 0 0 1 0"></fecolormatrix>
+            <feColorMatrix type="matrix" values="0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0.3333 0.3333 0.3333 0 0.2 0 0 0 1 0" />
         </filter>
     </defs>
 
@@ -58,13 +58,14 @@
     <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
 
     <!-- 路線ベース右向き -->
-    <g lcdParts="arrange" isDraw="direction == 0" arrange-axis="x" arrange-interval="0" shadowId="inner, outer" filter="url(#outline)">
+    <g lcdParts="arrange" isDraw="direction == 0" arrange-axis="x" arrange-interval="0" lcd-holAlign="right" shadowId="inner, outer" filter="url(#outline)">
         <rect lcdParts="arrangeArea" x="0" y="721" width="1920" height="87" fill="rgba(221, 221, 221, 0.2)" />
 
         <!-- 路線ベース根本 -->
         <g lcdParts="group" lcd-color="rootSection.color">
             <rect lcdParts="groupArea" x="0" y="721" width="226" height="87" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
+            <rect lcdParts="static" isDraw="rootSection.type == 0" lcd-noFilter="true" lcd-color="#555555" x="0" y="721" width="226" height="87" fill="#555555" />
             <path lcdParts="static" isDraw="rootSection.type == 0" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" />
             <!-- 1:進行方向でないかつ続く(端に届く) -->
             <rect lcdParts="static" isDraw="(rootSection.type == 1) and (direction == 0)" x="0" y="721" width="226" height="87" fill="rgba(227,127,127,0.4)" />
@@ -173,19 +174,19 @@
     <rect lcdParts="mulShadow" shadowId="inner" x="0" y="721" width="1920" height="87" fill="url(#innerGradient)" style="mix-blend-mode: multiply;" />
 
     <!-- 駅パーツ -->
-    <g lcdParts="arrange" isDraw="direction == 0" arrange-interval="13" arrangeDirection="0">
-        <rect lcdParts="arrangeArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
-        <rect lcd-funcCall="stationInfo" x="1594" y="359" width="200" height="634" fill="#99999930" />
+    <g lcdParts="slot" isDraw="direction == 0" interval="13" slotNum="stationFrameNum" slotStart="end" setPoint="center">
+        <rect lcdParts="slotArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
+        <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:dispStationList" argOrder="1" slotPoint="auto" x="1594" y="359" width="200" height="634" fill="#99999930" />
     </g>
-    <g lcdParts="arrange" isDraw="direction == 1" arrange-interval="13" arrangeDirection="1">
-        <rect lcdParts="arrangeArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
-        <rect lcd-funcCall="stationInfo" x="1594" y="359" width="200" height="634" fill="#99999930" />
+    <g lcdParts="slot" isDraw="direction == 1" interval="13" slotNum="stationFrameNum" slotStart="start" setPoint="center">
+        <rect lcdParts="slotArea" x="126" y="359" width="1668" height="634" fill="#55555520" />
+        <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:dispStationList" argOrder="1" slotPoint="auto" x="1594" y="359" width="200" height="634" fill="#99999930" />
     </g>
     <!-- 路線ベース2影 -->
     <rect lcdParts="mulShadow" shadowId="outer" x="0" y="721" width="1920" height="87" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
 
     <!-- 位置アイコン -->
-    <g lcdParts="slot" slotNum="dispStationList.length * 2 - 1">
+    <g lcdParts="slot" slotNum="stationFrameNum * 2 - 1">
         <rect lcdParts="slotArea" x="226" y="721" width="1468" height="87" fill="#99999950" />
         <g lcdParts="group" isDraw="direction == 0" slotPoint="drawPos">
             <rect lcdParts="groupArea" x="172" y="721" width="108" height="87" fill="#99999950"/>
@@ -204,7 +205,7 @@
                         style="mix-blend-mode: multiply;" />
             </g>
         </g>
-        <g lcdParts="group" isDraw="direction == 1" slotPoint="dispStationList.length * 2 - 2 - drawPos">
+        <g lcdParts="group" isDraw="direction == 1" slotPoint="stationFrameNum * 2 - 2 - drawPos">
             <rect lcdParts="groupArea" x="172" y="721" width="108" height="87" fill="#99999950"/>
             <g lcdParts="group" isDraw="direction == 1">
                 <polygon lcdParts="static" points="280,719 220,719 176,764.5 219,809 279,809 236,764.5" fill="white" />
@@ -235,9 +236,18 @@
 
 
     <!-- 関数定義 -->
-    <g lcd-funcDef="stationInfo">
+     <g lcd-funcDef="stationInfo">
         <rect lcdParts="funcArea" x="1594" y="359" width="200" height="634" fill="none" />
-        <g lcdParts="group" lcd-arg="dispStation:dispStationList">
+        <g lcdParts="group">
+            <rect lcdParts="groupArea" x="1594" y="359" width="200" height="634" fill="none" />
+            <rect lcd-funcCall="stationContent" isDraw="!$dispStation.isGray" x="1594" y="359" width="200" height="634" fill="none" />
+            <rect lcd-funcCall="stationContent" isDraw="$dispStation.isGray" filter="url(#grayscale)" x="1594" y="359" width="200" height="634" fill="none" />
+        </g>
+    </g>
+
+    <g lcd-funcDef="stationContent">
+        <rect lcdParts="funcArea" x="1594" y="359" width="200" height="634" fill="none" />
+        <g lcdParts="group">
             <rect lcdParts="groupArea" x="1594" y="359" width="200" height="634" fill="none" />
             <!-- 上の駅名 -->
             <!-- 日本語 -->
@@ -245,12 +255,12 @@
                 <rect lcdParts="arrangeArea" x="1640" y="359" width="108" height="355" fill="#FF999930" />
                 <!-- 駅名 -->
                 <!-- 日本語 -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.name}　" lcd-holAilgn="center" isDraw="$dispStation.name.length == 1" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
-                <rect lcdParts="textBox" lcdText="#{$dispStation.name[0]}　#{$dispStation.name[1]}" lcd-holAilgn="center" isDraw="$dispStation.name.length == 2" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
-                <rect lcdParts="textBox" lcdText="#{$dispStation.name}" lcd-holAilgn="center" isDraw="$dispStation.name.length >= 3" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.name}　" lcd-holAlign="center" isDraw="$dispStation.name.length == 1" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.name[0]}　#{$dispStation.name[1]}" lcd-holAlign="center" isDraw="$dispStation.name.length == 2" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.name}" lcd-holAlign="center" isDraw="$dispStation.name.length >= 3" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
                 <!-- ナンバリング -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAilgn="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAilgn="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
             </g>
             <!-- 英語 -->
             <g lcdParts="arrange" visible="langId == 2" arrange-axis="y" arrange-interval="5">
@@ -261,8 +271,8 @@
                     <rect lcdParts="textBox" lcdText="#{$dispStation.eng}" x="1634" y="680" width="333" height="70" fill="#99999950" transform="rotate(-60, 1634, 680)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
                 </g>
                 <!-- ナンバリング -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAilgn="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAilgn="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
             </g>
 
             <!-- 乗換路線 -->
@@ -278,7 +288,7 @@
             </g>
 
             <!-- 駅アイコン -->
-            <g lcdParts="group" shadowId="outer">
+            <g lcdParts="group" shadowId="outer" lcd-noFilter="true">
                 <!-- 0:停車駅アイコン -->
                 <rect lcdParts="static" isDraw="$dispStation.stationIconType == 0" x="1640" y="730" width="108" height="69" fill="rgb(255, 255, 255)" />
                 <!-- 1:右向き通過駅アイコン -->
@@ -286,7 +296,7 @@
                 <!-- 2:左向き通過駅アイコン -->
                 <polygon lcdParts="static" isDraw="($dispStation.stationIconType == 1) and (direction == 1)" points="1712,738 1701,738 1672,764.5 1701,791 1712,791 1683,764.5" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
                 <!-- 駅所要時間 -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.sectionTime}" isDraw="($dispStation.stationIconType == 0) and (isDrawTime)" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.sectionTime}" isDraw="($dispStation.stationIconType == 0) and !($dispStation.isGray) and (isDrawTime)" x="1647" y="737" width="94" height="55" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="jp" />
             </g>
         </g>
     </g>

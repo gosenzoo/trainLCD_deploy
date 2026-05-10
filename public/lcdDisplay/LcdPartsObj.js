@@ -27,7 +27,7 @@ class LcdPartsObj {
         this._prevVisible  = true;
         this._resolveValue = null;
         this._exprParser   = null;
-        this.horizontalAlign = attr('lcd-holAilgn')    || 'left';
+        this.horizontalAlign = attr('lcd-holAlign')    || 'left';
         this.flexible        = attr('lcd-flex')        === 'true';
         this.margin          = parseFloat(attr('lcd-margin'))       || 0;
         const mcr            = parseFloat(attr('lcd-minComRatio'));

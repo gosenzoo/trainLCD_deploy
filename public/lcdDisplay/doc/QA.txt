@@ -21,7 +21,7 @@
 １．共通フィールドのSVG属性名: verticalAlign, horizontalAlign, flexible, margin, minComRatio は SVG のどの属性名から読み込むか
 ⇒
 verticalAlign:lcd-verAlign
-horizontalAlign:lcd-holAilgn
+horizontalAlign:lcd-holAlign
 flexible:lcd-flex
 margin:lcd-margin
 minComRatio:lcd-minComRatio

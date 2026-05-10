@@ -18,7 +18,7 @@
 | `realX, realY` | — | number | 実際の描画座標 |
 | `realWidth, realHeight` | — | number | 実際の描画サイズ |
 | `verticalAlign` | `lcd-verAlign` | `"top"` \| `"center"` \| `"bottom"` | 縦方向の揃え位置 |
-| `horizontalAlign` | `lcd-holAilgn` | `"left"` \| `"center"` \| `"right"` | 横方向の揃え位置 |
+| `horizontalAlign` | `lcd-holAlign` | `"left"` \| `"center"` \| `"right"` | 横方向の揃え位置 |
 | `flexible` | `lcd-flex` | boolean | axis方向のみの圧縮（比率変更）を許可するか |
 | `margin` | `lcd-margin` | number | axis と逆方向の余白（px）。align の端からの距離 |
 | `minComRatio` | `lcd-minComRatio` | number | 最小圧縮率。この比率を超えて圧縮が必要になると、圧縮余裕のある他要素が優先的に圧縮される |

@@ -1463,6 +1463,17 @@ _buildContainerChildren(svgDom, drawParams, args, skipLcdParts, parentArgMap = {
 
 `argName` と右辺はコロンで必ず区切る。省略形はない。右辺が `$` で始まる場合は `args` を `resolveArgToken` で解決し、それ以外は `drawParams` を `resolveDrawParam` で解決する。
 
+**`argOrder` — 配列展開順の制御:**
+
+`lcd-arg` と同じ要素に `argOrder` 属性を付与することで、配列展開の順序を制御できる。
+
+| 値 | 動作 |
+|---|---|
+| `"0"`（デフォルト） | 配列の先頭から順に展開（従来通り） |
+| `"1"` | 配列を逆順に展開（末尾から先頭へ） |
+
+arrange・slot の `_buildContainerChildren` および slot の `_buildSlotChildren` における lcd-arg 展開ループに適用される。配列の取得自体は変わらず、`forEach` の前に `argOrder="1"` の場合のみ `[...argArray].reverse()` した配列を使う。
+
 `lcdText` のテンプレート展開（`resolveTemplate`）は `#{...}` 構文のみを使用する。`$` で始まる場合は args 参照、それ以外は drawParams 参照として解決する。`visible` 式は `exprParser` 経由のため引き続き `$argName.field` のまま。
 
 **ArrangeObj コンストラクタ**: inline だった子ビルドループを `this._buildContainerChildren(svgDom, drawParams, args, 'arrangeArea', this.arg)` に置き換え。
@@ -1880,17 +1891,20 @@ mulShadow rect: x=rx, y=ry, width=rw, height=rh
 | `lcdParts="slot"` | `<g>` | — | スロット配置コンテナ |
 | `slotNum` | slot `<g>` | 数値または式（デフォルト: 1） | スロット数。drawParams / args の値を参照する式を記述可能 |
 | `axis` | slot `<g>` | `"x"`（デフォルト）/ `"y"` | 主軸方向（x: 横、y: 縦） |
+| `setPoint` | slot `<g>` | `"edge"`（デフォルト）/ `"center"` | スロット座標の計算モード（後述） |
+| `slotStart` | slot `<g>` | `"start"`（デフォルト）/ `"end"` | `slotPoint="auto"` 要素の割り当て開始方向 |
+| `interval` | slot `<g>` | 数値（デフォルト: 0） | スロット間の間隔（px）。`setPoint="center"` の場合のみ座標計算に影響する |
 | `lcdParts="slotArea"` | slot 直接子 `<rect>` | — | スロット領域の範囲を定義する |
-| `slotPoint` | slot 直接子要素 | 数値または式（0 始まり） | 配置先スロット番号。drawParams / args の値を参照する式を記述可能 |
+| `slotPoint` | slot 直接子要素 | 数値または式（0 始まり）/ `"auto"` | 配置先スロット番号。`"auto"` を指定すると自動割り当て（後述） |
 
 #### 動的評価
 
-`slotNum` および `slotPoint` は `ExprParser.evalNumber()` で評価される。
+`slotNum` および `slotPoint`（数値の場合）は `ExprParser.evalNumber()` で評価される。
 
 - **`slotNum`**: slot `<g>` 要素が属するスコープの `drawParams` と `args` を使用して評価する。
-- **`slotPoint`**: 各子要素のオブジェクト構築時点のスコープで評価する。`lcd-arg` 展開がある場合は、展開後の `args`（例: `$dispStation`）を使用して要素ごとに個別に評価する。
+- **`slotPoint`**: 各子要素のオブジェクト構築時点のスコープで評価する。`lcd-arg` 展開がある場合は、展開後の `args`（例: `$dispStation`）を使用して要素ごとに個別に評価する。`"auto"` の場合は数値評価を行わず自動割り当て対象とする。
 
-評価結果は整数に丸めて使用する。評価結果が数値でない場合や範囲外の場合はその子要素をスキップする。
+評価結果は整数に丸めて使用する。評価結果が数値でない場合や範囲外の場合はその子要素をスキップする。`slotPoint` 属性がない要素は引き続きスキップする。
 
 #### ExprParser.evalNumber() — 数値式評価メソッド
 
@@ -1932,22 +1946,53 @@ mulShadow rect: x=rx, y=ry, width=rw, height=rh
 
 変更ファイル: `public/lcdDisplay/ExprParser.js`（`tokenize` にトークン追加、`parseComparison` に演算子追加）
 
-#### スロット位置の計算
+#### スロット位置の計算（setPoint）
 
 slotArea の主軸方向の先頭座標を S、長さを L とする。
+
+**`setPoint="edge"`（デフォルト）**
 
 | slotNum | 位置 |
 |---|---|
 | 1 | S + L/2（中心のみ） |
 | N > 1 | 位置_i = S + i / (N-1) × L　（i = 0 … N-1） |
 
-例: slotNum=2 → 両端（S と S+L）、slotNum=3 → 両端＋中心（S, S+L/2, S+L）
+例: slotNum=3 → S, S+L/2, S+L（両端＋中心）
+
+**`setPoint="center"`**
+
+スロット領域を interval で区切り、各スロットセル幅 `w = (L - (N-1) × interval) / N` の中心に座標を置く。
+
+| 位置 |
+|---|
+| 位置_i = S + i × (w + interval) + w / 2　（i = 0 … N-1） |
+
+interval = 0 のとき `w = L/N` となり、位置_i = S + (i + 0.5) × L / N（各セル中心）
+
+例: slotNum=3, interval=0 → S+L/6, S+L/2, S+5L/6（各セル中心）
+
+#### slotPoint="auto" — 自動スロット割り当て
+
+`slotPoint="auto"` を指定した子要素は、明示的 `slotPoint` 数値を持つ要素が使用済みのスロットを除いた残りのスロットに、DOM 順で順番に割り当てられる。
+
+**割り当てアルゴリズム:**
+
+1. 数値 `slotPoint` を持つ全子要素を構築し、使用済みスロット番号のセットを収集する
+2. `slotStart="start"`: スロット 0 → N-1 の順に未使用スロットをリストアップ
+   `slotStart="end"`: スロット N-1 → 0 の順に未使用スロットをリストアップ
+3. `slotPoint="auto"` の子要素を DOM 順に走査し、リストから先頭のスロットを順に割り当てる
+4. 利用可能スロット数を超えた `auto` 要素は配置しない
+
+**例（slotNum=5、スロット2を数値指定済み、slotStart="start"）:**
+
+利用可能スロット = [0, 1, 3, 4] → auto要素1番目→0, 2番目→1, 3番目→3, …
 
 #### 子要素の配置ルール
 
 - **主軸**: 子要素の中心が slotPoint に対応するスロット座標と一致するように移動する
 - **交差軸**: slotArea の交差軸方向中心に揃える
 - `slotPoint` 属性のない要素はスキップする
+- `slotPoint="auto"` は自動割り当て後、スロット範囲外になった場合はスキップする
 - `getRealSize()` で非ゼロサイズを返すオブジェクトのみ対象とする（path / polygon 単体は不可）
 
 #### 対応子要素
@@ -1962,6 +2007,13 @@ arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `s
 | `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj` に `slot` ケース追加 |
 | `public/lcdDisplay/Drawer.js` | 変更 | `_buildNode` に `slot` ケース追加 |
 | `public/lcdDisplay/index.html` | 変更 | `SlotObj.js` の `<script>` タグ追加 |
+
+#### 追加機能のファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/lcdDisplay/SlotObj.js` | 変更 | `setPoint`・`slotStart` 読み取り、`slotPoint="auto"` 自動割り当てロジック、`setPoint="center"` 座標計算 |
+| `public/lcdDisplay/SlotObj.js` | 変更 | `interval` 読み取り、`setPoint="center"` 座標計算への interval 反映 |
 
 ---
 
@@ -2002,6 +2054,7 @@ arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `s
 | 対象要素 | SVG内の任意の場所に配置可能な `<rect>` |
 | rect の役割 | 配置先領域（target area）を x/y/width/height で指定する。この rect 自体はレンダリングされない |
 | 同名関数の複数呼び出し | 可能。毎回独立したクローンを展開する |
+| 属性の引き渡し | `lcd-funcCall`・`x`・`y`・`width`・`height`・`fill` を除く呼び出し元 rect の全属性を、展開後の各トップレベル要素ノードにコピーする（既存属性は上書き） |
 
 ---
 
@@ -2011,7 +2064,9 @@ arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `s
 
 1. **funcDef の収集**: SVGルートの直接子 `<g>` で `lcd-funcDef` 属性を持つものをすべて走査し、`funcName → { funcAreaRect, contentNodes[] }` のマップを構築する。`contentNodes` は funcArea rect を除いた残りの子ノード（テキストノードを含む）のリスト。収集後、funcDef `<g>` 自体は SVG DOM から取り除く。
 
-2. **funcCall の解決**: SVG DOM 全体（書き換え後）を走査し、`lcd-funcCall` 属性を持つ `<rect>` をすべて列挙する。各 funcCall rect に対して以下を実行する:
+2. **funcDef 内 funcCall の展開（ネスト対応）**: 全 funcDef の収集が完了した後、各 funcDef の `contentNodes` 内に含まれる `lcd-funcCall` を展開する。一時的な `<g>` コンテナに contentNodes を移し、そのコンテナに対して funcCall 展開（スケール・オフセット・クローン・属性コピー・DOM置換）を実行する。展開後のコンテナ子ノード列を新しい `contentNodes` とする。これにより funcDef が別の funcDef を参照できる。
+
+3. **funcCall の解決**: SVG DOM 全体（書き換え後）を走査し、`lcd-funcCall` 属性を持つ `<rect>` をすべて列挙する。各 funcCall rect に対して以下を実行する:
    - **スケール計算**: funcArea の width/height を元サイズ、funcCall rect の width/height を目標サイズとして非均等スケールを計算する。
      ```
      sx = callWidth  / funcAreaWidth
@@ -2023,9 +2078,10 @@ arrange と同じ lcdParts 種別が使用可能: `arrange`, `slot`, `group`, `s
      ty = cy - ay*sy
      ```
    - **クローン生成・インライン展開**: `contentNodes` の各ノードを `cloneNode(true)` で深コピーし、**座標属性を直接書き換え**てスケール・移動を適用する（`_scaleNode`）。transform 属性は使用しない。
+   - **属性コピー**: `lcd-funcCall`・`x`・`y`・`width`・`height`・`fill` を除く呼び出し元 rect の全属性を収集し、各トップレベルクローン要素ノードに設定する（既存属性は上書き）。
    - **DOM置換**: スケール済みクローンを funcCall `<rect>` の直前に `insertBefore` で挿入し、rect を `removeChild` で除去する。**ラッパー `<g>` は使用しない**（`lcdParts` なしの `<g>` に包むと ArrangeObj が子要素としてスキップするため）。
 
-3. **結果**: 置換後の SVG DOM をそのまま `buildTree()` に渡す。ツリーシステムは展開済みの通常要素として処理する。
+4. **結果**: 置換後の SVG DOM をそのまま `buildTree()` に渡す。ツリーシステムは展開済みの通常要素として処理する。
 
 ---
 

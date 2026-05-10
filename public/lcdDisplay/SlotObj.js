@@ -12,7 +12,13 @@ class SlotObj extends GObj {
         this._args       = args;
 
         // axis属性: x(横/デフォルト) or y(縦)
-        this.axis    = svgDom.getAttribute('axis') || 'x';
+        this.axis      = svgDom.getAttribute('axis')      || 'x';
+        // setPoint属性: edge(デフォルト=端点均等配置) or center(各セル中心配置)
+        this.setPoint  = svgDom.getAttribute('setPoint')  || 'edge';
+        // slotStart属性: start(デフォルト) or end — slotPoint="auto"の割り当て開始方向
+        this.slotStart = svgDom.getAttribute('slotStart') || 'start';
+        // interval属性: スロット間の間隔(px)。setPoint="center"の座標計算のみに影響する
+        this.interval  = parseFloat(svgDom.getAttribute('interval')) || 0;
         // slotNum属性: ExprParser.evalNumberで評価する（数値リテラル・変数参照・四則演算に対応）
         const slotNumAttr = svgDom.getAttribute('slotNum');
         if (slotNumAttr !== null) {
@@ -42,7 +48,9 @@ class SlotObj extends GObj {
     // 子要素を構築してslotPointと共にリストを返す
     _buildSlotChildren(svgDom) {
         const { drawParams, args, textDrawer, exprParser } = this._ctx;
-        const slotItems = [];
+        // 数値slotPoint確定済みアイテムとauto割り当て待ちアイテムを分けて収集する
+        const fixedItems = []; // { slotPoint: number, obj }
+        const autoItems  = []; // { obj }
 
         const childArr = Array.from(svgDom.children).filter(c => c.getAttribute);
         const localShadowMap = MulShadowUtil.collectShadowMap(childArr);
@@ -60,9 +68,12 @@ class SlotObj extends GObj {
             if (child.getAttribute('lcdParts') === 'slotArea') return;
             if (child.getAttribute('lcdParts') === 'mulShadow') return;
 
-            // slotPoint属性がない要素はスキップ
+            // slotPoint属性がない要素はスキップ（"auto"も含む文字列属性がある場合のみ処理）
             const slotPointAttr = child.getAttribute('slotPoint');
             if (slotPointAttr === null) return;
+
+            // "auto"かどうかを判定（数値式とautoを分岐）
+            const isAuto = slotPointAttr.trim() === 'auto';
 
             // shadowId処理（mulShadow乗算影の伝播）
             const shadowIdAttr      = child.getAttribute('shadowId');
@@ -70,7 +81,7 @@ class SlotObj extends GObj {
             const prevActiveShadows = this._ctx.activeShadows;
             if (localShadows.length > 0) this._ctx.activeShadows = localShadows;
 
-            // group lcd-color配列展開: 現在のargsでslotPointを評価し、色ごとにコピーして追加
+            // group lcd-color配列展開: 色ごとにコピーして追加
             if (child.getAttribute('lcdParts') === 'group') {
                 const colorAttr = child.getAttribute('lcd-color');
                 if (colorAttr) {
@@ -80,12 +91,20 @@ class SlotObj extends GObj {
                             c => c.getAttribute && c.getAttribute('lcdParts') === 'groupArea'
                         );
                         if (hasArea) {
-                            const slotPoint = evalSlotPoint(slotPointAttr, args);
-                            if (!isNaN(slotPoint)) {
+                            if (isAuto) {
+                                // autoの場合: 色コピーをautoItemsへ
                                 colorVal.forEach(color => {
                                     const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
-                                    if (obj) slotItems.push({ slotPoint, obj });
+                                    if (obj) autoItems.push({ obj });
                                 });
+                            } else {
+                                const slotPoint = evalSlotPoint(slotPointAttr, args);
+                                if (!isNaN(slotPoint)) {
+                                    colorVal.forEach(color => {
+                                        const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser, color);
+                                        if (obj) fixedItems.push({ slotPoint, obj });
+                                    });
+                                }
                             }
                             if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
                             return;
@@ -107,13 +126,21 @@ class SlotObj extends GObj {
                     argArray = LcdPartsObj.resolveDrawParam(drawParamsVarName, drawParams);
                 }
                 if (argName && Array.isArray(argArray)) {
-                    argArray.forEach(element => {
+                    // argOrder="1"の場合は配列を逆順にして展開する
+                    const orderedArray = child.getAttribute('argOrder') === '1' ? [...argArray].reverse() : argArray;
+                    orderedArray.forEach(element => {
                         const childArgs = Object.assign({}, args, { [argName]: element });
-                        // childArgsでslotPointを再評価して$argName参照を解決する
-                        const slotPoint = evalSlotPoint(slotPointAttr, childArgs);
-                        if (isNaN(slotPoint)) return;
-                        const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
-                        if (obj) slotItems.push({ slotPoint, obj });
+                        if (isAuto) {
+                            // autoの場合: 展開コピーをautoItemsへ
+                            const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
+                            if (obj) autoItems.push({ obj });
+                        } else {
+                            // childArgsでslotPointを再評価して$argName参照を解決する
+                            const slotPoint = evalSlotPoint(slotPointAttr, childArgs);
+                            if (isNaN(slotPoint)) return;
+                            const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser);
+                            if (obj) fixedItems.push({ slotPoint, obj });
+                        }
                     });
                     if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
                     return;
@@ -121,16 +148,44 @@ class SlotObj extends GObj {
             }
 
             // 通常の子要素: 現在のargsでslotPointを評価
-            const slotPoint = evalSlotPoint(slotPointAttr, args);
-            if (!isNaN(slotPoint)) {
+            if (isAuto) {
                 const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
-                if (obj) slotItems.push({ slotPoint, obj });
+                if (obj) autoItems.push({ obj });
+            } else {
+                const slotPoint = evalSlotPoint(slotPointAttr, args);
+                if (!isNaN(slotPoint)) {
+                    const obj = this._createChildObj(child, drawParams, args, textDrawer, exprParser);
+                    if (obj) fixedItems.push({ slotPoint, obj });
+                }
             }
 
             if (localShadows.length > 0) this._ctx.activeShadows = prevActiveShadows;
         });
 
-        return slotItems;
+        // slotPoint="auto" 要素に空きスロットを順番に割り当てる
+        if (autoItems.length > 0) {
+            // 数値slotPointが使用済みのスロット番号をセットに収集
+            const usedSlots = new Set(fixedItems.map(item => item.slotPoint));
+            // slotStartに応じて未使用スロットを順番にリストアップ
+            const available = [];
+            if (this.slotStart === 'end') {
+                for (let i = this.slotNum - 1; i >= 0; i--) {
+                    if (!usedSlots.has(i)) available.push(i);
+                }
+            } else {
+                for (let i = 0; i < this.slotNum; i++) {
+                    if (!usedSlots.has(i)) available.push(i);
+                }
+            }
+            // DOM順でauto要素に割り当てる（利用可能スロット数を超えた要素はスキップ）
+            autoItems.forEach((item, idx) => {
+                if (idx < available.length) {
+                    fixedItems.push({ slotPoint: available[idx], obj: item.obj });
+                }
+            });
+        }
+
+        return fixedItems;
     }
 
     // 子要素のlcdPartsに応じてオブジェクトを生成する（ArrangeObj._createChildObjと同一ロジック）
@@ -246,7 +301,9 @@ class SlotObj extends GObj {
                     argArray = LcdPartsObj.resolveDrawParam(drawParamsVarName, drawParams);
                 }
                 if (argName && Array.isArray(argArray)) {
-                    argArray.forEach(element => {
+                    // argOrder="1"の場合は配列を逆順にして展開する
+                    const orderedArray = child.getAttribute('argOrder') === '1' ? [...argArray].reverse() : argArray;
+                    orderedArray.forEach(element => {
                         const childArgs = Object.assign({}, args, { [argName]: element });
                         // parentColorOverrideを渡して祖先からの色継承を維持する
                         const obj = this._createChildObj(child, drawParams, childArgs, textDrawer, exprParser, parentColorOverride);
@@ -298,9 +355,16 @@ class SlotObj extends GObj {
         const S = isX ? this.x : this.y;
         const L = isX ? this.width : this.height;
         const N = this.slotNum;
-        const slotPositions = N <= 0 ? [] : N === 1
-            ? [S + L / 2]
-            : Array.from({ length: N }, (_, i) => S + (i / (N - 1)) * L);
+        // setPointモードに応じてスロット座標を計算する（center: 各セル中心、edge: 端点均等配置）
+        // center: w=(L-(N-1)*interval)/N として 位置_i = S + i*(w+interval) + w/2
+        const slotPositions = N <= 0 ? [] : this.setPoint === 'center'
+            ? (() => {
+                const w = (L - (N - 1) * this.interval) / N;
+                return Array.from({ length: N }, (_, i) => S + i * (w + this.interval) + w / 2);
+            })()
+            : N === 1
+                ? [S + L / 2]
+                : Array.from({ length: N }, (_, i) => S + (i / (N - 1)) * L);
 
         // noFilterSinkを生成する（this._filterがある場合のみ）、filterなしの場合は既存sinkを引き継ぐ
         const { childCtx: sinkCtx, sink } = this._openSink(ctx);
