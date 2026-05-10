@@ -199,7 +199,7 @@
     <!-- 位置アイコン -->
     <g lcdParts="slot" slotNum="stationFrameNum * 2 - 1">
         <rect lcdParts="slotArea" x="226" y="721" width="1468" height="87" fill="#99999950" />
-        <g lcdParts="group" isDraw="direction == 0" slotPoint="drawPos">
+        <g lcdParts="group" isDraw="direction == 0" slotPoint="(drawPos + (stationFrameNum - dispStationList.length) * 2)">
             <rect lcdParts="groupArea" x="172" y="721" width="108" height="87" fill="#99999950"/>
             <g lcdParts="group">
                 <polygon lcdParts="static" points="172,719 232,719 276,764.5 233,809 173,809 216,764.5" fill="white" />
@@ -216,7 +216,7 @@
                         style="mix-blend-mode: multiply;" />
             </g>
         </g>
-        <g lcdParts="group" isDraw="direction == 1" slotPoint="stationFrameNum * 2 - 2 - drawPos">
+        <g lcdParts="group" isDraw="direction == 1" slotPoint="stationFrameNum * 2 - 2 - (drawPos + (stationFrameNum - dispStationList.length) * 2)" >
             <rect lcdParts="groupArea" x="172" y="721" width="108" height="87" fill="#99999950"/>
             <g lcdParts="group" isDraw="direction == 1">
                 <polygon lcdParts="static" points="280,719 220,719 176,764.5 219,809 279,809 236,764.5" fill="white" />
@@ -269,9 +269,12 @@
                 <rect lcdParts="textBox" lcdText="#{$dispStation.name}　" lcd-holAlign="center" isDraw="$dispStation.name.length == 1" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
                 <rect lcdParts="textBox" lcdText="#{$dispStation.name[0]}　#{$dispStation.name[1]}" lcd-holAlign="center" isDraw="$dispStation.name.length == 2" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
                 <rect lcdParts="textBox" lcdText="#{$dispStation.name}" lcd-holAlign="center" isDraw="$dispStation.name.length >= 3" lcd-fitY="true" x="1657" y="359" width="74" height="355" fill="#99999950" data-style='{"fontFamily": "ShinGoPr6N, BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' axis="vertical" spacing="5px" base="top" />
+                <!-- ナンバリング次 -->
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconNext.symbol}-#{$dispStation.numIconNext.number}" isDraw="($dispStation.numIconType == 0) and ($dispStation.numIconNext.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconNext.presetKey}" symbolText="#{$dispStation.numIconNext.symbol}" numberText="#{$dispStation.numIconNext.number}" lineColor="#{$dispStation.numIconNext.color}" outlineWidth="0" isDraw="($dispStation.numIconType == 1) and ($dispStation.numIconNext.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
                 <!-- ナンバリング -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIcon.symbol}-#{$dispStation.numIcon.number}" isDraw="($dispStation.numIconType == 0) and ($dispStation.numIcon.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIcon.presetKey}" symbolText="#{$dispStation.numIcon.symbol}" numberText="#{$dispStation.numIcon.number}" lineColor="#{$dispStation.numIcon.color}" outlineWidth="0" isDraw="($dispStation.numIconType == 1) and ($dispStation.numIcon.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
             </g>
             <!-- 英語 -->
             <g lcdParts="arrange" visible="langId == 2" arrange-axis="y" arrange-interval="5">
@@ -281,9 +284,12 @@
                     <rect lcdParts="groupArea" x="1657" y="359" width="74" height="355" />
                     <rect lcdParts="textBox" lcdText="#{$dispStation.eng}" x="1634" y="680" width="333" height="70" fill="#99999950" transform="rotate(-60, 1634, 680)" data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
                 </g>
+                <!-- ナンバリング次 -->
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconNext.symbol}-#{$dispStation.numIconNext.number}" isDraw="($dispStation.numIconType == 0) and ($dispStation.numIconNext.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconNext.presetKey}" symbolText="#{$dispStation.numIconNext.symbol}" numberText="#{$dispStation.numIconNext.number}" lineColor="#{$dispStation.numIconNext.color}" outlineWidth="0" isDraw="($dispStation.numIconType == 1) and ($dispStation.numIconNext.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
                 <!-- ナンバリング -->
-                <rect lcdParts="textBox" lcdText="#{$dispStation.numIconSymbol}-#{$dispStation.numIconNumber}" isDraw="$dispStation.lineNumberType == 0" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
-                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIconPresetKey}" symbolText="#{$dispStation.numIconSymbol}" numberText="#{$dispStation.numIconNumber}" lineColor="#{$dispStation.lineColor}" outlineWidth="0" isDraw="$dispStation.lineNumberType == 1" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
+                <rect lcdParts="textBox" lcdText="#{$dispStation.numIcon.symbol}-#{$dispStation.numIcon.number}" isDraw="($dispStation.numIconType == 0) and ($dispStation.numIcon.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+                <rect lcdParts="numbering" lcd-numKey="#{$dispStation.numIcon.presetKey}" symbolText="#{$dispStation.numIcon.symbol}" numberText="#{$dispStation.numIcon.number}" lineColor="#{$dispStation.numIcon.color}" outlineWidth="0" isDraw="($dispStation.numIconType == 1) and ($dispStation.numIcon.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1663" y="655" width="62" height="62" fill="#96a9ff" />
             </g>
 
             <!-- 乗換路線 -->

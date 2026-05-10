@@ -64,9 +64,9 @@
     <!-- 種別表示 -->
     <g lcdParts="group" isDraw="!isTerminal">
       <g lcdParts="static" id="header-trainType">
-      <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
-      <rect id="trainTypeBackColor" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
-      <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
+        <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+        <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
+        <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
       </g>
       <rect lcdParts="textBox" lcdText="#{trainType}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
       <rect lcdParts="textBox" lcdText="#{trainTypeEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
@@ -112,7 +112,7 @@
         <rect lcdParts="textBox" lcdText="#{nowStation.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
         <rect lcdParts="textBox" lcdText="#{nowStation.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
         <!-- ナンバリング -->
-        <rect lcdParts="numbering" lcd-numKey="#{nowStation.numIconPresetKey}" symbolText="#{nowStation.numIconSymbol}" numberText="#{nowStation.numIconNumber}" lineColor="#{nowStation.lineColor}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+        <rect lcdParts="numbering" isDraw="nowStation.numIcon.isDraw" lcd-numKey="#{nowStation.numIcon.presetKey}" symbolText="#{nowStation.numIcon.symbol}" numberText="#{nowStation.numIcon.number}" lineColor="#{nowStation.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" />
       </g>
       <!-- つぎは、まもなく、ただいま -->
       <g lcdParts="group">
@@ -144,7 +144,7 @@
       <rect lcdParts="textBox" lcdText="#{destination.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
       <rect lcdParts="textBox" lcdText="#{destination.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
       <!-- ナンバリング -->
-      <rect lcdParts="numbering" lcd-numKey="#{destination.numIconPresetKey}" symbolText="#{destination.numIconSymbol}" numberText="#{destination.numIconNumber}" lineColor="#{destination.lineColor}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+      <rect lcdParts="numbering" isDraw="destination.numIcon.isDraw" lcd-numKey="#{destination.numIcon.presetKey}" symbolText="#{destination.numIcon.symbol}" numberText="#{destination.numIcon.number}" lineColor="#{destination.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" />
     </g>
   </g>
 </svg>

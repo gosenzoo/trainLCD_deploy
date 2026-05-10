@@ -79,7 +79,7 @@
     <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"></svg>
   </div>
 
-  <div id="svg-toolbar" style="padding:8px 24px;display:flex;align-items:center;gap:12px;background:#2a2a2a;border-bottom:1px solid #444;">
+  <div id="svg-toolbar" style="padding:8px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#2a2a2a;border-bottom:1px solid #444;">
     <button id="redraw-btn" class="toolbar-btn">再描画</button>
     <button id="lang-btn"       class="toolbar-btn">言語切替 [L]</button>
     <button id="runstate-btn"   class="toolbar-btn">runState [R]</button>
@@ -89,7 +89,11 @@
     <button id="isdrawlinename-btn"      class="toolbar-btn">isDrawLineName [N]</button>
     <button id="isdawnextstation-btn" class="toolbar-btn">isDrawNextStation [S]</button>
     <button id="isstopping-btn"       class="toolbar-btn">isStopping [I]</button>
-    <button id="page-btn"            class="toolbar-btn">ページ切替 [P]</button>
+    <button id="page-btn"                   class="toolbar-btn">ページ切替 [P]</button>
+    <button id="rootsectiontype-btn"       class="toolbar-btn">rootSection.type [Q]</button>
+    <button id="arrowsectiontype-btn"      class="toolbar-btn">arrowSection.type [W]</button>
+    <button id="rootsectionisconnect-btn"  class="toolbar-btn">rootSection.isConnect [alt+Q]</button>
+    <button id="arrowsectionisconnect-btn" class="toolbar-btn">arrowSection.isConnect [alt+W]</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
       デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）
@@ -244,6 +248,22 @@
         drawer.pageReload();
         redraw();
       }
+      function doRootSectionTypeCycle() {
+        cycleNestedNumberParam('rootSection', 'type', 0, 1);
+        redraw();
+      }
+      function doArrowSectionTypeCycle() {
+        cycleNestedNumberParam('arrowSection', 'type', 0, 1);
+        redraw();
+      }
+      function doRootSectionIsConnectToggle() {
+        toggleNestedBoolParam('rootSection', 'isConnect');
+        redraw();
+      }
+      function doArrowSectionIsConnectToggle() {
+        toggleNestedBoolParam('arrowSection', 'isConnect');
+        redraw();
+      }
 
       document.getElementById('lang-btn')            .addEventListener('click', doLangCycle);
       document.getElementById('runstate-btn')        .addEventListener('click', doRunStateCycle);
@@ -253,22 +273,34 @@
       document.getElementById('isdrawlinename-btn')  .addEventListener('click', doIsDrawLineNameToggle);
       document.getElementById('isdawnextstation-btn').addEventListener('click', doIsDrawNextStationToggle);
       document.getElementById('isstopping-btn')       .addEventListener('click', doIsStoppingToggle);
-      document.getElementById('page-btn')            .addEventListener('click', doPageCycle);
+      document.getElementById('page-btn')                   .addEventListener('click', doPageCycle);
+      document.getElementById('rootsectiontype-btn')       .addEventListener('click', doRootSectionTypeCycle);
+      document.getElementById('arrowsectiontype-btn')      .addEventListener('click', doArrowSectionTypeCycle);
+      document.getElementById('rootsectionisconnect-btn')  .addEventListener('click', doRootSectionIsConnectToggle);
+      document.getElementById('arrowsectionisconnect-btn') .addEventListener('click', doArrowSectionIsConnectToggle);
 
       document.addEventListener('keydown', e => {
         // 入力欄にフォーカスがある場合は無視
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         const key = e.key.toUpperCase();
-        if      (key === 'L') doLangCycle();
-        else if (key === 'R') doRunStateCycle();
-        else if (key === 'T') doTerminalToggle();
-        else if (key === 'M') doDirectionToggle();
-        else if (key === 'E') doIsDrawTimeToggle();
-        else if (key === 'N') doIsDrawLineNameToggle();
-        else if (key === 'S') doIsDrawNextStationToggle();
-        else if (key === 'I') doIsStoppingToggle();
-        else if (key === 'P') doPageCycle();
+        if (e.altKey) {
+          // alt+キー: ネストパラメータのbool切替
+          if      (key === 'Q') { e.preventDefault(); doRootSectionIsConnectToggle(); }
+          else if (key === 'W') { e.preventDefault(); doArrowSectionIsConnectToggle(); }
+        } else {
+          if      (key === 'L') doLangCycle();
+          else if (key === 'R') doRunStateCycle();
+          else if (key === 'T') doTerminalToggle();
+          else if (key === 'M') doDirectionToggle();
+          else if (key === 'E') doIsDrawTimeToggle();
+          else if (key === 'N') doIsDrawLineNameToggle();
+          else if (key === 'S') doIsDrawNextStationToggle();
+          else if (key === 'I') doIsStoppingToggle();
+          else if (key === 'P') doPageCycle();
+          else if (key === 'Q') doRootSectionTypeCycle();
+          else if (key === 'W') doArrowSectionTypeCycle();
+        }
       });
     };
 
@@ -285,6 +317,29 @@
       const el = paramList.querySelector(`[data-key="${key}"]`);
       if (!el) return;
       el.checked = !el.checked;
+    }
+
+    // JSONテキストエリアで管理されているネストパラメータのサブフィールドを数値サイクルさせる
+    function cycleNestedNumberParam(parentKey, subKey, min, max) {
+      const el = paramList.querySelector(`[data-key="${parentKey}"]`);
+      if (!el) return;
+      try {
+        const obj = JSON.parse(el.value);
+        const current = Number(obj[subKey]);
+        obj[subKey] = isNaN(current) || current >= max ? min : current + 1;
+        el.value = JSON.stringify(obj, null, 2);
+      } catch {}
+    }
+
+    // JSONテキストエリアで管理されているネストパラメータのサブフィールドのbooleanを反転する
+    function toggleNestedBoolParam(parentKey, subKey) {
+      const el = paramList.querySelector(`[data-key="${parentKey}"]`);
+      if (!el) return;
+      try {
+        const obj = JSON.parse(el.value);
+        obj[subKey] = !obj[subKey];
+        el.value = JSON.stringify(obj, null, 2);
+      } catch {}
     }
   </script>
 </body>

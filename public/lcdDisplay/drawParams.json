@@ -13,11 +13,13 @@
    "name": "金月洞",
    "kana": "きんげつどう",
    "eng": "Kingetsudō",
-   "lineColor": "#8700f3",
-   "numIconPresetKey": "N_tokyu",
-   "numIconSymbol": "G",
-   "numIconNumber": "12",
-
+   "numIcon": {
+      "isDraw": true,
+      "presetKey": "N_tokyu",
+      "symbol": "G",
+      "number": "12",
+      "color": "#8700f3"
+   },
    "transfers": "",
    "transferText": "",
    "transferTextEng": "",
@@ -35,10 +37,13 @@
     "name": "新青森",
     "kana": "しんあおもり",
     "eng": "Shin-Aomori",
-    "lineColor": "#009900",
-    "numIconPresetKey": "N_tokyu",
-    "numIconSymbol": "T",
-    "numIconNumber": "19"
+    "numIcon": {
+      "isDraw": true,
+      "presetKey": "N_tokyu",
+      "symbol": "T",
+      "number": "19",
+      "color": "#009900"
+    }
   },
   "carNumber": 3,
 
@@ -87,12 +92,22 @@
       "name": "東京",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
-      "stationIconType": "0", 
+      "numIcon": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
+      "stationIconType": "0",
       "sectionTime": "20",
       "transfersText": [
         ":M:京浜東北線",
@@ -108,11 +123,21 @@
       "name": "上野",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
       "stationIconType": "0",
       "sectionTime": "20",
       "transfersText": [
@@ -129,11 +154,21 @@
       "name": "尾久",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "1",
       "stationIconType": "0",
       "sectionTime": "20",
       "transfersText": [
@@ -150,11 +185,21 @@
       "name": "赤羽",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
       "stationIconType": "0",
       "sectionTime": "20",
       "transfersText": [
@@ -171,11 +216,21 @@
       "name": "浦和",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
       "stationIconType": "0",
       "sectionTime": "20",
       "transfersText": [
@@ -192,11 +247,21 @@
       "name": "さいたま新都心",
       "kana": "きんげつどう",
       "eng": "Kinge",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "1",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "1",
       "stationIconType": "1",
       "sectionTime": "20",
       "transfersText": [
@@ -213,11 +278,21 @@
       "name": "大宮",
       "kana": "きんげつどう",
       "eng": "Kingetsudōooooooooo",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
       "stationIconType": "1",
       "sectionTime": "20",
       "transfersText": [
@@ -234,11 +309,21 @@
       "name": "土呂",
       "kana": "きんげつどう",
       "eng": "Kingetsudōooooooooo",
-      "lineColor": "#8700f3",
-      "numIconPresetKey": "N_tokyu",
-      "numIconSymbol": "G",
-      "numIconNumber": "12",
-      "lineNumberType": "0",
+      "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+      },
+      "numIconNext": {
+        "isDraw": false,
+        "presetKey": "N_tokyu",
+        "symbol": "TY",
+        "number": "08",
+        "color": "#0000CC"
+      },
+      "numIconType": "0",
       "stationIconType": "1",
       "sectionTime": "20",
       "transfersText": [
