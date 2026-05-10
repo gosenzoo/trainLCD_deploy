@@ -59,64 +59,92 @@
     <!-- ヘッダー背景 -->
     <rect lcdParts="static" id="header-back" x="0" y="0" width="1920" height="350" fill="url(#tokyuBackGradient)" filter="url(#dropShadow)" />
 
-    <!-- 号車表示 -->
-    <g lcdParts="static" id="header-carNum">
-      <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
-      <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
-    </g>
-    <rect lcdParts="textBox" lcdText="#{carNumber}" visible="true" id="carNumText" x="1723" y="39" width="78" height="78" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "middle"}' lang="en" />
-    <rect lcdParts="textBox" lcdText="号車" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="carText" x="1822" y="80" width="78" height="38" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
-    <rect lcdParts="textBox" lcdText="car No." lcd-animType="fade" visible="langId == 2" id="carTextEng" x="1575" y="35" width="125" height="38" fill="#99999950" data-style='{"fontWeight": "regular", "fontFamily": "sans-serif", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
 
-    <!-- 行先方面表示 -->
-    <g lcdParts="arrange" visible="(langId == 0) or (langId == 1)" lcd-animType="fade" arrange-interval="10" arrange-axis="x">
-      <rect lcdParts="arrangeArea" x="431" y="34" width="1136" height="79" fill="#99999950" />
-
-      <rect lcdParts="textBox" lcdText="#{viaText}" lcd-fitX="true" x="431" y="51" width="200" height="62" lcd-verAlign="bottom" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-      <rect lcdParts="textBox" lcdText="#{destination}" lcd-fitX="true" x="431" y="34" width="200" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-      <rect lcdParts="textBox" lcdText="ゆき" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-    </g>
-    <g lcdParts="arrange" visible="langId == 2" arrange-interval="10" lcd-animType="fade" arrange-axis="x">
-      <rect lcdParts="arrangeArea" x="431" y="34" width="1136" height="79" fill="#99999950" />
-      <rect lcdParts="textBox" lcdText="for" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-      <rect lcdParts="textBox" lcdText="#{destinationEng}" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-    </g>
-
-    <!-- 長時間停車中 -->
-    <rect id="header-viaTextStop" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-    <rect id="header-viaTextStopEng" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-    <rect id="header-stopYukiText" x="1750" y="224" width="150" height="86" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
-    <rect id="header-stopYukiTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
 
     <!-- 種別表示 -->
-    <g lcdParts="static" id="header-trainType">
+    <g lcdParts="group" isDraw="!isTerminal">
+      <g lcdParts="static" id="header-trainType">
       <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
       <rect id="trainTypeBackColor" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
       <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
+      </g>
+      <rect lcdParts="textBox" lcdText="#{trainType}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
+      <rect lcdParts="textBox" lcdText="#{trainTypeEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
+      <!-- 種別補足表示 -->
+      <rect lcdParts="textBox" lcdText="#{trainTypeSubText}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeSubText" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+      <rect lcdParts="textBox" lcdText="#{trainTypeSubTextEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeSubTextEng" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
     </g>
-    <rect lcdParts="textBox" lcdText="#{trainType}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
-    <rect lcdParts="textBox" lcdText="#{trainTypeEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
-    <!-- 種別補足表示 -->
-    <rect lcdParts="textBox" lcdText="#{trainTypeSubText}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeSubText" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
-    <rect lcdParts="textBox" lcdText="#{trainTypeSubTextEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeSubTextEng" x="23" y="133" width="359" height="43" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
 
-    <!-- ナンバリング -->
-    <rect lcdParts="numbering" lcd-numKey="#{nowStation.numIconPresetKey}" symbolText="#{nowStation.numIconSymbol}" numberText="#{nowStation.numIconNumber}" lineColor="#{nowStation.lineColor}" outlineWidth="5" x="482" y="152" width="163" height="162" />
 
-    <!-- 駅名 -->
-    <rect lcdParts="textBox" lcdText="#{nowStation.name}" lcd-animType="kuru" visible="langId == 0" id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
-    <rect lcdParts="textBox" lcdText="#{nowStation.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
-    <rect lcdParts="textBox" lcdText="#{nowStation.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
 
-    <!-- つぎは、まもなく、ただいま -->
-    <rect lcdParts="textBox" lcdText="ただいま" lcd-animType="fade" visible="(runState == 0) and ((langId == 0) or (langId == 1)) and !(isTerminal)" id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
-    <rect lcdParts="textBox" lcdText="つぎは" lcd-animType="fade" visible="(runState == 1) and ((langId == 0)  or (langId == 1)) and !(isTerminal)" id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
-    <rect lcdParts="textBox" lcdText="まもなく" lcd-animType="fade" visible="(runState == 2) and ((langId == 0) or (langId == 1)) and !(isTerminal)" id="header-runStateText" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
-    <rect lcdParts="textBox" lcdText="Next" lcd-animType="fade" visible="(langId == 2) and !(runState == 0) and !(isTerminal)" id="header-runStateTextEng" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+    <!-- 号車表示 -->
+    <g lcdParts="group">
+      <g lcdParts="static">
+        <rect x="1708" y="22" width="108" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+        <rect x="1711" y="25" width="102" height="102" rx="11" ry="11" fill="url(#outerGradient)" />
+      </g>
+      <rect lcdParts="textBox" lcdText="#{carNumber}" visible="true" id="carNumText" x="1723" y="39" width="78" height="78" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "middle"}' lang="en" />
+      <rect lcdParts="textBox" lcdText="号車" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="carText" x="1822" y="80" width="78" height="38" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
+      <rect lcdParts="textBox" lcdText="car No." lcd-animType="fade" visible="langId == 2" id="carTextEng" x="1575" y="35" width="125" height="38" fill="#99999950" data-style='{"fontWeight": "regular", "fontFamily": "sans-serif", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' />
+    </g>
 
-    <rect lcdParts="textBox" lcdText="ただいま終点" lcd-animType="fade" visible="(runState == 0) and ((langId == 0) or (langId == 1)) and (isTerminal)" id="header-runStateTerminalText" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
-    <rect lcdParts="textBox" lcdText="つぎは終点" lcd-animType="fade" visible="(runState == 1) and ((langId == 0) or (langId == 1)) and (isTerminal)" id="header-runStateTerminalText" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
-    <rect lcdParts="textBox" lcdText="まもなく終点" lcd-animType="fade" visible="(runState == 2) and ((langId == 0) or (langId == 1)) and (isTerminal)" id="header-runStateTerminalText" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
-    <rect lcdParts="textBox" lcdText="Next Terminal" lcd-animType="fade" visible="(langId == 2) and !(runState == 0) and (isTerminal)" id="header-runStateTerminalTextEng" x="45" y="200" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+
+
+    <!-- 長時間停車中でない -->
+    <g lcdParts="group" isDraw="!isStopping">
+      <!-- 行先方面表示 -->
+      <g lcdParts="group" isDraw="!isTerminal">
+        <g lcdParts="arrange" visible="langId != 2" lcd-animType="fade" arrange-interval="10" arrange-axis="x">
+          <rect lcdParts="arrangeArea" x="431" y="34" width="1136" height="79" fill="#99999950" />
+          <rect lcdParts="textBox" lcdText="#{viaText}" lcd-fitX="true" x="431" y="51" width="200" height="62" lcd-verAlign="bottom" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+          <rect lcdParts="textBox" lcdText="#{destination.name}" lcd-fitX="true" x="431" y="34" width="200" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+          <rect lcdParts="textBox" lcdText="ゆき" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+        </g>
+        <g lcdParts="arrange" visible="langId == 2" arrange-interval="10" lcd-animType="fade" arrange-axis="x">
+          <rect lcdParts="arrangeArea" x="431" y="34" width="1136" height="79" fill="#99999950" />
+          <rect lcdParts="textBox" lcdText="for" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+          <rect lcdParts="textBox" lcdText="#{destination.eng}" lcd-fitX="true" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+        </g>
+      </g>
+      <!-- 駅名 -->
+      <g lcdParts="group">
+        <rect lcdParts="textBox" lcdText="#{nowStation.name}" lcd-animType="kuru" visible="langId == 0" id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
+        <rect lcdParts="textBox" lcdText="#{nowStation.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="#{nowStation.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
+        <!-- ナンバリング -->
+        <rect lcdParts="numbering" lcd-numKey="#{nowStation.numIconPresetKey}" symbolText="#{nowStation.numIconSymbol}" numberText="#{nowStation.numIconNumber}" lineColor="#{nowStation.lineColor}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+      </g>
+      <!-- つぎは、まもなく、ただいま -->
+      <g lcdParts="group">
+        <g lcdParts="group" isDraw="!isTerminal">
+          <rect lcdParts="textBox" lcdText="ただいま" lcd-animType="fade" visible="langId != 2" isDraw="runState == 0" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+          <rect lcdParts="textBox" lcdText="つぎは" lcd-animType="fade" visible="langId != 2" isDraw="runState == 1" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+          <rect lcdParts="textBox" lcdText="まもなく" lcd-animType="fade" visible="langId != 2" isDraw="runState == 2" x="75" y="240" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+          <rect lcdParts="textBox" lcdText="Next" lcd-animType="fade" visible="langId == 2" isDraw="!(runState == 0)" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+        </g>
+        <g lcdParts="group" isDraw="isTerminal">
+          <rect lcdParts="textBox" lcdText="終点" lcd-animType="fade" visible="langId != 2" isDraw="runState == 0" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
+          <rect lcdParts="textBox" lcdText="つぎは終点" lcd-animType="fade" visible="langId != 2" isDraw="runState == 1" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
+          <rect lcdParts="textBox" lcdText="まもなく終点" lcd-animType="fade" visible="langId != 2" isDraw="runState == 2" x="45" y="240" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end", "letterSpacing": {"2": "25px"}}' />
+          <rect lcdParts="textBox" lcdText="Next Terminal" lcd-animType="fade" visible="langId == 2" isDraw="!(runState == 0)" x="45" y="200" width="400" height="73" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "end"}' />
+        </g>
+      </g>
+    </g>
+
+
+
+    <!-- 長時間停車中 -->
+    <g lcdParts="group" isDraw="isStopping">
+      <!-- 行先方面表示 -->
+      <rect lcdParts="textBox" lcdText="#{viaText}" visible="langId != 2" lcd-animType="fade" x="431" y="34" width="1136" height="79" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "start", "fill": "rgb(255, 255, 255)"}' />
+      <rect lcdParts="textBox" lcdText="ゆき" visible="langId != 2" lcd-animType="fade" x="1750" y="224" width="150" height="86" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "BIZ UDGothic", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
+      <rect lcdParts="textBox" lcdText="for"  visible="langId == 2" lcd-animType="fade" x="75" y="200" width="305" height="73" fill="#99999950" data-style='{"fontWeight": "bold", "fontFamily": "sans-serif", "textAnchor": "end", "fill": "rgb(255, 255, 255)"}' />
+      <!-- 行先名 -->
+      <rect lcdParts="textBox" lcdText="#{destination.name}" lcd-animType="kuru" visible="langId == 0" id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
+      <rect lcdParts="textBox" lcdText="#{destination.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
+      <rect lcdParts="textBox" lcdText="#{destination.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
+      <!-- ナンバリング -->
+      <rect lcdParts="numbering" lcd-numKey="#{destination.numIconPresetKey}" symbolText="#{destination.numIconSymbol}" numberText="#{destination.numIconNumber}" lineColor="#{destination.lineColor}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+    </g>
   </g>
 </svg>

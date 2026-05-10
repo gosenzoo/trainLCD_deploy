@@ -88,6 +88,7 @@
     <button id="isdrawtime-btn"    class="toolbar-btn">isDrawTime [E]</button>
     <button id="isdrawlinename-btn"      class="toolbar-btn">isDrawLineName [N]</button>
     <button id="isdawnextstation-btn" class="toolbar-btn">isDrawNextStation [S]</button>
+    <button id="isstopping-btn"       class="toolbar-btn">isStopping [I]</button>
     <button id="page-btn"            class="toolbar-btn">ページ切替 [P]</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="debug-chk" style="accent-color:#569cd6;">
@@ -235,6 +236,10 @@
         toggleBoolParam('isDrawNextStation');
         redraw();
       }
+      function doIsStoppingToggle() {
+        toggleBoolParam('isStopping');
+        redraw();
+      }
       function doPageCycle() {
         drawer.pageReload();
         redraw();
@@ -247,6 +252,7 @@
       document.getElementById('isdrawtime-btn')      .addEventListener('click', doIsDrawTimeToggle);
       document.getElementById('isdrawlinename-btn')  .addEventListener('click', doIsDrawLineNameToggle);
       document.getElementById('isdawnextstation-btn').addEventListener('click', doIsDrawNextStationToggle);
+      document.getElementById('isstopping-btn')       .addEventListener('click', doIsStoppingToggle);
       document.getElementById('page-btn')            .addEventListener('click', doPageCycle);
 
       document.addEventListener('keydown', e => {
@@ -261,6 +267,7 @@
         else if (key === 'E') doIsDrawTimeToggle();
         else if (key === 'N') doIsDrawLineNameToggle();
         else if (key === 'S') doIsDrawNextStationToggle();
+        else if (key === 'I') doIsStoppingToggle();
         else if (key === 'P') doPageCycle();
       });
     };

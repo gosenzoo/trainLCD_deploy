@@ -1,6 +1,7 @@
 {
   "langId": 0,
   "runState": 1,
+  "isStopping": false,
   "numIconPresetKeys": ["N_tokyu"],
   "isTerminal": false,
   "isNextStation": true,
@@ -16,10 +17,8 @@
    "numIconPresetKey": "N_tokyu",
    "numIconSymbol": "G",
    "numIconNumber": "12",
-   "lineNumberType": "0",
+
    "transfers": "",
-   "isPass": false,
-   "lineId": "4",
    "transferText": "",
    "transferTextEng": "",
    "doorSide": "left",
@@ -32,8 +31,15 @@
   },
   "nextStopName": "七戸十和田",
   "viaText": "東北新幹線直通",
-  "destination": "新青森",
-  "destinationEng": "Chuo-Rinkan",
+  "destination": {
+    "name": "新青森",
+    "kana": "しんあおもり",
+    "eng": "Shin-Aomori",
+    "lineColor": "#009900",
+    "numIconPresetKey": "N_tokyu",
+    "numIconSymbol": "T",
+    "numIconNumber": "19"
+  },
   "carNumber": 3,
 
 
