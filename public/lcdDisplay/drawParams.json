@@ -343,7 +343,7 @@
     "drawPos": 40,
     "rootSection": {
       "color": "rgb(200, 200, 200)",
-      "type": 1,
+      "type": 0,
       "lineName": "田園都市線",
       "lineNameEng": "Den-en-toshi Line",
       "lineNameColor": "rgb(0, 255, 0)",
@@ -351,7 +351,7 @@
     },
     "arrowSection": {
       "color": "rgb(255, 0, 0)",
-      "type": 1,
+      "type": 0,
       "lineName": "田園都市線",
       "lineNameEng": "Den-en-toshi Line",
       "lineNameColor": "rgb(255, 0, 0)",

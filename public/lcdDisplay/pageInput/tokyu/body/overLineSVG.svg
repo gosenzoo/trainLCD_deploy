@@ -54,7 +54,7 @@
             <rect lcdParts="groupArea" x="0" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
             <!-- <rect lcdParts="static" isDraw="(overLine.rootSection.type == 0) and (overLine.rootSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowLeft)" shadowId="" x="0" y="721" width="143" height="87" fill="url(#lineShadowLeft)" /> -->
-            <!-- <path lcdParts="static" isDraw="overLine.rootSection.type == 0" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" /> -->
+            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 180 840 V 882 H 158 a 21 21 0 0 1 -21 -21 a 21 21 0 0 1 21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 1:進行方向でないかつ続く(端に届く) -->
             <rect lcdParts="static" isDraw="(overLine.rootSection.type == 1) and (direction == 0)" x="0" y="840" width="180" height="42" fill="rgba(227,127,127,0.4)" />
             <!-- 路線ベース路線名テキスト左側 -->
@@ -80,7 +80,7 @@
             <rect lcdParts="groupArea" x="1740" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
             <!-- <rect lcdParts="static" isDraw="(arrowSection.type == 0) and (arrowSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowRight)" shadowId="" x="1777" y="721" width="143" height="87" fill="url(#lineShadowRight)" /> -->
-            <!-- <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" /> -->
+            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 1740 840 V 882 H 1762 a 21 21 0 0 0 21 -21 a 21 21 0 0 0 -21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 2:進行方向かつ続く(矢印) -->
             <polygon lcdParts="static" isDraw="(overLine.arrowSection.type == 1) and (direction == 0)" points="1740,840 1783,840 1801,861 1783,882 1740,882" fill="rgba(221, 221, 221, 0.4)" />
             <!-- 路線ベース路線名テキスト右側 -->
@@ -104,7 +104,7 @@
             <rect lcdParts="groupArea" x="1740" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
             <!-- <rect lcdParts="static" isDraw="(overLine.rootSection.type == 0) and (overLine.rootSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowRight)" shadowId="" x="1777" y="721" width="143" height="87" fill="url(#lineShadowRight)" /> -->
-            <!-- <path lcdParts="static" isDraw="overLine.rootSection.type == 0" d="M 1850 721 H 1694 V 808 H 1850 a 10 10 0 0 0 10 -10 V 731 a 10 10 0 0 0 -10 -10 Z" data-basePoint="1694,721" fill="rgba(221, 221, 221, 0.4)" /> -->
+            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 1740 840 V 882 H 1762 a 21 21 0 0 0 21 -21 a 21 21 0 0 0 -21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 1:進行方向でないかつ続く(端に届く) -->
             <rect lcdParts="static" isDraw="(overLine.rootSection.type == 1) and (direction == 1)" x="1740" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 路線ベース路線名テキスト右側 -->
@@ -129,8 +129,8 @@
         <g lcdParts="group" lcd-color="overLine.arrowSection.color">
             <rect lcdParts="groupArea" x="0" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
-            <rect lcdParts="static" isDraw="(overLine.arrowSection.type == 0) and (overLine.arrowSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowLeft)" shadowId="" x="0" y="721" width="143" height="87" fill="url(#lineShadowLeft)" />
-            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 70 721 H 226 V 808 H 70 a 10 10 0 0 1 -10 -10 V 731 a 10 10 0 0 1 10 -10 Z" fill="rgba(215,129,129,0.4)" />
+            <!-- <rect lcdParts="static" isDraw="(overLine.arrowSection.type == 0) and (overLine.arrowSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowLeft)" shadowId="" x="0" y="721" width="143" height="87" fill="url(#lineShadowLeft)" /> -->
+            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 180 840 V 882 H 158 a 21 21 0 0 1 -21 -21 a 21 21 0 0 1 21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 2:進行方向かつ続く(矢印) -->
             <polygon lcdParts="static" isDraw="overLine.arrowSection.type == 1" points="180,840 137,840 119,861 137,882 180,882" fill="rgba(227,127,127,0.4)" />
             <!-- 路線ベース路線名テキスト左側 -->
@@ -175,16 +175,16 @@
                     repeatCount="indefinite"
                     calcMode="discrete" />
                 </polygon>
-                <polygon lcdParts="static" points="200,842 222,842 237,861 222,880 200,880 218,861"
+                <polygon lcdParts="static" points="203,842 222,842 237,861 222,880 200,880 218,861"
                         fill="url(#innerGradient)"
                         style="mix-blend-mode: multiply;" />
             </g>
         </g>
         <g lcdParts="group" isDraw="direction == 1" slotPoint="overLine.stationFrameNum * 2 - 2 - (overLine.drawPos + (overLine.stationFrameNum - overLine.dispStationList.length) * 2)" >
-            <rect lcdParts="groupArea" x="172" y="721" width="108" height="87" fill="#99999950"/>
+            <rect lcdParts="groupArea" x="173" y="840" width="78" height="42" fill="#99999950"/>
             <g lcdParts="group" isDraw="direction == 1">
-                <polygon lcdParts="static" points="280,719 220,719 176,764.5 219,809 279,809 236,764.5" fill="white" />
-                <polygon lcdParts="static" points="272,721 224,721 182,764.5 225,809 273,809 230,764.5">
+                <polygon lcdParts="static" points="225,840 200,840 184,861 200,882 225,882 209,861" fill="white" />
+                <polygon lcdParts="static" points="221,842 202,842 187,861 202,880 221,880 206,861,764.5">
                     <animate
                     attributeName="fill"
                     values="red;blue"
@@ -192,7 +192,7 @@
                     repeatCount="indefinite"
                     calcMode="discrete" />
                 </polygon>
-                <polygon lcdParts="static" points="272,721 224,721 182,764.5 225,809 273,809 230,764.5"
+                <polygon lcdParts="static" points="221,842 202,842 187,861 202,880 221,880 206,861"
                         fill="url(#innerGradient)"
                         style="mix-blend-mode: multiply;" />
             </g>
@@ -277,6 +277,6 @@
 
     <!-- 参考画像 -->
     <!-- <image href="../../../imgs/tokyu-time.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
-    <!-- <image href="../../../imgs/tokyu-overLineJP.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
-    <image href="../../../imgs/tokyu-overLineENG.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+    <image href="../../../imgs/tokyu-overLineJP.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+    <!-- <image href="../../../imgs/tokyu-overLineENG.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
 </svg>
