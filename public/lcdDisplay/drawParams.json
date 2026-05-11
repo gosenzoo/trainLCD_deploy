@@ -1,4 +1,12 @@
 {
+  "Pages": [
+    "defaultLineSVG.svg",
+    "overLineSVG.svg",
+    "transfers.svg",
+    "platform.svg"
+  ],
+
+
   "langId": 0,
   "runState": 1,
   "isStopping": false,
@@ -81,11 +89,6 @@
   "isDrawNextStation": true,
   "isDrawTime": true,
   "isDrawLineName": true,
-
-  "Pages": [
-    "defaultLineSVG.svg",
-    "overLineSVG.svg"
-  ],
 
   "dispStationList": [
     {
