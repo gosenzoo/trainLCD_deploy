@@ -56,11 +56,40 @@
     <rect lcdParts="static" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(./defs.svg#dropShadow2)"></rect>
     <rect lcdParts="textBox" lcdText="のりかえ" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
     <rect lcdParts="textBox" lcdText="Transfer" x="32" y="942" width="203" height="36" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}'></rect>
-    <!-- 乗換欄 -->
-    <!-- <rect id="transferListAreaMulti" x="280" y="866" width="1600" height="128" fill="#999999"></rect> -->
-    <!-- <rect id="transferListArea" x="280" y="886" width="1600" height="88" fill="#5f5f5f"></rect> -->
+    
+    <!-- 乗換欄1行 -->
+    <g lcdParts="arrange" isDraw="platform.transfers.length == 1" arrange-interval="40">
+        <rect lcdParts="arrangeArea" x="280" y="886" width="1600" height="88" fill="#d2d2d244" />
+        <g lcdParts="arrange" lcd-arg="transfer:platform.transfers[0]" arrange-interval="10" lcd-fitX="true">
+            <rect lcdParts="arrangeArea" x="280" y="886" width="500" height="88" fill="#d2d2d2FF" />
+            <rect lcdParts="textBox" lcdText="#{$transfer.lineIcon}" lcd-minComRatio="1" lcd-fitX="true" x="280" y="886" width="90" height="88" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start", "letterSpacing": "5px"}' />
+            <g lcdParts="arrange" arrange-interval="3" arrange-axis="y" lcd-fitX="true">
+                <rect lcdParts="arrangeArea" x="380" y="886" width="300" height="88" fill="#999999" />
+                <rect lcdParts="textBox" lcdText="#{$transfer.name}" lcd-fitX="true" x="380" y="886" width="300" height="57" fill="#444444" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' />
+                <rect lcdParts="textBox" lcdText="#{$transfer.eng}" lcd-fitX="true" x="380" y="946" width="300" height="28" fill="#444444" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' />
+            </g>
+        </g>
+    </g>
+    <!-- 乗換欄複数行 -->
+    <g lcdParts="arrange" isDraw="platform.transfers.length != 1" arrange-axis="y" arrange-interval="5">
+        <rect lcdParts="arrangeArea" x="280" y="866" width="1600" height="128" fill="#999999" />
+        <!-- 各行 -->
+        <g lcdParts="arrange" lcd-arg="transferList:platform.transfers" lcd-fitX="true" arrange-interval="10">
+            <rect lcdParts="arrangeArea" x="280" y="886" width="1600" height="88" fill="#d2d2d244" />
+            <!-- 各パーツ -->
+            <g lcdParts="arrange" lcd-arg="transfer:$transferList" arrange-interval="10" lcd-fitX="true">
+                <rect lcdParts="arrangeArea" x="280" y="886" width="500" height="88" fill="#d2d2d2FF" />
+                <rect lcdParts="textBox" lcdText="#{$transfer.lineIcon}" lcd-minComRatio="1" lcd-fitX="true" x="280" y="886" width="90" height="88" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start", "letterSpacing": "5px"}' />
+                <g lcdParts="arrange" arrange-interval="3" arrange-axis="y" lcd-fitX="true">
+                    <rect lcdParts="arrangeArea" x="380" y="886" width="300" height="88" fill="#999999" />
+                    <rect lcdParts="textBox" lcdText="#{$transfer.name}" lcd-fitX="true" x="380" y="886" width="300" height="57" fill="#444444" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' />
+                    <rect lcdParts="textBox" lcdText="#{$transfer.eng}" lcd-fitX="true" x="380" y="946" width="300" height="28" fill="#444444" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' />
+                </g>
+            </g>
+        </g>
+    </g>
 
 
     <!-- 参考画像 -->
-    <!-- <image id="platform-jitubutu" href="../.././platform-jitubutu.png" x="0" y="0" width="1920" height="1080" opacity="0.5" /> -->
+    <image id="platform-jitubutu" href="../../../imgs/tokyu-platform.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
 </svg>

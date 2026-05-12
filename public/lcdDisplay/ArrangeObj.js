@@ -323,8 +323,10 @@ class ArrangeObj extends GObj {
             const crossNatural = isX ? this._childNaturalSizes[i].height : this._childNaturalSizes[i].width;
             if (hasFitAxis) {
                 // axis方向もcross方向も、fitが指定されていれば擬似無限を渡す
-                const crossFit  = isX ? child.fitY : child.fitX;
-                const crossSize = crossFit ? INFINITE : crossNatural;
+                // cross方向は、親から渡された圧縮後サイズを上限とする（7.13）
+                const crossFit    = isX ? child.fitY : child.fitX;
+                const actualCross = isX ? this.height : this.width;
+                const crossSize   = crossFit ? INFINITE : Math.min(crossNatural, actualCross);
                 child.setSize(isX ? INFINITE : crossSize, isX ? crossSize : INFINITE);
                 const r = child.getRealSize();
                 return isX ? r.width : r.height;
@@ -338,9 +340,11 @@ class ArrangeObj extends GObj {
         this._axisSizes    = axisSizes;
 
         // パス3: 圧縮後サイズで各子要素を最終setSize
+        // cross方向は、親から渡された圧縮後サイズを上限とする（7.13）
         this.children.forEach((child, i) => {
             const crossNatural = isX ? this._childNaturalSizes[i].height : this._childNaturalSizes[i].width;
-            const crossSize    = (isX ? child.fitY : child.fitX) ? (isX ? this.height : this.width) : crossNatural;
+            const actualCross  = isX ? this.height : this.width;
+            const crossSize    = (isX ? child.fitY : child.fitX) ? actualCross : Math.min(crossNatural, actualCross);
             child.setSize(isX ? axisSizes[i] : crossSize, isX ? crossSize : axisSizes[i]);
         });
 

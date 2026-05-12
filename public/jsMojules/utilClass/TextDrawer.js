@@ -175,78 +175,100 @@ class TextDrawer{
 
         const textList = text.split(":"); //テキストと、絵文字IDに分割
         if(textList.length % 2 === 0){ //:での分割数が偶数の場合、:が奇数となる。つまり構文エラーなのでnullを返す
-            return null; 
+            return null;
         }
 
-        const spacing = 1;
+        // 空文字を除いたユニット（テキスト or アイコン）を収集する
+        // アイコンは1文字として扱い、テキストは文字数分としてカウントする
+        const units = []; // { type: 'text'|'icon', content: string }
+        let totalCharUnits = 0;
+        for(let i = 0; i < textList.length; i++){
+            if(textList[i] === "") continue;
+            if(i % 2 === 0){
+                units.push({ type: 'text', content: textList[i] });
+                totalCharUnits += textList[i].length;
+            } else {
+                units.push({ type: 'icon', content: textList[i] });
+                totalCharUnits += 1;
+            }
+        }
+        if(units.length === 0) return null;
 
+        // letterSpacingを解決する（オブジェクト形式は総文字単位数をキーに、文字列形式はそのまま使用）
+        const resolvedStyleJson = Object.assign({}, styleJson);
+        if(this.isObject(resolvedStyleJson.letterSpacing)){
+            const key = `${totalCharUnits}`;
+            resolvedStyleJson.letterSpacing = Object.prototype.hasOwnProperty.call(resolvedStyleJson.letterSpacing, key)
+                ? resolvedStyleJson.letterSpacing[key]
+                : "0px";
+        }
+        const letterSpacingPx = resolvedStyleJson.letterSpacing != null
+            ? (parseInt(resolvedStyleJson.letterSpacing) || 0)
+            : 0;
+
+        // 各ユニットの自然幅を算出する（アイコン: height、テキスト: getTextWidth）
+        const fontSize = this.getFontSize(height * textHeightRatio, styleJson.fontFamily, lang);
+        units.forEach(unit => {
+            unit.naturalWidth = unit.type === 'icon'
+                ? height
+                : this.getTextWidth(unit.content, fontSize, resolvedStyleJson);
+        });
+
+        // 総自然幅 = 各ユニット幅の合計 + ユニット間letterSpacing × (N-1)
+        const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0)
+            + letterSpacingPx * (units.length - 1);
+
+        // maxWidthを超える場合は全ユニット幅・間隔に均等な圧縮比率を適用する
+        const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
+        const scaledGap = letterSpacingPx * scale;
+
+        // ユニットを順番に配置する
+        const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        let nowX = x;
         let wholeWidth = 0;
 
-        //空文字を除いたテキスト、絵文字IDの数をそれぞれ計算
-        let textCnt = 0;
-        let iconCnt = 0;
-        for(let i = 0; i < textList.length; i++){
-            if(textList[i] === ""){ continue; } //空文字ならスキップ
-            if(i % 2 === 0){ //テキストなら
-                textCnt++;
-            }
-            else{ //アイコンなら
-                iconCnt++;
-            }
-        }
-        //テキストに割り振れる幅を計算
-        const allTextWidth = width - (height + spacing) * iconCnt;
-        if(allTextWidth < 0){ return null; } //アイコンの幅がテキストの幅を超える場合、nullを返す
-        let textWidth = allTextWidth / textCnt; //アイコンを除いたテキストの幅を計算
+        units.forEach((unit, idx) => {
+            const unitWidth = unit.naturalWidth * scale;
+            const isLast = idx === units.length - 1;
 
-        //テキスト描画
-        const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        let nowX = x; //現在のx座標
-        for(let i = 0; i < textList.length; i++){
-            if(i % 2 === 0){ //テキストなら
-                if(textList[i] === ""){ 
-                    //空文字ならアイコン間隔をあけてスキップ
-                    nowX += spacing;
-                    wholeWidth += spacing;
-                    continue;
-                }
+            if(unit.type === 'text'){
+                // テキストはcreateByAreaで描画（resolvedStyleJsonでletterSpacingを引き継ぐ）
                 const textObj = this.createByArea(
-                    textList[i], nowX, y + (height * (1 - textHeightRatio) / 2), textWidth, height * textHeightRatio, styleJson, lang
+                    unit.content,
+                    nowX,
+                    y + (height * (1 - textHeightRatio) / 2),
+                    unitWidth,
+                    height * textHeightRatio,
+                    Object.assign({}, resolvedStyleJson),
+                    lang
                 );
-                iconTextElem.appendChild(textObj.element);
-                nowX += textObj.width; //次のテキストのx座標を更新
-                wholeWidth += textObj.width;
-            }
-            else{ //アイコンなら
-                if(textList[i] === ""){ continue; } //空文字ならスキップ
-                if(typeof this.iconDict[textList[i]] === "string"){
+                if(textObj) iconTextElem.appendChild(textObj.element);
+            } else {
+                // アイコンの描画
+                if(typeof this.iconDict[unit.content] === "string"){
                     //base64なら
                     const iconElem = document.createElementNS("http://www.w3.org/2000/svg", "image");
-                    iconElem.setAttribute("href", this.iconDict[textList[i]]); //アイコンのURLを設定
+                    iconElem.setAttribute("href", this.iconDict[unit.content]);
                     iconElem.setAttribute("x", String(nowX));
                     iconElem.setAttribute("y", String(y));
-                    iconElem.setAttribute("width", String(height));
+                    iconElem.setAttribute("width", String(unitWidth));
                     iconElem.setAttribute("height", String(height));
                     iconTextElem.appendChild(iconElem);
-                    nowX += height; //次のアイコンのx座標を更新
-                    wholeWidth += height;
-                }
-                else{
+                } else {
                     //プリセットなら
-                    const iconParams = this.iconDict[textList[i]];
-                    const geometory = {
-                        x: nowX,
-                        y: y,
-                        width: height,
-                        height: height,
-                    }
-                    const icon = this.numIconDrawer.createNumIconFromPreset(iconParams.presetType, iconParams.symbol, "", iconParams.color, geometory, 0);
+                    const iconParams = this.iconDict[unit.content];
+                    const geometory = { x: nowX, y: y, width: unitWidth, height: height };
+                    const icon = this.numIconDrawer.createNumIconFromPreset(
+                        iconParams.presetType, iconParams.symbol, "", iconParams.color, geometory, 0
+                    );
                     iconTextElem.appendChild(icon);
-                    nowX += height; //次のアイコンのx座標を更新
-                    wholeWidth += height;
                 }
             }
-        }
+
+            nowX += unitWidth + (isLast ? 0 : scaledGap);
+            wholeWidth += unitWidth + (isLast ? 0 : scaledGap);
+        });
+
         return {element: iconTextElem, width: wholeWidth};
     }
 

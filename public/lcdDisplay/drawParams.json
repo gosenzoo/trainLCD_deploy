@@ -18,26 +18,25 @@
   "trainTypeSubText": "八戸から各停",
   "trainTypeSubTextEng": "Local from Hachinohe",
   "nowStation": {
-   "name": "金月洞",
-   "kana": "きんげつどう",
-   "eng": "Kingetsudō",
-   "numIcon": {
-      "isDraw": true,
-      "presetKey": "N_tokyu",
-      "symbol": "G",
-      "number": "12",
-      "color": "#8700f3"
-   },
-   "transfers": "",
-   "transferText": "",
-   "transferTextEng": "",
-   "doorSide": "left",
-   "transferCountLineP": "",
-   "otherLineInd": "",
-   "slotNum": "0",
-   "leftSlotInd": "0",
-   "otherCarNum": "0",
-   "otherLeftSlotInd": "0"
+    "name": "金月洞",
+    "kana": "きんげつどう",
+    "eng": "Kingetsudō",
+    "numIcon": {
+        "isDraw": true,
+        "presetKey": "N_tokyu",
+        "symbol": "G",
+        "number": "12",
+        "color": "#8700f3"
+    },
+    "transferText": "",
+    "transferTextEng": "",
+    "doorSide": "left",
+    "transferCountLineP": "",
+    "otherLineInd": "",
+    "slotNum": "0",
+    "leftSlotInd": "0",
+    "otherCarNum": "0",
+    "otherLeftSlotInd": "0"
   },
   "nextStopName": "七戸十和田",
   "viaText": "東北新幹線直通",
@@ -845,6 +844,35 @@
         "sectionTime": "20",
         "isGray": false
       }
+    ]
+  },
+
+
+
+  "platform": {
+    "transfers": [
+      [
+        {
+          "lineIcon": ":M::D:",
+          "name": "東急線",
+          "eng": "Tokyu Line"
+        },
+        {
+          "lineIcon": ":j::k::n::s:",
+          "name": "地下鉄線",
+          "eng": "Tokyu Line"
+        },
+        {
+          "lineIcon": ":K:",
+          "name": "田園都市線",
+          "eng": "Tokyu Line"
+        },
+        {
+          "lineIcon": ":O:",
+          "name": "みなとみらい線",
+          "eng": "Tokyu Line"
+        }
+      ]
     ]
   }
 }

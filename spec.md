@@ -2292,6 +2292,55 @@ public/lcdDisplay/
 
 ---
 
+### 7.12 TextDrawer — createIconTextByArea の letterSpacing 対応
+
+#### 概要
+
+`createIconTextByArea`（コロン区切りのアイコン付きテキスト描画）において、アイコンを 1 文字として扱い、`letterSpacing` で指定した間隔をアイコン間・テキスト間・アイコンとテキスト間のすべてに適用する。
+
+#### 文字単位数のカウント
+
+テキストセグメントは文字数（`.length`）、アイコンは 1 としてカウントする。空文字セグメントはカウントしない。
+
+例: `:M::D:` → アイコン2個 → 総単位数 = 2  
+例: `:M:東急` → アイコン1 + テキスト2文字 → 総単位数 = 3
+
+#### letterSpacing の解決
+
+| styleJson.letterSpacing の型 | 解決方法 |
+|---|---|
+| オブジェクト `{"2": "30px"}` | 総文字単位数をキーとして値を取り出す。キーが存在しない場合は 0px |
+| 文字列 `"30px"` | そのまま使用 |
+| 未指定 | 0px |
+
+解決した letterSpacing をテキストセグメントへの `createByArea` 呼び出し時にも渡す（テキスト内部の文字間隔にも適用される）。
+
+#### 幅の算出と圧縮
+
+1. 各ユニットの自然幅を算出する
+   - アイコン: `height` px
+   - テキスト: `getTextWidth(text, fontSize, resolvedStyleJson)` の返り値
+2. N ユニット間に letterSpacing を N-1 箇所挿入した総自然幅を計算する
+3. 総自然幅 > maxWidth の場合: `scale = maxWidth / 総自然幅` を全ユニット幅・間隔に均等適用
+
+#### 配置
+
+ユニットを左から順番に配置する。最後のユニットの後には gap を加えない。
+
+| ユニット種別 | 処理 |
+|---|---|
+| テキスト | `createByArea(text, nowX, y+offset, unitWidth, height*textHeightRatio, resolvedStyleJson, lang)` |
+| アイコン（base64） | `<image>` 要素を生成。`width` に圧縮後の unitWidth を設定 |
+| アイコン（preset） | `numIconDrawer.createNumIconFromPreset` を呼び出し。geometry.width に unitWidth を設定 |
+
+#### ファイル変更一覧
+
+| ファイル | 変更種別 | 内容 |
+|---|---|---|
+| `public/jsMojules/utilClass/TextDrawer.js` | 変更 | `createIconTextByArea` を書き換え。固定テキスト幅割り当てを廃止し、letterSpacing を考慮した自然幅ベースの配置に変更 |
+
+---
+
 ### データ受け渡し
 
 ```
@@ -2428,3 +2477,47 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 ```
 
 `iconDict` に登録されたキーを `:key:` 形式で記述すると、表示側で対応するアイコン画像に置換される。
+
+---
+
+### 7.13 ArrangeObj — cross 方向圧縮対応 (`setSize` 修正)
+
+#### 問題
+
+y 軸 arrange が子要素の高さを圧縮した場合（例: 88px → 61.5px）、子要素の x 軸 arrange は `setSize(width, 61.5)` を受け取る。  
+しかし `setSize` 内の pass1・pass3 では `_childNaturalSizes[i].height`（構築時の 88px）をそのまま cross 方向サイズとして使い続けていたため、子要素のアイコン・テキストが構築時の高さで自然幅を計算してしまい、圧縮後の高さ基準より広い自然幅が算出される。その結果、実際には十分なスペースがあるにもかかわらず横方向も過剰に圧縮された。
+
+#### 修正方針
+
+`setSize` の pass1・pass3 で `crossNatural` を使う箇所を `Math.min(crossNatural, actualCross)` に変更する。
+
+- `actualCross = isX ? this.height : this.width`（`setSize` 冒頭で更新済みの圧縮後サイズ）
+- cross が圧縮されていない場合は `min` の結果が変わらないため後方互換
+
+#### 変更箇所
+
+| ファイル | 対象 |
+|---|---|
+| `public/lcdDisplay/ArrangeObj.js` | `setSize` pass1・pass3 の `crossSize` 算出ロジック |
+
+#### 修正内容
+
+**pass1（fit 子要素の自然サイズ取得）**
+
+```javascript
+// 修正前
+const crossSize = crossFit ? INFINITE : crossNatural;
+// 修正後
+const actualCross = isX ? this.height : this.width;
+const crossSize = crossFit ? INFINITE : Math.min(crossNatural, actualCross);
+```
+
+**pass3（最終 setSize）**
+
+```javascript
+// 修正前
+const crossSize = (isX ? child.fitY : child.fitX) ? (isX ? this.height : this.width) : crossNatural;
+// 修正後
+const actualCross = isX ? this.height : this.width;
+const crossSize = (isX ? child.fitY : child.fitX) ? actualCross : Math.min(crossNatural, actualCross);
+```
