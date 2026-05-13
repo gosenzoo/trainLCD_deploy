@@ -214,13 +214,40 @@ class TextDrawer{
                 : this.getTextWidth(unit.content, fontSize, resolvedStyleJson);
         });
 
-        // 総自然幅 = 各ユニット幅の合計 + ユニット間letterSpacing × (N-1)
-        const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0)
-            + letterSpacingPx * (units.length - 1);
+        // isComIcon: trueなら全ユニット均等圧縮（従来動作）、falseならアイコン固定・テキストのみ圧縮
+        const isComIcon = styleJson.isComIcon === true;
+        const allGaps   = letterSpacingPx * (units.length - 1);
 
-        // maxWidthを超える場合は全ユニット幅・間隔に均等な圧縮比率を適用する
-        const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
-        const scaledGap = letterSpacingPx * scale;
+        let unitWidths; // 各ユニットの描画幅
+        let renderGap;  // ユニット間gap幅
+
+        if(isComIcon){
+            // 全ユニットを均等圧縮（従来動作）
+            const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0) + allGaps;
+            const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
+            unitWidths = units.map(u => u.naturalWidth * scale);
+            renderGap  = letterSpacingPx * scale;
+        } else {
+            // アイコン固定・テキストのみ圧縮（isComIcon: false）
+            // letterSpacingを含む固定幅からテキストに使えるスペースを算出する
+            const iconTotal = units.reduce((sum, u) => u.type === 'icon' ? sum + u.naturalWidth : sum, 0);
+            const textTotal = units.reduce((sum, u) => u.type === 'text' ? sum + u.naturalWidth : sum, 0);
+            const fixedTotal   = iconTotal + allGaps;
+            const availForText = width - fixedTotal;
+
+            if(textTotal > 0 && availForText > 0){
+                // テキストのみに圧縮率を適用、アイコンとgapは固定
+                const textRatio = availForText / textTotal;
+                unitWidths = units.map(u => u.type === 'icon' ? u.naturalWidth : u.naturalWidth * textRatio);
+                renderGap  = letterSpacingPx;
+            } else {
+                // フォールバック: テキストなし or 固定要素だけで超過 → 全体均等圧縮
+                const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0) + allGaps;
+                const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
+                unitWidths = units.map(u => u.naturalWidth * scale);
+                renderGap  = letterSpacingPx * scale;
+            }
+        }
 
         // ユニットを順番に配置する
         const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -228,7 +255,7 @@ class TextDrawer{
         let wholeWidth = 0;
 
         units.forEach((unit, idx) => {
-            const unitWidth = unit.naturalWidth * scale;
+            const unitWidth = unitWidths[idx];
             const isLast = idx === units.length - 1;
 
             if(unit.type === 'text'){
@@ -265,8 +292,8 @@ class TextDrawer{
                 }
             }
 
-            nowX += unitWidth + (isLast ? 0 : scaledGap);
-            wholeWidth += unitWidth + (isLast ? 0 : scaledGap);
+            nowX += unitWidth + (isLast ? 0 : renderGap);
+            wholeWidth += unitWidth + (isLast ? 0 : renderGap);
         });
 
         return {element: iconTextElem, width: wholeWidth};

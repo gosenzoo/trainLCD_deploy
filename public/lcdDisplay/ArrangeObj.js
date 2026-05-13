@@ -244,55 +244,61 @@ class ArrangeObj extends GObj {
         return { width: this.realWidth, height: this.realHeight };
     }
 
-    // axis方向の圧縮サイズをminComRatioアルゴリズムで計算して返す
-    _calcAxisSizes(naturalSizes, minComRatios, targetTotal, interval) {
+    // axis方向の圧縮サイズを固定/自由要素分離方式で計算して返す（7.14）
+    // minSizes: 各子要素の絶対最小axis幅（0=完全自由、natural=完全固定）
+    _calcAxisSizes(naturalSizes, minSizes, targetTotal, interval) {
         const n = naturalSizes.length;
         if (n === 0) return [];
 
-        const totalInterval        = interval * (n - 1);
-        const availableForContent  = targetTotal - totalInterval;
-        const naturalTotal         = naturalSizes.reduce((a, b) => a + b, 0);
+        const totalInterval       = interval * (n - 1);
+        const availableForContent = targetTotal - totalInterval;
+        const naturalTotal        = naturalSizes.reduce((a, b) => a + b, 0);
 
         // 圧縮不要なら自然サイズをそのまま返す
         if (naturalTotal <= availableForContent) return [...naturalSizes];
 
-        const currentSizes = [...naturalSizes];
-        let freeIndices    = naturalSizes.map((_, i) => i);
-        let fixedTotal     = 0;
+        // 固定要素の合計・自由要素の合計・自由要素に使えるスペースを計算する
+        const fixedTotal       = minSizes.reduce((a, b) => a + b, 0);
+        const freeNaturals     = naturalSizes.map((nat, i) => nat - minSizes[i]);
+        const freeTotalNatural = freeNaturals.reduce((a, b) => a + b, 0);
+        const availableForFree = availableForContent - fixedTotal;
 
-        // フェーズ1: minComRatioに達するまで自由要素を等圧縮
-        while (freeIndices.length > 0) {
-            const freeNatural = freeIndices.reduce((sum, i) => sum + naturalSizes[i], 0);
-            const needed      = availableForContent - fixedTotal;
-            if (freeNatural <= 0) break;
-
-            const ratio = needed / freeNatural;
-
-            // この比率でminComRatioを下回る要素を探す
-            const toClamp = freeIndices.filter(i => minComRatios[i] > 0 && ratio < minComRatios[i]);
-
-            if (toClamp.length === 0) {
-                // 全free要素に等比率を適用して終了
-                freeIndices.forEach(i => { currentSizes[i] = naturalSizes[i] * ratio; });
-                freeIndices = [];
-            } else {
-                // minComRatioで固定してfreeから除外
-                toClamp.forEach(i => {
-                    currentSizes[i] = naturalSizes[i] * minComRatios[i];
-                    fixedTotal += currentSizes[i];
-                });
-                freeIndices = freeIndices.filter(i => !toClamp.includes(i));
-            }
+        // 通常ケース: 自由要素のみに圧縮率を適用する
+        // ratio = (描画可能幅 - 固定要素合計) / 自由要素合計
+        if (freeTotalNatural > 0 && availableForFree > 0) {
+            const ratio = availableForFree / freeTotalNatural;
+            return naturalSizes.map((_, i) => minSizes[i] + freeNaturals[i] * ratio);
         }
 
-        // フェーズ2: 全要素がminComRatioに達してもまだ超過している場合は全体を均等圧縮
-        const totalSize = currentSizes.reduce((a, b) => a + b, 0);
-        if (totalSize > availableForContent + 0.001) {
-            const uniformRatio = availableForContent / totalSize;
-            currentSizes.forEach((_, i) => { currentSizes[i] *= uniformRatio; });
-        }
+        // フォールバック: 自由要素なし or 固定要素だけで超過している場合
+        // → 最小サイズを按分して詰める（minComRatio下限を下回る可能性あり）
+        const baseTotal = fixedTotal > 0 ? fixedTotal : naturalTotal;
+        if (baseTotal <= 0 || availableForContent <= 0) return naturalSizes.map(() => 0);
+        const fallbackRatio = availableForContent / baseTotal;
+        return minSizes.map(m => m * fallbackRatio);
+    }
 
-        return currentSizes;
+    // axis方向の最小サイズを再帰的に計算する（内部の自由要素を0とした場合のサイズ）
+    // setSize(INFINITE, ...)呼び出し後に呼ぶこと（_axisSizesが最新状態の前提）
+    getMinAxisSize(isX) {
+        if (this.children.length === 0) return 0;
+        const selfIsX = this.axis === 'x';
+
+        if (selfIsX === isX) {
+            // クエリ方向が自身のaxis方向と一致: 子要素の最小サイズ合計 + interval
+            const childMinSum = this.children.reduce((sum, child, i) => {
+                const childMin = (child instanceof ArrangeObj)
+                    ? child.getMinAxisSize(isX)
+                    : this._axisSizes[i] * child.minComRatio;
+                return sum + childMin;
+            }, 0);
+            return childMinSum + this.interval * (this.children.length - 1);
+        } else {
+            // クエリ方向が自身のaxis方向と直交(cross方向):
+            // fitX/Yがある場合は0（外から幅を与えられる）、なければ現在の実サイズ
+            const hasFit = isX ? this.fitX : this.fitY;
+            return hasFit ? 0 : (isX ? this.realWidth : this.realHeight);
+        }
     }
 
     // 指定サイズに合わせて子要素を圧縮し、実際に設定されたサイズを返す
@@ -334,10 +340,20 @@ class ArrangeObj extends GObj {
             return isX ? this._childNaturalSizes[i].width : this._childNaturalSizes[i].height;
         });
 
-        // パス2: 実効自然サイズに基づいて圧縮サイズを算出
-        const minComRatios = this.children.map(c => c.minComRatio);
-        const axisSizes    = this._calcAxisSizes(effectiveNaturalAxes, minComRatios, axisTarget, this.interval);
-        this._axisSizes    = axisSizes;
+        // パス2: 実効自然サイズに基づいて圧縮サイズを算出（7.14）
+        // 各子要素の内部構造を考慮した絶対最小axis幅を計算する
+        // hasFitAxis かつ ArrangeObj の場合は _axisSizes が最新なので再帰計算可能
+        const minAxisSizes = this.children.map((child, i) => {
+            const naturalSize = effectiveNaturalAxes[i];
+            const hasFitAxis  = isX ? child.fitX : child.fitY;
+            const internalMin = (hasFitAxis && child instanceof ArrangeObj)
+                ? child.getMinAxisSize(isX)
+                : naturalSize * child.minComRatio;
+            // 内部最小値と外部minComRatio制約の大きい方を採用する
+            return Math.max(internalMin, naturalSize * child.minComRatio);
+        });
+        const axisSizes = this._calcAxisSizes(effectiveNaturalAxes, minAxisSizes, axisTarget, this.interval);
+        this._axisSizes = axisSizes;
 
         // パス3: 圧縮後サイズで各子要素を最終setSize
         // cross方向は、親から渡された圧縮後サイズを上限とする（7.13）

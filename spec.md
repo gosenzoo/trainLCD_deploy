@@ -1722,6 +1722,10 @@ groupArea を持つ group 要素は ArrangeObj の子要素としても機能す
 
 - `ArrangeObj._createChildObj()` に `lcdParts="group"` のケースを追加し、`new GroupObj(svgDom)` を生成する（再帰的に子要素をビルド）。
 - GroupObj のコンストラクタに ArrangeObj が参照するレイアウト属性フィールドを追加する（`fitX`・`fitY`・`flexible`・`minComRatio`・`margin`・`verticalAlign`・`horizontalAlign`）。これらは SVG 属性から読み取り、未指定時はデフォルト値を使用する。
+
+| フィールド | SVG 属性 | デフォルト値 | 説明 |
+|---|---|---|---|
+| `minComRatio` | `lcd-minComRatio` | `0` | axis 方向の最小圧縮率（0〜1）。`0` = 完全に自由に圧縮可能。`1` = 圧縮不可（自然サイズを保持）。`LcdPartsObj` コンストラクタで `parseFloat` し、`NaN` の場合は `0` とする。 |
 - groupArea なしの group は `getRealSize()` が `{0, 0}` を返すため、arrange のレイアウトには参加しない。
 
 #### lcd-arg による複数コピー生成（arrange 配下）
@@ -2521,3 +2525,118 @@ const crossSize = (isX ? child.fitY : child.fitX) ? (isX ? this.height : this.wi
 const actualCross = isX ? this.height : this.width;
 const crossSize = (isX ? child.fitY : child.fitX) ? actualCross : Math.min(crossNatural, actualCross);
 ```
+
+---
+
+### 7.14 ArrangeObj — 入れ子 arrange の内部固定幅を考慮した均等圧縮
+
+#### 問題
+
+arrange が 2 段以上入れ子になっている場合、外側 arrange が子要素の幅を均等圧縮する際、子 arrange の内部構造（固定要素の存在）が考慮されない。
+
+**具体例**：外側 x 軸 arrange に 2 つの転送項目（子 arrange）が並ぶ。
+- 項目 A：アイコン（固定 88px）＋テキスト（自然幅 200px）→ 自然幅計 288px
+- 項目 B：アイコン（固定 88px）＋テキスト（自然幅 150px）→ 自然幅計 238px
+- 利用可能幅：400px（interval 40px を除いた 360px）
+
+**現在の動作**（一律圧縮）:
+- 圧縮率 = 360 / (288+238) = 0.684
+- 項目 A → 197px（テキスト 197-88-10=99px、テキスト圧縮率 99/200 = 49.5%）
+- 項目 B → 163px（テキスト 163-88-10=65px、テキスト圧縮率 65/150 = 43.3%）
+→ テキストの圧縮率が項目によって異なる
+
+**期待する動作**（内部固定幅を考慮した圧縮）:
+- 固定幅合計 = 88+10 + 88+10 = 196px
+- 自由幅合計 = 200+150 = 350px
+- 自由要素への圧縮率 = (360-196) / 350 = 164/350 ≈ 46.9%
+- 項目 A → (88+10) + 200×0.469 = 98+93.7 = 191.7px
+- 項目 B → (88+10) + 150×0.469 = 98+70.3 = 168.3px
+→ テキストの圧縮率が両項目で同一（46.9%）
+
+#### 設計
+
+各子要素に **`getMinAxisSize(isX)`** メソッドを追加し、「自由要素をすべて 0 に圧縮したときの最小 axis サイズ」を再帰的に計算する。
+
+| 要素種別 | `getMinAxisSize(isX)` の返し値 |
+|---|---|
+| **ArrangeObj（axis 方向がクエリと一致）** | `子要素の getMinAxisSize の合計 + interval合計` |
+| **ArrangeObj（cross 方向、fitX/Y あり）** | `0`（外から与えられるサイズに適応できる） |
+| **ArrangeObj（cross 方向、fitX/Y なし）** | `realWidth / realHeight`（固定サイズ） |
+| **リーフ要素** | `naturalAxisSize × minComRatio` |
+
+`setSize` の pass2 で `minAxisSizes` を算出し、`_calcAxisSizes` へ渡す。
+
+#### `_calcAxisSizes` の変更
+
+引数を `minComRatios[]`（相対比率）から `minSizes[]`（絶対最小幅）に変更し、以下の一段計算に置き換える。
+
+```
+fixedTotal      = Σ minSizes[i]
+freeNaturals[i] = naturalSizes[i] − minSizes[i]
+freeTotal       = Σ freeNaturals[i]
+availableForFree = availableForContent − fixedTotal
+ratio           = availableForFree / freeTotal
+target[i]       = minSizes[i] + freeNaturals[i] × ratio
+```
+
+**フォールバック**（`freeTotal ≤ 0` または `availableForFree ≤ 0`）：全要素を均等圧縮。
+
+#### `minAxisSizes` の算出タイミング
+
+外側 arrange の pass1（`child.setSize(INFINITE, crossSize)` 呼び出し後）に計算する。このとき fit 子 arrange の `_axisSizes` は最新状態になっているため、`getMinAxisSize` が正確な値を返せる。
+
+fit でない子（`hasFitAxis = false`）は `_axisSizes` が未更新の可能性があるため、`naturalSize × child.minComRatio` を保守的な最小値として使用する。
+
+最終的な `minAxisSizes[i]` は内部最小値と外部 `minComRatio` 制約の大きい方をとる:
+```
+minAxisSizes[i] = max(computedInternalMin, naturalSizes[i] × child.minComRatio)
+```
+
+#### 変更箇所
+
+| ファイル | 対象 |
+|---|---|
+| `public/lcdDisplay/ArrangeObj.js` | `getMinAxisSize(isX)` メソッド追加、`setSize` pass2、`_calcAxisSizes` 全面変更 |
+
+---
+
+### 7.15 TextDrawer — `createIconTextByArea` のアイコン固定オプション（`isComIcon`）
+
+#### 概要
+
+アイコン交じりテキスト描画時に、テキスト圧縮の際にアイコンを縮小しないオプションを追加する。
+
+`textBox` 要素の `data-style` に `"isComIcon"` フィールドを追加する。
+
+| 値 | 動作 |
+|---|---|
+| `false`（デフォルト） | アイコンを固定幅として扱う。テキスト部分のみ圧縮して残りのスペースに収める。 |
+| `true` | 全ユニット（アイコン・テキスト）を均等な比率で圧縮する（従来動作）。 |
+
+#### `isComIcon: false` 時のアルゴリズム
+
+アイコンを arrange における `minComRatio=1` 要素と同様に扱う。
+
+```
+iconFixedWidth    = Σ アイコンユニットの自然幅（= height）
+allGapsWidth      = letterSpacingPx × (units.length − 1)
+textTotalNatural  = Σ テキストユニットの自然幅
+
+fixedTotal        = iconFixedWidth + allGapsWidth
+availableForText  = width − fixedTotal
+```
+
+- `availableForText > 0` かつ `textTotalNatural > 0`：
+  `textRatio = availableForText / textTotalNatural` をテキストユニットのみに適用。アイコンは `height` のまま。
+- それ以外（テキストなし or 固定要素だけで超過）：
+  全ユニットを均等比率で圧縮するフォールバック（`isComIcon: true` と同じ計算）。
+
+#### letterSpacing の扱い
+
+`isComIcon: false` の場合、ユニット間の letterSpacing 間隔はすべて固定値（`letterSpacingPx` のまま）として扱い、スケーリングしない。
+
+#### 変更箇所
+
+| ファイル | 対象 |
+|---|---|
+| `public/jsMojules/utilClass/TextDrawer.js` | `createIconTextByArea` |
