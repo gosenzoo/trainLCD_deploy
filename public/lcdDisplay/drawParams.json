@@ -10,7 +10,7 @@
   "langId": 0,
   "runState": 1,
   "isStopping": false,
-  "numIconPresetKeys": ["N_tokyu"],
+  "numIconPresetKeys": ["N_tokyu", "N_tokyo_subway", "N_JR_central"],
   "isTerminal": false,
   "isNextStation": true,
   "trainType": "急行",
@@ -870,6 +870,74 @@
         {
           "lineIcon": ":O:",
           "name": "みなとみらい線",
+          "eng": "Tokyu Line"
+        }
+      ]
+    ]
+  },
+
+  "transfers": {
+    "transferList": [
+      [
+        {
+          "lineIcon": ":K:",
+          "name": "田園都市線",
+          "eng": "Den-en-toshi Line",
+          "station": {
+            "name": "渋谷",
+            "eng": "Shibuya",
+            "type": "N_tokyo_subway",
+            "symbol": "K",
+            "number": "01",
+            "color": "#009900"
+          }
+        },
+        {
+          "lineIcon": ":O:",
+          "name": "らい線",
+          "eng": "Minatomirai Line",
+          "station": {
+            "name": "渋谷",
+            "eng": "Shibuya",
+            "type": "N_tokyo_subway",
+            "symbol": "K",
+            "number": "01",
+            "color": "#009900"
+          }
+        }
+      ],
+      [
+        {
+          "lineIcon": ":M::D:",
+          "name": "東急線",
+          "eng": "Tokyu Line",
+          "station": {
+            "name": "渋谷",
+            "eng": "Shibuya",
+            "type": "N_tokyo_subway",
+            "symbol": "K",
+            "number": "01",
+            "color": "#009900"
+          }
+        },
+        {
+          "lineIcon": ":j::k:",
+          "name": "地下鉄線",
+          "eng": "Subway Line",
+          "station": {
+            "name": "渋谷",
+            "eng": "Shibuya",
+            "type": "N_tokyo_subway",
+            "symbol": "K",
+            "number": "01",
+            "color": "#009900"
+          }
+        }
+      ],
+      [
+        {
+          "lineIcon": ":T::T::T::T::T::T::T::T:",
+          "name": "東急線",
           "eng": "Tokyu Line"
         }
       ]

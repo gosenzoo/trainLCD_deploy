@@ -15,6 +15,14 @@ class ArrangeObj extends GObj {
         this.arg      = {}; // { 引数名: 配列 }
         this.children = [];
         this._uniformScale = 1;
+        // 列左端揃え: arrange-alignDepth 属性（y軸arrangeに指定）
+        this._alignDepth      = parseInt(svgDom.getAttribute('arrange-alignDepth')) || 0;
+        // 列数が異なるグループ間の左端揃えモード（'center'=デフォルト / 'left'=最小startXに統一）
+        this._lineAlign       = svgDom.getAttribute('arrange-lineAlign') || 'center';
+        // 外側arrangeの _prepareAlignment が設定する強制列幅配列（null = 通常動作）
+        this._forcedAxisSizes = null;
+        // _prepareAlignment が設定する列の絶対x座標・幅配列（null = 通常動作）
+        this._alignedColPositions = null;
         // _filterはGObjコンストラクタで設定済みのため、ここでは重複初期化しない
 
         // arrangeAreaのrectから領域を取得
@@ -301,6 +309,98 @@ class ArrangeObj extends GObj {
         }
     }
 
+    // y軸arrangeの列左端揃えプレパス（絶対x座標配置方式）
+    // containerX/Width/Align: このグループのコンテナ境界と水平揃え
+    _prepareAlignment(rows, depth, containerX, containerWidth, containerAlign) {
+        const INFINITE = 1e9;
+
+        // Step1: 列数ごとにグループ化する
+        const groups = new Map(); // colCount → row[]
+        rows.forEach(row => {
+            const count = row.children.length;
+            if (!groups.has(count)) groups.set(count, []);
+            groups.get(count).push(row);
+        });
+
+        // Step2&3: 各グループの列幅・startXを計算してgroupDataに収集する
+        const groupData = [];
+        groups.forEach((groupRows, colCount) => {
+            // 各行の自然列幅を計測して列ごとの最大幅を集計する
+            const natWidths = groupRows.map(row => {
+                row._forcedAxisSizes     = null;
+                row._alignedColPositions = null;
+                row.setSize(INFINITE, row.height);
+                return [...row._axisSizes];
+            });
+            const maxWidths = Array(colCount).fill(0);
+            natWidths.forEach(nw => {
+                nw.forEach((w, i) => { if (w > maxWidths[i]) maxWidths[i] = w; });
+            });
+            const interval   = groupRows[0].interval;
+            const wholeWidth = maxWidths.reduce((s, w) => s + w, 0)
+                + interval * Math.max(0, colCount - 1);
+
+            // wholeWidthがコンテナ幅を超える場合、_calcAxisSizesで圧縮する（7.16）
+            let finalWidths = maxWidths;
+            if (wholeWidth > containerWidth) {
+                const minSizes = maxWidths.map((w, i) => {
+                    const maxMinRatio = groupRows.reduce((m, row) => {
+                        const child = row.children[i];
+                        return child ? Math.max(m, child.minComRatio) : m;
+                    }, 0);
+                    return w * maxMinRatio;
+                });
+                finalWidths = this._calcAxisSizes(maxWidths, minSizes, containerWidth, interval);
+            }
+            const finalWholeWidth = finalWidths.reduce((s, w) => s + w, 0)
+                + interval * Math.max(0, colCount - 1);
+
+            // コンテナのalignから開始x座標を求める（圧縮後の全体幅を使用）
+            let startX;
+            if (containerAlign === 'center') {
+                startX = containerX + (containerWidth - finalWholeWidth) / 2;
+            } else {
+                startX = containerX;
+            }
+
+            groupData.push({ groupRows, colCount, finalWidths, startX, interval });
+        });
+
+        // Step3.5: arrange-lineAlign="left" の場合、全グループのstartXをmin(startX)に統一する（7.16）
+        if (this._lineAlign === 'left' && groupData.length > 1) {
+            const minX = Math.min(...groupData.map(d => d.startX));
+            groupData.forEach(d => { d.startX = minX; });
+        }
+
+        // Step4: 各グループにcolPositionsを設定する
+        groupData.forEach(({ groupRows, colCount, finalWidths, startX, interval }) => {
+            let cumX = 0;
+            const colPositions = finalWidths.map(w => {
+                const pos = { x: startX + cumX, width: w };
+                cumX += w + interval;
+                return pos;
+            });
+            groupRows.forEach(row => {
+                row._forcedAxisSizes     = finalWidths;   // 圧縮後の列幅（setSize用）
+                row._alignedColPositions = colPositions;  // getElement用の絶対x座標
+            });
+
+            // Step5: depth > 1 なら対応列がx軸arrangeの場合に再帰適用する
+            // コンテナ = 列iの絶対x範囲、align = 'left' 固定
+            if (depth > 1) {
+                for (let i = 0; i < colCount; i++) {
+                    const subRows = groupRows
+                        .map(row => row.children[i])
+                        .filter(c => c instanceof ArrangeObj && c.axis === 'x');
+                    if (subRows.length === groupRows.length) {
+                        this._prepareAlignment(subRows, depth - 1,
+                            colPositions[i].x, colPositions[i].width, 'left');
+                    }
+                }
+            }
+        });
+    }
+
     // 指定サイズに合わせて子要素を圧縮し、実際に設定されたサイズを返す
     setSize(width, height) {
         if (this.children.length === 0) return { width: 0, height: 0 };
@@ -312,6 +412,15 @@ class ArrangeObj extends GObj {
 
         const isX        = this.axis === 'x';
         const axisTarget = isX ? width : height;
+
+        // y軸arrangeかつ arrange-alignDepth 指定がある場合、列左端揃えのプレパスを実行する
+        // x軸の行 arrange 子を収集して _prepareAlignment で強制列幅を設定する
+        if (this._alignDepth > 0 && !isX) {
+            const rowChildren = this.children.filter(
+                c => c instanceof ArrangeObj && c.axis === 'x'
+            );
+            if (rowChildren.length > 0) this._prepareAlignment(rowChildren, this._alignDepth, this.x, this.width, this.horizontalAlign);
+        }
 
         // flexible=false でも子要素のaxis圧縮・setSize伝播は常に実行する
         // （子要素自身のflexible等の設定を活かすため）
@@ -340,6 +449,16 @@ class ArrangeObj extends GObj {
             return isX ? this._childNaturalSizes[i].width : this._childNaturalSizes[i].height;
         });
 
+        // _forcedAxisSizes が設定されている場合、強制列幅を有効自然サイズの下限として適用する（7.16）
+        // 全行で同一の強制幅をベースに圧縮されるため、圧縮後も列左端の揃えが維持される
+        if (this._forcedAxisSizes !== null) {
+            for (let i = 0; i < effectiveNaturalAxes.length && i < this._forcedAxisSizes.length; i++) {
+                if (this._forcedAxisSizes[i] > effectiveNaturalAxes[i]) {
+                    effectiveNaturalAxes[i] = this._forcedAxisSizes[i];
+                }
+            }
+        }
+
         // パス2: 実効自然サイズに基づいて圧縮サイズを算出（7.14）
         // 各子要素の内部構造を考慮した絶対最小axis幅を計算する
         // hasFitAxis かつ ArrangeObj の場合は _axisSizes が最新なので再帰計算可能
@@ -360,7 +479,16 @@ class ArrangeObj extends GObj {
         this.children.forEach((child, i) => {
             const crossNatural = isX ? this._childNaturalSizes[i].height : this._childNaturalSizes[i].width;
             const actualCross  = isX ? this.height : this.width;
-            const crossSize    = (isX ? child.fitY : child.fitX) ? actualCross : Math.min(crossNatural, actualCross);
+            let crossSize      = (isX ? child.fitY : child.fitX) ? actualCross : Math.min(crossNatural, actualCross);
+            // y軸arrangeで列左端揃えが有効な行は、crossSizeをforcedTotalに確定する（7.16）
+            // forced[i]=max(全行のnatural[i])なので全行でeffectiveNaturalAxes=forced、
+            // naturalTotal=forcedTotal=axisTargetとなり圧縮なしでrealWidth=forcedTotalが全行一致する
+            if (!isX && child instanceof ArrangeObj
+                    && child._forcedAxisSizes !== null && child._forcedAxisSizes.length > 0) {
+                const forcedTotal = child._forcedAxisSizes.reduce((s, w) => s + w, 0)
+                    + child.interval * (child._forcedAxisSizes.length - 1);
+                crossSize = Math.min(forcedTotal, actualCross);
+            }
             child.setSize(isX ? axisSizes[i] : crossSize, isX ? crossSize : axisSizes[i]);
         });
 
@@ -479,30 +607,52 @@ class ArrangeObj extends GObj {
         // arrangeDirection=1の場合は配置順を逆にする（サイズ計算は記述順のまま）
         const orderedChildren = this.arrangeDirection === 1 ? [...this.children].reverse() : this.children;
 
-        orderedChildren.forEach(child => {
-            const { width: cw, height: ch } = child.getRealSize();
-            const childAxisSize  = isX ? cw : ch;
-            const childCrossSize = isX ? ch : cw;
-            const crossPos       = this._calcCrossPos(crossAvail, childCrossSize, child);
+        // _alignedColPositions が設定されている場合、絶対x座標で各列を配置する（7.16）
+        // センタリング計算をバイパスし、_prepareAlignment で求めた絶対xを直接使用する
+        if (isX && this._alignedColPositions) {
+            orderedChildren.forEach((child, orderedIdx) => {
+                // arrangeDirection=1で逆順配置の場合、元のchildren配列のインデックスに変換する
+                const origIdx    = this.arrangeDirection === 1
+                    ? this.children.length - 1 - orderedIdx
+                    : orderedIdx;
+                const { height: ch } = child.getRealSize();
+                const crossPos   = this._calcCrossPos(crossAvail, ch, child);
+                const colPos     = this._alignedColPositions[origIdx];
+                const childX     = colPos ? colPos.x : this.x;
+                const childY     = this.y + crossPos;
 
-            // 最初の描画要素でなければ前にintervalを挿入
-            const axisPos = firstRendered ? axisCursor : axisCursor + this.interval;
-            // this.x/this.yを加算して絶対座標化（transformラッパーを使わないためkuruアニメーションと競合しない）
-            const childX  = this.x + (isX ? axisPos  : crossPos);
-            const childY  = this.y + (isX ? crossPos : axisPos);
+                child.setCoordinate(childX, childY);
+                const el = child.getElement(childCtx);
+                if (el) {
+                    this._placeChild(el, child, filteredG, outer, childCtx);
+                }
+            });
+        } else {
+            orderedChildren.forEach(child => {
+                const { width: cw, height: ch } = child.getRealSize();
+                const childAxisSize  = isX ? cw : ch;
+                const childCrossSize = isX ? ch : cw;
+                const crossPos       = this._calcCrossPos(crossAvail, childCrossSize, child);
 
-            child.setCoordinate(childX, childY);
-            const el = child.getElement(childCtx);
+                // 最初の描画要素でなければ前にintervalを挿入
+                const axisPos = firstRendered ? axisCursor : axisCursor + this.interval;
+                // this.x/this.yを加算して絶対座標化（transformラッパーを使わないためkuruアニメーションと競合しない）
+                const childX  = this.x + (isX ? axisPos  : crossPos);
+                const childY  = this.y + (isX ? crossPos : axisPos);
 
-            if (el) {
-                // 子要素を振り分け: noFilter+sink→sink、filter適用対象→filteredG、その他→outer
-                this._placeChild(el, child, filteredG, outer, childCtx);
-                // intervalは描画された要素の後ろに積算（次の要素の前に使う）
-                axisCursor = axisPos + childAxisSize;
-                firstRendered = false;
-            }
-            // 描画されなかった要素はaxisCursorもfirstRenderedも変更しない
-        });
+                child.setCoordinate(childX, childY);
+                const el = child.getElement(childCtx);
+
+                if (el) {
+                    // 子要素を振り分け: noFilter+sink→sink、filter適用対象→filteredG、その他→outer
+                    this._placeChild(el, child, filteredG, outer, childCtx);
+                    // intervalは描画された要素の後ろに積算（次の要素の前に使う）
+                    axisCursor = axisPos + childAxisSize;
+                    firstRendered = false;
+                }
+                // 描画されなかった要素はaxisCursorもfirstRenderedも変更しない
+            });
+        }
 
         // filteredGをouterの先頭に挿入し、sinkの要素（フィルター外配置）をouterに追加する
         this._finalizeFilterSplit(outer, filteredG);

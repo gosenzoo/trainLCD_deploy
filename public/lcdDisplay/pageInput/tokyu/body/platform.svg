@@ -90,6 +90,11 @@
     </g>
 
 
+    <!-- フッター -->
+    <!-- 次の停車駅 -->
+    <rect lcdParts="textBox" lcdText="#{nowStation.name}を出ますと【#{nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+
+
     <!-- 参考画像 -->
     <image id="platform-jitubutu" href="../../../imgs/tokyu-platform.png" x="0" y="0" width="1920" height="1080" opacity="0.5" />
 </svg>

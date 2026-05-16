@@ -60,6 +60,82 @@
     <rect lcdParts="textBox" lcdText="/" x="918" y="376" width="64" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
     <rect lcdParts="textBox" lcdText="Transfer" x="982" y="376" width="276" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "middle"}' />
 
+    <!-- 乗換リスト(１行の場合) -->
+    <g visibility="hidden" lcdParts="arrange" isDraw="transfers.transferList.length == 1" lcd-holAlign="center" arrange-interval="30">
+        <rect lcdParts="arrangeArea" x="85" y="667" width="1750" height="140" fill="#99999950" />
+        <rect lcd-funcCall="transferBox" lcd-arg="transfer:transfers.transferList[0]" x="85" y="480" width="1263" height="140" fill="#99999930" />
+    </g>
+    <!-- 乗換リスト(２行の場合) -->
+    <g visibility="hidden" lcdParts="arrange" isDraw="transfers.transferList.length == 2" arrange-alignDepth="2" lcd-holAlign="center" arrange-interval="110" arrange-axis="y">
+        <rect lcdParts="arrangeArea" x="85" y="558" width="1750" height="390" fill="#99999950" />
+        <g lcdParts="arrange" lcd-arg="transfers:transfers.transferList" lcd-holAlign="center" arrange-interval="60">
+            <rect lcdParts="arrangeArea" x="85" y="558" width="1750" height="140" fill="#99999950" />
+            <rect lcd-funcCall="transferBox" lcd-arg="transfer:$transfers" x="85" y="480" width="1263" height="140" fill="#99999930" />
+        </g>
+    </g>
+    <!-- 乗換リスト(３行の場合) -->
+    <g visibility="hidden" lcdParts="arrange" isDraw="transfers.transferList.length == 3" arrange-alignDepth="2" arrange-lineAlign="left" lcd-holAlign="center" arrange-interval="40" arrange-axis="y">
+        <rect lcdParts="arrangeArea" x="85" y="480" width="1750" height="500" fill="#99999950" />
+        <g lcdParts="arrange" lcd-arg="transfers:transfers.transferList" lcd-holAlign="center" arrange-interval="60">
+            <rect lcdParts="arrangeArea" x="85" y="480" width="1750" height="140" fill="#99999950" />
+            <rect lcd-funcCall="transferBox" lcd-arg="transfer:$transfers" x="85" y="480" width="1263" height="140" fill="#99999930" />
+        </g>
+    </g>
+    <!-- 乗換リスト(４行以上の場合) -->
+    <g visibility="" lcdParts="arrange" isDraw="transfers.transferList.length > 3" arrange-alignDepth="2" arrange-lineAlign="left" lcd-holAlign="center" arrange-interval="20" arrange-axis="y">
+        <rect lcdParts="arrangeArea" x="85" y="480" width="1750" height="500" fill="#99999950" />
+        <g lcdParts="arrange" lcd-arg="transfers:transfers.transferList" lcd-holAlign="center" arrange-interval="60">
+            <rect lcdParts="arrangeArea" x="85" y="480" width="1750" height="140" fill="#99999950" />
+            <rect lcd-funcCall="transferBox" lcd-arg="transfer:$transfers" x="85" y="480" width="1263" height="140" fill="#99999930" />
+        </g>
+    </g>
+
+
+    <!-- フッター -->
+    <!-- 次の停車駅 -->
+    <rect lcdParts="textBox" lcdText="#{nowStation.name}を出ますと【#{nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+
+
+
+    <!-- 関数定義 -->
+    <!-- 各パーツ -->
+    <g lcd-funcDef="transferBox">
+        <rect lcdParts="funcArea" x="85" y="480" width="1263" height="140" fill="#99999950" />
+        <g lcdParts="arrange" arrange-interval="93" lcd-fitX="true">
+            <rect lcdParts="arrangeArea" x="85" y="480" width="1263" height="140" fill="#d2d2d2FF" />
+            <rect lcd-funcCall="transferLineBox" x="85" y="480" width="620" height="140" fill="#99999930" />
+            <rect lcd-funcCall="transferStationBox" isDraw="$transfer.station != null" lcd-verAlign="center" x="798" y="498" width="550" height="102" fill="#99999930" />
+        </g>
+    </g>
+
+    <g lcd-funcDef="transferLineBox">
+        <rect lcdParts="funcArea" x="85" y="480" width="620" height="140" fill="#99999950" />
+        <g lcdParts="arrange" arrange-interval="10" lcd-fitX="true">
+            <rect lcdParts="arrangeArea" x="85" y="480" width="620" height="140" fill="#d2d2d2FF" />
+            <rect lcdParts="textBox" lcdText="#{$transfer.lineIcon}" lcd-minComRatio="1" lcd-fitX="true" x="85" y="480" width="140" height="140" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start", "letterSpacing": "5px"}' />
+            <g lcdParts="arrange" arrange-interval="15" arrange-axis="y" lcd-fitX="true">
+                <rect lcdParts="arrangeArea" x="225" y="480" width="480" height="140" fill="#99999950" />
+                <rect lcdParts="textBox" lcdText="#{$transfer.name}" lcd-fitX="true" x="225" y="483" width="480" height="75" fill="#444444" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' />
+                <rect lcdParts="textBox" lcdText="#{$transfer.eng}" lcd-fitX="true" x="225" y="573" width="480" height="42" fill="#444444" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' />
+            </g>
+        </g>
+    </g>
+
+    <g lcd-funcDef="transferStationBox">
+        <rect lcdParts="funcArea" x="798" y="498" width="550" height="102" fill="#99999950" />
+        <g lcdParts="arrange" arrange-interval="10" lcd-fitX="true">
+            <rect lcdParts="arrangeArea" x="798" y="498" width="550" height="102" fill="#d2d2d2FF" />
+            <rect lcdParts="numbering" lcd-numKey="#{$transfer.station.type}" symbolText="#{$transfer.station.symbol}" numberText="#{$transfer.station.number}" lineColor="#{$transfer.station.color}" lcd-minComRatio="1" x="798" y="498" width="102" height="102" fill="#99999950" />
+            <g lcdParts="arrange" arrange-interval="6" arrange-axis="y" lcd-fitX="true">
+                <rect lcdParts="arrangeArea" x="900" y="498" width="448" height="102" fill="#99999950" />
+                <rect lcdParts="textBox" lcdText="#{$transfer.station.name}駅" lcd-fitX="true" x="900" y="498" width="448" height="54" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "start"}' />
+                <rect lcdParts="textBox" lcdText="#{$transfer.station.eng} Sta." lcd-fitX="true" x="900" y="558" width="448" height="34" fill="#444444" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "start"}' />
+            </g>
+        </g>
+    </g>
+
     <!-- 参考画像 -->
-    <image href="./../../../imgs/tokyu-transfers.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+    <!-- <image href="./../../../imgs/tokyu-transfers.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+    <!-- <image href="./../../../imgs/tokyu-transfers2_2.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+    <image href="./../../../imgs/tokyu-transfers3_2.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
 </svg>

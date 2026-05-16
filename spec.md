@@ -1636,11 +1636,13 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 | `symbolText` | 路線記号テキスト。テンプレート展開対応 |
 | `numberText` | 番号テキスト。テンプレート展開対応 |
 | `lineColor` | 路線カラー。テンプレート展開対応 |
+| `lcd-minComRatio` | 最小圧縮率（0〜1）。`setSize` でアイコンサイズが `naturalSize × minComRatio` を下回らないよう保護する |
 
 #### サイズ規則
 
 - `min(width, height)` を `naturalSize` とし、左/上詰めの正方形が描画範囲
-- `flexible = false` と同等: `setSize(w, h)` では `min(min(w,h), naturalSize)` を上限として縮小のみ（拡大しない）
+- `flexible = false` と同等: `setSize(w, h)` では縮小のみ（拡大しない）
+- `lcd-minComRatio` が設定されている場合、`setSize(w, h)` で決定するアイコンサイズが `naturalSize × minComRatio` を下回らない（axis・cross 両方向に適用）
 - `realWidth = realHeight`（常に正方形）
 
 #### デバッグ環境での読み込み
@@ -1651,7 +1653,7 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 
 | ファイル | 変更種別 | 内容 |
 |---|---|---|
-| `public/lcdDisplay/NumIconObj.js` | 新規 | `NumIconObj` クラス（`LcdPartsObj` 継承） |
+| `public/lcdDisplay/NumIconObj.js` | 変更 | `setSize` に `lcd-minComRatio` 下限保護を追加 |
 | `public/lcdDisplay/Drawer.js` | 変更 | `load()` に numIconDrawer 初期化を追加、`_buildNode` に `numbering` 追加、`arrangeCtx` に `numIconDrawer` を追加 |
 | `public/lcdDisplay/ArrangeObj.js` | 変更 | `_createChildObj` に `numbering` 追加 |
 | `public/lcdDisplay/drawParams.json` | 変更 | `numIconPresetKeys` 配列を追加 |
@@ -2640,3 +2642,184 @@ availableForText  = width − fixedTotal
 | ファイル | 対象 |
 |---|---|
 | `public/jsMojules/utilClass/TextDrawer.js` | `createIconTextByArea` |
+
+---
+
+### 7.16 ArrangeObj — y軸 arrange の列左端揃え（`arrange-alignDepth`）
+
+#### 概要
+
+y軸 arrange 内に複数の x軸 arrange（行）が縦に並ぶ構造において、対応する列位置の左端 x 座標を全行間で揃えるオプションを追加する。
+
+#### 新属性
+
+| 属性 | 対象 | 型 | デフォルト | 説明 |
+|---|---|---|---|---|
+| `arrange-alignDepth` | `lcdParts="arrange"`（y軸のみ有効） | 整数 ≥ 1 | なし（無効） | 指定した深さまで、対応する列の左端を全行間で揃える |
+| `arrange-lineAlign` | `lcdParts="arrange"`（y軸のみ有効） | `"center"` / `"left"` | `"center"` | 列数が異なる行グループ間の左端揃えモード。`"center"` = グループごとに独立してコンテナ内中央揃え。`"left"` = 全グループの開始 x を `min(startX)` に統一して左端を揃える |
+
+#### 対象構造
+
+```
+[外側 y軸 arrange: arrange-alignDepth="N"]
+  ├─ [行A: x軸 arrange]          ← 深さ1の「行」
+  │    ├─ [列A-0: 任意要素]
+  │    ├─ [列A-1: x軸 arrange]   ← 深さ2の「行」（axis="x" の場合のみ対象）
+  │    │    ├─ [列A-1-0]
+  │    │    └─ [列A-1-1]
+  │    └─ [列A-2: 任意要素]
+  └─ [行B: x軸 arrange]
+       ├─ [列B-0: 任意要素]
+       ├─ [列B-1: x軸 arrange]
+       │    ├─ [列B-1-0]
+       │    └─ [列B-1-1]
+       └─ [列B-2: 任意要素]
+```
+
+#### 動作仕様
+
+**深さ1の動作（列左端を揃える）:**
+
+1. 外側 y軸 arrange の直接子要素のうち x軸 ArrangeObj を「行」として収集する（`lcd-arg` 展開による生成物も同様に扱う）
+2. 行を「直接子要素の数」でグループ化し、同数グループ内の行同士でのみ揃えを行う
+3. 各列位置 `i` について、グループ内全行の自然幅の最大値 `maxWidth[i]` を計算する
+4. 各行の列 `i` は `maxWidth[i]` を有効自然幅として使用し、圧縮のベースとする
+
+**深さ2以上の動作:**
+
+深さ1の処理に加えて、各列位置 `i` に対応する子要素が x軸 ArrangeObj である場合、それらを「行」として再帰的に同じ揃え処理を深さ `N-1` で適用する。
+
+**圧縮との兼ね合い:**
+
+強制された自然幅（maxWidth）は最小自然幅として機能する。全行が同一の強制幅から始まり、同一の利用可能幅（外側 arrange の幅）を受け取るため、通常の圧縮アルゴリズムにより全行で同一の圧縮率が適用され、圧縮後も列左端の揃えが維持される。
+
+#### アルゴリズム（絶対 x 座標配置方式）
+
+`setSize` のセンタリングフローに依存せず、`_prepareAlignment` が列ごとの **絶対 x 座標** を事前計算し、`getElement` 時に直接配置する。
+
+**`_prepareAlignment(rows, depth, containerX, containerWidth, containerAlign)` メソッド（新規）:**
+
+```
+rows:           揃え対象の x軸 ArrangeObj の配列
+depth:          残り深さ
+containerX:     このグループの配置基準となるコンテナ左端 x（初回: 外側 arrange の this.x）
+containerWidth: コンテナ幅（初回: 外側 arrange の this.width）
+containerAlign: コンテナの水平揃え（初回: 外側 arrange の horizontalAlign）
+
+Step 1: 列数ごとにグループ化
+  groups = groupBy(rows, r => r.children.length)
+
+Step 2: 各グループで列最大幅・全体幅を計算、必要に応じて圧縮
+  for each (colCount, groupRows) in groups:
+    for each row in groupRows:
+      row._forcedAxisSizes = null; row._alignedColPositions = null
+      row.setSize(INFINITE, row.height)   // 自然幅計測
+      natWidths[row] = [...row._axisSizes]
+    maxWidths[i]  = max(natWidths[row][i])  for all row in groupRows
+    wholeWidth    = sum(maxWidths) + interval × max(0, colCount − 1)
+
+    // wholeWidth > containerWidth の場合、_calcAxisSizes で圧縮する
+    finalWidths = maxWidths
+    if wholeWidth > containerWidth:
+      minSizes[i] = maxWidths[i] × max(row.children[i].minComRatio for each row)
+      finalWidths = _calcAxisSizes(maxWidths, minSizes, containerWidth, interval)
+    finalWholeWidth = sum(finalWidths) + interval × max(0, colCount − 1)
+
+Step 3: containerAlign からグループの開始 x を求める
+  if containerAlign == 'center':
+    startX = containerX + (containerWidth − finalWholeWidth) / 2
+  else:  // 'left'
+    startX = containerX
+  // ← Step 2&3 を全グループ分収集してから Step 3.5 へ
+
+Step 3.5: arrange-lineAlign="left" の場合、全グループのstartXを統一する
+  if _lineAlign == 'left' and グループ数 > 1:
+    minX = min(startX for each group)
+    for each group: startX = minX
+
+Step 4: 各列の絶対 x 座標を設定し、行に記録する
+  cumX = 0
+  colPositions[i] = { x: startX + cumX, width: finalWidths[i] };  cumX += finalWidths[i] + interval
+  for each row in groupRows:
+    row._forcedAxisSizes     = finalWidths   // 圧縮後の列幅（setSize 用）
+    row._alignedColPositions = colPositions  // getElement 用絶対 x 座標
+
+Step 5: depth > 1 なら対応列を再帰的に揃える
+  for each column i:
+    subRows = [row.children[i] for row in groupRows]
+              .filter(c => c instanceof ArrangeObj && c.axis === 'x')
+    if subRows.length == groupRows.length:
+      _prepareAlignment(subRows, depth − 1,
+          colPositions[i].x, colPositions[i].width, 'left')
+      // コンテナ = 列 i の絶対 x 範囲。align は 'left' 固定
+```
+
+**`setSize` の変更（外側 y軸 arrange）:**
+
+通常フロー（pass1〜3）の前に `_prepareAlignment` を呼び出す：
+
+```
+if (_alignDepth > 0 && axis === 'y'):
+  rowChildren = children.filter(c => c instanceof ArrangeObj && c.axis === 'x')
+  _prepareAlignment(rowChildren, _alignDepth, this.x, this.width, this.horizontalAlign)
+// 以降は通常の pass1〜3
+```
+
+**`setSize` の変更（各行 x軸 arrange）:**
+
+pass1 完了後、`_forcedAxisSizes` が設定されていれば有効自然サイズを上書きして pass2 へ進む：
+
+```
+// pass1 完了後
+if (_forcedAxisSizes !== null):
+  effectiveNaturalAxes[i] = max(effectiveNaturalAxes[i], _forcedAxisSizes[i])  for each i
+// 以降は通常の pass2〜3
+```
+
+**`setSize` の変更（外側 y軸 arrange） — pass3 crossSize:**
+
+`_forcedAxisSizes` が設定された行は `crossSize = min(forcedTotal, actualCross)` として、行の setSize に正確な幅を渡す（子要素のテキスト圧縮幅を正しく保つため）：
+
+```
+// pass3 ループ内（y軸 arrange かつ child._forcedAxisSizes が設定されている行）
+forcedTotal = sum(child._forcedAxisSizes) + child.interval × (列数 − 1)
+crossSize   = min(forcedTotal, actualCross)
+```
+
+**`getElement` の変更（各行 x軸 arrange）:**
+
+`_alignedColPositions` が設定されている場合、axisCursor ベースの配置をバイパスして絶対 x 座標で各列を配置する：
+
+```
+if isX and _alignedColPositions is not null:
+  for each (child, origIdx) in children (元のインデックスを保持):
+    crossPos = _calcCrossPos(crossAvail, child.realHeight, child)
+    childX   = _alignedColPositions[origIdx].x   // 絶対 x 座標
+    childY   = this.y + crossPos
+    child.setCoordinate(childX, childY)
+    el = child.getElement(childCtx)
+    // el を outer に追加
+else:
+  // 既存の axisCursor ベース配置（変更なし）
+```
+
+#### 実装詳細
+
+**新規プロパティ（ArrangeObj）:**
+
+| プロパティ | 設定元 | 説明 |
+|---|---|---|
+| `_alignDepth` | `arrange-alignDepth` 属性（整数） | 0 = 無効（デフォルト）、1 以上 = 有効 |
+| `_lineAlign` | `arrange-lineAlign` 属性 | `'center'`（デフォルト）/ `'left'`。列数が異なるグループ間の左端揃えモード |
+| `_forcedAxisSizes` | `_prepareAlignment` が設定 | 強制列幅の配列。`null` の場合は通常動作 |
+| `_alignedColPositions` | `_prepareAlignment` が設定 | `[{x, width}]` 列ごとの絶対 x 座標と幅。`null` の場合は通常動作 |
+
+**再帰時のコンテナ境界について:**
+
+深さ 1 では外側 y軸 arrange の `this.x` / `this.width` / `horizontalAlign` をコンテナとして使用する。深さ 2 以降では、親レベルで確定した `colPositions[i].x` / `colPositions[i].width` を再帰先のコンテナとして渡すことで、各深さで正確な絶対座標が計算される。
+
+#### 変更ファイル
+
+| ファイル | 対象 |
+|---|---|
+| `public/lcdDisplay/ArrangeObj.js` | コンストラクタに `_alignedColPositions` 追加、`_prepareAlignment` 書き換え、`setSize` の `_prepareAlignment` 呼び出し引数更新・pass3 crossSize 維持、`getElement` に絶対 x 配置ブランチ追加 |

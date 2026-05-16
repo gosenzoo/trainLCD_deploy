@@ -29,11 +29,13 @@ class NumIconObj extends LcdPartsObj {
     }
 
     // 指定サイズで再計算（flexible=false と同様、縮小のみ・正方形を維持）
+    // lcd-minComRatio が設定されている場合、アイコンサイズが naturalSize×minComRatio を下回らない
     setSize(width, height) {
-        const iconSize    = Math.min(width, height);
-        const scale       = this._naturalSize > 0 ? Math.min(iconSize / this._naturalSize, 1) : 1;
-        this.realWidth    = this._naturalSize * scale;
-        this.realHeight   = this._naturalSize * scale;
+        const minSize  = this._naturalSize * this.minComRatio;
+        const iconSize = Math.max(minSize, Math.min(width, height));
+        const scale    = this._naturalSize > 0 ? Math.min(iconSize / this._naturalSize, 1) : 1;
+        this.realWidth  = this._naturalSize * scale;
+        this.realHeight = this._naturalSize * scale;
         return { width: this.realWidth, height: this.realHeight };
     }
 
