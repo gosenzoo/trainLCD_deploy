@@ -1,0 +1,411 @@
+class TextDrawer{
+    constructor(iconDict, numIconDrawer){
+        this.iconDict = iconDict; //アイコン辞書を保存
+        this.capRatioCache = {};
+        this.numIconDrawer = numIconDrawer;
+    }
+
+    // 統合テキスト描画関数
+    // input が DOM Element の場合: 属性を読み取り axis・アイコン有無に応じて振り分け
+    // input がパラメータオブジェクトの場合: フィールドの内容に応じて振り分け
+    //   オブジェクトの形式: { x, y, width, height, styleJson, lang?, transform?, axis?, spacing?, base?, textHeightRatio? }
+    // テキストに ':' が含まれる場合はアイコン付きテキスト（createIconTextByArea）として処理
+    create(text, input){
+        if(input instanceof Element){
+            // Element から属性を読み取り
+            const x = parseFloat(input.getAttribute("x"));
+            const y = parseFloat(input.getAttribute("y"));
+            const width = parseFloat(input.getAttribute("width"));
+            const height = parseFloat(input.getAttribute("height"));
+            const styleJson = JSON.parse(input.getAttribute("data-style"));
+            const lang = input.getAttribute("lang");
+            const axis = input.getAttribute("axis");
+            const spacing = parseFloat(input.getAttribute("spacing"));
+            const base = input.getAttribute("base");
+            const transform = input.getAttribute("transform");
+            const textHeightRatio = parseFloat(input.getAttribute("data-text-height-ratio")) || 1;
+
+            if(axis === "vertical"){
+                return this.createByAreaVertical(text, x, y, width, height, styleJson, spacing, base);
+            }
+            if(text.includes(':')){
+                return this.createIconTextByArea(text, x, y, width, height, styleJson, lang, textHeightRatio);
+            }
+            return this.createByArea(text, x, y, width, height, styleJson, lang, transform);
+        }
+        else{
+            // パラメータオブジェクト
+            const p = input;
+            if(p.axis === "vertical"){
+                return this.createByAreaVertical(text, p.x, p.y, p.width, p.height, p.styleJson, p.spacing, p.base);
+            }
+            if(text.includes(':')){
+                return this.createIconTextByArea(text, p.x, p.y, p.width, p.height, p.styleJson, p.lang, p.textHeightRatio);
+            }
+            return this.createByArea(text, p.x, p.y, p.width, p.height, p.styleJson, p.lang, p.transform);
+        }
+    }
+
+    //矩形領域にフィットするよう文字を配置（領域はElementで渡す）
+    createByAreaEl(text, areaEl){
+        const x = parseFloat(areaEl.getAttribute("x"));
+        const y = parseFloat(areaEl.getAttribute("y"));
+        const width = parseFloat(areaEl.getAttribute("width"));
+        const height = parseFloat(areaEl.getAttribute("height"));
+        const styleJson = JSON.parse(areaEl.getAttribute("data-style"));
+        const lang = areaEl.getAttribute("lang");
+        const axis = areaEl.getAttribute("axis");
+        const spacing = parseFloat(areaEl.getAttribute("spacing"));
+        const base = areaEl.getAttribute("base");
+        const transform = areaEl.getAttribute("transform");
+
+        let textEl;
+        if(axis === "vertical"){
+            textEl = this.createByAreaVertical(text, x, y, width, height, styleJson, spacing, base);
+        }
+        else{
+            textEl = this.createByArea(text, x, y, width, height, styleJson, lang, transform);
+        }
+        return textEl;
+    }
+    //矩形領域にフィットするよう文字を配置（領域はパラメータで定める）
+    createByArea(text, x, y, maxWidth, height, styleJson, lang='ja', transform=null){
+        //return { element: document.createElementNS("http://www.w3.org/2000/svg", "text"), width: 100 }; //ダミー
+        if(lang === null){ lang = "ja"; }
+
+        let strokeWidth = 0;
+        let stroke;
+
+        //文字間隔がJSONなら、適する値を取り出す
+        if(this.isObject(styleJson.letterSpacing)){
+            if(Object.keys(styleJson.letterSpacing).includes(`${text.length}`)){
+                styleJson.letterSpacing = styleJson.letterSpacing[text.length];
+            }
+            else{
+                styleJson.letterSpacing = "0px";
+            }
+        }
+        if(styleJson.stroke){
+            //strokeが定義されていれば
+            strokeWidth = styleJson.stroke.strokeWidth;
+            stroke = styleJson.stroke.stroke;
+            delete styleJson.stroke;
+        }
+
+        const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        const fontSize = this.getFontSize(height, styleJson.fontFamily, lang);
+        let textWidth = this.getTextWidth(text, fontSize, styleJson);
+        if(textWidth > maxWidth){ //テキスト描画時の長さがmaxSizeを超えていたら、圧縮
+            textElem.setAttribute("textLength", `${maxWidth}px`); //テキストの長さを設定
+            textElem.setAttribute("lengthAdjust", "spacingAndGlyphs"); //文字間隔とグリフの調整を有効にする
+            textWidth = maxWidth;
+        }
+        //各パラメータを設定
+        textElem.textContent = text;
+
+        // text-anchor に依存せず自前でx座標を決定し、常に text-anchor="start" で描画する。
+        // CSS letter-spacing の末尾追加有無が Windows(Chrome) と iOS(Safari) で異なり、
+        // text-anchor="middle"/"end" の基準幅がブラウザ間でずれるため。
+        // textWidth は getTextWidth で計算した (n-1) 個分の spacing を含む幅を使う。
+        let textX;
+        if(styleJson.textAnchor === "middle"){
+            textX = x + maxWidth / 2 - textWidth / 2;
+        } else if(styleJson.textAnchor === "end"){
+            textX = x + maxWidth - textWidth;
+        } else {
+            textX = x;
+        }
+        styleJson.textAnchor = "start"; // style文字列生成前にstartへ変更
+        textElem.setAttribute("x", String(textX));
+
+        let yOffset = height; 
+        if(lang === "ja"){ yOffset -= fontSize * 0.08 }// ←この 0.15 は経験的に調整（フォント依存）
+        textElem.setAttribute("y", String(y + yOffset));
+        textElem.setAttribute("font-size", fontSize.toString());
+        textElem.setAttribute("style", this.styleTextFromJson(styleJson));
+        if(transform != null){
+            textElem.setAttribute("transform", transform);
+        }
+
+        let ret;
+
+        if(strokeWidth > 0){
+            //縁取りがあれば
+            const strokeText = textElem.cloneNode(true);
+            strokeText.setAttribute("stroke-width", strokeWidth * 2);
+            strokeText.setAttribute("stroke", stroke);
+
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.appendChild(strokeText);
+            g.appendChild(textElem);
+            ret = g;
+        }
+        else{
+            //縁取りがなければ
+            ret = textElem;
+        }
+
+        return {element: ret, width: textWidth};
+    }
+    createByAreaVertical(text, x, y, width, height, styleJson, spacing=5, base="bottom"){
+        if(spacing === null){ spacing = 5; }
+        if(base === null){ base = "bottom"; }
+
+        const stationName = document.createElementNS("http://www.w3.org/2000/svg", "g"); //駅名テキスト用グループ
+
+        const areaBottomY = y + height; //駅名矩形の下端Y座標を取得
+        let mojiX = x;
+        let mojiY = areaBottomY - width;
+        for(let i = 0; i < text.length; i++){ //1文字ずつ設置
+            stationName.appendChild(this.createByArea(text[text.length-1 - i], mojiX, mojiY, width, width, styleJson, "ja").element);
+            mojiY -= width + spacing;
+        }
+        //駅名の高さが矩形の高さを超える場合、圧縮
+        const stationNameHeight = text.length * width + (text.length-1) * spacing; //駅名の高さを計算
+        const maxHeight = height; //矩形の高さを取得
+        if(stationNameHeight > maxHeight){
+            const scale = maxHeight / stationNameHeight; //圧縮率を計算
+            stationName.setAttribute("transform", ` translate(0,${areaBottomY}) scale(1,${scale}) translate(0,${-areaBottomY})`); //駅名を圧縮
+        }
+        return {element: stationName};
+    }
+    createIconTextByArea(text, x, y, width, height, styleJson, lang='ja', textHeightRatio=1){
+        if(lang == null){ lang = 'ja'; }
+        if(textHeightRatio == null){ textHeightRatio = 1; }
+
+        const textList = text.split(":"); //テキストと、絵文字IDに分割
+        if(textList.length % 2 === 0){ //:での分割数が偶数の場合、:が奇数となる。つまり構文エラーなのでnullを返す
+            return null;
+        }
+
+        // 空文字を除いたユニット（テキスト or アイコン）を収集する
+        // アイコンは1文字として扱い、テキストは文字数分としてカウントする
+        const units = []; // { type: 'text'|'icon', content: string }
+        let totalCharUnits = 0;
+        for(let i = 0; i < textList.length; i++){
+            if(textList[i] === "") continue;
+            if(i % 2 === 0){
+                units.push({ type: 'text', content: textList[i] });
+                totalCharUnits += textList[i].length;
+            } else {
+                units.push({ type: 'icon', content: textList[i] });
+                totalCharUnits += 1;
+            }
+        }
+        if(units.length === 0) return null;
+
+        // letterSpacingを解決する（オブジェクト形式は総文字単位数をキーに、文字列形式はそのまま使用）
+        const resolvedStyleJson = Object.assign({}, styleJson);
+        if(this.isObject(resolvedStyleJson.letterSpacing)){
+            const key = `${totalCharUnits}`;
+            resolvedStyleJson.letterSpacing = Object.prototype.hasOwnProperty.call(resolvedStyleJson.letterSpacing, key)
+                ? resolvedStyleJson.letterSpacing[key]
+                : "0px";
+        }
+        const letterSpacingPx = resolvedStyleJson.letterSpacing != null
+            ? (parseInt(resolvedStyleJson.letterSpacing) || 0)
+            : 0;
+
+        // 各ユニットの自然幅を算出する（アイコン: height、テキスト: getTextWidth）
+        const fontSize = this.getFontSize(height * textHeightRatio, styleJson.fontFamily, lang);
+        units.forEach(unit => {
+            unit.naturalWidth = unit.type === 'icon'
+                ? height
+                : this.getTextWidth(unit.content, fontSize, resolvedStyleJson);
+        });
+
+        // isComIcon: trueなら全ユニット均等圧縮（従来動作）、falseならアイコン固定・テキストのみ圧縮
+        const isComIcon = styleJson.isComIcon === true;
+        const allGaps   = letterSpacingPx * (units.length - 1);
+
+        let unitWidths; // 各ユニットの描画幅
+        let renderGap;  // ユニット間gap幅
+
+        if(isComIcon){
+            // 全ユニットを均等圧縮（従来動作）
+            const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0) + allGaps;
+            const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
+            unitWidths = units.map(u => u.naturalWidth * scale);
+            renderGap  = letterSpacingPx * scale;
+        } else {
+            // アイコン固定・テキストのみ圧縮（isComIcon: false）
+            // letterSpacingを含む固定幅からテキストに使えるスペースを算出する
+            const iconTotal = units.reduce((sum, u) => u.type === 'icon' ? sum + u.naturalWidth : sum, 0);
+            const textTotal = units.reduce((sum, u) => u.type === 'text' ? sum + u.naturalWidth : sum, 0);
+            const fixedTotal   = iconTotal + allGaps;
+            const availForText = width - fixedTotal;
+
+            if(textTotal > 0 && availForText > 0){
+                // テキストのみに圧縮率を適用、アイコンとgapは固定
+                const textRatio = availForText / textTotal;
+                unitWidths = units.map(u => u.type === 'icon' ? u.naturalWidth : u.naturalWidth * textRatio);
+                renderGap  = letterSpacingPx;
+            } else {
+                // フォールバック: テキストなし or 固定要素だけで超過 → 全体均等圧縮
+                const totalNaturalWidth = units.reduce((sum, u) => sum + u.naturalWidth, 0) + allGaps;
+                const scale = totalNaturalWidth > width ? width / totalNaturalWidth : 1;
+                unitWidths = units.map(u => u.naturalWidth * scale);
+                renderGap  = letterSpacingPx * scale;
+            }
+        }
+
+        // ユニットを順番に配置する
+        const iconTextElem = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        let nowX = x;
+        let wholeWidth = 0;
+
+        units.forEach((unit, idx) => {
+            const unitWidth = unitWidths[idx];
+            const isLast = idx === units.length - 1;
+
+            if(unit.type === 'text'){
+                // テキストはcreateByAreaで描画（resolvedStyleJsonでletterSpacingを引き継ぐ）
+                const textObj = this.createByArea(
+                    unit.content,
+                    nowX,
+                    y + (height * (1 - textHeightRatio) / 2),
+                    unitWidth,
+                    height * textHeightRatio,
+                    Object.assign({}, resolvedStyleJson),
+                    lang
+                );
+                if(textObj) iconTextElem.appendChild(textObj.element);
+            } else {
+                // アイコンの描画
+                if(typeof this.iconDict[unit.content] === "string"){
+                    //base64なら
+                    const iconElem = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                    iconElem.setAttribute("href", this.iconDict[unit.content]);
+                    iconElem.setAttribute("x", String(nowX));
+                    iconElem.setAttribute("y", String(y));
+                    iconElem.setAttribute("width", String(unitWidth));
+                    iconElem.setAttribute("height", String(height));
+                    iconTextElem.appendChild(iconElem);
+                } else {
+                    //プリセットなら
+                    const iconParams = this.iconDict[unit.content];
+                    const geometory = { x: nowX, y: y, width: unitWidth, height: height };
+                    const icon = this.numIconDrawer.createNumIconFromPreset(
+                        iconParams.presetType, iconParams.symbol, "", iconParams.color, geometory, 0
+                    );
+                    iconTextElem.appendChild(icon);
+                }
+            }
+
+            nowX += unitWidth + (isLast ? 0 : renderGap);
+            wholeWidth += unitWidth + (isLast ? 0 : renderGap);
+        });
+
+        return {element: iconTextElem, width: wholeWidth};
+    }
+
+    getTextWidth(text, fontSize, styleJson){
+        //return 100;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // "regular"はCanvas APIで無効な値のため"normal"に正規化する（textAnchor計算のズレ防止）
+        const fontWeight = styleJson.fontWeight === 'regular' ? 'normal' : (styleJson.fontWeight || 'normal');
+        // CSSのgenericフォントファミリー名（sans-serif等）はクォート不要。クォートすると
+        // iOS SafariでSVG描画と異なるフォントに解決されて幅測定がずれるため、named fontのみクォートする
+        const GENERIC_FAMILIES = new Set(['sans-serif', 'serif', 'monospace', 'cursive', 'fantasy', 'system-ui']);
+        const familyStr = GENERIC_FAMILIES.has(styleJson.fontFamily)
+            ? styleJson.fontFamily
+            : `'${styleJson.fontFamily}'`;
+        ctx.font = `${fontWeight} ${fontSize}px ${familyStr}`;
+
+        const metrics = ctx.measureText(text);
+        let width;
+        if(styleJson.letterSpacing != null){
+            width = metrics.width + (text.length - 1) * parseInt(styleJson.letterSpacing);
+        }
+        else{
+            width = metrics.width;
+        }
+        return width;
+    }
+    styleTextFromJson(styleJson){
+        let styleText = "";
+        for (let key in styleJson) {
+            let keyCss = this.toSnake(key);
+            styleText += `${keyCss}:${styleJson[key]};`
+        }
+        return styleText;
+    }
+    toSnake(str){
+        return str.replace(/([A-Z])/g, (s) => {return '-' + s.charAt(0).toLowerCase();})
+    }
+    isObject(value) {
+        return value !== null && typeof value === 'object';
+    }
+
+    getFontSize(height, fontFamily, lang){
+        //return 100;
+        const capHeightRatio = this.measureCapHeightRatio(fontFamily, lang);
+        const fontSize = height / capHeightRatio;
+        return fontSize;
+    }
+    measureCapHeightRatio(fontFamily, lang){
+        //キャッシュを確認
+        const key = `${fontFamily}-${lang}`;
+        if (this.capRatioCache[key]) return this.capRatioCache[key];
+
+        // Canvas 要素を作成（DOMに追加しない）
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 200;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const fontSize = 100; // 比率を安定させるために大きめ
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        // iOS SafariではctxにfontをセットするとtextBaselineがリセットされる場合があるため、font設定後に再設定する
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.textBaseline = 'top';
+        if(lang == "en"){
+            ctx.fillText('H', 50, 50);
+        }
+        else if(lang === "ja"){
+            ctx.fillText('寺', 50, 50);
+        }
+        else{
+            ctx.fillText('H', 50, 50); // デフォルトは英語のH
+        }
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        let top = null;
+        let bottom = null;
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const idx = (y * canvas.width + x) * 4;
+                const alpha = data[idx + 3];
+                if (alpha > 0) {
+                    if (top === null) top = y;
+                    bottom = y;
+                    break; // この行で1ピクセルでも描画されていればそのyを記録
+                }
+            }
+        }
+
+        if (top !== null && bottom !== null) {
+            const ratio = (bottom - top + 1) / fontSize;
+            this.capRatioCache[key] = ratio; // キャッシュに保存
+            return ratio;
+        }
+        return null; // 何も描画されていなかった場合
+    }
+    measureTextWidth(text, fontSize, fontFamily, fontWeight) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // フォントスタイルを正確に組み立て
+        ctx.font = `${fontSize}px '${fontFamily}'`; // フォントファミリーを 'sans-serif' に設定
+        //if(text === "湘南新宿ライン"){ console.log(ctx.font); }
+
+        const metrics = ctx.measureText(text);
+        return metrics.width;
+    }
+}
