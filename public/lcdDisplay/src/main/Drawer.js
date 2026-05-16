@@ -1,72 +1,48 @@
 class Drawer {
     constructor() {
-        this.drawParams = null;
+        this._drawParams = null;
         this.iconList = null;
-        this.templateSVG = null;
+        this._headerSVG = null;
         this.textDrawer = null;
         this.exprParser = new ExprParser();
-        this.debug = false; // trueにするとarrangeArea境界と末端要素境界を表示
+        this._debug = false;
         this._bodySVGCache = null;   // ページキャッシュ（filename → SVGElement）
-        this._currentPageIndex = 0;  // 現在のページインデックス
     }
 
-    // 同フォルダのファイルを並列フェッチして初期化
-    async load() {
-        const [drawParams, iconList, templateSVG] = await Promise.all([
-            fetch('./drawParams.json').then(r => r.json()),
-            fetch('./iconList.json').then(r => r.json()),
-            this._fetchSVG('./pageInput/tokyu/header/headerSVG.svg'),
-        ]);
-        this.drawParams = drawParams;
+    // 初期化。全リソースはindex側でロード済みのものを受け取る
+    load(drawParams, iconList, numIconPresets, headerSVG, bodySVGMap) {
+        this._drawParams = drawParams;
         this.iconList = iconList;
-        // url(./defs.svg#id) → url(#id) に正規化し、funcDef/funcCallを事前展開してからテンプレートを保持
-        this._normalizeSVGDefsRefs(templateSVG);
-        this._resolveFuncCalls(templateSVG);
-        this.templateSVG = templateSVG;
 
-        // drawParams.Pagesに列挙された全bodySVGを並列フェッチしてキャッシュ
+        // url(./defs.svg#id) → url(#id) に正規化し、funcDef/funcCallを事前展開してからヘッダーSVGを保持
+        this._normalizeSVGDefsRefs(headerSVG);
+        this._resolveFuncCalls(headerSVG);
+        this._headerSVG = headerSVG;
+
+        // 受け取ったbodySVGMapを処理してキャッシュに格納
         this._bodySVGCache = new Map();
-        this._currentPageIndex = 0;
-        const pages = drawParams.Pages || [];
-        await Promise.all(pages.map(async filename => {
-            try {
-                const bodySVG = await this._fetchSVG(`./pageInput/tokyu/body/${filename}`);
-                this._normalizeSVGDefsRefs(bodySVG);
-                this._resolveFuncCalls(bodySVG);
-                this._bodySVGCache.set(filename, bodySVG);
-            } catch (e) {
-                console.warn(`body SVG not found: ${filename}`);
-            }
-        }));
+        for (const [filename, bodySVG] of bodySVGMap) {
+            this._normalizeSVGDefsRefs(bodySVG);
+            this._resolveFuncCalls(bodySVG);
+            this._bodySVGCache.set(filename, bodySVG);
+        }
 
         this.textDrawer = new TextDrawer(this.iconList, null);
 
-        // drawParams.numIconPresetKeys に列挙されたプリセットSVGを並列フェッチしてNumIconDrawerを初期化
-        const presetKeys   = drawParams.numIconPresetKeys || [];
-        const numIconPresets = {};
-        await Promise.all(presetKeys.map(async key => {
-            try {
-                numIconPresets[key] = await this._fetchSVG(`/presetNumIcons/${key}.svg`);
-            } catch (e) {
-                console.warn(`numIcon preset not found: ${key}`);
-            }
-        }));
+        // index側でロード済みのnumIconPresetsを受け取りNumIconDrawerを初期化
         this.numIconDrawer = new NumIconDrawer(numIconPresets);
     }
 
-    // 現在のページのbodySVGを返す（Pagesが空またはキャッシュ未ヒットはnull）
+    // 現在のページのbodySVGを返す（drawParams.page未設定またはキャッシュ未ヒットはnull）
     get currentBodySVG() {
-        const pages = (this.drawParams && this.drawParams.Pages) || [];
-        if (pages.length === 0 || !this._bodySVGCache) return null;
-        const filename = pages[this._currentPageIndex % pages.length];
-        return this._bodySVGCache.get(filename) || null;
+        const page = this._drawParams?.page;
+        if (!page || !this._bodySVGCache) return null;
+        return this._bodySVGCache.get(page) || null;
     }
 
-    // ページを1つ進める（Pagesの末尾に達したら先頭に戻る）
-    pageReload() {
-        const pages = (this.drawParams && this.drawParams.Pages) || [];
-        if (pages.length === 0) return;
-        this._currentPageIndex = (this._currentPageIndex + 1) % pages.length;
+    // デバッグ表示（arrangeArea境界: 青 / 末端要素境界: 赤）の有効/無効を切り替える
+    setDebug(value) {
+        this._debug = value;
     }
 
     // SVGをDOMParserで取得（HTTP非2xxの場合はthrow）
@@ -322,7 +298,7 @@ class Drawer {
     _collectDefs() {
         const defsEl = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         const seenIds = new Set();
-        const sources = [this.templateSVG, this.currentBodySVG].filter(Boolean);
+        const sources = [this._headerSVG, this.currentBodySVG].filter(Boolean);
         for (const svg of sources) {
             const defs = svg.querySelector('defs');
             if (!defs) continue;
@@ -337,27 +313,30 @@ class Drawer {
         return defsEl;
     }
 
-    // <defs>をtargetSVGの先頭に注入し、オブジェクトツリーを構築してコンテンツ<g>を返す
-    draw(targetSVG) {
-        // header+bodyのdefsを収集してtargetSVGに注入（buildTree内でthis._defsElを参照するため先に設定）
+    // オブジェクトツリーを構築し、<defs>とコンテンツ<g>をまとめたDocumentFragmentを返す
+    draw(drawParams) {
+        this._drawParams = drawParams;
+        // header+bodyのdefsを収集（buildTree内でthis._defsElを参照するため先に設定）
         this._defsEl = this._collectDefs();
-        if (this._defsEl) {
-            targetSVG.insertBefore(this._defsEl, targetSVG.firstChild);
-        }
 
         // オブジェクトツリーを構築してgetElementで描画
         this.buildTree();
         console.log(this.defaultLineRoot);
         const resolveValue = name => this._resolveValue(name);
-        const ctx = { resolveValue, exprParser: this.exprParser, debug: this.debug };
+        const ctx = { resolveValue, exprParser: this.exprParser, debug: this._debug };
 
-        // defaultLine → header の順に同一<g>へ結合して返す
+        // defaultLine → header の順に同一<g>へ結合する
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         const defaultLineEl = this.defaultLineRoot.getElement(ctx);
         if (defaultLineEl) g.appendChild(defaultLineEl);
         const headerEl = this.root.getElement(ctx);
         if (headerEl) g.appendChild(headerEl);
-        return g;
+
+        // <defs>とコンテンツ<g>をDocumentFragmentにまとめて返す
+        const fragment = document.createDocumentFragment();
+        if (this._defsEl) fragment.appendChild(this._defsEl);
+        fragment.appendChild(g);
+        return fragment;
     }
 
     // テンプレートSVGからオブジェクトツリーを構築してthis.rootに設定する
@@ -382,7 +361,7 @@ class Drawer {
 
         // ルートはSVG要素自体に対応するGroupObj（visible属性なし）
         this.root = new GroupObj(null);
-        const tmChildArr = Array.from(this.templateSVG.children).filter(c => c.getAttribute);
+        const tmChildArr = Array.from(this._headerSVG.children).filter(c => c.getAttribute);
         this._activeShadowMap = MulShadowUtil.collectShadowMap(tmChildArr);
         for (const child of tmChildArr) {
             if (child.getAttribute('lcdParts') === 'mulShadow') continue;
@@ -400,7 +379,7 @@ class Drawer {
         // isDraw属性が静的評価でfalseならツリーに追加しない
         const isDrawAttr = element.getAttribute ? element.getAttribute('isDraw') : null;
         if (isDrawAttr !== null) {
-            const resolveValue = LcdPartsObj.makeResolveValue(this.drawParams, {});
+            const resolveValue = LcdPartsObj.makeResolveValue(this._drawParams, {});
             if (!this.exprParser.eval(isDrawAttr, resolveValue)) return null;
         }
 
@@ -415,11 +394,11 @@ class Drawer {
             if (lcdParts === 'group') {
                 const lcdColorAttr = element.getAttribute('lcd-color');
                 if (lcdColorAttr) {
-                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, this.drawParams);
+                    const resolved = StaticObj._resolveLcdColor(lcdColorAttr, this._drawParams);
                     const color = Array.isArray(resolved) ? (resolved[0] || null) : (resolved || null);
                     if (color) {
                         domForChildren = element.cloneNode(true);
-                        StaticObj._applyColorToDOM(domForChildren, color, this.drawParams);
+                        StaticObj._applyColorToDOM(domForChildren, color, this._drawParams);
                     }
                 }
             }
@@ -439,23 +418,23 @@ class Drawer {
             this._activeShadowMap = prevShadowMap;
             return group;
         } else if (lcdParts === 'static') {
-            return new StaticObj(element, this.drawParams);
+            return new StaticObj(element, this._drawParams);
         } else if (lcdParts === 'textBox') {
-            return new TextBoxObj(element, this.drawParams, {}, this.textDrawer);
+            return new TextBoxObj(element, this._drawParams, {}, this.textDrawer);
         } else if (lcdParts === 'numbering') {
-            return new NumIconObj(element, this.drawParams, {}, this.numIconDrawer);
+            return new NumIconObj(element, this._drawParams, {}, this.numIconDrawer);
         } else if (lcdParts === 'arrange') {
             // shadowId（カンマ区切り可）を解析して _activeShadowMap に一致する影リストを activeShadows に渡す
             const shadowIdAttr  = element.getAttribute('shadowId');
             const rootShadowMap = this._activeShadowMap || {};
             const activeShadows = MulShadowUtil.resolveShadows(shadowIdAttr, rootShadowMap);
             const arrangeCtx = {
-                drawParams: this.drawParams,
+                drawParams: this._drawParams,
                 args: {},
                 textDrawer: this.textDrawer,
                 numIconDrawer: this.numIconDrawer,
                 exprParser: this.exprParser,
-                debug: this.debug,
+                debug: this._debug,
                 defsEl: this._defsEl,
                 activeShadows: activeShadows.length > 0 ? activeShadows : null,
                 // ルートレベルのshadowMapを子孫ArrangeObjに引き継ぐ（深くネストされた要素のshadowId解決に使用）
@@ -471,12 +450,12 @@ class Drawer {
             const rootShadowMap = this._activeShadowMap || {};
             const activeShadows = MulShadowUtil.resolveShadows(shadowIdAttr, rootShadowMap);
             const slotCtx = {
-                drawParams: this.drawParams,
+                drawParams: this._drawParams,
                 args: {},
                 textDrawer: this.textDrawer,
                 numIconDrawer: this.numIconDrawer,
                 exprParser: this.exprParser,
-                debug: this.debug,
+                debug: this._debug,
                 defsEl: this._defsEl,
                 activeShadows: activeShadows.length > 0 ? activeShadows : null,
                 rootShadowMap,
@@ -487,9 +466,10 @@ class Drawer {
         return null;
     }
 
-    // オブジェクトツリー全体にlangChangeを伝播する
-    // drawParamsを更新したあとに呼び出すことで、変化した visible をアニメーションで遷移させる
-    langChange(transTime, gapTime) {
+    // 言語を切り替え、オブジェクトツリー全体にlangChangeを伝播する
+    // visible の変化をアニメーションで遷移させる
+    langChange(newLangId, transTime, gapTime) {
+        this._drawParams.langId = newLangId;
         if (this.defaultLineRoot) this.defaultLineRoot.langChange(transTime, gapTime);
         if (this.root) this.root.langChange(transTime, gapTime);
     }
@@ -504,7 +484,7 @@ class Drawer {
         if (token !== '' && !isNaN(num)) return num;
         // ドット記法でdrawParamsを辿る
         const keys = token.split('.');
-        let val = this.drawParams;
+        let val = this._drawParams;
         for (const key of keys) {
             if (val === null || val === undefined) return undefined;
             val = val[key];

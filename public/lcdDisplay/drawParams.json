@@ -1,12 +1,5 @@
 {
-  "Pages": [
-    "defaultLineSVG.svg",
-    "overLineSVG.svg",
-    "transfers.svg",
-    "platform.svg"
-  ],
-
-
+  "page": "defaultLineSVG.svg",
   "langId": 0,
   "runState": 1,
   "isStopping": false,

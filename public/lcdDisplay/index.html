@@ -123,6 +123,8 @@
     const svg = document.getElementById('display');
     const paramList = document.getElementById('param-list');
     let drawer;
+    let pageNameList = []; // pageNameList.jsonから読み込んだページ一覧
+    let currentPageIndex = 0; // 現在のページインデックス（index側で管理）
 
     // drawParamsの各エントリを入力フィールドとして生成する
     function buildControls(params) {
@@ -182,25 +184,72 @@
 
     // SVGをクリアして再描画する
     function redraw() {
-      drawer.drawParams = collectParams();
-      drawer.debug = document.getElementById('debug-chk').checked;
+      drawer.setDebug(document.getElementById('debug-chk').checked);
       while (svg.firstChild) svg.removeChild(svg.firstChild);
-      svg.appendChild(drawer.draw(svg));
+      svg.appendChild(drawer.draw(collectParams()));
+    }
+
+    // SVGファイルをフェッチしてSVGElement（documentElement）を返す
+    async function fetchSVG(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`fetch failed: ${res.status} ${url}`);
+      const text = await res.text();
+      return new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+    }
+
+    // numIconPresetSVGをキーごとにフェッチして { key: SVGElement } マップを返す
+    async function loadNumIconPresets(presetKeys) {
+      const presets = {};
+      await Promise.all(presetKeys.map(async key => {
+        try {
+          presets[key] = await fetchSVG(`/presetNumIcons/${key}.svg`);
+        } catch (e) {
+          console.warn(`numIcon preset not found: ${key}`);
+        }
+      }));
+      return presets;
+    }
+
+    // bodySVGをPages配列のファイル名ごとにフェッチして Map<filename, SVGElement> を返す
+    async function loadBodySVGs(pages) {
+      const map = new Map();
+      await Promise.all(pages.map(async filename => {
+        try {
+          map.set(filename, await fetchSVG(`./pageInput/tokyu/body/${filename}`));
+        } catch (e) {
+          console.warn(`body SVG not found: ${filename}`);
+        }
+      }));
+      return map;
     }
 
     window.onload = async () => {
       // LcdAnimatorをグローバルシングルトンとして初期化（langChange時のアニメーションで使用）
       window.lcdAnimator = new LcdAnimator();
+
+      // drawParams.json・pageNameList.jsonを先にフェッチし、残りのリソースを並列ロードしてDrawerを初期化
+      const [drawParams, loadedPageNameList] = await Promise.all([
+        fetch('./drawParams.json').then(r => r.json()),
+        fetch('./pageNameList.json').then(r => r.json()),
+      ]);
+      pageNameList = loadedPageNameList;
+      const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
+        fetch('./iconList.json').then(r => r.json()),
+        loadNumIconPresets(drawParams.numIconPresetKeys || []),
+        fetchSVG('./pageInput/tokyu/header/headerSVG.svg'),
+        loadBodySVGs(pageNameList),
+      ]);
+
       drawer = new Drawer();
-      await drawer.load();
+      drawer.load(drawParams, iconList, numIconPresets, headerSVG, bodySVGMap);
 
       // lcdSVGのサイズをheaderSVGのviewBoxに合わせる
-      const viewBox = drawer.templateSVG.getAttribute('viewBox');
+      const viewBox = headerSVG.getAttribute('viewBox');
       if (viewBox) svg.setAttribute('viewBox', viewBox);
 
       // 初期描画とコントロール生成
-      svg.appendChild(drawer.draw(svg));
-      buildControls(drawer.drawParams);
+      svg.appendChild(drawer.draw(drawParams));
+      buildControls(drawParams);
 
       document.getElementById('redraw-btn').addEventListener('click', redraw);
 
@@ -213,8 +262,8 @@
       function doLangCycle() {
         cycleNumberParam('langId', 0, 2);
         const el = paramList.querySelector('[data-key="langId"]');
-        if (el) drawer.drawParams.langId = Number(el.value);
-        drawer.langChange(LANG_TRANS_MS, LANG_GAP_MS);
+        const newLangId = el ? Number(el.value) : 0;
+        drawer.langChange(newLangId, LANG_TRANS_MS, LANG_GAP_MS);
       }
       function doRunStateCycle() {
         cycleNumberParam('runState', 0, 2);
@@ -245,7 +294,11 @@
         redraw();
       }
       function doPageCycle() {
-        drawer.pageReload();
+        if (pageNameList.length === 0) return;
+        currentPageIndex = (currentPageIndex + 1) % pageNameList.length;
+        // UIのpage入力フィールドを更新してredrawで反映させる
+        const el = paramList.querySelector('[data-key="page"]');
+        if (el) el.value = pageNameList[currentPageIndex];
         redraw();
       }
       function doRootSectionTypeCycle() {
