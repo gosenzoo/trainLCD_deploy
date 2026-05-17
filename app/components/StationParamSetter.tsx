@@ -107,32 +107,38 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     }
 
     // 選択中の乗換路線エントリの line フィールドを更新する
+    // functional updater を使い、IconNewPopup の setSetting と競合しないようにする
     const updateTransferLine = (field: 'lineIconKey' | 'name' | 'kana' | 'eng', value: string) => {
         if (transferSelectedIndex === null) return
-        const _setting = structuredClone(setting)
-        selectedIndexes.forEach(ind => {
-            const station = _setting.stationList[ind - 1]
-            if (!station || !station.transfers[transferSelectedIndex]) return
-            // 旧形式データで line が未定義の場合は初期化する
-            ensureTransferLine(station.transfers[transferSelectedIndex])
-            station.transfers[transferSelectedIndex].line[field] = value
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(ind => {
+                const station = _setting.stationList[ind - 1]
+                if (!station || !station.transfers[transferSelectedIndex]) return
+                // 旧形式データで line が未定義の場合は初期化する
+                ensureTransferLine(station.transfers[transferSelectedIndex])
+                station.transfers[transferSelectedIndex].line[field] = value
+            })
+            return _setting
         })
-        setSetting(_setting)
     }
 
     // kana/eng を同時更新する（かな入力時の自動ローマ字補完用）
+    // functional updater を使い、IconNewPopup の setSetting と競合しないようにする
     const updateTransferLineKanaEng = (kana: string) => {
         if (transferSelectedIndex === null) return
-        const _setting = structuredClone(setting)
-        selectedIndexes.forEach(ind => {
-            const station = _setting.stationList[ind - 1]
-            if (!station || !station.transfers[transferSelectedIndex]) return
-            // 旧形式データで line が未定義の場合は初期化する
-            ensureTransferLine(station.transfers[transferSelectedIndex])
-            station.transfers[transferSelectedIndex].line.kana = kana
-            station.transfers[transferSelectedIndex].line.eng = kanaToAlphabet(kana, 1)
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(ind => {
+                const station = _setting.stationList[ind - 1]
+                if (!station || !station.transfers[transferSelectedIndex]) return
+                // 旧形式データで line が未定義の場合は初期化する
+                ensureTransferLine(station.transfers[transferSelectedIndex])
+                station.transfers[transferSelectedIndex].line.kana = kana
+                station.transfers[transferSelectedIndex].line.eng = kanaToAlphabet(kana, 1)
+            })
+            return _setting
         })
-        setSetting(_setting)
     }
 
     // 乗換路線リストの操作対象配列（targetStation の transfers）
