@@ -27,10 +27,10 @@ class Drawer {
             this._bodySVGCache.set(filename, bodySVG);
         }
 
-        this.textDrawer = new TextDrawer(this.iconList, null);
-
         // index側でロード済みのnumIconPresetsを受け取りNumIconDrawerを初期化
         this.numIconDrawer = new NumIconDrawer(numIconPresets);
+        // TextDrawer にnumIconDrawerを渡す（:iconKey: 形式のプリセットアイコン描画に使用）
+        this.textDrawer = new TextDrawer(this.iconList, this.numIconDrawer);
     }
 
     // 現在のページのbodySVGを返す（drawParams.page未設定またはキャッシュ未ヒットはnull）
