@@ -16,7 +16,7 @@ type stationParamsSetterProps = {
     setSetting: React.Dispatch<React.SetStateAction<settingType>>,
     selectedIndexes: number[],
     // 表示するセクション（StationList のアクティブタブに連動）
-    activeSection: 'basic' | 'defaultLine' | 'platform'
+    activeSection: 'basic' | 'defaultLine' | 'transfersDisp' | 'platform'
 }
 
 const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes, activeSection}) => {
@@ -529,6 +529,31 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     targetStation.transferText = transferText;
                     targetStation.transferTextEng = transferTextEng;
                 }}>登録路線情報を反映</button>
+                <br></br>
+            </>)}
+
+            {/* ===== 乗換一覧表示タブ (transfersDisp) ===== */}
+            {activeSection === 'transfersDisp' && (<>
+                <label>乗換一覧行分割指定</label>
+                <br></br>
+                <textarea
+                    rows={8}
+                    cols={30}
+                    onChange={(e) => formUpdated(e, 'transfersListDisp')}
+                    value={targetStation?.transfersListDisp ?? ''}
+                ></textarea>
+                <br></br>
+                {/* 基本設定情報を反映: station.transfers のIDリストをそのままテキストボックスに書き込む */}
+                <button onClick={() => {
+                    if (!targetStation) return
+                    const _setting = structuredClone(setting)
+                    selectedIndexes.forEach(ind => {
+                        if (_setting.stationList[ind - 1]) {
+                            _setting.stationList[ind - 1].transfersListDisp = _setting.stationList[ind - 1].transfers
+                        }
+                    })
+                    setSetting(_setting)
+                }}>基本設定情報を反映</button>
                 <br></br>
             </>)}
 

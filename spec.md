@@ -197,6 +197,7 @@ classDiagram
 | `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー |
 | `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
 | `transfers` | string | 乗換路線IDリスト（スペース区切り） |
+| `transfersListDisp` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
 | `isPass` | boolean | 通過駅フラグ |
 | `sectionTime` | string | 次駅までの所要時間（分） |
 | `lineId` | string | この駅以降の区間路線ID |
@@ -585,26 +586,47 @@ type GenericItemListProps<T> = {
 
 ### 4.8 駅設定エリアのタブ構成
 
-`StationList` エリア下部に表示するコンテンツを、4 つのタブで切り替える。
+`StationList` エリア下部に表示するコンテンツを、5 つのタブで切り替える。
 
 #### タブ一覧
 
 | タブID | タブラベル | コンテンツ |
 |--------|-----------|-----------|
 | `basic` | 駅基本設定 | 駅名・かな・英語・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア |
-| `defaultLine` | 路線図 | 次区間所要時間・次区間路線ID・乗換案内（日英テキスト）・登録路線情報を反映ボタン |
-| `platform` | ホーム案内 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
+| `defaultLine` | 詳細路線図表示 | 次区間所要時間・次区間路線ID・乗換案内（日英テキスト）・登録路線情報を反映ボタン |
+| `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
+| `platform` | ホーム案内表示 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
 | `map` | マップ | 既存の MapComponent（現在開発中） |
+
+#### 「乗換一覧表示」タブの仕様
+
+- `stationType.transfersListDisp` を編集する `<textarea>` を配置する（初期値: 空文字列）
+- 値はそのまま `station.transfersListDisp` に書き込む
+- **「基本設定情報を反映」ボタン**: クリックすると、現在の `station.transfers`（スペース区切りのID列）を `<textarea>` に書き込み `station.transfersListDisp` を更新する
+  - 例: `"1 3 5"` → textarea 値 `"1 3 5"`（改行なし、ユーザが後で改行を挿入可能）
+
+#### `transfersListDisp` の書式と drawParams への反映ロジック
+
+```
+transfersListDisp の例（ユーザが改行を挿入した状態）:
+"1 3\n5"
+→ 1行目: ID 1, 3 の路線
+→ 2行目: ID 5 の路線
+```
+
+- **空の場合**: 従来通り `transfers` の各IDを1行1路線として `transferList` を生成する
+- **空でない場合**: 改行で分割した各部分を1行とし、各行内をスペースで分割して路線IDとして `transferList` を生成する
+  - `lineDict` に存在しないIDは除外する
 
 #### 実装方針
 
-- `StationList` の `TabType` を `'basic' | 'defaultLine' | 'platform' | 'map'` に変更する
-- タブボタン行を 4 ボタンに更新する
-- `StationParamSetter` に `activeSection: 'basic' | 'defaultLine' | 'platform'` prop を追加する
+- `StationList` の `TabType` を `'basic' | 'defaultLine' | 'transfersDisp' | 'platform' | 'map'` に変更する
+- タブボタン行を 5 ボタンに更新する
+- `StationParamSetter` に `activeSection: 'basic' | 'defaultLine' | 'transfersDisp' | 'platform'` prop を追加する
   - `StationList` から現在のアクティブタブを渡し、`StationParamSetter` 内で表示するフォーム群を切り替える
   - `map` タブは `StationParamSetter` ではなく `StationList` が直接 `MapComponent` をレンダリングする
 - 既存の `AccordionSection`（詳細設定）は廃止し、タブで代替する
-- グレーアウト（駅未選択時）は `basic` / `defaultLine` / `platform` セクションすべてに適用する
+- グレーアウト（駅未選択時）は `basic` / `defaultLine` / `transfersDisp` / `platform` セクションすべてに適用する
 
 ---
 

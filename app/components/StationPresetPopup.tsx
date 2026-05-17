@@ -50,6 +50,7 @@ const toStationType = (station: PresetStation, lineColor: string, number: string
     leftSlotInd: "0",
     otherCarNum: "0",
     otherLeftSlotInd: "0",
+    transfersListDisp: "",
 })
 
 // 駅・路線の選択ハイライトに使うスタイル

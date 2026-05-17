@@ -768,17 +768,36 @@ class ProgressController {
      */
     _buildTransfers(currentStationInd, posState) {
         const displayStation = getNextStopStation(this.stationList, currentStationInd);
-        const transferIds = this._parseTransferIds(displayStation.transfers);
 
-        // 各路線を1行ずつ（二次元配列の外側 = 行数）
-        const transferList = transferIds
-            .filter(id => this.lineDict[id])
-            .map(id => {
-                const line = this.lineDict[id];
-                // lineIconKeyは :key: の形式で埋め込む
-                const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
-                return [{ lineIcon, name: line.name || "", eng: line.eng || "" }];
-            });
+        let transferList;
+        if (displayStation.transfersListDisp) {
+            // transfersListDisp が設定されている場合: 改行で行を分割し、各行をスペース区切りのIDリストとして解釈する
+            transferList = displayStation.transfersListDisp
+                .split("\n")
+                .map(line => {
+                    // 各行内のスペース区切りIDを1行のアイテム配列に変換する
+                    return line.split(" ")
+                        .map(id => id.trim())
+                        .filter(id => id && this.lineDict[id])
+                        .map(id => {
+                            const lineData = this.lineDict[id];
+                            const lineIcon = lineData.lineIconKey ? `:${lineData.lineIconKey}:` : "";
+                            return { lineIcon, name: lineData.name || "", eng: lineData.eng || "" };
+                        });
+                })
+                .filter(row => row.length > 0); // 有効なIDが1件もない行は除外する
+        } else {
+            // transfersListDisp が空の場合: 従来通り各路線を1行ずつ配置する
+            const transferIds = this._parseTransferIds(displayStation.transfers);
+            transferList = transferIds
+                .filter(id => this.lineDict[id])
+                .map(id => {
+                    const line = this.lineDict[id];
+                    // lineIconKeyは :key: の形式で埋め込む
+                    const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
+                    return [{ lineIcon, name: line.name || "", eng: line.eng || "" }];
+                });
+        }
 
         return { transferList };
     }

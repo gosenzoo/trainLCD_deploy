@@ -17,7 +17,7 @@ type stationListProps = {
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
 }
 // タブID: 表示アプリ側の命名に合わせる（defaultLine=路線図, platform=ホーム案内）
-type TabType = 'basic' | 'defaultLine' | 'platform' | 'map';
+type TabType = 'basic' | 'defaultLine' | 'transfersDisp' | 'platform' | 'map';
 
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
@@ -81,7 +81,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             transferCountLineP: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
-            otherCarNum: "0", otherLeftSlotInd: "0"
+            otherCarNum: "0", otherLeftSlotInd: "0", transfersListDisp: ""
         })
         setSetting(_setting)
         // splice の実際の挿入位置（0-based: _index）を 1-based に変換して選択する
@@ -229,9 +229,10 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     const renderContent = () => {
         switch (activeTab) {
-            // 駅基本設定・路線図・ホーム案内は StationParamSetter に activeSection を渡して表示内容を切り替える
+            // 駅基本設定・路線図・乗換一覧表示・ホーム案内は StationParamSetter に activeSection を渡して表示内容を切り替える
             case 'basic':
             case 'defaultLine':
+            case 'transfersDisp':
             case 'platform':
                 return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} activeSection={activeTab} />
             case 'map':
@@ -285,11 +286,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     className={`btn-toggle${isNumberDescending ? ' btn-toggle--active' : ''}`}
                 >ナンバリング補完降順</button>
             </div>
-            {/* 駅設定エリアのタブ切り替え（4タブ） */}
+            {/* 駅設定エリアのタブ切り替え（5タブ） */}
             <div className="operation-tabs">
                 <button onClick={() => setActiveTab('basic')} className={`tab-btn${activeTab === 'basic' ? ' active' : ''}`}>駅基本設定</button>
-                <button onClick={() => setActiveTab('defaultLine')} className={`tab-btn${activeTab === 'defaultLine' ? ' active' : ''}`}>路線図</button>
-                <button onClick={() => setActiveTab('platform')} className={`tab-btn${activeTab === 'platform' ? ' active' : ''}`}>ホーム案内</button>
+                <button onClick={() => setActiveTab('defaultLine')} className={`tab-btn${activeTab === 'defaultLine' ? ' active' : ''}`}>詳細路線図表示</button>
+                <button onClick={() => setActiveTab('transfersDisp')} className={`tab-btn${activeTab === 'transfersDisp' ? ' active' : ''}`}>乗換一覧表示</button>
+                <button onClick={() => setActiveTab('platform')} className={`tab-btn${activeTab === 'platform' ? ' active' : ''}`}>ホーム案内表示</button>
                 <button onClick={() => setActiveTab('map')} className={`tab-btn${activeTab === 'map' ? ' active' : ''}`}>マップ</button>
             </div>
             {renderContent()}

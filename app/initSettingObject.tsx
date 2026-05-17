@@ -55,7 +55,8 @@ const initStationObject: stationType = {
     slotNum: "0",
     leftSlotInd: "0",
     otherCarNum: "0",
-    otherLeftSlotInd: "0"
+    otherLeftSlotInd: "0",
+    transfersListDisp: ""
 }
 
 const initLineObject = {
