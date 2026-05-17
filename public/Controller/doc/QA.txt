@@ -1,0 +1,138 @@
+■QA.txt — Controller 実装前の確認事項
+
+---
+
+Q1. 仕様書の typo と思われる箇所について
+
+controllerSpec.txt の moveState/moveStation の記述に以下の記載があります。
+
+  moveState(step)
+    ProgressController.moveState(step)を呼び出す。
+    ProgressController.pageReset()      ← ここ
+    ProgressController.langReset()も呼び出す。  ← ここ
+
+「ProgressController.pageReset()」「ProgressController.langReset()」は、
+それぞれ「pageController.pageReset()」「langController.langReset()」の
+間違いでしょうか？
+
+moveStation(step) にも同様の記述があります。
+
+A1. はい、間違いです。修正お願いします。
+
+
+---
+
+Q2. 各サブクラスに渡すパラメータ（progressParams / pageParams / langParams）の中身について
+
+仕様書に「何を抽出するかは後述」とありますが、後述箇所が見当たりません。
+それぞれのパラメータに何を含めるか教えてください。
+
+現時点での推定：
+
+  progressParams（推定）:
+    - stationList: settings.stationList（全駅リスト）
+    - isLoop: settings.info.isLoop（環状運転か）
+    - operationList: settings.operationList（種別・行先など、駅区間ごとの運行情報）
+
+  pageParams（推定）:
+    - pageNameList: string[]（表示するSVGページ名の一覧。状態ごとに変わる？）
+
+  langParams（推定）:
+    - langIdList: { langId, displayTime, animTime, gapTime }[]（言語IDと表示時間の一覧）
+
+A2. 
+progressParams:
+settingsから必要な情報を抜き出して、そちらで決めてください。
+
+pageParams: pageNameList: string[]
+langParams:langIdList: { langId, displayTime, transTime, gapTime }[]
+です。
+
+---
+
+Q3. isStopping（長時間停車）の実装方針について
+
+現行アプリの ProgressController では、setTimeout によるタイマーで
+長時間停車フラグ（isLongStop）を管理しています。
+
+新 Controller でも同様にタイマー機構を ProgressController 内部に持たせますか？
+それとも、長時間停車の検知は外部（呼び出し元）が担い、Controller には
+外部から isStopping を注入する設計にしますか？
+
+A3. タイマー機構をprogressControllerに持たせます。
+タイマーが発火すると、pageReset(), langReset()をし、getDrawParams()を出力します。
+
+---
+
+Q4. langIdList の構造と、時間情報の用途について
+
+仕様書に「表示時間、アニメーション遷移時間、gapTime」が langIdList の要素に含まれると
+ありますが、これらは drawParams には含まれていません。
+
+想定している構造と用途を教えてください。
+たとえば以下のような構造を想定していますが、合っていますか？
+
+  langIdList = [
+    { langId: 0, displayTime: 4000, animTime: 500, gapTime: 200 },
+    { langId: 1, displayTime: 4000, animTime: 500, gapTime: 200 },
+  ]
+
+また、displayTime 等は drawParams に含めず、呼び出し元が langRotate() を
+叩くタイミングを決めるための情報として LangController が保持する、
+という理解で合っていますか？
+
+A4. langIdの切り替えもタイマーで行います。各idに対応するdisplayTime時間経過すると、タイマー発火で
+言語タイマーコールバックを動かします。
+言語タイマーコールバックの設定はControllerアプリ呼び出し側で行います。
+コールバックの引数は(langId, transTime, gapTime)です。
+
+---
+
+Q5. 各 getParams() の出力分担について
+
+getDrawParams() は3つの getParams() の出力を統合して drawParams を返しますが、
+どの情報をどのコントローラが出力するかを教えてください。
+
+現時点での推定：
+
+  PageController.getParams()
+    → { page }  のみ
+
+  LangController.getParams()
+    → { langId }  のみ
+    （displayTime 等の時間情報を含める場合は langOutput に追加するか？）
+
+  ProgressController.getParams()
+    → 上記以外の全フィールド:
+       runState, isStopping, isTerminal,
+       isDrawNextStation, isDrawTime, isDrawLineName,
+       whole, defaultLine, overLine, platform, transfers
+
+ProgressController.getParams() が drawParams の大部分を担うという理解で
+よいでしょうか？
+
+A5. そのとおりです
+
+---
+
+Q6. LangController タイマー発火後の動作について
+
+タイマーが発火してコールバック (langId, transTime, gapTime) を呼んだ後、
+currentLangId の更新（次の言語への進行）と次回タイマーの再起動は、
+LangController が自動で行いますか？
+それとも、コールバックを受け取った呼び出し元が Controller.langRotate() を呼ぶことで
+進行させる設計ですか？
+
+A6. タイマーで動かすか、langRotate()で動かす方法の2通りを用意します。
+今回はタイマーのみ実装するので、langRotate()は使用しません。
+
+---
+
+Q7. ProgressController の isStopping 発火時の通知方法について
+
+A3 より「タイマーが発火すると pageReset()・langReset() をして getDrawParams() を出力する」
+とのことですが、この getDrawParams() の出力はどのように呼び出し元に届けますか？
+現行アプリの onLongStop コールバックのように、あらかじめ登録しておいたコールバック関数に
+drawParams を渡す形でしょうか？
+
+A7. それでお願いします。

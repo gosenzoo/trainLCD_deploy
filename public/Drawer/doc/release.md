@@ -1,0 +1,1 @@
+src配下の要素を1つのDrawerアプリとしてリリースしたいです。まず、外から見た際にAPIのみ使えるようにしたいです。使えるAPIは、オブジェクト生成、load()：初期化（iconList,templateSVG）,langChange()：言語を進める,Reload()：全再読み込み,PageReload()：body部分再読み込み　です。まず、方針を教えてください。

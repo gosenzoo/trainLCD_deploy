@@ -93,7 +93,7 @@
 
     <!-- フッター -->
     <!-- 次の停車駅 -->
-    <rect lcdParts="textBox" lcdText="#{nowStation.name}を出ますと【#{nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+    <rect lcdParts="textBox" lcdText="#{whole.nowStation.name}を出ますと【#{whole.nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
 
 
 

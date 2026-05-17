@@ -1,337 +1,345 @@
 {
   "page": "defaultLineSVG.svg",
+
   "langId": 0,
   "runState": 1,
   "isStopping": false,
-  "numIconPresetKeys": ["N_tokyu", "N_tokyo_subway", "N_JR_central"],
   "isTerminal": false,
-  "isNextStation": true,
-  "trainType": "急行",
-  "trainTypeEng": "Express",
-  "trainTypeSubText": "八戸から各停",
-  "trainTypeSubTextEng": "Local from Hachinohe",
-  "nowStation": {
-    "name": "金月洞",
-    "kana": "きんげつどう",
-    "eng": "Kingetsudō",
-    "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
-    },
-    "transferText": "",
-    "transferTextEng": "",
-    "doorSide": "left",
-    "transferCountLineP": "",
-    "otherLineInd": "",
-    "slotNum": "0",
-    "leftSlotInd": "0",
-    "otherCarNum": "0",
-    "otherLeftSlotInd": "0"
-  },
-  "nextStopName": "七戸十和田",
-  "viaText": "東北新幹線直通",
-  "destination": {
-    "name": "新青森",
-    "kana": "しんあおもり",
-    "eng": "Shin-Aomori",
-    "numIcon": {
-      "isDraw": true,
-      "presetKey": "N_tokyu",
-      "symbol": "T",
-      "number": "19",
-      "color": "#009900"
-    }
-  },
-  "carNumber": 3,
-
-
-
-  "direction": 0,
-  "sections": [
-    {"color1": "rgb(200, 200, 200)", "color2": "rgb(200, 200, 200)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
-    {"color1": "rgb(200, 200, 200)", "color2": "rgb(0, 255, 0)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
-    {"color1": "rgb(0, 255, 0)", "color2": "rgb(0, 255, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
-    {"color1": "rgb(0, 0, 255)", "color2": "rgb(0, 0, 255)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 0, 255)"},
-    {"color1": "rgb(255, 0, 255)", "color2": "rgb(255, 0, 255)", "type": 0, "lineName": "新横浜線", "lineNameEng": "Shin-Yokohama Line", "lineNameColor": "rgb(255, 0, 255)"},
-    {"color1": "rgb(255, 0, 0)", "color2": "rgb(255, 0, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(255, 0, 0)"},
-    {"color1": "rgb(255, 127, 0)", "color2": "rgb(255, 255, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(255, 127, 0)"}
-  ],
-  "rootSection": {
-    "color": "rgb(200, 200, 200)",
-    "type": 0,
-    "lineName": "田園都市線",
-    "lineNameEng": "Den-en-toshi Line",
-    "lineNameColor": "rgb(0, 255, 0)",
-    "isConnect": true
-  },
-  "arrowSection": {
-    "color": "rgb(255, 0, 255)",
-    "type": 0,
-    "lineName": "東横線",
-    "lineNameEng": "Tōyoko Line",
-    "lineNameColor": "rgb(255, 0, 255)",
-    "isConnect": true
-  },
-  "drawPos": 3,
-  "stationFrameNum": 8,
-  
   "isDrawNextStation": true,
   "isDrawTime": true,
   "isDrawLineName": true,
 
-  "dispStationList": [
-    {
-      "name": "東京",
+  "whole": {
+    "trainType": "急行",
+    "trainTypeEng": "Express",
+    "trainTypeSubText": "八戸から各停",
+    "trainTypeSubTextEng": "Local from Hachinohe",
+    "nowStation": {
+      "name": "金月洞",
       "kana": "きんげつどう",
       "eng": "Kingetsudō",
       "numIcon": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
       },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
-      },
-      "numIconType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": true
+      "doorSide": "left"
     },
-    {
-      "name": "上野",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
+    "nextStopName": "七戸十和田",
+    "viaText": "東北新幹線直通",
+    "destination": {
+      "name": "新青森",
+      "kana": "しんあおもり",
+      "eng": "Shin-Aomori",
       "numIcon": {
         "isDraw": true,
         "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
-      },
-      "numIconNext": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
-      },
-      "numIconType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": false
+        "symbol": "T",
+        "number": "19",
+        "color": "#009900"
+      }
     },
-    {
-      "name": "尾久",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
-      },
-      "numIconNext": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
-      },
-      "numIconType": "1",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":D:田園都市線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":D:Den-en-toshi Line"
-      ],
-      "isGray": false
+    "carNumber": 3,
+    "direction": 0
+  },
+
+  "defaultLine": {
+    "sections": [
+      {"color1": "rgb(200, 200, 200)", "color2": "rgb(200, 200, 200)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
+      {"color1": "rgb(200, 200, 200)", "color2": "rgb(0, 255, 0)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
+      {"color1": "rgb(0, 255, 0)", "color2": "rgb(0, 255, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 255, 0)"},
+      {"color1": "rgb(0, 0, 255)", "color2": "rgb(0, 0, 255)", "type": 0, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(0, 0, 255)"},
+      {"color1": "rgb(255, 0, 255)", "color2": "rgb(255, 0, 255)", "type": 0, "lineName": "新横浜線", "lineNameEng": "Shin-Yokohama Line", "lineNameColor": "rgb(255, 0, 255)"},
+      {"color1": "rgb(255, 0, 0)", "color2": "rgb(255, 0, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(255, 0, 0)"},
+      {"color1": "rgb(255, 127, 0)", "color2": "rgb(255, 255, 0)", "type": 1, "lineName": "", "lineNameEng": "", "lineNameColor": "rgb(255, 127, 0)"}
+    ],
+    "rootSection": {
+      "color": "rgb(200, 200, 200)",
+      "type": 0,
+      "lineName": "田園都市線",
+      "lineNameEng": "Den-en-toshi Line",
+      "lineNameColor": "rgb(0, 255, 0)",
+      "isConnect": true
     },
-    {
-      "name": "赤羽",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
-      },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
-      },
-      "numIconType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":s::k::n:地下鉄線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":s::k::n:Subway Line"
-      ],
-      "isGray": false
+    "arrowSection": {
+      "color": "rgb(255, 0, 255)",
+      "type": 0,
+      "lineName": "東横線",
+      "lineNameEng": "Tōyoko Line",
+      "lineNameColor": "rgb(255, 0, 255)",
+      "isConnect": true
     },
-    {
-      "name": "浦和",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudō",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
+    "drawPos": 3,
+    "stationFrameNum": 8,
+    "dispStationList": [
+      {
+        "name": "東京",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudō",
+        "numIcon": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "0",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": true,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
+      {
+        "name": "上野",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudō",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "0",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconType": "0",
-      "stationIconType": "0",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": false
-    },
-    {
-      "name": "さいたま新都心",
-      "kana": "きんげつどう",
-      "eng": "Kinge",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
+      {
+        "name": "尾久",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudō",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "1",
+        "stationIconType": "0",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":D:田園都市線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":D:Den-en-toshi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
+      {
+        "name": "赤羽",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudō",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "0",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":s::k::n:地下鉄線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":s::k::n:Subway Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconType": "1",
-      "stationIconType": "1",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": false
-    },
-    {
-      "name": "大宮",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudōooooooooo",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
+      {
+        "name": "浦和",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudō",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "0",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
+      {
+        "name": "さいたま新都心",
+        "kana": "きんげつどう",
+        "eng": "Kinge",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "1",
+        "stationIconType": "1",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconType": "0",
-      "stationIconType": "1",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": false
-    },
-    {
-      "name": "土呂",
-      "kana": "きんげつどう",
-      "eng": "Kingetsudōooooooooo",
-      "numIcon": {
-        "isDraw": true,
-        "presetKey": "N_tokyu",
-        "symbol": "G",
-        "number": "12",
-        "color": "#8700f3"
+      {
+        "name": "大宮",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudōooooooooo",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "1",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
       },
-      "numIconNext": {
-        "isDraw": false,
-        "presetKey": "N_tokyu",
-        "symbol": "TY",
-        "number": "08",
-        "color": "#0000CC"
-      },
-      "numIconType": "0",
-      "stationIconType": "1",
-      "sectionTime": "20",
-      "transfersText": [
-        ":M:京浜東北線",
-        ":O:大井町線"
-      ],
-      "transfersTextEng": [
-        ":M:Keihin-Tohoku Line",
-        ":O:Ōimachi Line"
-      ],
-      "isGray": false
-    }
-  ],
+      {
+        "name": "土呂",
+        "kana": "きんげつどう",
+        "eng": "Kingetsudōooooooooo",
+        "numIcon": {
+          "isDraw": true,
+          "presetKey": "N_tokyu",
+          "symbol": "G",
+          "number": "12",
+          "color": "#8700f3"
+        },
+        "numIconNext": {
+          "isDraw": false,
+          "presetKey": "N_tokyu",
+          "symbol": "TY",
+          "number": "08",
+          "color": "#0000CC"
+        },
+        "numIconType": "0",
+        "stationIconType": "1",
+        "sectionTime": "20",
+        "transfersText": [
+          ":M:京浜東北線",
+          ":O:大井町線"
+        ],
+        "transfersTextEng": [
+          ":M:Keihin-Tohoku Line",
+          ":O:Ōimachi Line"
+        ],
+        "isGray": false,
+        "transferText": "",
+        "transferTextEng": ""
+      }
+    ]
+  },
 
   "overLine": {
     "stationFrameNum": 21,
@@ -841,7 +849,6 @@
   },
 
 
-
   "platform": {
     "transfers": [
       [
@@ -866,7 +873,13 @@
           "eng": "Tokyu Line"
         }
       ]
-    ]
+    ],
+    "transferCountLineP": "",
+    "otherLineInd": "",
+    "slotNum": "0",
+    "leftSlotInd": "0",
+    "otherCarNum": "0",
+    "otherLeftSlotInd": "0"
   },
 
   "transfers": {

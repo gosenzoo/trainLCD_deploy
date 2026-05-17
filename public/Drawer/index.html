@@ -227,15 +227,16 @@
       // LcdAnimatorをグローバルシングルトンとして初期化（langChange時のアニメーションで使用）
       window.lcdAnimator = new LcdAnimator();
 
-      // drawParams.json・pageNameList.jsonを先にフェッチし、残りのリソースを並列ロードしてDrawerを初期化
-      const [drawParams, loadedPageNameList] = await Promise.all([
+      // 設定ファイル群を並列フェッチし、残りのリソースをロードしてDrawerを初期化
+      const [drawParams, loadedPageNameList, numIconPresetKeys] = await Promise.all([
         fetch('./drawParams.json').then(r => r.json()),
         fetch('./pageNameList.json').then(r => r.json()),
+        fetch('./numIconPresetKeys.json').then(r => r.json()),
       ]);
       pageNameList = loadedPageNameList;
       const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
         fetch('./iconList.json').then(r => r.json()),
-        loadNumIconPresets(drawParams.numIconPresetKeys || []),
+        loadNumIconPresets(numIconPresetKeys),
         fetchSVG('./pageInput/tokyu/header/headerSVG.svg'),
         loadBodySVGs(pageNameList),
       ]);

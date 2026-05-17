@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LCD シミュレータ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=M+PLUS+1:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: "Overused Grotesk";
+      src: url("/fonts/OverusedGrotesk-SemiBold.woff2") format('woff2');
+      font-weight: 600;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #1e1e1e;
+      color: #ccc;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== ツールバー ===== */
+    #toolbar {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      background: #2a2a2a;
+      border-bottom: 1px solid #444;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #toolbar .title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #ddd;
+      margin-right: 8px;
+    }
+    .toolbar-btn {
+      padding: 5px 14px;
+      background: #0e639c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .toolbar-btn:hover { background: #1177bb; }
+    .toolbar-btn.secondary {
+      background: #4a4a4a;
+    }
+    .toolbar-btn.secondary:hover { background: #5a5a5a; }
+    .toolbar-sep { width: 1px; height: 22px; background: #555; }
+    #debug-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #aaa;
+    }
+    #debug-label input { accent-color: #569cd6; }
+
+    /* ===== メインレイアウト ===== */
+    #main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ===== 操作パネル（左） ===== */
+    #control-panel {
+      width: 240px;
+      flex-shrink: 0;
+      background: #252526;
+      border-right: 1px solid #3a3a3a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .panel-section {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #333;
+    }
+    .panel-section h3 {
+      margin: 0 0 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+    }
+
+    /* ステータス表示 */
+    .status-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 5px 10px;
+      font-size: 12px;
+    }
+    .status-key { color: #888; }
+    .status-val { color: #4ec9b0; font-weight: bold; word-break: break-all; }
+    #status-runstate-0 { color: #569cd6; }
+    #status-runstate-1 { color: #4ec9b0; }
+    #status-runstate-2 { color: #dcdcaa; }
+
+    /* ナビゲーションボタン */
+    .nav-btn {
+      width: 100%;
+      padding: 8px 10px;
+      background: #37373d;
+      color: #ccc;
+      border: 1px solid #4a4a4a;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .nav-btn:hover { background: #44444a; border-color: #569cd6; color: #fff; }
+    .nav-btn:last-child { margin-bottom: 0; }
+    .nav-btn .shortcut {
+      font-size: 10px;
+      color: #666;
+      background: #333;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .nav-btn-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .nav-btn-pair .nav-btn { margin-bottom: 0; }
+
+    /* ===== SVG表示エリア（右） ===== */
+    #display-area {
+      flex: 1;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #svg-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #display {
+      width: 100%;
+      max-width: 1920px;
+      display: block;
+    }
+
+    /* ===== ステータスバー ===== */
+    #statusbar {
+      flex-shrink: 0;
+      padding: 3px 16px;
+      background: #007acc;
+      font-size: 11px;
+      color: #fff;
+      display: flex;
+      gap: 20px;
+    }
+    #statusbar strong { font-weight: bold; }
+
+    /* ===== ローディング ===== */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30,30,30,0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 100;
+      font-size: 14px;
+      color: #ccc;
+    }
+    #loading-overlay.hidden { display: none; }
+    #loading-msg { color: #aaa; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- ローディングオーバーレイ -->
+  <div id="loading-overlay">
+    <div>LCD シミュレータ 読み込み中...</div>
+    <div id="loading-msg">settings.json を取得中</div>
+  </div>
+
+  <!-- ツールバー -->
+  <div id="toolbar">
+    <span class="title">LCD シミュレータ</span>
+    <div class="toolbar-sep"></div>
+    <button id="btn-reload" class="toolbar-btn secondary">設定再読込 [0]</button>
+    <div class="toolbar-sep"></div>
+    <label id="debug-label">
+      <input type="checkbox" id="debug-chk">
+      デバッグ境界表示
+    </label>
+  </div>
+
+  <!-- メイン -->
+  <div id="main">
+
+    <!-- 操作パネル -->
+    <div id="control-panel">
+
+      <!-- ステータス -->
+      <div class="panel-section">
+        <h3>現在の状態</h3>
+        <div class="status-grid">
+          <span class="status-key">駅</span>
+          <span class="status-val" id="st-station">-</span>
+          <span class="status-key">stateInd</span>
+          <span class="status-val" id="st-state">-</span>
+          <span class="status-key">runState</span>
+          <span class="status-val" id="st-runstate">-</span>
+          <span class="status-key">終端</span>
+          <span class="status-val" id="st-terminal">-</span>
+          <span class="status-key">page</span>
+          <span class="status-val" id="st-page">-</span>
+          <span class="status-key">lang</span>
+          <span class="status-val" id="st-lang">-</span>
+        </div>
+      </div>
+
+      <!-- 状態移動 -->
+      <div class="panel-section">
+        <h3>状態移動</h3>
+        <div class="nav-btn-pair">
+          <button class="nav-btn" id="btn-state-prev">
+            ◀ 状態-1 <span class="shortcut">←</span>
+          </button>
+          <button class="nav-btn" id="btn-state-next">
+            状態+1 ▶ <span class="shortcut">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 駅移動 -->
+      <div class="panel-section">
+        <h3>駅移動</h3>
+        <div class="nav-btn-pair">
+          <button class="nav-btn" id="btn-sta-prev">
+            ◀◀ 駅-1 <span class="shortcut">A</span>
+          </button>
+          <button class="nav-btn" id="btn-sta-next">
+            駅+1 ▶▶ <span class="shortcut">D</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ページ・言語 -->
+      <div class="panel-section">
+        <h3>ページ / 言語</h3>
+        <button class="nav-btn" id="btn-page">
+          ページ切替 <span class="shortcut">P</span>
+        </button>
+        <button class="nav-btn" id="btn-lang">
+          言語切替（手動） <span class="shortcut">L</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SVG表示エリア -->
+    <div id="display-area">
+      <div id="svg-wrap">
+        <svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 270"></svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ステータスバー -->
+  <div id="statusbar">
+    <span>駅: <strong id="sb-station">-</strong></span>
+    <span>状態: <strong id="sb-runstate">-</strong></span>
+    <span>page: <strong id="sb-page">-</strong></span>
+    <span>lang: <strong id="sb-lang">-</strong></span>
+    <span>stateInd: <strong id="sb-state">-</strong></span>
+  </div>
+
+  <!-- ===== Controllerスクリプト ===== -->
+  <script src="../Controller/src/utility/utils.js"></script>
+  <script src="../Controller/src/obj/PageController.js"></script>
+  <script src="../Controller/src/obj/LangController.js"></script>
+  <script src="../Controller/src/obj/ProgressController.js"></script>
+  <script src="../Controller/src/main/Controller.js"></script>
+
+  <!-- ===== Drawerスクリプト ===== -->
+  <script src="../Drawer/src/utility/Animator.js"></script>
+  <script src="../Drawer/src/utility/TextDrawer.js"></script>
+  <script src="../Drawer/src/utility/NumIconDrawer.js"></script>
+  <script src="../Drawer/src/utility/ExprParser.js"></script>
+  <script src="../Drawer/src/utility/MulShadowUtil.js"></script>
+  <script src="../Drawer/src/objects/LcdPartsObj.js"></script>
+  <script src="../Drawer/src/objects/GObj.js"></script>
+  <script src="../Drawer/src/objects/StaticObj.js"></script>
+  <script src="../Drawer/src/objects/GroupObj.js"></script>
+  <script src="../Drawer/src/objects/TextBoxObj.js"></script>
+  <script src="../Drawer/src/objects/ArrangeObj.js"></script>
+  <script src="../Drawer/src/objects/SlotObj.js"></script>
+  <script src="../Drawer/src/objects/NumIconObj.js"></script>
+  <script src="../Drawer/src/main/Drawer.js"></script>
+
+  <!-- ===== LcdSimulator統合クラス ===== -->
+  <script src="src/LcdSimulator.js"></script>
+
+  <script>
+    // ============================================================
+    // LcdSimulator デバッグ画面 メインスクリプト
+    // settings.json → Controller → drawParams → Drawer → SVG
+    // ============================================================
+
+    const svgEl    = document.getElementById('display');
+    const loadingEl = document.getElementById('loading-overlay');
+    const loadingMsg = document.getElementById('loading-msg');
+
+    // LcdSimulatorインスタンス（初期化後に設定）
+    let sim = null;
+
+    // ページ・言語パラメータ（Drawerのページ名リストに合わせて定義）
+    const PAGE_PARAMS = {
+      pageNameList: ["defaultLineSVG.svg", "overLineSVG.svg", "transfers.svg", "platform.svg"]
+    };
+    // Drawerリソースのベースパス（LcdSimulatorからの相対パス）
+    const DRAWER_BASE = '../Drawer';
+
+    // ------------------------------------------------------------
+    // ステータス表示の更新
+    // ------------------------------------------------------------
+    const RUN_STATE_LABELS = ['停車中', 'つぎは', 'まもなく'];
+    const LANG_LABELS      = ['日本語', 'English'];
+
+    function updateStatus(drawParams) {
+      const stationName = drawParams.hereStation?.name ?? '-';
+      const runLabel    = RUN_STATE_LABELS[drawParams.runState] ?? String(drawParams.runState);
+      const langLabel   = LANG_LABELS[drawParams.langId] ?? String(drawParams.langId);
+
+      // 操作パネル内ステータス
+      document.getElementById('st-station').textContent  = stationName;
+      document.getElementById('st-state').textContent    = drawParams.stateInd ?? '-';
+      document.getElementById('st-runstate').textContent = runLabel;
+      document.getElementById('st-terminal').textContent = drawParams.isTerminal ? 'あり' : 'なし';
+      document.getElementById('st-page').textContent     = drawParams.page ?? '-';
+      document.getElementById('st-lang').textContent     = langLabel;
+
+      // ステータスバー
+      document.getElementById('sb-station').textContent  = stationName;
+      document.getElementById('sb-runstate').textContent = runLabel;
+      document.getElementById('sb-page').textContent     = drawParams.page ?? '-';
+      document.getElementById('sb-lang').textContent     = langLabel;
+      document.getElementById('sb-state').textContent    = drawParams.stateInd ?? '-';
+    }
+
+    // ------------------------------------------------------------
+    // SVGフェッチユーティリティ
+    // ------------------------------------------------------------
+    async function fetchSVG(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`fetch failed: ${res.status} ${url}`);
+      const text = await res.text();
+      return new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+    }
+
+    async function loadNumIconPresets(presetKeys) {
+      const presets = {};
+      await Promise.all(presetKeys.map(async key => {
+        try {
+          presets[key] = await fetchSVG(`/presetNumIcons/${key}.svg`);
+        } catch (e) {
+          console.warn(`numIcon preset not found: ${key}`);
+        }
+      }));
+      return presets;
+    }
+
+    async function loadBodySVGs(pageNameList) {
+      const map = new Map();
+      await Promise.all(pageNameList.map(async filename => {
+        try {
+          map.set(filename, await fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/body/${filename}`));
+        } catch (e) {
+          console.warn(`body SVG not found: ${filename}`);
+        }
+      }));
+      return map;
+    }
+
+    // ------------------------------------------------------------
+    // 初期化処理
+    // ------------------------------------------------------------
+    async function init() {
+      loadingEl.classList.remove('hidden');
+      sim = null;
+
+      try {
+        // settings.json と Drawerリソース一覧を並列フェッチ
+        loadingMsg.textContent = 'settings.json を取得中';
+        const [settings, pageNameList, numIconPresetKeys] = await Promise.all([
+          fetch('settings.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+          fetch(`${DRAWER_BASE}/pageNameList.json`).then(r => r.json()),
+          fetch(`${DRAWER_BASE}/numIconPresetKeys.json`).then(r => r.json()),
+        ]);
+
+        // langIdListをsettings.dispConfigから取得する
+        const LANG_PARAMS = { langIdList: settings.dispConfig.langIdList };
+
+        // SVGリソースを並列フェッチ
+        loadingMsg.textContent = 'SVGリソースを取得中';
+        const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
+          fetch(`${DRAWER_BASE}/iconList.json`).then(r => r.json()),
+          loadNumIconPresets(numIconPresetKeys),
+          fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/header/headerSVG.svg`),
+          loadBodySVGs(pageNameList),
+        ]);
+
+        // LcdAnimatorをグローバルシングルトンとして初期化
+        window.lcdAnimator = new LcdAnimator();
+
+        // SVGのviewBoxをheaderSVGに合わせる
+        const viewBox = headerSVG.getAttribute('viewBox');
+        if (viewBox) svgEl.setAttribute('viewBox', viewBox);
+
+        // Drawer・Controllerの初期化とload処理をLcdSimulatorに委譲する
+        loadingMsg.textContent = 'LcdSimulator を初期化中';
+        const drawer = new Drawer();
+        const drawerResources = { iconList, numIconPresets, headerSVG, bodySVGMap };
+        sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, svgEl, drawerResources);
+
+        // 再描画後にUIステータスを更新するコールバックを登録
+        sim.onRender = (drawParams) => updateStatus(drawParams);
+
+        // 初期描画
+        sim.start();
+
+        loadingEl.classList.add('hidden');
+      } catch (e) {
+        loadingMsg.textContent = '読み込みエラー: ' + e.message;
+        console.error(e);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // ボタンイベント
+    // ------------------------------------------------------------
+    document.getElementById('btn-state-next').addEventListener('click', () => sim?.moveState(1));
+    document.getElementById('btn-state-prev').addEventListener('click', () => sim?.moveState(-1));
+    document.getElementById('btn-sta-next').addEventListener('click',   () => sim?.moveStation(1));
+    document.getElementById('btn-sta-prev').addEventListener('click',   () => sim?.moveStation(-1));
+    document.getElementById('btn-page').addEventListener('click',       () => sim?.pageRotate());
+    document.getElementById('btn-lang').addEventListener('click',       () => sim?.langRotate());
+    document.getElementById('btn-reload').addEventListener('click',     () => init());
+
+    document.getElementById('debug-chk').addEventListener('change', e => {
+      sim?.setDebug(e.target.checked);
+    });
+
+    // ------------------------------------------------------------
+    // キーボードショートカット
+    // ------------------------------------------------------------
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key.toLowerCase()) {
+        case 'arrowright': sim?.moveState(1);    break;
+        case 'arrowleft':  sim?.moveState(-1);   break;
+        case 'd': sim?.moveStation(1);  break;
+        case 'a': sim?.moveStation(-1); break;
+        case 'p': sim?.pageRotate();    break;
+        case 'l': sim?.langRotate();    break;
+        case '0': init();               break;
+      }
+    });
+
+    // ページ読み込み時に初期化
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

@@ -8,13 +8,28 @@
 
 | 変数名 | 型 | 用途 |
 |---|---|---|
-| Pages | string[] | 表示するSVGページファイル名のリスト |
+| page | string | 現在表示するボディSVGのファイル名 |
 | langId | number | 表示言語ID（0:日本語, 1:英語, 2:その他） |
 | runState | number | 運行状態（0:ただいま停車中, 1:つぎは, 2:まもなく） |
 | isStopping | boolean | 長時間停車中かの判定（行先表示パターンの切り替え） |
-| numIconPresetKeys | string[] | 読み込むナンバリングアイコンプリセットキーの一覧 |
 | isTerminal | boolean | 終点かの判定（次駅表示の切り替え） |
-| isNextStation | boolean | 次の駅情報を表示するかの判定 |
+| isDrawNextStation | boolean | フッターの次停車駅表示の要否 |
+| isDrawTime | boolean | 駅間所要時間表示の要否 |
+| isDrawLineName | boolean | 路線名表示の要否 |
+| whole | [Whole](#whole) | 全ページ共通の行先・駅名・進行方向などの情報 |
+| defaultLine | [DefaultLine](#defaultline) | 通常路線図ページ（defaultLineSVG）用の路線図データ |
+| overLine | [OverLine](#overline) | 駅数が多い場合の追加路線図データ |
+| platform | [Platform](#platform) | 乗車位置案内ページのデータ |
+| transfers | [Transfers](#transfers) | 乗換案内ページのデータ |
+
+---
+
+## Whole
+
+全ページ共通の行先・駅名・進行方向などの情報。
+
+| 変数名 | 型 | 用途 |
+|---|---|---|
 | trainType | string | 種別名（日本語） |
 | trainTypeEng | string | 種別名（英語） |
 | trainTypeSubText | string | 種別補足テキスト（日本語） |
@@ -25,18 +40,21 @@
 | destination | [Destination](#destination) | 行先駅の情報 |
 | carNumber | number | 号車番号 |
 | direction | number | 進行方向（0:右向き, 1:左向き） |
+
+---
+
+## DefaultLine
+
+通常路線図ページ（defaultLineSVG.svg）用の路線図データ。
+
+| 変数名 | 型 | 用途 |
+|---|---|---|
 | sections | [SectionItem](#sectionitem)[] | 路線図の駅間セクション配列（線色・形状） |
 | rootSection | [SectionFull](#sectionfull) | 路線図の後方側末端セクション |
 | arrowSection | [SectionFull](#sectionfull) | 路線図の前方側末端セクション |
 | drawPos | number | 路線図の現在位置オフセット（何駅目を中央に描くか） |
 | stationFrameNum | number | 路線図の駅枠の総数 |
-| isDrawNextStation | boolean | フッターの次停車駅表示の要否 |
-| isDrawTime | boolean | 駅間所要時間表示の要否 |
-| isDrawLineName | boolean | 路線名表示の要否 |
 | dispStationList | [DispStation](#dispstation)[] | 路線図に表示する駅のリスト |
-| overLine | [OverLine](#overline) | 駅数が多い場合の追加路線図データ |
-| platform | [Platform](#platform) | 乗車位置案内ページのデータ |
-| transfers | [Transfers](#transfers) | 乗換案内ページのデータ |
 
 ---
 
@@ -50,15 +68,7 @@
 | kana | string | 駅名（ひらがな） |
 | eng | string | 駅名（英語） |
 | numIcon | [NumIcon](#numicon) | ナンバリングアイコン情報 |
-| transferText | string | 乗換情報テキスト（日本語） |
-| transferTextEng | string | 乗換情報テキスト（英語） |
 | doorSide | string | ドア開方向（"left" / "right"） |
-| transferCountLineP | string | 乗換路線数（テキスト表示用） |
-| otherLineInd | string | 他路線インジケーター |
-| slotNum | string | スロット番号 |
-| leftSlotInd | string | 左スロットインジケーター |
-| otherCarNum | string | 他車両数 |
-| otherLeftSlotInd | string | 他左スロットインジケーター |
 
 ---
 
@@ -92,6 +102,8 @@
 | transfersText | string[] | 乗換路線テキスト配列（日本語） |
 | transfersTextEng | string[] | 乗換路線テキスト配列（英語） |
 | isGray | boolean | グレースケール表示か（通過済み駅など） |
+| transferText | string | 当駅の乗換情報テキスト（日本語）（未使用） |
+| transferTextEng | string | 当駅の乗換情報テキスト（英語）（未使用） |
 
 ---
 
@@ -132,6 +144,12 @@
 | 変数名 | 型 | 用途 |
 |---|---|---|
 | transfers | [TransferItem](#transferitem)[][] | ホームごとの乗換路線情報の二次元配列 |
+| transferCountLineP | string | 乗換路線数（テキスト表示用）（未使用） |
+| otherLineInd | string | 他路線インジケーター（未使用） |
+| slotNum | string | スロット番号（未使用） |
+| leftSlotInd | string | 左スロットインジケーター（未使用） |
+| otherCarNum | string | 他車両数（未使用） |
+| otherLeftSlotInd | string | 他左スロットインジケーター（未使用） |
 
 ---
 
@@ -161,7 +179,7 @@
 
 ### SectionItem
 
-`sections[]` および `overLine.sections[]` の各要素。駅間の線区を表す。
+`defaultLine.sections[]` および `overLine.sections[]` の各要素。駅間の線区を表す。
 
 | 変数名 | 型 | 用途 |
 |---|---|---|
@@ -174,7 +192,7 @@
 
 ### SectionFull
 
-`rootSection` / `arrowSection` の末端セクション。
+`defaultLine.rootSection` / `defaultLine.arrowSection` / `overLine.rootSection` / `overLine.arrowSection` の末端セクション。
 
 | 変数名 | 型 | 用途 |
 |---|---|---|

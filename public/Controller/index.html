@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controller デバッグ</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1e1e1e; color: #ccc; font-family: sans-serif; }
+
+    /* ツールバー */
+    #toolbar {
+      padding: 8px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      background: #2a2a2a;
+      border-bottom: 1px solid #444;
+    }
+    .toolbar-btn {
+      padding: 6px 16px;
+      background: #0e639c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .toolbar-btn:hover { background: #1177bb; }
+    .toolbar-sep {
+      width: 1px;
+      height: 24px;
+      background: #555;
+      margin: 0 4px;
+    }
+
+    /* drawParams表示エリア */
+    #main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: calc(100vh - 53px);
+    }
+
+    /* 左ペイン: drawParams JSON */
+    #params-pane {
+      padding: 20px 24px;
+      overflow-y: auto;
+      border-right: 1px solid #333;
+    }
+    #params-pane h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    #params-json {
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+      color: #d4d4d4;
+    }
+    /* JSON構文ハイライト */
+    .json-key    { color: #9cdcfe; }
+    .json-str    { color: #ce9178; }
+    .json-num    { color: #b5cea8; }
+    .json-bool   { color: #569cd6; }
+    .json-null   { color: #569cd6; }
+
+    /* 右ペイン: ログ */
+    #log-pane {
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+    #log-pane h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    #log-list {
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #ccc;
+    }
+    .log-entry { border-bottom: 1px solid #2a2a2a; padding: 4px 0; }
+    .log-entry .log-time { color: #6a6a6a; margin-right: 8px; }
+    .log-entry .log-msg  { color: #d4d4d4; }
+    .log-lang  { color: #dcdcaa; }
+    .log-state { color: #4ec9b0; }
+
+    /* ステータスバー */
+    #statusbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 4px 24px;
+      background: #007acc;
+      font-size: 12px;
+      color: #fff;
+      display: flex;
+      gap: 24px;
+    }
+    #statusbar span { opacity: 0.85; }
+    #statusbar span strong { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ツールバー -->
+  <div id="toolbar">
+    <button class="toolbar-btn" id="btn-state-prev">◀ 状態-1 [A]</button>
+    <button class="toolbar-btn" id="btn-state-next">状態+1 [D] ▶</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" id="btn-sta-prev">◀◀ 駅-1 [Q]</button>
+    <button class="toolbar-btn" id="btn-sta-next">駅+1 [E] ▶▶</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" id="btn-page">ページ切替 [P]</button>
+    <button class="toolbar-btn" id="btn-lang">言語切替 [L]</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" id="btn-reload" style="background:#5a5a5a;">設定再読込 [R]</button>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <div id="main">
+    <div id="params-pane">
+      <h2>drawParams</h2>
+      <div id="params-json">読み込み中...</div>
+    </div>
+    <div id="log-pane">
+      <h2>ログ</h2>
+      <div id="log-list"></div>
+    </div>
+  </div>
+
+  <!-- ステータスバー -->
+  <div id="statusbar">
+    <span>stateInd: <strong id="sb-state">-</strong></span>
+    <span>駅: <strong id="sb-station">-</strong></span>
+    <span>runState: <strong id="sb-runstate">-</strong></span>
+    <span>page: <strong id="sb-page">-</strong></span>
+    <span>lang: <strong id="sb-lang">-</strong></span>
+  </div>
+
+  <!-- Controllerの依存ファイルを順番にロード -->
+  <script src="src/utility/utils.js"></script>
+  <script src="src/obj/PageController.js"></script>
+  <script src="src/obj/LangController.js"></script>
+  <script src="src/obj/ProgressController.js"></script>
+  <script src="src/main/Controller.js"></script>
+
+  <script>
+    // ============================================================
+    // デバッグ画面メインスクリプト
+    // settings.jsonを読み込んでControllerを初期化し、
+    // drawParamsをリアルタイムに画面表示する
+    // ============================================================
+
+    let controller = null;
+
+    // ページ・言語パラメータはここで固定定義
+    // （settings.jsonにはsettingsオブジェクトのみ含まれる）
+    const PAGE_PARAMS = {
+      pageNameList: ["defaultLineSVG.svg", "overLineSVG.svg", "transfers.svg", "platform.svg"]
+    };
+    // ------------------------------------------------------------
+    // JSON構文ハイライト
+    // ------------------------------------------------------------
+    function syntaxHighlight(obj) {
+      const json = JSON.stringify(obj, null, 2);
+      return json.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        match => {
+          let cls = 'json-num';
+          if (/^"/.test(match)) {
+            cls = /:$/.test(match) ? 'json-key' : 'json-str';
+          } else if (/true|false/.test(match)) {
+            cls = 'json-bool';
+          } else if (/null/.test(match)) {
+            cls = 'json-null';
+          }
+          return `<span class="${cls}">${match}</span>`;
+        }
+      );
+    }
+
+    // ------------------------------------------------------------
+    // ログ追記
+    // ------------------------------------------------------------
+    function addLog(msg, extraClass = '') {
+      const logList = document.getElementById('log-list');
+      const now = new Date();
+      const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${extraClass}">${msg}</span>`;
+      logList.prepend(entry);
+      // ログが多くなりすぎないよう100件に制限
+      while (logList.children.length > 100) logList.lastChild.remove();
+    }
+
+    // ------------------------------------------------------------
+    // drawParamsの表示・ステータスバー更新
+    // ------------------------------------------------------------
+    function updateDisplay(drawParams, action = '') {
+      document.getElementById('params-json').innerHTML = syntaxHighlight(drawParams);
+
+      // ステータスバー更新
+      document.getElementById('sb-state').textContent    = drawParams.stateInd    ?? '-';
+      document.getElementById('sb-station').textContent  = drawParams.hereStation?.name ?? '-';
+      document.getElementById('sb-runstate').textContent = ['停車中', 'つぎは', 'まもなく'][drawParams.runState] ?? '-';
+      document.getElementById('sb-page').textContent     = drawParams.page        ?? '-';
+      document.getElementById('sb-lang').textContent     = ['日本語', 'English'][drawParams.langId] ?? drawParams.langId;
+
+      if (action) addLog(action, 'log-state');
+    }
+
+    // ------------------------------------------------------------
+    // Controllerの初期化（settings.jsonを読み込む）
+    // ------------------------------------------------------------
+    async function initController() {
+      addLog('settings.json を読み込み中...');
+      try {
+        const res = await fetch('settings.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const settings = await res.json();
+
+        // langIdListをsettings.dispConfigから取得する
+        const LANG_PARAMS = { langIdList: settings.dispConfig.langIdList };
+
+        controller = new Controller(settings, PAGE_PARAMS, LANG_PARAMS);
+
+        // 言語タイマー発火時のコールバック
+        controller.onLangTimer = (langId, transTime, gapTime) => {
+          // タイマー発火直後のdrawParamsを表示（次の言語に進んだ後の状態）
+          setTimeout(() => updateDisplay(controller.getDrawParams(), `言語タイマー発火 → langId=${langId}`), 0);
+          addLog(`onLangTimer: langId=${langId}, transTime=${transTime}, gapTime=${gapTime}`, 'log-lang');
+        };
+
+        // 長時間停車コールバック
+        controller.onLongStop = (drawParams) => {
+          updateDisplay(drawParams, '長時間停車タイマー発火 → page/langリセット');
+        };
+
+        const drawParams = controller.getDrawParams();
+        updateDisplay(drawParams, `初期化完了: ${settings.info?.settingName ?? ''}`);
+        addLog(`駅数: ${settings.stationList?.length ?? 0}、運用数: ${settings.operationList?.length ?? 0}`);
+      } catch (e) {
+        document.getElementById('params-json').textContent = 'エラー: ' + e.message;
+        addLog('読み込み失敗: ' + e.message);
+        console.error(e);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // ボタンイベント
+    // ------------------------------------------------------------
+    document.getElementById('btn-state-next').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.moveState(1), '状態+1 (moveState)');
+    });
+    document.getElementById('btn-state-prev').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.moveState(-1), '状態-1 (moveState)');
+    });
+    document.getElementById('btn-sta-next').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.moveStation(1), '駅+1 (moveStation)');
+    });
+    document.getElementById('btn-sta-prev').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.moveStation(-1), '駅-1 (moveStation)');
+    });
+    document.getElementById('btn-page').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.pageRotate(), 'ページ切替 (pageRotate)');
+    });
+    document.getElementById('btn-lang').addEventListener('click', () => {
+      if (!controller) return;
+      updateDisplay(controller.langRotate(), '言語切替 (langRotate)');
+    });
+    document.getElementById('btn-reload').addEventListener('click', () => {
+      initController();
+    });
+
+    // ------------------------------------------------------------
+    // キーボードショートカット
+    // ------------------------------------------------------------
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key.toLowerCase()) {
+        case 'd': document.getElementById('btn-state-next').click(); break;
+        case 'a': document.getElementById('btn-state-prev').click(); break;
+        case 'e': document.getElementById('btn-sta-next').click();   break;
+        case 'q': document.getElementById('btn-sta-prev').click();   break;
+        case 'p': document.getElementById('btn-page').click();       break;
+        case 'l': document.getElementById('btn-lang').click();       break;
+        case 'r': document.getElementById('btn-reload').click();     break;
+      }
+    });
+
+    // ページ読み込み時に初期化
+    initController();
+  </script>
+</body>
+</html>

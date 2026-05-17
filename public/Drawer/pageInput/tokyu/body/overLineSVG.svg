@@ -46,17 +46,17 @@
 
 
     <!-- 路線ベース右向き -->
-    <g lcdParts="arrange" isDraw="direction == 0" arrange-axis="x" arrange-interval="0" lcd-holAlign="right" shadowId="inner, outer" filter="url(#outline)">
+    <g lcdParts="arrange" isDraw="whole.direction == 0" arrange-axis="x" arrange-interval="0" lcd-holAlign="right" shadowId="inner, outer" filter="url(#outline)">
         <rect lcdParts="arrangeArea" x="0" y="840" width="1920" height="42" fill="rgba(221, 221, 221, 0.2)" />
 
         <!-- 路線ベース根本 -->
-        <g lcdParts="group" lcd-color="rootSection.color">
+        <g lcdParts="group" lcd-color="overLine.rootSection.color">
             <rect lcdParts="groupArea" x="0" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 0:進行方向、進行方向でない共通、続かない(終端) -->
             <!-- <rect lcdParts="static" isDraw="(overLine.rootSection.type == 0) and (overLine.rootSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowLeft)" shadowId="" x="0" y="721" width="143" height="87" fill="url(#lineShadowLeft)" /> -->
-            <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 180 840 V 882 H 158 a 21 21 0 0 1 -21 -21 a 21 21 0 0 1 21 -21 Z" fill="rgba(0, 0, 0, 1)" />
+            <path lcdParts="static" isDraw="overLine.rootSection.type == 0" d="M 180 840 V 882 H 158 a 21 21 0 0 1 -21 -21 a 21 21 0 0 1 21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 1:進行方向でないかつ続く(端に届く) -->
-            <rect lcdParts="static" isDraw="(overLine.rootSection.type == 1) and (direction == 0)" x="0" y="840" width="180" height="42" fill="rgba(227,127,127,0.4)" />
+            <rect lcdParts="static" isDraw="overLine.rootSection.type == 1" x="0" y="840" width="180" height="42" fill="rgba(227,127,127,0.4)" />
             <!-- 路線ベース路線名テキスト左側 -->
             <!-- 日本語 -->
             <!-- <rect lcdParts="textBox" lcdText="#{overLine.rootSection.lineName}" visible="langId != 2" isDraw="isDrawLineName" lcd-noFilter="true" lcd-color="overLine.rootSection.lineNameColor" x="25" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' /> -->
@@ -82,7 +82,7 @@
             <!-- <rect lcdParts="static" isDraw="(arrowSection.type == 0) and (arrowSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowRight)" shadowId="" x="1777" y="721" width="143" height="87" fill="url(#lineShadowRight)" /> -->
             <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 1740 840 V 882 H 1762 a 21 21 0 0 0 21 -21 a 21 21 0 0 0 -21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 2:進行方向かつ続く(矢印) -->
-            <polygon lcdParts="static" isDraw="(overLine.arrowSection.type == 1) and (direction == 0)" points="1740,840 1783,840 1801,861 1783,882 1740,882" fill="rgba(221, 221, 221, 0.4)" />
+            <polygon lcdParts="static" isDraw="overLine.arrowSection.type == 1" points="1740,840 1783,840 1801,861 1783,882 1740,882" fill="rgba(221, 221, 221, 0.4)" />
             <!-- 路線ベース路線名テキスト右側 -->
             <!-- 日本語 -->
             <!-- <rect lcdParts="textBox" lcdText="#{arrowSection.lineName}" visible="langId != 2" isDraw="isDrawLineName" lcd-noFilter="true" lcd-color="arrowSection.lineNameColor" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' /> -->
@@ -96,7 +96,7 @@
         </g>
     </g>
     <!-- 路線ベース左向き -->
-    <g lcdParts="arrange" isDraw="direction == 1" arrangeDirection="1" arrange-axis="x" arrange-interval="0" shadowId="inner, outer" filter="url(#outline)">
+    <g lcdParts="arrange" isDraw="whole.direction == 1" arrangeDirection="1" arrange-axis="x" arrange-interval="0" shadowId="inner, outer" filter="url(#outline)">
         <rect lcdParts="arrangeArea" x="0" y="840" width="1920" height="42" fill="rgba(221, 221, 221, 0.2)" />
 
         <!-- 路線ベース根本 -->
@@ -106,7 +106,7 @@
             <!-- <rect lcdParts="static" isDraw="(overLine.rootSection.type == 0) and (overLine.rootSection.isConnect)" lcd-noFilter="true" noFilterZ="down" lcd-color="url(#lineShadowRight)" shadowId="" x="1777" y="721" width="143" height="87" fill="url(#lineShadowRight)" /> -->
             <path lcdParts="static" isDraw="overLine.arrowSection.type == 0" d="M 1740 840 V 882 H 1762 a 21 21 0 0 0 21 -21 a 21 21 0 0 0 -21 -21 Z" fill="rgba(0, 0, 0, 1)" />
             <!-- 1:進行方向でないかつ続く(端に届く) -->
-            <rect lcdParts="static" isDraw="(overLine.rootSection.type == 1) and (direction == 1)" x="1740" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
+            <rect lcdParts="static" isDraw="overLine.arrowSection.type == 1" x="1740" y="840" width="180" height="42" fill="rgba(221, 221, 221, 0.2)" />
             <!-- 路線ベース路線名テキスト右側 -->
             <!-- 日本語 -->
             <!-- <rect lcdParts="textBox" lcdText="#{rootSection.lineName}" visible="langId != 2" isDraw="isDrawLineName" lcd-noFilter="true" lcd-color="rootSection.lineNameColor" x="1780" y="675" width="115" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' /> -->
@@ -149,11 +149,11 @@
     <rect lcdParts="mulShadow" shadowId="inner" x="0" y="840" width="1920" height="42" fill="url(#innerGradient)" style="mix-blend-mode: multiply;" />
 
     <!-- 駅パーツ -->
-    <g lcdParts="slot" isDraw="direction == 0" interval="0" slotNum="overLine.stationFrameNum" slotStart="end" setPoint="edge">
+    <g lcdParts="slot" isDraw="whole.direction == 0" interval="0" slotNum="overLine.stationFrameNum" slotStart="end" setPoint="edge">
         <rect lcdParts="slotArea" x="180" y="359" width="1560" height="580" fill="#55555520" />
         <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:overLine.dispStationList" argOrder="1" slotPoint="auto" x="1707" y="359" width="64" height="580" fill="#99999930" />
     </g>
-    <g lcdParts="slot" isDraw="direction == 1" interval="0" slotNum="overLine.stationFrameNum" slotStart="start" setPoint="edge">
+    <g lcdParts="slot" isDraw="whole.direction == 1" interval="0" slotNum="overLine.stationFrameNum" slotStart="start" setPoint="edge">
         <rect lcdParts="slotArea" x="180" y="359" width="1560" height="580" fill="#55555520" />
         <rect lcd-funcCall="stationInfo" lcd-arg="dispStation:overLine.dispStationList" argOrder="1" slotPoint="auto" x="1707" y="359" width="64" height="580" fill="#99999930" />
     </g>
@@ -163,7 +163,7 @@
     <!-- 位置アイコン -->
     <g lcdParts="slot" slotNum="overLine.stationFrameNum * 2 - 1">
         <rect lcdParts="slotArea" x="180" y="840" width="1560" height="42" fill="#99999950" />
-        <g lcdParts="group" isDraw="direction == 0" slotPoint="(overLine.drawPos + (overLine.stationFrameNum - overLine.dispStationList.length) * 2)">
+        <g lcdParts="group" isDraw="whole.direction == 0" slotPoint="(overLine.drawPos + (overLine.stationFrameNum - overLine.dispStationList.length) * 2)">
             <rect lcdParts="groupArea" x="173" y="840" width="78" height="42" fill="#9999990"/>
             <g lcdParts="group">
                 <polygon lcdParts="static" points="199,840 224,840 240,861 224,882 199,882 215,861" fill="white" />
@@ -180,9 +180,9 @@
                         style="mix-blend-mode: multiply;" />
             </g>
         </g>
-        <g lcdParts="group" isDraw="direction == 1" slotPoint="overLine.stationFrameNum * 2 - 2 - (overLine.drawPos + (overLine.stationFrameNum - overLine.dispStationList.length) * 2)" >
+        <g lcdParts="group" isDraw="whole.direction == 1" slotPoint="overLine.stationFrameNum * 2 - 2 - (overLine.drawPos + (overLine.stationFrameNum - overLine.dispStationList.length) * 2)" >
             <rect lcdParts="groupArea" x="173" y="840" width="78" height="42" fill="#99999950"/>
-            <g lcdParts="group" isDraw="direction == 1">
+            <g lcdParts="group" isDraw="whole.direction == 1">
                 <polygon lcdParts="static" points="225,840 200,840 184,861 200,882 225,882 209,861" fill="white" />
                 <polygon lcdParts="static" points="221,842 202,842 187,861 202,880 221,880 206,861,764.5">
                     <animate
@@ -201,7 +201,7 @@
 
     <!-- フッター -->
     <!-- 次の停車駅 -->
-    <rect lcdParts="textBox" lcdText="#{nowStation.name}を出ますと【#{nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
+    <rect lcdParts="textBox" lcdText="#{whole.nowStation.name}を出ますと【#{whole.nextStopName}】にとまります" visible="langId != 2" isDraw="isDrawNextStation" x="30" y="1010" width="1310" height="50" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
     <!-- 時間は異なります(日本語) -->
     <rect lcdParts="textBox" lcdText="運転状況により、" visible="langId != 2" isDraw="isDrawTime" x="1528" y="998" width="400" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
     <rect lcdParts="textBox" lcdText="多少時間は異なります。" visible="langId != 2" isDraw="isDrawTime" x="1528" y="1038" width="400" height="34" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "start", "fill": "rgb(0, 0, 0)"}' lang="ja" />
@@ -261,9 +261,9 @@
                 <!-- 0:停車駅アイコン -->
                 <circle lcdParts="static" isDraw="$dispStation.stationIconType == 0" cx="1739" cy="861" r="16" fill="rgb(255, 255, 255)" />
                 <!-- 1:右向き通過駅アイコン -->
-                <polygon lcdParts="static" isDraw="($dispStation.stationIconType == 1) and (direction == 0)" points="1728,845 1737,845 1751,861 1737,877 1728,877 1742,861" data-basePoint="1285,764.5" fill="#ffffff" />
+                <polygon lcdParts="static" isDraw="($dispStation.stationIconType == 1) and (whole.direction == 0)" points="1728,845 1737,845 1751,861 1737,877 1728,877 1742,861" data-basePoint="1285,764.5" fill="#ffffff" />
                 <!-- 2:左向き通過駅アイコン -->
-                <polygon lcdParts="static" isDraw="($dispStation.stationIconType == 1) and (direction == 1)" points="1750,845 1741,845 1727,861 1741,877 1750,877 1736,861" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
+                <polygon lcdParts="static" isDraw="($dispStation.stationIconType == 1) and (whole.direction == 1)" points="1750,845 1741,845 1727,861 1741,877 1750,877 1736,861" data-basePoint="1285,764.5" fill="rgb(255, 255, 255)" />
                 <!-- 駅所要時間 -->
                 <g lcdParts="group" isDraw="($dispStation.stationIconType == 0) and !($dispStation.isGray) and (isDrawTime)">
                     <rect lcdParts="static" x="1707" y="890" width="64" height="46" fill="#fafafa" />
