@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <head>
-    <link rel = "stylesheet" href="./css/Display.css">
     <title>LCDディスプレイ</title>
     <meta charset="utf-8">
     <meta name="viewport" content="user-scalable=no">
@@ -8,42 +7,209 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=M+PLUS+1:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- <script type="text/javascript" src="//typesquare.com/3/tsst/script/ja/typesquare.js?674a254ce7304eaaba354683ac1e02e5" charset="utf-8"></script> -->
+    <style>
+      @font-face {
+        font-family: "Overused Grotesk";
+        src: url("/fonts/OverusedGrotesk-SemiBold.woff2") format('woff2');
+        font-weight: 600;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+      svg#display { display: block; }
+    </style>
 </head>
 
 <body onmousedown="return false">
-    <svg id="display"></svg>
+    <svg id="display" xmlns="http://www.w3.org/2000/svg"></svg>
 
-    <script src="./js/display.js"></script>
-    <script src="./js/functinons.js"></script>
+    <!-- Controllerスクリプト -->
+    <script src="./Controller/src/utility/utils.js"></script>
+    <script src="./Controller/src/obj/PageController.js"></script>
+    <script src="./Controller/src/obj/LangController.js"></script>
+    <script src="./Controller/src/obj/ProgressController.js"></script>
+    <script src="./Controller/src/main/Controller.js"></script>
 
-    <script src="./jsMojules/utilClass/createRail.js"></script>
-    <script src="./jsMojules/utilClass/createTrain.js"></script>
-    <script src="./jsMojules/utilClass/createPlatform.js"></script>
-    <script src="./jsMojules/utilClass/colorChanger.js"></script>
+    <!-- Drawerスクリプト -->
+    <script src="./Drawer/src/utility/Animator.js"></script>
+    <script src="./Drawer/src/utility/TextDrawer.js"></script>
+    <script src="./Drawer/src/utility/NumIconDrawer.js"></script>
+    <script src="./Drawer/src/utility/ExprParser.js"></script>
+    <script src="./Drawer/src/utility/MulShadowUtil.js"></script>
+    <script src="./Drawer/src/objects/LcdPartsObj.js"></script>
+    <script src="./Drawer/src/objects/GObj.js"></script>
+    <script src="./Drawer/src/objects/StaticObj.js"></script>
+    <script src="./Drawer/src/objects/GroupObj.js"></script>
+    <script src="./Drawer/src/objects/TextBoxObj.js"></script>
+    <script src="./Drawer/src/objects/ArrangeObj.js"></script>
+    <script src="./Drawer/src/objects/SlotObj.js"></script>
+    <script src="./Drawer/src/objects/NumIconObj.js"></script>
+    <script src="./Drawer/src/main/Drawer.js"></script>
 
-    <script src="./jsMojules/LCDController.js"></script>
-    
-    <script src="./jsMojules/utilClass/TextDrawer.js"></script>
-    <script src="./jsMojules/utilClass/TransferWidget.js"></script>
-    <script src="./jsMojules/utilClass/TransferListWidget.js"></script>
-    <script src="./jsMojules/utilClass/ProgressController.js"></script>
-    <script src="./jsMojules/utilClass/NumIconDrawer.js"></script>
-    <script src="./jsMojules/utilClass/MapHandler.js"></script>
-    <script src="./jsMojules/utilClass/Animator.js"></script>
-    <script src="./jsMojules/utilClass/PageRotator.js"></script>
+    <!-- LcdSimulator統合クラス -->
+    <script src="./LcdSimulator/src/LcdSimulator.js"></script>
 
-    <script src="./jsMojules/HeaderController.js"></script>
-    <script src="./jsMojules/HeaderDrawer.js"></script>
-    <script src="./jsMojules/FooterController.js"></script>
-    <script src="./jsMojules/FooterDrawer.js"></script>
+    <script>
+        // ============================================================
+        // display.html メインスクリプト
+        // localStorageのsettingsをController+Drawerで表示する
+        // ユーザー操作は旧display.htmlと同一
+        // ============================================================
 
-    <script src="./jsMojules/body/DefaultLineController.js"></script>
-    <script src="./jsMojules/body/DefaultLineDrawer.js"></script>
-    <script src="./jsMojules/body/OverLineController.js"></script>
-    <script src="./jsMojules/body/OverLineDrawer.js"></script>
-    <script src="./jsMojules/body/PlatformControler.js"></script>
-    <script src="./jsMojules/body/PlatformDrawer.js"></script>
-    <script src="./jsMojules/body/TransferController.js"></script>
-    <script src="./jsMojules/body/TransferDrawer.js"></script>
+        const DRAWER_BASE = './Drawer';
+
+        // settingsにdispConfigがない場合（旧Editor出力）に使用するデフォルト値
+        const DEFAULT_PAGE_LIST = [
+            { pageName: "defaultLineSVG.svg", dispTime: 8000 },
+            { pageName: "overLineSVG.svg",    dispTime: 8000 },
+            { pageName: "transfers.svg",       dispTime: 8000 },
+            { pageName: "platform.svg",        dispTime: 8000 },
+        ];
+        const DEFAULT_LANG_PARAMS = {
+            langIdList: [
+                { langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 },
+                { langId: 1, displayTime: 2000, transTime: 400, gapTime: 100 },
+                { langId: 2, displayTime: 4000, transTime: 400, gapTime: 100 }
+            ]
+        };
+
+        const displaySVG = document.getElementById('display');
+        let sim  = null;
+        let width, height;
+
+        // ============================================================
+        // ユーザー操作（旧display.htmlと同じ操作系）
+        // ============================================================
+
+        // キーボード操作（PC）
+        // P: ページ送り / ArrowLeft・ArrowRight: 状態移動 / A・D: 駅移動
+        function keyDown(e) {
+            if (!sim) return;
+            if      (e.key === 'p' || e.key === 'P') { sim.pageRotate();     }
+            else if (e.key === 'ArrowLeft')           { sim.moveState(-1);   }
+            else if (e.key === 'ArrowRight')          { sim.moveState(1);    }
+            else if (e.key === 'a')                   { sim.moveStation(-1); }
+            else if (e.key === 'd')                   { sim.moveStation(1);  }
+        }
+
+        // タッチ操作（スマホ）
+        // 左1/4: 上半分→駅-1, 下半分→状態-1
+        // 右1/4: 上半分→駅+1, 下半分→状態+1
+        // 中央1/2 かつ 下1/3: ページ送り
+        function windowTouched(e) {
+            if (!sim) return;
+            const touch = e.changedTouches[0];
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            if (touch.pageX < w / 4) {
+                if (touch.pageY > h / 2) { sim.moveState(-1);  }
+                else                     { sim.moveStation(-1); }
+            } else if (touch.pageX > w * 3 / 4) {
+                if (touch.pageY > h / 2) { sim.moveState(1);  }
+                else                     { sim.moveStation(1); }
+            } else if (touch.pageY > h * 2 / 3) {
+                // 中央1/2・下1/3: ページ送り
+                sim.pageRotate();
+            }
+        }
+
+        // ============================================================
+        // リソース読み込みユーティリティ
+        // ============================================================
+
+        async function fetchSVG(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`fetch failed: ${res.status} ${url}`);
+            const text = await res.text();
+            return new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+        }
+
+        async function loadNumIconPresets(presetKeys) {
+            const presets = {};
+            await Promise.all(presetKeys.map(async key => {
+                try { presets[key] = await fetchSVG(`/presetNumIcons/${key}.svg`); } catch (e) {}
+            }));
+            return presets;
+        }
+
+        async function loadBodySVGs(pageNameList) {
+            const map = new Map();
+            await Promise.all(pageNameList.map(async filename => {
+                try {
+                    map.set(filename, await fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/body/${filename}`));
+                } catch (e) {}
+            }));
+            return map;
+        }
+
+        // SVGサイズをウィンドウに合わせる
+        function resizeCanvas() {
+            if (!width || !height) return;
+            if (window.innerWidth < width / height * window.innerHeight) {
+                displaySVG.style.width  = window.innerWidth + 'px';
+                displaySVG.style.height = Math.floor(window.innerWidth * height / width) + 'px';
+            } else {
+                displaySVG.style.width  = Math.floor(window.innerHeight * width / height) + 'px';
+                displaySVG.style.height = window.innerHeight + 'px';
+            }
+        }
+
+        // ============================================================
+        // 初期化
+        // ============================================================
+
+        window.onload = async function () {
+            // localStorageからsettings読み込み（旧display.htmlと同じ）
+            const settings = JSON.parse(localStorage.getItem('lcdStrage'));
+            if (!settings) {
+                alert('settings が見つかりません。エディタで設定を保存してください。');
+                return;
+            }
+
+            // dispConfigがない旧形式のsettingsにはデフォルト値を使用
+            const pageList    = settings.dispConfig?.pageList ?? DEFAULT_PAGE_LIST;
+            const LANG_PARAMS = settings.dispConfig
+                ? { langIdList: settings.dispConfig.langIdList }
+                : DEFAULT_LANG_PARAMS;
+            // PAGE_PARAMS: pageList をそのまま渡す（Controller が pageName を参照）
+            const PAGE_PARAMS  = { pageList };
+            // SVGロード用にページ名だけ抽出する
+            const pageNameList = pageList.map(e => e.pageName);
+
+            // Drawerリソースを並列フェッチ
+            const [numIconPresetKeys] = await Promise.all([
+                fetch(`${DRAWER_BASE}/numIconPresetKeys.json`).then(r => r.json()),
+            ]);
+            const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
+                fetch(`${DRAWER_BASE}/iconList.json`).then(r => r.json()),
+                loadNumIconPresets(numIconPresetKeys),
+                fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/header/headerSVG.svg`),
+                loadBodySVGs(pageNameList),
+            ]);
+
+            // LcdAnimatorをグローバルシングルトンとして初期化
+            window.lcdAnimator = new LcdAnimator();
+
+            // viewBoxをheaderSVGに合わせてdisplaySVGに設定
+            const viewBox = headerSVG.getAttribute('viewBox');
+            if (viewBox) {
+                displaySVG.setAttribute('viewBox', viewBox);
+                const parts = viewBox.split(' ');
+                width  = parseFloat(parts[2]);
+                height = parseFloat(parts[3]);
+            }
+
+            // LcdSimulatorを初期化して描画開始
+            const drawer = new Drawer();
+            const drawerResources = { iconList, numIconPresets, headerSVG, bodySVGMap };
+            sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, displaySVG, drawerResources);
+            sim.start();
+
+            // イベントリスナーを設定
+            window.addEventListener('keydown',    keyDown);
+            window.addEventListener('touchstart', windowTouched);
+            window.addEventListener('resize',     resizeCanvas);
+            resizeCanvas();
+        };
+    </script>
 </body>
+</html>

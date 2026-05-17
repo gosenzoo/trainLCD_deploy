@@ -1,9 +1,30 @@
+// 言語ローテーション1エントリ
+type langIdEntryType = {
+    langId: number,
+    displayTime: number,
+    transTime: number,
+    gapTime: number
+}
+
+// ページ表示エントリ（ページ名と表示時間の組）
+type pageEntryType = {
+    pageName: string,
+    dispTime: number
+}
+
+// 表示設定（ページ一覧・言語ローテーション設定を保持）
+type dispConfigType = {
+    pageList: pageEntryType[],
+    langIdList: langIdEntryType[]
+}
+
 type settingType = {
     info: infoType,
     operationList: operationType[],
     stationList: stationType[],
     lineDict: {[id: string]: lineType},
-    iconDict: {[id: string]: string | iconParamsType}
+    iconDict: {[id: string]: string | iconParamsType},
+    dispConfig: dispConfigType
 }
 
 type infoType = {

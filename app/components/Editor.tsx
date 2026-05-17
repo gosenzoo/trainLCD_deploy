@@ -6,6 +6,7 @@ import OperationForm from './OperationForm'
 import StationList from "./StationList"
 import LineList from "./LineList"
 import IconList from './IconList'
+import DispConfig from './DispConfig'
 import AccordionSection from './AccordionSection'
 import "../type"
 import initSettingObject from '../initSettingObject'
@@ -67,6 +68,9 @@ const Editor = () => {
                 </AccordionSection>
                 <AccordionSection title="アイコン登録" defaultOpen={false}>
                     <IconList setting={setting} setSetting={setSetting}/>
+                </AccordionSection>
+                <AccordionSection title="表示設定" defaultOpen={false}>
+                    <DispConfig setting={setting} setSetting={setSetting}/>
                 </AccordionSection>
             </div>
         </div>

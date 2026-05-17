@@ -564,6 +564,26 @@ tr:hover td {
 }
 
 /* ============================================
+   表示設定テーブル (DispConfig)
+   ============================================ */
+
+/* 選択行は全セルをハイライトする（ページ・言語テーブル共通） */
+#dispConfigPageTable tr.selected th,
+#dispConfigPageTable tr.selected td,
+#dispConfigLangTable tr.selected th,
+#dispConfigLangTable tr.selected td {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
+/* 非選択時のフォームグレーアウト */
+.disp-config-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ============================================
    モーダルポップアップ
    ============================================ */
 

@@ -66,12 +66,42 @@ const initLineObject = {
     color: "",
 }
 
+// 言語エントリの初期値（日本語）
+const initLangIdEntryObject: langIdEntryType = {
+    langId: 0,
+    displayTime: 4000,
+    transTime: 400,
+    gapTime: 100
+}
+
+// ページエントリの初期値
+const initPageEntryObject: pageEntryType = {
+    pageName: "defaultLineSVG.svg",
+    dispTime: 8000
+}
+
+// 表示設定の初期値（全4ページ・日本語/ひらがな/英語の3言語ローテーション）
+const initDispConfigObject: dispConfigType = {
+    pageList: [
+        { pageName: "defaultLineSVG.svg", dispTime: 8000 },
+        { pageName: "overLineSVG.svg",    dispTime: 8000 },
+        { pageName: "transfers.svg",       dispTime: 8000 },
+        { pageName: "platform.svg",        dispTime: 8000 },
+    ],
+    langIdList: [
+        { langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 },
+        { langId: 1, displayTime: 2000, transTime: 400, gapTime: 100 },
+        { langId: 2, displayTime: 4000, transTime: 400, gapTime: 100 }
+    ]
+}
+
 const initSettingObject: settingType = {
     info: initInfoObject,
     operationList: [initOperationObject],
     stationList: [],
     lineDict: {},
-    iconDict: {}
+    iconDict: {},
+    dispConfig: initDispConfigObject
 }
 
-export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject}
+export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject, langIdEntry: initLangIdEntryObject, pageEntry: initPageEntryObject, dispConfig: initDispConfigObject}

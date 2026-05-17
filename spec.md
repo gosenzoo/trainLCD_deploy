@@ -49,6 +49,7 @@ classDiagram
         +stationType[] stationList
         +lineDict : Dict~string, lineType~
         +iconDict : Dict~string, string|iconParamsType~
+        +dispConfigType dispConfig
     }
 
     class infoType {
@@ -123,15 +124,35 @@ classDiagram
         +string symbol
     }
 
+    class dispConfigType {
+        +pageEntryType[] pageList
+        +langIdEntryType[] langIdList
+    }
+
+    class pageEntryType {
+        +string pageName
+        +number dispTime
+    }
+
+    class langIdEntryType {
+        +number langId
+        +number displayTime
+        +number transTime
+        +number gapTime
+    }
+
     settingType "1" *-- "1" infoType : info
     settingType "1" *-- "0..*" operationType : operationList
     settingType "1" *-- "0..*" stationType : stationList
     settingType "1" *-- "0..*" lineType : lineDict (ID→lineType)
     settingType "1" *-- "0..*" iconParamsType : iconDict (ID→iconParamsType\nor base64 string)
+    settingType "1" *-- "1" dispConfigType : dispConfig
 
     stationType --> lineType : lineId で参照
     stationType --> iconParamsType : numIconPresetKey で参照
     operationType --> iconParamsType : destinationNumIconKey で参照
+    dispConfigType "1" *-- "1..*" pageEntryType : pageList
+    dispConfigType "1" *-- "1..*" langIdEntryType : langIdList
 ```
 
 ### 3.2 フィールド詳細
@@ -205,6 +226,26 @@ classDiagram
 
 `iconDict` の値は `string`（base64 data URI）または `iconParamsType` の2種類。
 
+#### `dispConfigType` — 表示設定
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `pageList` | `pageEntryType[]` | 表示するページのリスト（表示順） |
+| `langIdList` | `langIdEntryType[]` | 言語ローテーション設定リスト（順番に切り替え） |
+
+#### `pageEntryType` — ページ表示エントリ
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` |
+| `dispTime` | number | このページを表示し続ける時間（ms） |
+
+#### `langIdEntryType` — 言語表示エントリ
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `langId` | number | 言語ID（0: 日本語, 1: ひらがな, 2: 英語） |
+| `displayTime` | number | この言語を表示し続ける時間（ms） |
+| `transTime` | number | 次言語への切り替えアニメーション時間（ms） |
+| `gapTime` | number | アニメーション後の待機時間（ms） |
+
 ---
 
 ## 4. コンポーネント構成
@@ -222,6 +263,7 @@ graph TD
     StationList["StationList\n駅一覧テーブル"]
     LineList["LineList\n路線一覧テーブル"]
     IconList["IconList\nアイコン一覧テーブル"]
+    DispConfig["DispConfig\n表示設定（言語ローテーション）"]
     GenericItemList["GenericItemList\n汎用テーブル（行選択）"]
     StationParamSetter["StationParamSetter\n選択駅の詳細設定（セクション切り替え式）"]
     MapComponent["MapComponent\nGoogle Mapsで座標設定"]
@@ -234,6 +276,7 @@ graph TD
     Editor --> StationList
     Editor --> LineList
     Editor --> IconList
+    Editor --> DispConfig
     TransferLinePopup["TransferLinePopup\n接続路線追加ポップアップ"]
 
     StationList --> GenericItemList
@@ -247,7 +290,7 @@ graph TD
 
 ### 4.2 セクションアコーディオン
 
-`Editor` 内の各セクション（ファイル操作・運用設定・駅設定・路線登録・アイコン登録）は、見出し行クリックで本体を開閉するアコーディオン形式とする。
+`Editor` 内の各セクション（ファイル操作・運用設定・駅設定・路線登録・アイコン登録・表示設定）は、見出し行クリックで本体を開閉するアコーディオン形式とする。
 
 #### 動作仕様
 
@@ -647,6 +690,106 @@ export function moveDictItemsDown<T>(
 | `StationList` | 駅追加ボタン（`addStation`） | 追加された駅の 1-based インデックス |
 | `LineList` | 路線追加ボタン（`addLine`） | 追加された路線の数値キー（文字列） |
 | `IconList` | アイコン追加ボタン（`iconAddButtonClicked`） | 登録名として入力した文字列（`newIconName`） |
+
+### 4.10 `DispConfig` — 表示設定コンポーネント
+
+**ファイル**: `app/components/DispConfig.tsx`
+
+`Editor` の「アイコン登録」アコーディオンセクションの直後に配置する「表示設定」セクション。`dispConfig.pageNameList` と `dispConfig.langIdList` を編集する UI を提供する。
+
+---
+
+#### 4.10.1 ページ設定（セクション上部）
+
+`pageList` を編集するテーブル。セクション内の最上部に配置する。
+
+**利用可能なページ名（固定の選択肢）**:
+
+| ページ名 | 説明 |
+|---|---|
+| `defaultLineSVG.svg` | 路線図（デフォルト） |
+| `overLineSVG.svg` | 全線路線図 |
+| `transfers.svg` | 乗換案内 |
+| `platform.svg` | ホーム案内 |
+
+**テーブルカラム定義**:
+
+| カラムヘッダー | フィールド | 備考 |
+|---|---|---|
+| ページ名 | `pageName` | `isSelector: true`、クリックで行選択 |
+| 表示時間(ms) | `dispTime` | 数値 |
+
+**ボタン**:
+
+| ボタン | 動作 |
+|--------|------|
+| 追加 | 利用可能なページ名を `<select>` で選択して末尾に追加（`dispTime` デフォルト: 8000） |
+| 削除 | 選択中のエントリを削除（`btn-danger`、未選択時は `disabled`） |
+| 上に移動 | 選択中のエントリを1つ上へ移動（未選択・先頭時は `disabled`） |
+| 下に移動 | 選択中のエントリを1つ下へ移動（未選択・末尾時は `disabled`） |
+
+**編集フォーム**: 非選択時もグレーアウト状態で常時表示。
+
+| ラベル | フィールド | 入力型 |
+|--------|-----------|--------|
+| 表示時間(ms) | `dispTime` | number |
+
+**内部状態**:
+
+| state | 型 | 説明 |
+|-------|----|------|
+| `selectedPageIndex` | `number \| null` | 選択中のページエントリインデックス |
+| `newPageName` | `string` | 追加する選択中のページ名（`<select>` の値） |
+
+---
+
+#### 4.10.2 言語設定（セクション下部）
+
+`langIdList` を編集するテーブル。ページ設定テーブルの下に配置する。
+
+**テーブルカラム定義**:
+
+| カラムヘッダー | フィールド | 備考 |
+|---|---|---|
+| 言語ID | `langId` | `isSelector: true`。0: 日本語, 1: ひらがな, 2: 英語 |
+| 表示時間(ms) | `displayTime` | 数値 |
+| 遷移時間(ms) | `transTime` | 数値 |
+| ギャップ時間(ms) | `gapTime` | 数値 |
+
+**ボタン**:
+
+| ボタン | 動作 |
+|--------|------|
+| 追加 | `langIdList` の末尾に新エントリを追加（デフォルト: `{ langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 }`） |
+| 削除 | 選択中のエントリを削除（`btn-danger`、未選択時は `disabled`） |
+
+**編集フォーム**: 非選択時もグレーアウト状態で常時表示。`.form-row` で各フィールドを `type="number"` で編集する。
+
+| ラベル | フィールド |
+|--------|-----------|
+| 言語ID | `langId` |
+| 表示時間(ms) | `displayTime` |
+| 遷移時間(ms) | `transTime` |
+| ギャップ時間(ms) | `gapTime` |
+
+---
+
+#### Props
+
+| prop | 型 | 説明 |
+|------|----|------|
+| `setting` | `settingType` | 設定オブジェクト |
+| `setSetting` | `Dispatch` | 設定更新コールバック |
+
+#### 内部状態（全体）
+
+| state | 型 | 説明 |
+|-------|----|------|
+| `selectedPageIndex` | `number \| null` | ページリストの選択中インデックス |
+| `newPageName` | `string` | 追加ページ選択 `<select>` の値 |
+| `selectedLangIndex` | `number \| null` | 言語リストの選択中インデックス |
+
+---
 
 ### 4.9 `OperationForm` — 運用タブ UI
 

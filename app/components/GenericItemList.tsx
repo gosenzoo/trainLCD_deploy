@@ -52,7 +52,8 @@ function GenericItemList<T,>({
                 </thead>
                 <tbody>
                     {rows.map(({ key, data }) => (
-                        <tr key={key}>
+                        // 行全体にも selected クラスを付与し、呼び出し元で行ハイライトの CSS を当てられるようにする
+                        <tr key={key} className={selectedKeys.includes(key) ? 'selected' : ''}>
                             {columns.map((col, i) =>
                                 // isSelector: true の列は <th> として描画し、クリックで onRowClick を呼ぶ
                                 col.isSelector ? (

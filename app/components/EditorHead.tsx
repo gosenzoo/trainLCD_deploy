@@ -42,6 +42,14 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                         Object.values(readData.lineDict).forEach(line => {
                             mergeProperties(line, initSettingObject.line);
                         });
+                        // 旧形式に dispConfig がない場合はデフォルト値を補完する
+                        if (!readData.dispConfig) {
+                            readData.dispConfig = structuredClone(initSettingObject.dispConfig);
+                        }
+                        // dispConfig に pageList がない場合はデフォルト値を補完する
+                        if (!readData.dispConfig.pageList) {
+                            readData.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
+                        }
                     }
                     catch (err) {
                         alert('設定ファイル読み込み時にエラーが発生')
@@ -110,6 +118,14 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                         return;
                     }
                     const setting = JSON.parse(lcdStrageItem);
+                    // 旧形式に dispConfig がない場合はデフォルト値を補完する
+                    if (!setting.dispConfig) {
+                        setting.dispConfig = structuredClone(initSettingObject.dispConfig);
+                    }
+                    // dispConfig に pageList がない場合はデフォルト値を補完する
+                    if (!setting.dispConfig.pageList) {
+                        setting.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
+                    }
                     setSetting(setting);
                 }}>LocalStorageから読み込み</button>
                 <button onClick={downloadFromSettings} className="btn-primary">設定をダウンロード</button>

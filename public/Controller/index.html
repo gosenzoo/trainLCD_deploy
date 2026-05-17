@@ -164,11 +164,13 @@
 
     let controller = null;
 
-    // ページ・言語パラメータはここで固定定義
-    // （settings.jsonにはsettingsオブジェクトのみ含まれる）
-    const PAGE_PARAMS = {
-      pageNameList: ["defaultLineSVG.svg", "overLineSVG.svg", "transfers.svg", "platform.svg"]
-    };
+    // ページリストのデフォルト値（settings.dispConfig.pageList がない旧形式用）
+    const DEFAULT_PAGE_LIST = [
+      { pageName: "defaultLineSVG.svg", dispTime: 8000 },
+      { pageName: "overLineSVG.svg",    dispTime: 8000 },
+      { pageName: "transfers.svg",       dispTime: 8000 },
+      { pageName: "platform.svg",        dispTime: 8000 },
+    ];
     // ------------------------------------------------------------
     // JSON構文ハイライト
     // ------------------------------------------------------------
@@ -231,7 +233,8 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const settings = await res.json();
 
-        // langIdListをsettings.dispConfigから取得する
+        // pageList と langIdList を settings.dispConfig から取得する（旧形式はデフォルト値で補完）
+        const PAGE_PARAMS = { pageList: settings.dispConfig?.pageList ?? DEFAULT_PAGE_LIST };
         const LANG_PARAMS = { langIdList: settings.dispConfig.langIdList };
 
         controller = new Controller(settings, PAGE_PARAMS, LANG_PARAMS);

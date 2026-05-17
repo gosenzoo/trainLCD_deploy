@@ -572,7 +572,8 @@ class ProgressController {
         let dispInd = nowInd;
 
         while (dispInd < stationFrameNum - 1 && listInd < this.stationList.length - 1) {
-            buf += parseInt(this.stationList[listInd].sectionTime) || 0;
+            // sectionTimeが空(NaN)の場合はNaNを伝播させ、累積時間を未確定扱いにする
+            buf += parseInt(this.stationList[listInd].sectionTime);
             listInd++;
 
             // 全体リストのlistIndが次の表示駅の_idに達したら時間を記録
