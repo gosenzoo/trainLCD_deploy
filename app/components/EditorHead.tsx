@@ -50,6 +50,27 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                         if (!readData.dispConfig.pageList) {
                             readData.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
                         }
+                        // transfers の旧形式を新形式（line オブジェクト直接保持）に変換する
+                        readData.stationList.forEach((station: any) => {
+                            if (typeof station.transfers === 'string') {
+                                // 最旧形式: スペース区切り文字列 → lineId 配列 → line オブジェクト
+                                station.transfers = station.transfers
+                                    ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
+                                        const lineData = readData.lineDict?.[id]
+                                        return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                    })
+                                    : [];
+                            } else if (Array.isArray(station.transfers)) {
+                                // 旧配列形式: { lineId, station } → { line, station }
+                                station.transfers = station.transfers.map((t: any) => {
+                                    if (t.lineId !== undefined && t.line === undefined) {
+                                        const lineData = readData.lineDict?.[t.lineId]
+                                        return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                    }
+                                    return t
+                                })
+                            }
+                        });
                     }
                     catch (err) {
                         alert('設定ファイル読み込み時にエラーが発生')
@@ -126,6 +147,27 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                     if (!setting.dispConfig.pageList) {
                         setting.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
                     }
+                    // transfers の旧形式を新形式（line オブジェクト直接保持）に変換する
+                    setting.stationList.forEach((station: any) => {
+                        if (typeof station.transfers === 'string') {
+                            // 最旧形式: スペース区切り文字列 → lineId 配列 → line オブジェクト
+                            station.transfers = station.transfers
+                                ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
+                                    const lineData = setting.lineDict?.[id]
+                                    return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                })
+                                : [];
+                        } else if (Array.isArray(station.transfers)) {
+                            // 旧配列形式: { lineId, station } → { line, station }
+                            station.transfers = station.transfers.map((t: any) => {
+                                if (t.lineId !== undefined && t.line === undefined) {
+                                    const lineData = setting.lineDict?.[t.lineId]
+                                    return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                }
+                                return t
+                            })
+                        }
+                    });
                     setSetting(setting);
                 }}>LocalStorageから読み込み</button>
                 <button onClick={downloadFromSettings} className="btn-primary">設定をダウンロード</button>

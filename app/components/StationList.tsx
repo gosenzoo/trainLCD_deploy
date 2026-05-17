@@ -77,7 +77,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         }
         _setting.stationList.splice(_index, 0, {
             name: "", kana: "", eng: "", number: _number, lineColor: _color,
-            numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: "",
+            numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             transferCountLineP: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
@@ -187,12 +187,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         },
         {
             header: '乗換路線',
-            // transfersはスペース区切りの路線IDリスト。各IDをアイコンとして描画する。
+            // transfers は transferItemType[] 。各エントリの line.lineIconKey をアイコンとして描画する。
             cell: (station) => (
                 <>
-                    {station.transfers.split(' ').map((lineId, idx) => {
-                        if (!lineId || !Object.keys(setting.lineDict).includes(lineId)) return null
-                        const iconParams = setting.iconDict[setting.lineDict[lineId].lineIconKey]
+                    {station.transfers.map((item, idx) => {
+                        const lineIconKey = item.line?.lineIconKey
+                        if (!lineIconKey) return null
+                        const iconParams = setting.iconDict[lineIconKey]
                         if (typeof iconParams === 'string') {
                             return iconParams ? <img key={idx} src={iconParams} alt="" width="20px" height="20px" /> : null
                         } else if (iconParams) {

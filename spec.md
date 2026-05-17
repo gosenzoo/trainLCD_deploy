@@ -94,7 +94,7 @@ classDiagram
         +string lineColor
         +string numIconPresetKey
         +string lineNumberType
-        +string transfers
+        +transferItemType[] transfers
         +boolean isPass
         +string sectionTime
         +string lineId
@@ -108,6 +108,28 @@ classDiagram
         +string leftSlotInd
         +string otherCarNum
         +string otherLeftSlotInd
+    }
+
+    class transferItemType {
+        +transferLineType line
+        +transferStationType station
+    }
+
+    class transferLineType {
+        +string lineIconKey
+        +string name
+        +string kana
+        +string eng
+    }
+
+    class transferStationType {
+        +boolean isDraw
+        +string type
+        +string symbol
+        +string color
+        +string number
+        +string name
+        +string eng
     }
 
     class lineType {
@@ -148,7 +170,10 @@ classDiagram
     settingType "1" *-- "0..*" iconParamsType : iconDict (ID→iconParamsType\nor base64 string)
     settingType "1" *-- "1" dispConfigType : dispConfig
 
-    stationType --> lineType : lineId で参照
+    stationType "1" *-- "0..*" transferItemType : transfers
+    transferItemType "1" *-- "1" transferLineType : line
+    transferItemType "1" *-- "1" transferStationType : station
+    stationType --> lineType : lineId で参照（区間路線）
     stationType --> iconParamsType : numIconPresetKey で参照
     operationType --> iconParamsType : destinationNumIconKey で参照
     dispConfigType "1" *-- "1..*" pageEntryType : pageList
@@ -196,7 +221,7 @@ classDiagram
 | `lineColor` | string | この駅の路線カラー（HEX） |
 | `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー |
 | `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
-| `transfers` | string | 乗換路線IDリスト（スペース区切り） |
+| `transfers` | `transferItemType[]` | 乗換路線のリスト。各エントリに路線IDと乗換駅情報を持つ |
 | `transfersListDisp` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
 | `isPass` | boolean | 通過駅フラグ |
 | `sectionTime` | string | 次駅までの所要時間（分） |
@@ -210,6 +235,31 @@ classDiagram
 | `otherLineInd` | string | 向かいホーム列車の路線ID |
 | `otherCarNum` | string | 向かいホーム列車の両数 |
 | `otherLeftSlotInd` | string | 向かいホーム列車の左端スロット |
+
+#### `transferItemType` — 乗換路線エントリ
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `line` | `transferLineType` | 乗換路線情報（路線アイコン・名称を直接保持） |
+| `station` | `transferStationType` | 乗換駅情報 |
+
+#### `transferLineType` — 乗換路線情報
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `lineIconKey` | string | 路線アイコンの `iconDict` キー |
+| `name` | string | 路線名（日本語） |
+| `kana` | string | 路線名（かな） |
+| `eng` | string | 路線名（英語） |
+
+#### `transferStationType` — 乗換駅情報
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `isDraw` | boolean | 駅描画フラグ（true のとき乗換一覧に駅名等を描画） |
+| `type` | string | ナンバリングアイコンのプリセットキー |
+| `symbol` | string | 路線記号文字（例: `TY`） |
+| `color` | string | 路線カラー（HEX） |
+| `number` | string | 乗換駅のナンバリング（例: `TY-01`） |
+| `name` | string | 乗換駅名（日本語） |
+| `eng` | string | 乗換駅名（英語） |
 
 #### `lineType` — 路線定義
 | フィールド | 型 | 説明 |
@@ -502,12 +552,23 @@ type GenericItemListProps<T> = {
 
 #### 乗換路線の表示・操作
 
-「乗換路線」欄のテキストボックスを廃止し、`transfers` に登録済みの路線を **`GenericItemList`** で表示・操作する。
+「乗換路線」欄のテキストボックスを廃止し、`transfers`（`transferItemType[]`）に登録済みの路線を **`GenericItemList`** で表示・操作する。
 
-- `transfers`（スペース区切りの路線IDリスト）に含まれるIDのみを行として表示
+- `transfers` の各エントリを行として表示
 - **路線記号列** に `isSelector: true` を付与しクリックで行選択可能にする
 - 路線カラーはカラムのセル背景で表示
-- 選択状態は `transferSelectedKeys: string[]`（選択中の路線IDリスト）で管理
+- 選択状態は `transferSelectedIndex: number | null`（選択中のインデックス）で管理
+
+**テーブルカラム定義**:
+
+| カラムヘッダー | 内容 | 備考 |
+|---|---|---|
+| 路線記号 | `item.line.lineIconKey` でアイコン描画 | `isSelector: true` |
+| 路線名 | `item.line.name` | |
+| ナンバリング | `station.type/symbol/number/color` で `createNumIconFromPreset` 描画、フォールバックでテキスト | 24px |
+| 駅名 | `station.name` | |
+| 駅名英語 | `station.eng` | |
+| 駅描画 | `station.isDraw` チェックボックス | |
 
 テーブル下部ボタン:
 
@@ -518,6 +579,30 @@ type GenericItemListProps<T> = {
 | 削除 | 選択行を `transfers` から除去（`btn-danger`） |
 
 並び替えは `listOperations.ts` の `moveArrayItemsUp` / `moveArrayItemsDown` を利用。操作結果は `stationList[].transfers` に即時反映する。
+
+テーブル下に入力フォームを2グループ配置する。いずれも選択中エントリの編集用であり、未選択時はグレーアウト（disabled）する。
+
+**路線情報フォーム**（テーブルと「ナンバリング記号」の間）:
+
+| ラベル | フィールド | 入力型 | 備考 |
+|--------|-----------|--------|------|
+| 路線記号 | `item.line.lineIconKey` | アイコンピッカー | 4.6節と同じ形式 |
+| 路線名 | `item.line.name` | テキスト | |
+| 路線名かな | `item.line.kana` | テキスト | |
+| 路線名英語 | `item.line.eng` | テキスト | |
+
+**乗換駅情報フォーム**（「ナンバリング記号」以降）:
+
+| ラベル | フィールド | 入力型 |
+|--------|-----------|--------|
+| ナンバリング記号 | `station.type` | `<select>`（駅基本設定上部と同じ） |
+| 路線カラー | `station.color` | カラーピッカー |
+| 路線記号 | `station.symbol` | テキスト |
+| ナンバリング | `station.number` | テキスト |
+| 駅名 | `station.name` | テキスト |
+| 駅名英語 | `station.eng` | テキスト |
+
+フォームの下に **「基本設定情報を反映」ボタン** を配置する。クリックすると選択中駅の `station.name` / `station.eng` を自駅の名前・英語名で上書きする。
 
 追加操作は下記の「接続路線を追加」ボタンで行う。テキストボックスによる直接編集は廃止。
 
@@ -539,15 +624,14 @@ type GenericItemListProps<T> = {
     | 路線名英語 | `eng` |
     | 路線カラー | `color` |
   - **「路線追加」ボタン（`btn-primary`）**:
-    1. フォームの値で `lineDict` の末尾に新しい路線を追加する（キーは既存最大値+1）
-    2. 追加した路線のIDを、選択中の全駅の `transfers` にスペース区切りで追記する（重複はスキップ）
-    3. ポップアップを閉じ、フォームをリセットする
+    1. フォームの値で `line: { lineIconKey, name, kana, eng }` を生成し、`{ line, station: { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" } }` として、選択中の全駅の `transfers` 配列末尾に追加する
+    2. ポップアップを閉じ、フォームをリセットする
 - **「リストから選択」タブ**:
   - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線記号・路線名・路線カラー）
   - ボタン行: `複数選択`（`btn-toggle`）のみ
   - **「路線追加」ボタン（`btn-primary`）**:
     1. 選択中の路線キーを `lineDict` の並び順（上から）でソートして取得する
-    2. 選択中の全駅の `transfers` に順番にスペース区切りで追記する（重複はスキップ）
+    2. 各路線キーについて `lineDict[key]` の `{ lineIconKey, name, kana, eng }` を `line` にコピーし、`{ line, station: { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" } }` として、選択中の全駅の `transfers` 配列末尾に追加する
     3. ポップアップを閉じる
 - **フッターボタン**: `閉じる` のみ（追加実行はタブ内ボタンで行う）
 
@@ -602,21 +686,21 @@ type GenericItemListProps<T> = {
 
 - `stationType.transfersListDisp` を編集する `<textarea>` を配置する（初期値: 空文字列）
 - 値はそのまま `station.transfersListDisp` に書き込む
-- **「基本設定情報を反映」ボタン**: クリックすると、現在の `station.transfers`（スペース区切りのID列）を `<textarea>` に書き込み `station.transfersListDisp` を更新する
-  - 例: `"1 3 5"` → textarea 値 `"1 3 5"`（改行なし、ユーザが後で改行を挿入可能）
+- **「基本設定情報を反映」ボタン**: クリックすると、現在の `station.transfers`（`transferItemType[]`）の各インデックス（0始まり）を1行スペース区切りで `<textarea>` に書き込み `station.transfersListDisp` を更新する
+  - 例: `transfers` が3要素 → textarea 値 `"0 1 2"`（改行なし、ユーザが後で改行を挿入可能）
 
 #### `transfersListDisp` の書式と drawParams への反映ロジック
 
 ```
 transfersListDisp の例（ユーザが改行を挿入した状態）:
-"1 3\n5"
-→ 1行目: ID 1, 3 の路線
-→ 2行目: ID 5 の路線
+"0 1\n2"
+→ 1行目: インデックス 0, 1 の乗換エントリ
+→ 2行目: インデックス 2 の乗換エントリ
 ```
 
-- **空の場合**: 従来通り `transfers` の各IDを1行1路線として `transferList` を生成する
-- **空でない場合**: 改行で分割した各部分を1行とし、各行内をスペースで分割して路線IDとして `transferList` を生成する
-  - `lineDict` に存在しないIDは除外する
+- **空の場合**: `transfers`（`transferItemType[]`）の各エントリを1行1路線として `transferList` を生成する（`line` / `station` 情報も含める）
+- **空でない場合**: 改行で分割した各部分を1行とし、各行内をスペースで分割して配列インデックス（数値）として `transferList` を生成する
+  - 範囲外のインデックスは除外する
 
 #### 実装方針
 

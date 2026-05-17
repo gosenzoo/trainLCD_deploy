@@ -104,7 +104,7 @@
         <g lcdParts="arrange" arrange-interval="93" lcd-fitX="true">
             <rect lcdParts="arrangeArea" x="85" y="480" width="1263" height="140" fill="#d2d2d2FF" />
             <rect lcd-funcCall="transferLineBox" x="85" y="480" width="620" height="140" fill="#99999930" />
-            <rect lcd-funcCall="transferStationBox" isDraw="$transfer.station != null" lcd-verAlign="center" x="798" y="498" width="550" height="102" fill="#99999930" />
+            <rect lcd-funcCall="transferStationBox" isDraw="$transfer.station.isDraw" lcd-verAlign="center" x="798" y="498" width="550" height="102" fill="#99999930" />
         </g>
     </g>
 

@@ -36,7 +36,7 @@ const toStationType = (station: PresetStation, lineColor: string, number: string
     lineColor,
     numIconPresetKey: "N_tokyu",  // 暫定デフォルト
     lineNumberType: "0",
-    transfers: "",
+    transfers: [],
     isPass: false,
     sectionTime: "",
     lineId: "",

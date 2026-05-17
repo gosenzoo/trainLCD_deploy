@@ -409,13 +409,20 @@
       sim = null;
 
       try {
-        // settings.json と Drawerリソース一覧を並列フェッチ
+        // settings.json と pageNameList を並列フェッチ
         loadingMsg.textContent = 'settings.json を取得中';
-        const [settings, pageNameList, numIconPresetKeys] = await Promise.all([
+        const [settings, pageNameList] = await Promise.all([
           fetch('settings.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
           fetch(`${DRAWER_BASE}/pageNameList.json`).then(r => r.json()),
-          fetch(`${DRAWER_BASE}/numIconPresetKeys.json`).then(r => r.json()),
         ]);
+
+        // settings 内の全 numIconPresetKey を重複なしで収集する
+        // 収集元: stationList[i].numIconPresetKey / transfers[j].station.type / operationList[i].destinationNumIconKey
+        const numIconPresetKeys = [...new Set([
+          ...settings.stationList.map(s => s.numIconPresetKey).filter(k => k),
+          ...settings.stationList.flatMap(s => (s.transfers || []).map(t => t.station?.type).filter(k => k)),
+          ...settings.operationList.map(op => op.destinationNumIconKey).filter(k => k),
+        ])];
 
         // langIdListをsettings.dispConfigから取得する
         const LANG_PARAMS = { langIdList: settings.dispConfig.langIdList };

@@ -42,7 +42,7 @@ const initStationObject: stationType = {
     lineColor: "",
     numIconPresetKey: "N_tokyu",
     lineNumberType: "0",
-    transfers: "",
+    transfers: [],
     isPass: false,
     sectionTime: "",
     lineId: "",

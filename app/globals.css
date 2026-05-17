@@ -800,6 +800,13 @@ tr:hover td {
   font-weight: 700;
 }
 
+#lineListPopupTable tr.selected th,
+#lineListPopupTable tr.selected td {
+  background: var(--accent-dim) !important;
+  color: var(--accent-hover) !important;
+  font-weight: 700;
+}
+
 /* 駅プリセットポップアップの駅行ホバー */
 .station-preset-row:hover {
   background: var(--bg-overlay);

@@ -1,3 +1,28 @@
+// 乗換駅情報（乗換先のナンバリング記号・路線記号・路線カラー・ナンバリング・駅名・駅名英語・駅描画フラグ）
+type transferStationType = {
+    isDraw: boolean,
+    type: string,
+    symbol: string,
+    color: string,
+    number: string,
+    name: string,
+    eng: string
+}
+
+// 乗換路線情報（路線アイコン・名称を直接保持。lineDictへの参照ではなく値をそのまま保存する）
+type transferLineType = {
+    lineIconKey: string,
+    name: string,
+    kana: string,
+    eng: string,
+}
+
+// 乗換路線エントリ（乗換路線情報と乗換駅情報の組）
+type transferItemType = {
+    line: transferLineType,
+    station: transferStationType
+}
+
 // 言語ローテーション1エントリ
 type langIdEntryType = {
     langId: number,
@@ -69,7 +94,7 @@ type stationType = {
     lineColor: string,
     numIconPresetKey:string,
     lineNumberType: string,
-    transfers: string,
+    transfers: transferItemType[],
     isPass: boolean,
     sectionTime: string,
     lineId: string,

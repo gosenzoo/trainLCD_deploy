@@ -401,7 +401,8 @@ class ProgressController {
         // 駅間にいる場合は出発済みの駅Aもgrayにするため Math.ceil を使う
         const isGrayThreshold = Math.ceil(hereDrawPos);
         const drawDispStationList = dispStationList.map((station, i) => {
-            const transferIds = this._parseTransferIds(station.transfers);
+            // transfers から drawItem 配列を生成する（新・旧形式を一括処理）
+            const transferItems = this._getTransferItems(station.transfers);
             return {
                 name:            station.name,
                 kana:            station.kana || "",
@@ -411,8 +412,8 @@ class ProgressController {
                 numIconType:     station.lineNumberType || "0",
                 stationIconType: station.isPass ? "1" : "0",
                 sectionTime:     (timeList[i] >= 0) ? String(timeList[i]) : "",
-                transfersText:    transferIds.map(id => this._formatTransferText(id, "name")),
-                transfersTextEng: transferIds.map(id => this._formatTransferText(id, "eng")),
+                transfersText:    transferItems.map(item => item.lineIcon + item.name),
+                transfersTextEng: transferItems.map(item => item.lineIcon + item.eng),
                 isGray:          i < isGrayThreshold || station.isPass,
                 transferText:    "",
                 transferTextEng: ""
@@ -735,17 +736,8 @@ class ProgressController {
      */
     _buildPlatform(currentStationInd, posState) {
         const displayStation = getNextStopStation(this.stationList, currentStationInd);
-        const transferIds = this._parseTransferIds(displayStation.transfers);
-
-        // 全乗換路線を1ホームとしてまとめる
-        const transferItems = transferIds
-            .filter(id => this.lineDict[id])
-            .map(id => {
-                const line = this.lineDict[id];
-                // lineIconKeyは :key: の形式で埋め込む
-                const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
-                return { lineIcon, name: line.name || "", eng: line.eng || "" };
-            });
+        // 全乗換路線を drawItem 配列に変換する（新・旧形式を一括処理）
+        const transferItems = this._getTransferItems(displayStation.transfers);
 
         return {
             transfers:         transferItems.length > 0 ? [transferItems] : [[]],
@@ -771,32 +763,35 @@ class ProgressController {
 
         let transferList;
         if (displayStation.transfersListDisp) {
-            // transfersListDisp が設定されている場合: 改行で行を分割し、各行をスペース区切りのIDリストとして解釈する
+            // transfersListDisp が設定されている場合: 改行で行を分割し、各行をスペース区切りトークンとして解釈する
+            // 新形式: トークンは transfers のインデックス（整数）
+            // 旧形式後方互換: トークンが有効インデックスでない場合は lineDict キーとして扱う
+            const transfers = displayStation.transfers;
             transferList = displayStation.transfersListDisp
                 .split("\n")
-                .map(line => {
-                    // 各行内のスペース区切りIDを1行のアイテム配列に変換する
-                    return line.split(" ")
-                        .map(id => id.trim())
-                        .filter(id => id && this.lineDict[id])
-                        .map(id => {
-                            const lineData = this.lineDict[id];
+                .map(rowStr => {
+                    return rowStr.split(" ")
+                        .map(token => token.trim())
+                        .filter(token => token)
+                        .map(token => {
+                            const idx = parseInt(token);
+                            if (!isNaN(idx) && Array.isArray(transfers) && idx >= 0 && idx < transfers.length) {
+                                // 新形式: インデックスで transfers[idx] を参照する
+                                return this._transferItemToDrawItem(transfers[idx]);
+                            }
+                            // 旧形式後方互換: lineDict キーとして参照する
+                            const lineData = this.lineDict[token];
+                            if (!lineData) return null;
                             const lineIcon = lineData.lineIconKey ? `:${lineData.lineIconKey}:` : "";
-                            return { lineIcon, name: lineData.name || "", eng: lineData.eng || "" };
-                        });
+                            return { lineIcon, name: lineData.name || "", eng: lineData.eng || "", station: { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" } };
+                        })
+                        .filter(item => item !== null);
                 })
-                .filter(row => row.length > 0); // 有効なIDが1件もない行は除外する
+                .filter(row => row.length > 0); // 有効なアイテムが1件もない行は除外する
         } else {
-            // transfersListDisp が空の場合: 従来通り各路線を1行ずつ配置する
-            const transferIds = this._parseTransferIds(displayStation.transfers);
-            transferList = transferIds
-                .filter(id => this.lineDict[id])
-                .map(id => {
-                    const line = this.lineDict[id];
-                    // lineIconKeyは :key: の形式で埋め込む
-                    const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
-                    return [{ lineIcon, name: line.name || "", eng: line.eng || "" }];
-                });
+            // transfersListDisp が空の場合: transfers の各エントリを1行ずつ配置する
+            transferList = this._getTransferItems(displayStation.transfers)
+                .map(item => [item]);
         }
 
         return { transferList };
@@ -826,26 +821,45 @@ class ProgressController {
     }
 
     /**
-     * station.transfers（スペース区切りのlineId文字列）をIDの配列に変換する
-     * @param {string} transfersStr
-     * @returns {string[]}
+     * 1つの transferItemType エントリを drawItem { lineIcon, name, eng, station } に変換する
+     * 新形式（t.line）と旧形式（t.lineId）の両方に対応する
+     * @param {object} t - transferItemType エントリ
+     * @returns {{lineIcon:string, name:string, eng:string, station:object}|null}
      */
-    _parseTransferIds(transfersStr) {
-        if (!transfersStr) return [];
-        return transfersStr.split(" ").filter(id => id);
+    _transferItemToDrawItem(t) {
+        if (!t) return null;
+        const defaultStation = { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" };
+        // 新形式: t.line を直接使用
+        if (t.line) {
+            const lineIcon = t.line.lineIconKey ? `:${t.line.lineIconKey}:` : "";
+            return { lineIcon, name: t.line.name || "", eng: t.line.eng || "", station: t.station ?? defaultStation };
+        }
+        // 旧形式: t.lineId で lineDict を参照（後方互換）
+        const line = this.lineDict?.[t.lineId];
+        if (!line) return null;
+        const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
+        return { lineIcon, name: line.name || "", eng: line.eng || "", station: t.station ?? defaultStation };
     }
 
     /**
-     * 乗換路線テキストを生成する
-     * 形式: lineIconKey + lineName（例: ":M:京浜東北線"）
-     * @param {string} lineId
-     * @param {"name"|"eng"} field
+     * station.transfers 全体を drawItem の配列に変換する
+     * 最旧形式（スペース区切り文字列）・旧配列形式（lineId）・新配列形式（line）の全てに対応する
+     * @param {string|Array} transfers
+     * @returns {Array}
      */
-    _formatTransferText(lineId, field) {
-        const line = this.lineDict[lineId];
-        if (!line) return "";
-        // lineIconKeyは :key: の形式で埋め込む（例: ":I_tokyu:東横線"）
-        const iconPart = line.lineIconKey ? `:${line.lineIconKey}:` : "";
-        return iconPart + (line[field] || "");
+    _getTransferItems(transfers) {
+        if (!transfers) return [];
+        // 最旧形式: スペース区切り文字列
+        if (!Array.isArray(transfers)) {
+            const defaultStation = { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" };
+            return transfers.split(" ").filter(id => id).map(id => {
+                const line = this.lineDict?.[id];
+                if (!line) return null;
+                const lineIcon = line.lineIconKey ? `:${line.lineIconKey}:` : "";
+                return { lineIcon, name: line.name || "", eng: line.eng || "", station: defaultStation };
+            }).filter(item => item !== null);
+        }
+        // 新・旧配列形式: _transferItemToDrawItem に委譲
+        return transfers.map(t => this._transferItemToDrawItem(t)).filter(item => item !== null);
     }
 }

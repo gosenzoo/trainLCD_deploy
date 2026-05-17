@@ -179,10 +179,15 @@
             // SVGロード用にページ名だけ抽出する
             const pageNameList = pageList.map(e => e.pageName);
 
+            // settings 内の全 numIconPresetKey を重複なしで収集する
+            // 収集元: stationList[i].numIconPresetKey / transfers[j].station.type / operationList[i].destinationNumIconKey
+            const numIconPresetKeys = [...new Set([
+                ...settings.stationList.map(s => s.numIconPresetKey).filter(k => k),
+                ...settings.stationList.flatMap(s => (s.transfers || []).map(t => t.station?.type).filter(k => k)),
+                ...settings.operationList.map(op => op.destinationNumIconKey).filter(k => k),
+            ])];
+
             // Drawerリソースを並列フェッチ
-            const [numIconPresetKeys] = await Promise.all([
-                fetch(`${DRAWER_BASE}/numIconPresetKeys.json`).then(r => r.json()),
-            ]);
             const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
                 fetch(`${DRAWER_BASE}/iconList.json`).then(r => r.json()),
                 loadNumIconPresets(numIconPresetKeys),
