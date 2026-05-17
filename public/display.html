@@ -14,7 +14,8 @@
         font-weight: 600;
       }
       * { box-sizing: border-box; }
-      body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+      /* 100dvh: iOS Safariのブラウザバー分を除いた実表示領域に合わせる。非対応ブラウザは100vhにフォールバック */
+      body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; height: 100dvh; }
       svg#display { display: block; }
     </style>
 </head>
@@ -142,14 +143,17 @@
         }
 
         // SVGサイズをウィンドウに合わせる
+        // visualViewport が使えるブラウザ（iOS Safari含む）ではブラウザバーを除いた実寸を使用する
         function resizeCanvas() {
             if (!width || !height) return;
-            if (window.innerWidth < width / height * window.innerHeight) {
-                displaySVG.style.width  = window.innerWidth + 'px';
-                displaySVG.style.height = Math.floor(window.innerWidth * height / width) + 'px';
+            const vw = window.visualViewport ? window.visualViewport.width  : window.innerWidth;
+            const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            if (vw < width / height * vh) {
+                displaySVG.style.width  = vw + 'px';
+                displaySVG.style.height = Math.floor(vw * height / width) + 'px';
             } else {
-                displaySVG.style.width  = Math.floor(window.innerHeight * width / height) + 'px';
-                displaySVG.style.height = window.innerHeight + 'px';
+                displaySVG.style.width  = Math.floor(vh * width / height) + 'px';
+                displaySVG.style.height = vh + 'px';
             }
         }
 
@@ -208,6 +212,10 @@
             window.addEventListener('keydown',    keyDown);
             window.addEventListener('touchstart', windowTouched);
             window.addEventListener('resize',     resizeCanvas);
+            // iOS SafariのブラウザバーUI変化に対応するため visualViewport のリサイズも監視する
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', resizeCanvas);
+            }
             resizeCanvas();
         };
     </script>
