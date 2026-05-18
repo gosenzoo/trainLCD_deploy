@@ -15,6 +15,9 @@ type IconNewPopupProps = {
     isNested?: boolean
 }
 
+// モジュールスコープで最後に使用したプリセット種別を記憶する（再マウント後も保持）
+let _savedPresetType: string = ''
+
 // iconDict の既存数値キーから次のユニークなキーを生成する
 function generateNewKey(iconDict: Record<string, string | iconParamsType>): string {
     const numericKeys = Object.keys(iconDict)
@@ -29,7 +32,7 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
     // サブタブ: 設定で追加 / 画像で追加
     const [newTab, setNewTab] = useState<'preset' | 'image'>('preset')
     // 「設定で追加」タブの入力値
-    const [presetType, setPresetType] = useState<string>(iconIndexes[0]?.key ?? '')
+    const [presetType, setPresetType] = useState<string>(_savedPresetType || (iconIndexes[0]?.key ?? ''))
     const [presetSymbol, setPresetSymbol] = useState<string>('')
     const [presetColor, setPresetColor] = useState<string>('#000000')
     // 「画像で追加」タブの入力値（base64）
@@ -94,7 +97,7 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
                     <div style={{gridRow: 1, gridColumn: 1, visibility: newTab === 'preset' ? 'visible' : 'hidden'}}>
                         <div className="form-row">
                             <label>プリセットから登録</label>
-                            <select value={presetType} onChange={e => setPresetType(e.target.value)}>
+                            <select value={presetType} onChange={e => { setPresetType(e.target.value); _savedPresetType = e.target.value }}>
                                 {iconIndexes.map(idx => (
                                     <option key={idx.key} value={idx.key}>{idx.name}</option>
                                 ))}

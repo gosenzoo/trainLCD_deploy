@@ -136,48 +136,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
     return(
         <div>
             <div className="btn-group">
-                <button onClick={e => {
-                    const lcdStrageItem = localStorage.getItem('lcdStrage');
-                    if(!lcdStrageItem){
-                        alert("localStrageにアイテムがありません");
-                        return;
-                    }
-                    const setting = JSON.parse(lcdStrageItem);
-                    // 旧形式に dispConfig がない場合はデフォルト値を補完する
-                    if (!setting.dispConfig) {
-                        setting.dispConfig = structuredClone(initSettingObject.dispConfig);
-                    }
-                    // dispConfig に pageList がない場合はデフォルト値を補完する
-                    if (!setting.dispConfig.pageList) {
-                        setting.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
-                    }
-                    // transfers の旧形式を新形式（line オブジェクト直接保持）に変換する
-                    setting.stationList.forEach((station: any) => {
-                        if (typeof station.transfers === 'string') {
-                            // 最旧形式: スペース区切り文字列 → lineId 配列 → line オブジェクト
-                            station.transfers = station.transfers
-                                ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
-                                    const lineData = setting.lineDict?.[id]
-                                    return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
-                                })
-                                : [];
-                        } else if (Array.isArray(station.transfers)) {
-                            // 旧配列形式: { lineId, station } → { line, station }
-                            station.transfers = station.transfers.map((t: any) => {
-                                if (t.lineId !== undefined && t.line === undefined) {
-                                    const lineData = setting.lineDict?.[t.lineId]
-                                    return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
-                                }
-                                // lineIconKey が旧形式（文字列）の場合は配列に正規化する
-                                if (t.line && typeof t.line.lineIconKey === 'string') {
-                                    t = { ...t, line: { ...t.line, lineIconKey: t.line.lineIconKey ? [t.line.lineIconKey] : [] } }
-                                }
-                                return t
-                            })
-                        }
-                    });
-                    setSetting(setting);
-                }}>LocalStorageから読み込み</button>
                 <button onClick={downloadFromSettings} className="btn-primary">設定をダウンロード</button>
                 <button onClick={(e) => {
                     if(window.confirm("全ての設定を初期化します\nダウンロードしていないデータは戻りません")){

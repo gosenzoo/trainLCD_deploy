@@ -188,7 +188,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             </div>
             <div className="form-row">
                 <label>プリセットから登録</label>
-                <select id="iconPresetSelect" onChange={(e) => setIconPresetType(e.target.value)}>
+                <select id="iconPresetSelect" value={iconPresetType} onChange={(e) => setIconPresetType(e.target.value)}>
                     {iconIndexes.map(num => (
                         <option key={num.key} value={num.key}>{num.name}</option>
                     ))}

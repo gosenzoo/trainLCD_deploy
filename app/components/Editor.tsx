@@ -22,6 +22,44 @@ const Editor = () => {
     // 表示タイプ状態を Editor で管理し、sticky ツールバーの「表示」ボタンから参照する
     const [displayType, setDisplayType] = useState<string>("tokyu")
 
+    // localStorageから設定を読み込み、旧形式を正規化して state に反映する
+    const loadFromLocalStorage = () => {
+        const lcdStrageItem = localStorage.getItem('lcdStrage');
+        if (!lcdStrageItem) {
+            alert("localStrageにアイテムがありません");
+            return;
+        }
+        const loaded = JSON.parse(lcdStrageItem);
+        if (!loaded.dispConfig) {
+            loaded.dispConfig = structuredClone(initSettingObject.dispConfig);
+        }
+        if (!loaded.dispConfig.pageList) {
+            loaded.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
+        }
+        loaded.stationList.forEach((station: any) => {
+            if (typeof station.transfers === 'string') {
+                station.transfers = station.transfers
+                    ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
+                        const lineData = loaded.lineDict?.[id]
+                        return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                    })
+                    : [];
+            } else if (Array.isArray(station.transfers)) {
+                station.transfers = station.transfers.map((t: any) => {
+                    if (t.lineId !== undefined && t.line === undefined) {
+                        const lineData = loaded.lineDict?.[t.lineId]
+                        return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                    }
+                    if (t.line && typeof t.line.lineIconKey === 'string') {
+                        t = { ...t, line: { ...t.line, lineIconKey: t.line.lineIconKey ? [t.line.lineIconKey] : [] } }
+                    }
+                    return t
+                })
+            }
+        });
+        setSetting(loaded);
+    }
+
     // 選択中の表示タイプに対応する LCD 画面を別タブで開く
     const openDisplay = () => {
         if (displayType === "JW-225") {
@@ -49,6 +87,7 @@ const Editor = () => {
                 <button onClick={() => window.open('/Controller/index.html', '_blank')} className="btn-secondary">Controllerデバッグ</button>
                 {/* Drawerデバッグ画面を別タブで開く */}
                 <button onClick={() => window.open('/lcdDisplay/index.html', '_blank')} className="btn-secondary">デバッグ</button>
+                <button onClick={loadFromLocalStorage}>LocalStorageから読み込み</button>
                 <button onClick={openDisplay} className="btn-primary">表示</button>
             </div>
             <div className="editor-container">

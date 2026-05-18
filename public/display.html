@@ -220,6 +220,11 @@
             // アイコン辞書は settings.iconDict を使用する（iconList.json はデバッグ用のため使用しない）
             const drawerResources = { iconList: settings.iconDict || {}, numIconPresets, iconPresets, headerSVG, bodySVGMap };
             sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, displaySVG, drawerResources);
+
+            // カスタムフォントが全て読み込まれてから描画を開始する。
+            // フォント未読み込みのまま描画すると Canvas の measureText がフォールバックフォントで
+            // 幅を測定してしまい、テキストのセンタリング位置がずれる。
+            await document.fonts.ready;
             sim.start();
 
             // イベントリスナーを設定

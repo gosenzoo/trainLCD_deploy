@@ -461,6 +461,8 @@
         // 再描画後にUIステータスを更新するコールバックを登録
         sim.onRender = (drawParams) => updateStatus(drawParams);
 
+        // フォント読み込み完了を待ってから描画（未読み込み時の measureText ずれを防ぐ）
+        await document.fonts.ready;
         // 初期描画
         sim.start();
 

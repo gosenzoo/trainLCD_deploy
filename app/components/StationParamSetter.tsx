@@ -9,7 +9,7 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
-import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
+import { IconArrowUp, IconArrowDown, IconTrash, IconPlus } from './SvgIcons'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -99,6 +99,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     // 路線情報フォームのアイコンピッカーで決定されたとき、選択中エントリの lineIconKey 末尾にキーを追加する
     const handleLineFormIconSelect = (key: string) => {
         if (transferSelectedIndex === null) return
+        // 選択中アイコンの右隣に挿入する。未選択の場合は末尾に追加する
+        const insertAt = selectedLineIconIndex !== null ? selectedLineIconIndex + 1 : null
         setSetting(prev => {
             const _setting = structuredClone(prev)
             selectedIndexes.forEach(ind => {
@@ -106,11 +108,17 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 if (!station || !station.transfers[transferSelectedIndex]) return
                 ensureTransferLine(station.transfers[transferSelectedIndex])
                 const keys = [...(station.transfers[transferSelectedIndex].line.lineIconKey || [])]
-                keys.push(key)
+                if (insertAt !== null && insertAt <= keys.length) {
+                    keys.splice(insertAt, 0, key)
+                } else {
+                    keys.push(key)
+                }
                 station.transfers[transferSelectedIndex].line.lineIconKey = keys
             })
             return _setting
         })
+        // 挿入したアイコンを選択状態にする
+        setSelectedLineIconIndex(insertAt !== null ? insertAt : null)
         setLineFormIconPickerMode(null)
     }
 
@@ -396,12 +404,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     containerId="transferLineDisplayContainer"
                 />
                 <div className="btn-group" style={{marginTop: '4px', marginBottom: '6px'}}>
-                    {/* 上矢印・下矢印・削除(ゴミ箱) をSVGアイコンで表示 */}
+                    {/* 上矢印・下矢印・追加(+)・削除(ゴミ箱) をSVGアイコンで表示 */}
                     <button onClick={moveTransferUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
                     <button onClick={moveTransferDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
-                    <button onClick={deleteTransfer} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
                     {/* 選択行の直下（未選択時は末尾）に空エントリを挿入するボタン */}
-                    <button onClick={() => {
+                    <button className="btn-icon btn-primary" title="追加" onClick={() => {
                         const insertAt = transferSelectedIndex !== null ? transferSelectedIndex + 1 : transfersArr.length
                         const newEntry: transferItemType = { line: { lineIconKey: [], name: '', kana: '', eng: '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
                         const _setting = structuredClone(setting)
@@ -413,7 +420,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         setSetting(_setting)
                         // 挿入した行を選択状態にする
                         setTransferSelectedIndex(insertAt)
-                    }}>追加</button>
+                    }}><IconPlus/></button>
+                    <button onClick={deleteTransfer} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
                 </div>
 
                 {/* 選択中の乗換路線エントリの編集フォーム */}
@@ -432,12 +440,14 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                 {(() => {
                                     const keys = selectedItem?.line?.lineIconKey ?? []
                                     return (
-                                        <div style={{display: 'flex', flexDirection: 'row', gap: '4px', minHeight: '34px', flexWrap: 'nowrap', marginBottom: '4px'}}>
+                                        // overflowX: auto で横スクロール可能にし、要素が増えてもはみ出さないようにする
+                                        <div style={{overflowX: 'auto', width: '100%', marginBottom: '4px'}}>
+                                        <div style={{display: 'flex', flexDirection: 'row', gap: '4px', minHeight: '34px', flexWrap: 'nowrap'}}>
                                             {keys.map((key, i) => {
                                                 const iconParams = setting.iconDict[key]
                                                 const isSelected = selectedLineIconIndex === i
                                                 const cellStyle: React.CSSProperties = {
-                                                    border: isSelected ? '2px solid #0066cc' : '2px solid #ccc',
+                                                    border: isSelected ? '2px solid #0066cc' : 'none',
                                                     borderRadius: '3px',
                                                     cursor: 'pointer',
                                                     padding: '1px',
@@ -465,14 +475,15 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                                 <div style={{width: '34px', height: '34px', border: '2px dashed #ccc', borderRadius: '3px'}} />
                                             )}
                                         </div>
+                                        </div>
                                     )
                                 })()}
                                 <div className="btn-group">
-                                    <button onClick={() => setLineFormIconPickerMode('new')}>新規追加</button>
-                                    <button onClick={() => setLineFormIconPickerMode('list')}>リストから選択</button>
-                                    <button onClick={deleteLineIcon} disabled={selectedLineIconIndex === null}>削除</button>
-                                    <button onClick={() => moveLineIcon(-1)} disabled={selectedLineIconIndex === null}>左</button>
-                                    <button onClick={() => moveLineIcon(1)} disabled={selectedLineIconIndex === null}>右</button>
+                                    <button onClick={() => setLineFormIconPickerMode('new')} className="btn-primary">新規追加</button>
+                                    <button onClick={() => setLineFormIconPickerMode('list')} className="btn-primary">リストから追加</button>
+                                    <button onClick={deleteLineIcon} disabled={selectedLineIconIndex === null} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
+                                    <button onClick={() => moveLineIcon(-1)} disabled={selectedLineIconIndex === null}>◀</button>
+                                    <button onClick={() => moveLineIcon(1)} disabled={selectedLineIconIndex === null}>▶</button>
                                 </div>
                             </div>
                             <div className="form-row">
