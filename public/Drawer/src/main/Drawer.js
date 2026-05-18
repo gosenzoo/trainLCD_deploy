@@ -10,7 +10,7 @@ class Drawer {
     }
 
     // 初期化。全リソースはindex側でロード済みのものを受け取る
-    load(drawParams, iconList, numIconPresets, headerSVG, bodySVGMap) {
+    load(drawParams, iconList, numIconPresets, iconPresets, headerSVG, bodySVGMap) {
         this._drawParams = drawParams;
         this.iconList = iconList;
 
@@ -27,10 +27,12 @@ class Drawer {
             this._bodySVGCache.set(filename, bodySVG);
         }
 
-        // index側でロード済みのnumIconPresetsを受け取りNumIconDrawerを初期化
+        // index側でロード済みの各プリセットを受け取りDrawerを初期化
         this.numIconDrawer = new NumIconDrawer(numIconPresets);
-        // TextDrawer にnumIconDrawerを渡す（:iconKey: 形式のプリセットアイコン描画に使用）
-        this.textDrawer = new TextDrawer(this.iconList, this.numIconDrawer);
+        // iconDict内のプリセット型アイコン（{presetType,symbol,color}）の描画用
+        this.iconDrawer = new IconDrawer(iconPresets);
+        // TextDrawer に numIconDrawer と iconDrawer を渡す
+        this.textDrawer = new TextDrawer(this.iconList, this.numIconDrawer, this.iconDrawer);
     }
 
     // 現在のページのbodySVGを返す（drawParams.page未設定またはキャッシュ未ヒットはnull）

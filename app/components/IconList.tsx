@@ -6,7 +6,7 @@ import "../type"
 import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
-import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
@@ -25,7 +25,7 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
     const [iconPresetSymbol, setIconPresetSymbol] = useState<string>("")
     const [iconPresetColor, setIconPresetColor] = useState<string>("")
 
-    const presetIconDict = loadPresetNumIconTexts()
+    const presetIconDict = loadIconPresetTexts()
 
     const toBase64Utf8 = (str: string) => {
         return btoa(

@@ -12,8 +12,9 @@ class LcdSimulator {
      * @param {Drawer}    drawer          - Drawerインスタンス（未load可）
      * @param {SVGElement} svgEl          - 描画先のSVG要素
      * @param {object}    drawerResources - Drawerのload用リソース一式
-     *   @param {object}  drawerResources.iconList        - アイコン辞書
+     *   @param {object}  drawerResources.iconList        - アイコン辞書（settings.iconDict）
      *   @param {object}  drawerResources.numIconPresets  - 数字アイコンSVGマップ
+     *   @param {object}  drawerResources.iconPresets     - アイコンプリセットSVGマップ
      *   @param {SVGElement} drawerResources.headerSVG    - ヘッダーSVG
      *   @param {Map}     drawerResources.bodySVGMap      - ボディSVGマップ
      */
@@ -31,6 +32,7 @@ class LcdSimulator {
             initialParams,
             drawerResources.iconList,
             drawerResources.numIconPresets,
+            drawerResources.iconPresets,
             drawerResources.headerSVG,
             drawerResources.bodySVGMap
         );

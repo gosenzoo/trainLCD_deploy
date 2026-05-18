@@ -1,8 +1,10 @@
 class TextDrawer{
-    constructor(iconDict, numIconDrawer){
+    constructor(iconDict, numIconDrawer, iconDrawer = null){
         this.iconDict = iconDict; //アイコン辞書を保存
         this.capRatioCache = {};
         this.numIconDrawer = numIconDrawer;
+        // プリセット型アイコン（iconParamsType）の描画に使用するIconDrawer
+        this.iconDrawer = iconDrawer;
     }
 
     // 統合テキスト描画関数
@@ -282,13 +284,19 @@ class TextDrawer{
                     iconElem.setAttribute("height", String(height));
                     iconTextElem.appendChild(iconElem);
                 } else {
-                    //プリセットなら
+                    // プリセット型アイコン（iconDictにキーが存在しない場合はスキップ）
                     const iconParams = this.iconDict[unit.content];
-                    const geometory = { x: nowX, y: y, width: unitWidth, height: height };
-                    const icon = this.numIconDrawer.createNumIconFromPreset(
-                        iconParams.presetType, iconParams.symbol, "", iconParams.color, geometory, 0
-                    );
-                    iconTextElem.appendChild(icon);
+                    if (iconParams) {
+                        const geometory = { x: nowX, y: y, width: unitWidth, height: height };
+                        // IconDrawer が利用可能な場合はそちらで描画する
+                        let icon = null;
+                        if (this.iconDrawer) {
+                            icon = this.iconDrawer.createIcon(
+                                iconParams.presetType, iconParams.symbol, iconParams.color, geometory
+                            );
+                        }
+                        if (icon) iconTextElem.appendChild(icon);
+                    }
                 }
             }
 

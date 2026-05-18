@@ -16,8 +16,6 @@ class TextBoxObj extends LcdPartsObj {
 
         // lcdTextテンプレートをdrawParamsとargsで展開
         const lcdText = svgDom.getAttribute('lcdText') || '';
-        console.log(svgDom)
-        console.log(lcdText);
         this.text = LcdPartsObj.resolveTemplate(lcdText, drawParams, args);
 
         // data-styleを解析（TextDrawerが内部で変更するためコンストラクタ段階でパース）

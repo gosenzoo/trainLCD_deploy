@@ -24,7 +24,7 @@ npm run start    # 本番サーバー起動
 npm run lint     # Next.js リント実行
 
 # SVGプリセットを追加・変更した後にアイコン型定義を再生成する
-node scripts/generatePresetNumIconTexts.js
+node scripts/generateIconPresetTexts.js
 ```
 
 ## アーキテクチャ
@@ -52,7 +52,7 @@ node scripts/generatePresetNumIconTexts.js
 
 ### アイコン生成パイプライン
 
-SVGプリセットは `assets/presetNumIcons/` に配置（例：`I_JR_east.svg`、`I_tokyu.svg`）。`scripts/generatePresetNumIconTexts.js` を実行すると、`src/generated/presetNumIconTexts.ts` にTypeScript定数としてコンパイルされる。アイコンプリセットを追加・変更した際はこのスクリプトを実行すること。
+SVGプリセットは `assets/iconPresets/` に配置（例：`I_JR_east.svg`、`I_tokyu.svg`）。`scripts/generateIconPresetTexts.js` を実行すると、`src/generated/iconPresetTexts.ts` にTypeScript定数としてコンパイルされる。アイコンプリセットを追加・変更した際はこのスクリプトを実行すること。`I_*`（アイコンプリセット）と `N_*`（数字アイコンプリセット）の両方を含む。
 
 クライアントサイドのアイコン描画は `app/modules/createIconFromPreset.client.ts` で処理（`.client.ts` サフィックス = ブラウザ専用コード）。
 

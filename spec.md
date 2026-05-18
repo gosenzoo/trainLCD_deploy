@@ -602,7 +602,13 @@ type GenericItemListProps<T> = {
 | 駅名 | `station.name` | テキスト |
 | 駅名英語 | `station.eng` | テキスト |
 
-フォームの下に **「基本設定情報を反映」ボタン** を配置する。クリックすると選択中駅の `station.name` / `station.eng` を自駅の名前・英語名で上書きする。
+フォームの下に **「基本設定情報を反映」ボタン** を配置する。クリックすると以下を実行する。
+
+1. 選択中駅の `station.name` / `station.eng` を自駅の基本設定（名前・英語名）で上書きする。
+2. 選択中の乗換エントリの `line.lineIconKey` が指すアイコン（`iconDict` の値）が **オブジェクト型**（`{presetType, symbol, color}`）の場合：
+   - `station.color` ← アイコンオブジェクトの `color`
+   - `station.symbol` ← アイコンオブジェクトの `symbol`
+   - `station.type` ← アイコンオブジェクトの `presetType` が `I_*` 形式のとき `N_` + 残部（例: `I_tokyu` → `N_tokyu`）を `numberIndexes` に照合し、存在すればセット（存在しない場合は変更しない）
 
 追加操作は下記の「接続路線を追加」ボタンで行う。テキストボックスによる直接編集は廃止。
 
@@ -1198,9 +1204,9 @@ classDiagram
         +createIconFromPreset(presets, key, symbolText, numberText, lineColor, outlineWidth) SVGElement|null
     }
 
-    class loadPresetNumIconTexts {
+    class loadIconPresetTexts {
         <<module>>
-        +loadPresetNumIconTexts() Record~string, string~
+        +loadIconPresetTexts() Record~string, string~
     }
 
     class presetIndex {
@@ -1219,10 +1225,10 @@ classDiagram
         +presetIconMaker(svgDoc, color, symbol) Document
     }
 
-    class generatePresetNumIconTexts {
+    class generateIconPresetTexts {
         <<build script>>
-        +assets/presetNumIcons/*.svg を読み込み
-        +src/generated/presetNumIconTexts.ts を生成
+        +assets/iconPresets/*.svg を読み込み（I_* および N_* 両対応）
+        +src/generated/iconPresetTexts.ts を生成
     }
 
     class listOperations {
@@ -1241,8 +1247,8 @@ classDiagram
     IconList ..> createIconFromPreset : アイコンプレビュー
     StationParamSetter ..> KanaConverter : かな→ローマ字自動変換
     LineList ..> KanaConverter : かな→ローマ字自動変換
-    createIconFromPreset ..> loadPresetNumIconTexts : SVGプリセット取得
-    loadPresetNumIconTexts ..> generatePresetNumIconTexts : 生成済みtsを参照
+    createIconFromPreset ..> loadIconPresetTexts : SVGプリセット取得
+    loadIconPresetTexts ..> generateIconPresetTexts : 生成済みtsを参照
     IconList ..> presetIndex : プリセット一覧取得
     OperationForm ..> presetIndex : ナンバリング一覧取得
     StationParamSetter ..> presetIndex : ナンバリング一覧取得
@@ -1251,12 +1257,12 @@ classDiagram
 | モジュール | 説明 |
 |---|---|
 | `createIconFromPreset.client.ts` | SVGプリセットにシンボル文字・路線色を合成してSVG要素を返す（ブラウザ専用） |
-| `loadPresetNumIconTexts.ts` | `src/generated/presetNumIconTexts.ts` から全SVGプリセットを辞書形式で返す |
+| `loadIconPresetTexts.ts` | `src/generated/iconPresetTexts.ts` から全SVGプリセット（I_* / N_*）を辞書形式で返す |
 | `presetIndex.ts` | アイコン・ナンバリングプリセットの key/name リスト定義 |
 | `KanaConverter.tsx` | ひらがな/カタカナ → ローマ字変換（駅名・路線名の英語自動補完） |
 | `presetIconMaker.tsx` | SVG DOM にカラー・シンボルを適用するユーティリティ |
 | `listOperations.ts` | リスト並び替え共通ユーティリティ（配列系・辞書系それぞれの上下移動関数） |
-| `generatePresetNumIconTexts.js` | ビルド用スクリプト。`assets/presetNumIcons/*.svg` を読み込み TypeScript ファイルを生成 |
+| `generateIconPresetTexts.js` | ビルド用スクリプト。`assets/iconPresets/*.svg`（I_* / N_* 両対応）を読み込み TypeScript ファイルを生成 |
 
 ---
 
@@ -1896,7 +1902,7 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 
 #### デバッグ環境での読み込み
 
-`drawParams.json` に `numIconPresetKeys` 配列を追加し、`Drawer.load()` で drawParams ロード後に各キーの SVG プリセットを `/presetNumIcons/${key}.svg` から fetch して `NumIconDrawer` を初期化する。
+`drawParams.json` に `numIconPresetKeys` 配列を追加し、`Drawer.load()` で drawParams ロード後に各キーの SVG プリセットを `/iconPresets/${key}.svg` から fetch して `NumIconDrawer` を初期化する。
 
 #### ファイル変更一覧
 

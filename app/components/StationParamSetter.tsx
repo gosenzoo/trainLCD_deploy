@@ -4,7 +4,7 @@ import kanaToAlphabet from "../modules/KanaConverter"
 import { text } from 'stream/consumers'
 import { iconIndexes, numberIndexes } from '../modules/presetIndex'
 import GenericItemList, { ColumnDef } from './GenericItemList'
-import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
+import { loadIconPresetTexts } from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
@@ -29,7 +29,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const [lineListPopupSelectedIndex, setLineListPopupSelectedIndex] = useState<number | null>(null)
     const [cachedTransferLines, setCachedTransferLines] = useState<transferLineType[]>([])
 
-    const presetIconDict = loadPresetNumIconTexts()
+    const presetIconDict = loadIconPresetTexts()
 
     const formUpdated = (e:any, field: stationMembers) => {
         if(!setting){
@@ -525,15 +525,37 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                     onChange={e => updateTransferStation('eng', e.target.value)}
                                 />
                             </div>
-                            {/* 選択中駅の駅名・駅名英語を乗換駅名フィールドにコピーする */}
+                            {/* 選択中駅の駅名・英語名、およびアイコンオブジェクト情報を乗換駅設定に反映する */}
                             <button onClick={() => {
                                 if (transferSelectedIndex === null || !targetStation) return
                                 const _setting = structuredClone(setting)
+
+                                // 参照元となる乗換エントリのアイコンを取得する
+                                const sourceTransfer = targetStation.transfers[transferSelectedIndex]
+                                const lineIconKey = sourceTransfer?.line?.lineIconKey
+                                const iconValue = lineIconKey ? setting.iconDict[lineIconKey] : undefined
+                                // アイコンがオブジェクト型（プリセット形式）かどうかを判定する
+                                const isIconObject = !!iconValue && typeof iconValue !== 'string'
+
                                 selectedIndexes.forEach(ind => {
                                     const station = _setting.stationList[ind - 1]
                                     if (!station || !station.transfers[transferSelectedIndex]) return
+                                    // 駅名・英語名を自駅の基本設定から上書きする
                                     station.transfers[transferSelectedIndex].station.name = targetStation.name
                                     station.transfers[transferSelectedIndex].station.eng = targetStation.eng
+                                    // アイコンがオブジェクト型の場合、路線カラー・路線記号・ナンバリング記号を反映する
+                                    if (isIconObject) {
+                                        station.transfers[transferSelectedIndex].station.color = (iconValue as iconParamsType).color
+                                        station.transfers[transferSelectedIndex].station.symbol = (iconValue as iconParamsType).symbol
+                                        // I_xxx → N_xxx に変換し numberIndexes に存在すればセットする
+                                        const presetType = (iconValue as iconParamsType).presetType
+                                        if (presetType?.startsWith('I_')) {
+                                            const candidateType = 'N_' + presetType.slice(2)
+                                            if (numberIndexes.some(n => n.key === candidateType)) {
+                                                station.transfers[transferSelectedIndex].station.type = candidateType
+                                            }
+                                        }
+                                    }
                                 })
                                 setSetting(_setting)
                             }}>基本設定情報を反映</button>

@@ -5,7 +5,7 @@ import "../type"
 import kanaToAlphabet from '../modules/KanaConverter'
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
-import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
@@ -23,7 +23,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     // 路線記号ポップアップの表示モード（null: 非表示 / 'new': 新規追加 / 'list': リストから選択）
     const [iconPickerMode, setIconPickerMode] = useState<'new' | 'list' | null>(null)
 
-    const presetIconDict = loadPresetNumIconTexts()
+    const presetIconDict = loadIconPresetTexts()
 
     // lineDict のキー（文字列）をそのまま選択キーとして使用するため変換不要
     const handleRowClick = (key: string) => {

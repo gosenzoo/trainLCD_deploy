@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import "../type"
 import GenericItemList, { ColumnDef } from './GenericItemList'
-import { loadPresetNumIconTexts } from '../modules/loadPresetNumIconTexts'
+import { loadIconPresetTexts } from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 type IconListPopupProps = {
@@ -22,7 +22,7 @@ const IconListPopup: React.FC<IconListPopupProps> = ({
     // 選択中のアイコンキー
     const [listSelectedKey, setListSelectedKey] = useState<string>('')
 
-    const presetIconDict = loadPresetNumIconTexts()
+    const presetIconDict = loadIconPresetTexts()
 
     // リストのカラム定義（ID列 + アイコンプレビュー列）
     const listColumns: ColumnDef<string | iconParamsType>[] = [

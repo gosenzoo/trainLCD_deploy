@@ -25,6 +25,7 @@ class Controller {
      * @param {object[]} langParams.langIdList  - 言語IDと時間パラメータのリスト
      */
     constructor(settings, pageParams, langParams) {
+        console.log(settings)
         // ProgressController用パラメータをsettingsから抽出して初期化
         const progressParams = {
             stationList:   settings.stationList,

@@ -198,11 +198,11 @@
     }
 
     // numIconPresetSVGをキーごとにフェッチして { key: SVGElement } マップを返す
-    async function loadNumIconPresets(presetKeys) {
+    async function loadIconPresets(presetKeys) {
       const presets = {};
       await Promise.all(presetKeys.map(async key => {
         try {
-          presets[key] = await fetchSVG(`/presetNumIcons/${key}.svg`);
+          presets[key] = await fetchSVG(`/iconPresets/${key}.svg`);
         } catch (e) {
           console.warn(`numIcon preset not found: ${key}`);
         }
@@ -236,7 +236,7 @@
       pageNameList = loadedPageNameList;
       const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
         fetch('./iconList.json').then(r => r.json()),
-        loadNumIconPresets(numIconPresetKeys),
+        loadIconPresets(numIconPresetKeys),
         fetchSVG('./pageInput/tokyu/header/headerSVG.svg'),
         loadBodySVGs(pageNameList),
       ]);

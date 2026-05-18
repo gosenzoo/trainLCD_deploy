@@ -34,6 +34,7 @@
     <script src="./Drawer/src/utility/Animator.js"></script>
     <script src="./Drawer/src/utility/TextDrawer.js"></script>
     <script src="./Drawer/src/utility/NumIconDrawer.js"></script>
+    <script src="./Drawer/src/utility/IconDrawer.js"></script>
     <script src="./Drawer/src/utility/ExprParser.js"></script>
     <script src="./Drawer/src/utility/MulShadowUtil.js"></script>
     <script src="./Drawer/src/objects/LcdPartsObj.js"></script>
@@ -124,10 +125,10 @@
             return new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
         }
 
-        async function loadNumIconPresets(presetKeys) {
+        async function loadIconPresets(presetKeys) {
             const presets = {};
             await Promise.all(presetKeys.map(async key => {
-                try { presets[key] = await fetchSVG(`/presetNumIcons/${key}.svg`); } catch (e) {}
+                try { presets[key] = await fetchSVG(`/iconPresets/${key}.svg`); } catch (e) {}
             }));
             return presets;
         }
@@ -187,10 +188,17 @@
                 ...settings.operationList.map(op => op.destinationNumIconKey).filter(k => k),
             ])];
 
-            // Drawerリソースを並列フェッチ
-            const [iconList, numIconPresets, headerSVG, bodySVGMap] = await Promise.all([
-                fetch(`${DRAWER_BASE}/iconList.json`).then(r => r.json()),
-                loadNumIconPresets(numIconPresetKeys),
+            // iconDict 内のプリセット型アイコン（オブジェクト形式）の presetType を重複なしで収集する
+            const iconPresetKeys = [...new Set(
+                Object.values(settings.iconDict || {})
+                    .filter(v => v && typeof v !== 'string' && v.presetType)
+                    .map(v => v.presetType)
+            )];
+
+            // Drawerリソースを並列フェッチ（iconList.jsonはデバッグ用のため使用しない）
+            const [numIconPresets, iconPresets, headerSVG, bodySVGMap] = await Promise.all([
+                loadIconPresets(numIconPresetKeys),
+                loadIconPresets(iconPresetKeys),  // IconDrawer用プリセットSVGも同じパスからフェッチ
                 fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/header/headerSVG.svg`),
                 loadBodySVGs(pageNameList),
             ]);
@@ -209,7 +217,8 @@
 
             // LcdSimulatorを初期化して描画開始
             const drawer = new Drawer();
-            const drawerResources = { iconList, numIconPresets, headerSVG, bodySVGMap };
+            // アイコン辞書は settings.iconDict を使用する（iconList.json はデバッグ用のため使用しない）
+            const drawerResources = { iconList: settings.iconDict || {}, numIconPresets, iconPresets, headerSVG, bodySVGMap };
             sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, displaySVG, drawerResources);
             sim.start();
 

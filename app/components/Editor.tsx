@@ -11,13 +11,13 @@ import AccordionSection from './AccordionSection'
 import "../type"
 import initSettingObject from '../initSettingObject'
 
-import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 const Editor = () => {
     const [setting, setSetting] = useState<settingType>(initSettingObject.setting)
 
-    const [presetIconDict, setPresetIconDict] = useState<Record<string, string>>(loadPresetNumIconTexts());
+    const [presetIconDict, setPresetIconDict] = useState<Record<string, string>>(loadIconPresetTexts());
 
     // 表示タイプ状態を Editor で管理し、sticky ツールバーの「表示」ボタンから参照する
     const [displayType, setDisplayType] = useState<string>("tokyu")

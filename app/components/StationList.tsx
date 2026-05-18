@@ -6,7 +6,7 @@ import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
-import {loadPresetNumIconTexts} from '../modules/loadPresetNumIconTexts'
+import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
@@ -27,7 +27,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     // 駅プリセットポップアップの表示状態
     const [isPresetPopupOpen, setIsPresetPopupOpen] = useState<boolean>(false)
 
-    const presetIconDict = loadPresetNumIconTexts()
+    const presetIconDict = loadIconPresetTexts()
 
     // GenericItemList は 0-based string key を返す。
     // 内部では StationParamSetter・MapComponent との互換性のため 1-based number で管理し、

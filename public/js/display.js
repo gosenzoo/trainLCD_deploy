@@ -73,7 +73,7 @@ window.onload = async function(){
     await Promise.all(
         numIconKeyList.map(async (key) => {
             try {
-                const svgElement = await getSVGElementFromUrl(`/presetNumIcons/${key}.svg`);
+                const svgElement = await getSVGElementFromUrl(`/iconPresets/${key}.svg`);
                 numIconPresets[key] = svgElement;
             } catch(err){
                 return;
