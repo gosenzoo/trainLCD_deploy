@@ -271,17 +271,26 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         {
             header: '路線記号',
             isSelector: true,  // クリックで行選択
-            // 複数アイコンがある場合は先頭キーのみ表示する（テーブル表示は1列のみ）
+            // 4つ以上ある場合は先頭3つを表示し、残り数を "+N" で示す
             cell: (item) => {
-                const firstKey = (item.line?.lineIconKey ?? [])[0]
-                const iconParams = firstKey ? setting.iconDict[firstKey] : undefined
-                if (typeof iconParams === 'string') {
-                    return iconParams ? <img src={iconParams} alt="" width="24px" height="24px" /> : null
-                } else if (iconParams) {
-                    const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
-                    return html ? <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} /> : null
-                }
-                return null
+                const keys = item.line?.lineIconKey ?? []
+                const displayKeys = keys.length >= 4 ? keys.slice(0, 3) : keys
+                const remaining = keys.length >= 4 ? keys.length - 3 : 0
+                return (
+                    <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                        {displayKeys.map((key, ki) => {
+                            const iconParams = setting.iconDict[key]
+                            if (typeof iconParams === 'string') {
+                                return iconParams ? <img key={ki} src={iconParams} alt="" width="24px" height="24px" /> : null
+                            } else if (iconParams) {
+                                const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                                return html ? <svg key={ki} viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                            }
+                            return null
+                        })}
+                        {remaining > 0 && <span style={{fontSize: '11px', marginLeft: '2px'}}>+{remaining}</span>}
+                    </div>
+                )
             },
         },
         {

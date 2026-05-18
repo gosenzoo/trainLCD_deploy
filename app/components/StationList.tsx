@@ -187,23 +187,30 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         },
         {
             header: '乗換路線',
-            // transfers は transferItemType[] 。各エントリの line.lineIconKey をアイコンとして描画する。
+            // transfers は transferItemType[] 。路線ごとにアイコンをグループ化して描画する。
+            // 路線間は gap で区切り、1路線内の複数アイコンはくっつけて表示する。
             cell: (station) => (
-                <>
+                <div style={{display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center'}}>
                     {station.transfers.map((item, idx) => {
-                        // 複数アイコンがある場合は先頭キーのみ表示する
-                        const firstKey = (item.line?.lineIconKey ?? [])[0]
-                        if (!firstKey) return null
-                        const iconParams = setting.iconDict[firstKey]
-                        if (typeof iconParams === 'string') {
-                            return iconParams ? <img key={idx} src={iconParams} alt="" width="20px" height="20px" /> : null
-                        } else if (iconParams) {
-                            const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
-                            return html ? <svg key={idx} viewBox='0 0 225 225' width="20px" height="20px" dangerouslySetInnerHTML={{ __html: html }} /> : null
-                        }
-                        return null
+                        const keys = item.line?.lineIconKey ?? []
+                        if (keys.length === 0) return null
+                        return (
+                            // 1路線分のアイコン群を隙間なく横並びにする
+                            <div key={idx} style={{display: 'flex', flexDirection: 'row'}}>
+                                {keys.map((key, ki) => {
+                                    const iconParams = setting.iconDict[key]
+                                    if (typeof iconParams === 'string') {
+                                        return iconParams ? <img key={ki} src={iconParams} alt="" width="20px" height="20px" /> : null
+                                    } else if (iconParams) {
+                                        const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                                        return html ? <svg key={ki} viewBox='0 0 225 225' width="20px" height="20px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                                    }
+                                    return null
+                                })}
+                            </div>
+                        )
                     })}
-                </>
+                </div>
             ),
         },
         {
