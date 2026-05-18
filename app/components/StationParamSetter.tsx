@@ -19,11 +19,14 @@ type stationParamsSetterProps = {
     activeSection: 'basic' | 'defaultLine' | 'transfersDisp' | 'platform'
 }
 
+
 const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes, activeSection}) => {
     // 路線情報フォームのアイコンピッカー用
     const [lineFormIconPickerMode, setLineFormIconPickerMode] = useState<'new' | 'list' | null>(null)
     // 乗換路線リストの選択インデックス（0-based、null: 未選択）
     const [transferSelectedIndex, setTransferSelectedIndex] = useState<number | null>(null)
+    // 路線記号アイコンリストの選択インデックス（0-based、null: 未選択）
+    const [selectedLineIconIndex, setSelectedLineIconIndex] = useState<number | null>(null)
     // 「リストから追加」ポップアップ
     const [isLineListPopupOpen, setIsLineListPopupOpen] = useState<boolean>(false)
     const [lineListPopupSelectedIndex, setLineListPopupSelectedIndex] = useState<number | null>(null)
@@ -65,8 +68,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             ;(station.transfers || []).forEach((t: transferItemType) => {
                 if (!t.line) return
                 // 全フィールドが空の場合はスキップする
-                if (!t.line.lineIconKey && !t.line.name && !t.line.kana && !t.line.eng) return
-                const key = `${t.line.lineIconKey}|${t.line.name}|${t.line.kana}|${t.line.eng}`
+                if (!t.line.lineIconKey?.length && !t.line.name && !t.line.kana && !t.line.eng) return
+                const key = `${(t.line.lineIconKey || []).join(',')}|${t.line.name}|${t.line.kana}|${t.line.eng}`
                 if (!seen.has(key)) {
                     seen.add(key)
                     lines.push({ ...t.line })
@@ -93,22 +96,72 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         setIsLineListPopupOpen(false)
     }
 
-    // 路線情報フォームのアイコンピッカーで決定されたとき、選択中エントリの line.lineIconKey を更新する
+    // 路線情報フォームのアイコンピッカーで決定されたとき、選択中エントリの lineIconKey 末尾にキーを追加する
     const handleLineFormIconSelect = (key: string) => {
-        updateTransferLine('lineIconKey', key)
+        if (transferSelectedIndex === null) return
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(ind => {
+                const station = _setting.stationList[ind - 1]
+                if (!station || !station.transfers[transferSelectedIndex]) return
+                ensureTransferLine(station.transfers[transferSelectedIndex])
+                const keys = [...(station.transfers[transferSelectedIndex].line.lineIconKey || [])]
+                keys.push(key)
+                station.transfers[transferSelectedIndex].line.lineIconKey = keys
+            })
+            return _setting
+        })
         setLineFormIconPickerMode(null)
+    }
+
+    // 路線記号アイコンリストで選択中のアイコンを削除する
+    const deleteLineIcon = () => {
+        if (transferSelectedIndex === null || selectedLineIconIndex === null) return
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(ind => {
+                const station = _setting.stationList[ind - 1]
+                if (!station || !station.transfers[transferSelectedIndex]) return
+                ensureTransferLine(station.transfers[transferSelectedIndex])
+                const keys = [...(station.transfers[transferSelectedIndex].line.lineIconKey || [])]
+                keys.splice(selectedLineIconIndex, 1)
+                station.transfers[transferSelectedIndex].line.lineIconKey = keys
+            })
+            return _setting
+        })
+        setSelectedLineIconIndex(null)
+    }
+
+    // 路線記号アイコンリストで選択中のアイコンを左右に移動する
+    const moveLineIcon = (dir: -1 | 1) => {
+        if (transferSelectedIndex === null || selectedLineIconIndex === null) return
+        setSetting(prev => {
+            const _setting = structuredClone(prev)
+            selectedIndexes.forEach(ind => {
+                const station = _setting.stationList[ind - 1]
+                if (!station || !station.transfers[transferSelectedIndex]) return
+                ensureTransferLine(station.transfers[transferSelectedIndex])
+                const keys = [...(station.transfers[transferSelectedIndex].line.lineIconKey || [])]
+                const newIdx = selectedLineIconIndex + dir
+                if (newIdx < 0 || newIdx >= keys.length) return
+                ;[keys[selectedLineIconIndex], keys[newIdx]] = [keys[newIdx], keys[selectedLineIconIndex]]
+                station.transfers[transferSelectedIndex].line.lineIconKey = keys
+            })
+            return _setting
+        })
+        setSelectedLineIconIndex(prev => prev !== null ? prev + dir : null)
     }
 
     // 旧形式エントリ（line が未定義）を line オブジェクトで初期化するヘルパー
     const ensureTransferLine = (t: any): void => {
         if (!t.line) {
-            t.line = { lineIconKey: '', name: '', kana: '', eng: '' }
+            t.line = { lineIconKey: [], name: '', kana: '', eng: '' }
         }
     }
 
     // 選択中の乗換路線エントリの line フィールドを更新する
     // functional updater を使い、IconNewPopup の setSetting と競合しないようにする
-    const updateTransferLine = (field: 'lineIconKey' | 'name' | 'kana' | 'eng', value: string) => {
+    const updateTransferLine = (field: 'name' | 'kana' | 'eng', value: string) => {
         if (transferSelectedIndex === null) return
         setSetting(prev => {
             const _setting = structuredClone(prev)
@@ -210,9 +263,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         {
             header: '路線記号',
             isSelector: true,  // クリックで行選択
-            // item.line.lineIconKey を直接参照（lineDictへの参照は使わない）
+            // 複数アイコンがある場合は先頭キーのみ表示する（テーブル表示は1列のみ）
             cell: (item) => {
-                const iconParams = item.line?.lineIconKey ? setting.iconDict[item.line.lineIconKey] : undefined
+                const firstKey = (item.line?.lineIconKey ?? [])[0]
+                const iconParams = firstKey ? setting.iconDict[firstKey] : undefined
                 if (typeof iconParams === 'string') {
                     return iconParams ? <img src={iconParams} alt="" width="24px" height="24px" /> : null
                 } else if (iconParams) {
@@ -349,7 +403,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     {/* 選択行の直下（未選択時は末尾）に空エントリを挿入するボタン */}
                     <button onClick={() => {
                         const insertAt = transferSelectedIndex !== null ? transferSelectedIndex + 1 : transfersArr.length
-                        const newEntry: transferItemType = { line: { lineIconKey: '', name: '', kana: '', eng: '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                        const newEntry: transferItemType = { line: { lineIconKey: [], name: '', kana: '', eng: '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
                         const _setting = structuredClone(setting)
                         selectedIndexes.forEach(ind => {
                             const station = _setting.stationList[ind - 1]
@@ -372,27 +426,54 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         {/* ── 乗換路線設定（路線記号〜路線名英語） ── */}
                         <fieldset className={isFormEnabled ? '' : 'disp-config-disabled'} style={{marginBottom: '6px'}}>
                             <legend>乗換路線設定</legend>
-                            <div className="form-row">
+                            <div className="form-row" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
                                 <label>路線記号</label>
-                                {/* 現在設定中のアイコンをプレビュー表示し、ピッカーボタンで変更する */}
+                                {/* 登録アイコンを横並びで表示するリスト（1行複数列、ヘッダーなし、セル選択可能） */}
                                 {(() => {
-                                    const iconParams = selectedItem?.line?.lineIconKey
-                                        ? setting.iconDict[selectedItem.line.lineIconKey]
-                                        : undefined
-                                    if (typeof iconParams === 'string') {
-                                        return iconParams
-                                            ? <img src={iconParams} alt="" width="30px" height="30px" />
-                                            : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
-                                    } else if (iconParams) {
-                                        const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
-                                        return html
-                                            ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} />
-                                            : <span style={{display:'inline-block', width:'30px', height:'30px'}} />
-                                    }
-                                    return <span style={{display:'inline-block', width:'30px', height:'30px'}} />
+                                    const keys = selectedItem?.line?.lineIconKey ?? []
+                                    return (
+                                        <div style={{display: 'flex', flexDirection: 'row', gap: '4px', minHeight: '34px', flexWrap: 'nowrap', marginBottom: '4px'}}>
+                                            {keys.map((key, i) => {
+                                                const iconParams = setting.iconDict[key]
+                                                const isSelected = selectedLineIconIndex === i
+                                                const cellStyle: React.CSSProperties = {
+                                                    border: isSelected ? '2px solid #0066cc' : '2px solid #ccc',
+                                                    borderRadius: '3px',
+                                                    cursor: 'pointer',
+                                                    padding: '1px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: '34px',
+                                                    height: '34px',
+                                                    boxSizing: 'border-box',
+                                                }
+                                                let content: React.ReactNode = null
+                                                if (typeof iconParams === 'string') {
+                                                    content = iconParams ? <img src={iconParams} alt="" width="30px" height="30px" /> : null
+                                                } else if (iconParams) {
+                                                    const html = createNumIconFromPreset(presetIconDict, iconParams.presetType, iconParams.symbol, '', iconParams.color)?.outerHTML
+                                                    content = html ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: html }} /> : null
+                                                }
+                                                return (
+                                                    <div key={i} style={cellStyle} onClick={() => setSelectedLineIconIndex(isSelected ? null : i)}>
+                                                        {content}
+                                                    </div>
+                                                )
+                                            })}
+                                            {keys.length === 0 && (
+                                                <div style={{width: '34px', height: '34px', border: '2px dashed #ccc', borderRadius: '3px'}} />
+                                            )}
+                                        </div>
+                                    )
                                 })()}
-                                <button onClick={() => setLineFormIconPickerMode('new')}>新規追加</button>
-                                <button onClick={() => setLineFormIconPickerMode('list')}>リストから選択</button>
+                                <div className="btn-group">
+                                    <button onClick={() => setLineFormIconPickerMode('new')}>新規追加</button>
+                                    <button onClick={() => setLineFormIconPickerMode('list')}>リストから選択</button>
+                                    <button onClick={deleteLineIcon} disabled={selectedLineIconIndex === null}>削除</button>
+                                    <button onClick={() => moveLineIcon(-1)} disabled={selectedLineIconIndex === null}>左</button>
+                                    <button onClick={() => moveLineIcon(1)} disabled={selectedLineIconIndex === null}>右</button>
+                                </div>
                             </div>
                             <div className="form-row">
                                 <label>路線名</label>
@@ -440,7 +521,9 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                                         header: '路線記号',
                                                         isSelector: true,
                                                         cell: (line) => {
-                                                            const iconParams = line.lineIconKey ? setting.iconDict[line.lineIconKey] : undefined
+                                                            // 先頭キーのみ表示する
+                                                            const firstKey = (line.lineIconKey ?? [])[0]
+                                                            const iconParams = firstKey ? setting.iconDict[firstKey] : undefined
                                                             if (typeof iconParams === 'string') {
                                                                 return iconParams ? <img src={iconParams} alt="" width="24px" height="24px" /> : null
                                                             } else if (iconParams) {
@@ -530,10 +613,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                 if (transferSelectedIndex === null || !targetStation) return
                                 const _setting = structuredClone(setting)
 
-                                // 参照元となる乗換エントリのアイコンを取得する
+                                // 参照元となる乗換エントリの先頭アイコンキーを取得する
                                 const sourceTransfer = targetStation.transfers[transferSelectedIndex]
-                                const lineIconKey = sourceTransfer?.line?.lineIconKey
-                                const iconValue = lineIconKey ? setting.iconDict[lineIconKey] : undefined
+                                const firstKey = (sourceTransfer?.line?.lineIconKey ?? [])[0]
+                                const iconValue = firstKey ? setting.iconDict[firstKey] : undefined
                                 // アイコンがオブジェクト型（プリセット形式）かどうかを判定する
                                 const isIconObject = !!iconValue && typeof iconValue !== 'string'
 
@@ -646,10 +729,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     targetStation.transfers.forEach((item: transferItemType) => {
                         const line = item.line
                         if (!line) return
-                        if (line.lineIconKey) transferText += `:${line.lineIconKey}:`
+                        // lineIconKey 配列の各要素を :key: で囲んで結合する
+                        const iconKeyStr = (line.lineIconKey || []).map((k: string) => `:${k}:`).join('')
+                        if (iconKeyStr) transferText += iconKeyStr
                         transferText += line.name;
                         transferText += "\n";
-                        if (line.lineIconKey) transferTextEng += `:${line.lineIconKey}:`
+                        if (iconKeyStr) transferTextEng += iconKeyStr
                         transferTextEng += line.eng;
                         transferTextEng += "\n";
                     });

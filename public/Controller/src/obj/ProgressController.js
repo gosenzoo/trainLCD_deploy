@@ -831,7 +831,13 @@ class ProgressController {
         const defaultStation = { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" };
         // 新形式: t.line を直接使用
         if (t.line) {
-            const lineIcon = t.line.lineIconKey ? `:${t.line.lineIconKey}:` : "";
+            // lineIconKey は string[]（新）または string（旧形式後方互換）の両方に対応する
+            let lineIcon = "";
+            if (Array.isArray(t.line.lineIconKey)) {
+                lineIcon = t.line.lineIconKey.map(k => `:${k}:`).join('');
+            } else if (t.line.lineIconKey) {
+                lineIcon = `:${t.line.lineIconKey}:`;
+            }
             return { lineIcon, name: t.line.name || "", eng: t.line.eng || "", station: t.station ?? defaultStation };
         }
         // 旧形式: t.lineId で lineDict を参照（後方互換）

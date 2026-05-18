@@ -191,9 +191,10 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             cell: (station) => (
                 <>
                     {station.transfers.map((item, idx) => {
-                        const lineIconKey = item.line?.lineIconKey
-                        if (!lineIconKey) return null
-                        const iconParams = setting.iconDict[lineIconKey]
+                        // 複数アイコンがある場合は先頭キーのみ表示する
+                        const firstKey = (item.line?.lineIconKey ?? [])[0]
+                        if (!firstKey) return null
+                        const iconParams = setting.iconDict[firstKey]
                         if (typeof iconParams === 'string') {
                             return iconParams ? <img key={idx} src={iconParams} alt="" width="20px" height="20px" /> : null
                         } else if (iconParams) {

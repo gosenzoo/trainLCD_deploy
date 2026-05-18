@@ -57,7 +57,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                                 station.transfers = station.transfers
                                     ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
                                         const lineData = readData.lineDict?.[id]
-                                        return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                        return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
                                     })
                                     : [];
                             } else if (Array.isArray(station.transfers)) {
@@ -65,7 +65,11 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                                 station.transfers = station.transfers.map((t: any) => {
                                     if (t.lineId !== undefined && t.line === undefined) {
                                         const lineData = readData.lineDict?.[t.lineId]
-                                        return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                        return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                    }
+                                    // lineIconKey が旧形式（文字列）の場合は配列に正規化する
+                                    if (t.line && typeof t.line.lineIconKey === 'string') {
+                                        t = { ...t, line: { ...t.line, lineIconKey: t.line.lineIconKey ? [t.line.lineIconKey] : [] } }
                                     }
                                     return t
                                 })
@@ -154,7 +158,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                             station.transfers = station.transfers
                                 ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {
                                     const lineData = setting.lineDict?.[id]
-                                    return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                    return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
                                 })
                                 : [];
                         } else if (Array.isArray(station.transfers)) {
@@ -162,7 +166,11 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                             station.transfers = station.transfers.map((t: any) => {
                                 if (t.lineId !== undefined && t.line === undefined) {
                                     const lineData = setting.lineDict?.[t.lineId]
-                                    return { line: { lineIconKey: lineData?.lineIconKey ?? '', name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                    return { line: { lineIconKey: lineData?.lineIconKey ? [lineData.lineIconKey] : [], name: lineData?.name ?? '', kana: lineData?.kana ?? '', eng: lineData?.eng ?? '' }, station: t.station ?? { isDraw: false, type: '', symbol: '', color: '', number: '', name: '', eng: '' } }
+                                }
+                                // lineIconKey が旧形式（文字列）の場合は配列に正規化する
+                                if (t.line && typeof t.line.lineIconKey === 'string') {
+                                    t = { ...t, line: { ...t.line, lineIconKey: t.line.lineIconKey ? [t.line.lineIconKey] : [] } }
                                 }
                                 return t
                             })

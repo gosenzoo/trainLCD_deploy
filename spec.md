@@ -116,7 +116,7 @@ classDiagram
     }
 
     class transferLineType {
-        +string lineIconKey
+        +string[] lineIconKey
         +string name
         +string kana
         +string eng
@@ -245,7 +245,7 @@ classDiagram
 #### `transferLineType` — 乗換路線情報
 | フィールド | 型 | 説明 |
 |---|---|---|
-| `lineIconKey` | string | 路線アイコンの `iconDict` キー |
+| `lineIconKey` | string[] | 路線アイコンの `iconDict` キーの配列。複数アイコンを順番に保持する。旧形式（文字列）は読み込み時に1要素配列に自動変換する |
 | `name` | string | 路線名（日本語） |
 | `kana` | string | 路線名（かな） |
 | `eng` | string | 路線名（英語） |
@@ -563,7 +563,7 @@ type GenericItemListProps<T> = {
 
 | カラムヘッダー | 内容 | 備考 |
 |---|---|---|
-| 路線記号 | `item.line.lineIconKey` でアイコン描画 | `isSelector: true` |
+| 路線記号 | `item.line.lineIconKey` の **先頭キー** のみアイコン描画 | `isSelector: true` |
 | 路線名 | `item.line.name` | |
 | ナンバリング | `station.type/symbol/number/color` で `createNumIconFromPreset` 描画、フォールバックでテキスト | 24px |
 | 駅名 | `station.name` | |
@@ -586,10 +586,27 @@ type GenericItemListProps<T> = {
 
 | ラベル | フィールド | 入力型 | 備考 |
 |--------|-----------|--------|------|
-| 路線記号 | `item.line.lineIconKey` | アイコンピッカー | 4.6節と同じ形式 |
+| 路線記号 | `item.line.lineIconKey` | アイコンリスト + 操作ボタン | 下記「複数アイコン形式」参照 |
 | 路線名 | `item.line.name` | テキスト | |
 | 路線名かな | `item.line.kana` | テキスト | |
 | 路線名英語 | `item.line.eng` | テキスト | |
+
+##### 路線記号フォームの複数アイコン形式
+
+`lineIconKey: string[]` をそのまま配列として扱い、登録済みアイコンを **1 行横並びリスト** で表示する。
+
+- **リスト**: ヘッダーなし・1 行・複数列。各セルはクリックで選択可能（選択中セルをハイライト）。アイコン描画は `iconDict` から引いて表示（base64 → `<img>`、プリセット型 → SVG 30×30px）
+- **ボタン（リスト下）**: `新規追加` `リストから選択` `削除` `左` `右`
+  - `新規追加`: `IconNewPopup` を開き、確定したキーを配列末尾に追加する
+  - `リストから選択`: `IconListPopup` を開き、確定したキーを配列末尾に追加する
+  - `削除`: 選択中インデックスを配列から除去する
+  - `左` / `右`: 選択中インデックスの要素を配列内で入れ替えて移動する
+
+内部状態として `selectedLineIconIndex: number | null`（選択中アイコンのインデックス）を保持する。
+
+**テーブル・他箇所での表示**: データ作成画面の各テーブルでは `lineIconKey[0]`（先頭要素）のみ描画する。
+
+**drawParams 抽出時の変換（ProgressController.js）**: `lineIconKey` 配列の各要素を `:key:` で囲んで結合した文字列として `lineIcon` フィールドに格納する（例: `["M","Y"]` → `":M::Y:"`）。旧形式（文字列）は後方互換として `:key:` に変換する。
 
 **乗換駅情報フォーム**（「ナンバリング記号」以降）:
 
@@ -605,7 +622,7 @@ type GenericItemListProps<T> = {
 フォームの下に **「基本設定情報を反映」ボタン** を配置する。クリックすると以下を実行する。
 
 1. 選択中駅の `station.name` / `station.eng` を自駅の基本設定（名前・英語名）で上書きする。
-2. 選択中の乗換エントリの `line.lineIconKey` が指すアイコン（`iconDict` の値）が **オブジェクト型**（`{presetType, symbol, color}`）の場合：
+2. 選択中の乗換エントリの `line.lineIconKey` の **先頭キー** が指すアイコン（`iconDict` の値）が **オブジェクト型**（`{presetType, symbol, color}`）の場合：
    - `station.color` ← アイコンオブジェクトの `color`
    - `station.symbol` ← アイコンオブジェクトの `symbol`
    - `station.type` ← アイコンオブジェクトの `presetType` が `I_*` 形式のとき `N_` + 残部（例: `I_tokyu` → `N_tokyu`）を `numberIndexes` に照合し、存在すればセット（存在しない場合は変更しない）
@@ -687,6 +704,16 @@ type GenericItemListProps<T> = {
 | `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
 | `platform` | ホーム案内表示 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
 | `map` | マップ | 既存の MapComponent（現在開発中） |
+
+#### 「詳細路線図表示」タブの「登録路線情報を反映」ボタン仕様
+
+クリックすると、`transfers` の各エントリから `transferText` / `transferTextEng` を自動生成する。
+
+- 各エントリの `line.lineIconKey` は `:key1::key2:` 形式で格納されているため、**そのまま文字列として連結**する（`:` を付け直さない）
+- 旧形式（プレーン文字列 ＝ `:` を含まない）の場合は `:${lineIconKey}:` として埋め込む
+- 生成ロジック（1エントリあたり）:
+  - `transferText` += `line.lineIconKey`（空でなければ） + `line.name` + `"\n"`
+  - `transferTextEng` += `line.lineIconKey`（空でなければ） + `line.eng` + `"\n"`
 
 #### 「乗換一覧表示」タブの仕様
 

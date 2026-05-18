@@ -11,7 +11,7 @@ type transferStationType = {
 
 // 乗換路線情報（路線アイコン・名称を直接保持。lineDictへの参照ではなく値をそのまま保存する）
 type transferLineType = {
-    lineIconKey: string,
+    lineIconKey: string[],  // 複数アイコンキーの配列（Drawer側では各要素を :key: で囲んで結合して使用）
     name: string,
     kana: string,
     eng: string,
