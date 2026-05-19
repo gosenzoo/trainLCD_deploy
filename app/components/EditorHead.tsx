@@ -46,9 +46,12 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                         if (!readData.dispConfig) {
                             readData.dispConfig = structuredClone(initSettingObject.dispConfig);
                         }
-                        // dispConfig に pageList がない場合はデフォルト値を補完する
-                        if (!readData.dispConfig.pageList) {
-                            readData.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
+                        // dispConfig に pageDispList がない場合はデフォルト値を補完する
+                        if (!readData.dispConfig.pageDispList) {
+                            readData.dispConfig.pageDispList = structuredClone(initSettingObject.dispConfig.pageDispList);
+                        }
+                        if (readData.dispConfig.isPageAuto === undefined) {
+                            readData.dispConfig.isPageAuto = true;
                         }
                         // transfers の旧形式を新形式（line オブジェクト直接保持）に変換する
                         readData.stationList.forEach((station: any) => {
