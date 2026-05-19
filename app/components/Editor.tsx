@@ -33,8 +33,11 @@ const Editor = () => {
         if (!loaded.dispConfig) {
             loaded.dispConfig = structuredClone(initSettingObject.dispConfig);
         }
-        if (!loaded.dispConfig.pageList) {
-            loaded.dispConfig.pageList = structuredClone(initSettingObject.dispConfig.pageList);
+        if (!loaded.dispConfig.pageDispList) {
+            loaded.dispConfig.pageDispList = structuredClone(initSettingObject.dispConfig.pageDispList);
+        }
+        if (loaded.dispConfig.isPageAuto === undefined) {
+            loaded.dispConfig.isPageAuto = true;
         }
         loaded.stationList.forEach((station: any) => {
             if (typeof station.transfers === 'string') {

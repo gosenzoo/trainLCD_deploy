@@ -31,16 +31,22 @@ type langIdEntryType = {
     gapTime: number
 }
 
-// ページ表示エントリ（ページ名と表示時間の組）
-type pageEntryType = {
+// ページ表示エントリ（ページ名・表示時間・表示条件の組）
+// type: 0=無条件 / 1=乗換あり / 2=次運用あり（未実装） / 3=Message（未実装）
+type pageObjType = {
     pageName: string,
-    dispTime: number
+    dispTime: number,
+    type: number
 }
 
-// 表示設定（ページ一覧・言語ローテーション設定を保持）
+// pageState（0〜5）をキーにpageObjType[]を保持するページリスト辞書
+type pageDispListType = { [key: string]: pageObjType[] }
+
+// 表示設定（走行状態別ページリスト・言語ローテーション設定を保持）
 type dispConfigType = {
-    pageList: pageEntryType[],
-    langIdList: langIdEntryType[]
+    pageDispList: pageDispListType,
+    langIdList: langIdEntryType[],
+    isPageAuto: boolean  // true: タイマー自動切換え / false: ユーザー操作による手動切換え
 }
 
 type settingType = {
@@ -71,6 +77,7 @@ type operationType = {
     trainTypeSub: string,
     trainTypeSubEng: string,
     trainTypeColor: string,
+    trainTypeBackColor: string,
     lineLogo: string,
     lineColor: string,
     carNumber: string,
@@ -133,5 +140,5 @@ type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
 
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
-type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'lineLogo' | 'lineColor' | 
+type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
     'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'startStationInd'

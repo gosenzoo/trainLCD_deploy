@@ -11,6 +11,7 @@ class Drawer {
 
     // 初期化。全リソースはindex側でロード済みのものを受け取る
     load(drawParams, iconList, numIconPresets, iconPresets, headerSVG, bodySVGMap) {
+        console.log(drawParams);
         this._drawParams = drawParams;
         this.iconList = iconList;
 
@@ -323,7 +324,6 @@ class Drawer {
 
         // オブジェクトツリーを構築してgetElementで描画
         this.buildTree();
-        console.log(this.defaultLineRoot);
         const resolveValue = name => this._resolveValue(name);
         const ctx = { resolveValue, exprParser: this.exprParser, debug: this._debug };
 

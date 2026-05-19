@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import "../type"
 import GenericItemList, { ColumnDef } from './GenericItemList'
-import initSettingObject from '../initSettingObject'
+import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
+import ToggleSwitch from './ToggleSwitch'
 
 type dispConfigProps = {
     setting: settingType,
@@ -18,6 +19,12 @@ const AVAILABLE_PAGES = [
     "platform.svg",
 ]
 
+// pageStateの表示名（0〜5）
+const PAGE_STATE_LABELS = ['始発停車', '走行', '直前', '停車', '通過', '終点停車']
+
+// pageTypeの表示名（0〜3）
+const PAGE_TYPE_LABELS = ['無条件', '乗換あり', '次運用あり', 'Message']
+
 // 言語IDに対応する表示名（0:日本語, 1:ひらがな, 2:英語）
 const LANG_NAMES: Record<number, string> = {
     0: '日本語',
@@ -26,21 +33,24 @@ const LANG_NAMES: Record<number, string> = {
 }
 
 const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
-    // ページ設定の選択状態
+    // ページ設定の状態
+    const [selectedPageStateTab, setSelectedPageStateTab] = useState<number>(0)
     const [selectedPageIndex, setSelectedPageIndex] = useState<number | null>(null)
-    const [newPageName, setNewPageName] = useState<string>(AVAILABLE_PAGES[0])
 
     // 言語設定の選択状態
     const [selectedLangIndex, setSelectedLangIndex] = useState<number | null>(null)
 
-    const pageList   = setting.dispConfig?.pageList   ?? []
-    const langIdList = setting.dispConfig?.langIdList ?? []
+    const pageDispList = setting.dispConfig?.pageDispList ?? {}
+    const langIdList   = setting.dispConfig?.langIdList ?? []
+
+    // 現在タブのページリスト
+    const currentPageList: pageObjType[] = pageDispList[String(selectedPageStateTab)] ?? []
 
     // ============================================================
     // ページ設定操作
     // ============================================================
 
-    const pageColumns: ColumnDef<pageEntryType>[] = [
+    const pageColumns: ColumnDef<pageObjType>[] = [
         {
             header: 'ページ名',
             isSelector: true,
@@ -48,26 +58,42 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
         },
         {
             header: '表示時間(ms)',
-            cell: (row) => row.dispTime
+            cell: (row) => String(row.dispTime)
+        },
+        {
+            header: '表示条件',
+            cell: (row) => PAGE_TYPE_LABELS[row.type] ?? String(row.type)
         }
     ]
+
+    const handlePageStateTabChange = (tab: number) => {
+        setSelectedPageStateTab(tab)
+        setSelectedPageIndex(null)
+    }
 
     const handlePageRowClick = (key: string) => {
         const idx = Number(key)
         setSelectedPageIndex(prev => prev === idx ? null : idx)
     }
 
+    // 選択行の直下（未選択時は末尾）に新規エントリを挿入する
     const addPage = () => {
         const _setting = structuredClone(setting)
-        _setting.dispConfig.pageList.push({ pageName: newPageName, dispTime: initSettingObject.pageEntry.dispTime })
+        const list: pageObjType[] = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
+        const insertAt = selectedPageIndex !== null ? selectedPageIndex + 1 : list.length
+        list.splice(insertAt, 0, { pageName: AVAILABLE_PAGES[0], dispTime: 8000, type: 0 })
+        if (!_setting.dispConfig.pageDispList) _setting.dispConfig.pageDispList = {}
+        _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)
-        setSelectedPageIndex(_setting.dispConfig.pageList.length - 1)
+        setSelectedPageIndex(insertAt)
     }
 
     const deletePage = () => {
         if (selectedPageIndex === null) return
         const _setting = structuredClone(setting)
-        _setting.dispConfig.pageList.splice(selectedPageIndex, 1)
+        const list = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
+        list.splice(selectedPageIndex, 1)
+        _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)
         setSelectedPageIndex(null)
     }
@@ -75,31 +101,34 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
     const movePageUp = () => {
         if (selectedPageIndex === null || selectedPageIndex === 0) return
         const _setting = structuredClone(setting)
-        const list = _setting.dispConfig.pageList
-        ;[list[selectedPageIndex - 1], list[selectedPageIndex]] =
-            [list[selectedPageIndex], list[selectedPageIndex - 1]]
+        const list = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
+        ;[list[selectedPageIndex - 1], list[selectedPageIndex]] = [list[selectedPageIndex], list[selectedPageIndex - 1]]
+        _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)
         setSelectedPageIndex(selectedPageIndex - 1)
     }
 
     const movePageDown = () => {
-        if (selectedPageIndex === null || selectedPageIndex >= pageList.length - 1) return
+        if (selectedPageIndex === null || selectedPageIndex >= currentPageList.length - 1) return
         const _setting = structuredClone(setting)
-        const list = _setting.dispConfig.pageList
-        ;[list[selectedPageIndex], list[selectedPageIndex + 1]] =
-            [list[selectedPageIndex + 1], list[selectedPageIndex]]
+        const list = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
+        ;[list[selectedPageIndex], list[selectedPageIndex + 1]] = [list[selectedPageIndex + 1], list[selectedPageIndex]]
+        _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)
         setSelectedPageIndex(selectedPageIndex + 1)
     }
 
-    const updatePageDispTime = (value: string) => {
+    // 選択中エントリのフィールドを更新する
+    const updateSelectedPage = (field: keyof pageObjType, value: string | number) => {
         if (selectedPageIndex === null) return
         const _setting = structuredClone(setting)
-        _setting.dispConfig.pageList[selectedPageIndex].dispTime = Number(value)
+        const list = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
+        list[selectedPageIndex] = { ...list[selectedPageIndex], [field]: value }
+        _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)
     }
 
-    const selectedPage = selectedPageIndex !== null ? pageList[selectedPageIndex] : null
+    const selectedPage = selectedPageIndex !== null ? currentPageList[selectedPageIndex] : null
     const pageFormDisabled = selectedPage === null
 
     // ============================================================
@@ -124,7 +153,7 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
 
     const addLang = () => {
         const _setting = structuredClone(setting)
-        _setting.dispConfig.langIdList.push({ ...initSettingObject.langIdEntry })
+        _setting.dispConfig.langIdList.push({ langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 })
         setSetting(_setting)
         setSelectedLangIndex(_setting.dispConfig.langIdList.length - 1)
     }
@@ -155,46 +184,78 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
         <div>
             {/* ---- ページ設定 ---- */}
             <h3>ページ設定</h3>
-            <GenericItemList
-                columns={pageColumns}
-                rows={pageList.map((entry, i) => ({ key: String(i), data: entry }))}
-                selectedKeys={selectedPageIndex !== null ? [String(selectedPageIndex)] : []}
-                onRowClick={handlePageRowClick}
-                tableId="dispConfigPageTable"
-            />
-            <div className="btn-group">
-                <select value={newPageName} onChange={e => setNewPageName(e.target.value)}>
-                    {AVAILABLE_PAGES.map(name => (
-                        <option key={name} value={name}>{name}</option>
-                    ))}
-                </select>
-                <button className="btn-secondary" onClick={addPage}>追加</button>
-                <button
-                    className="btn-secondary"
-                    onClick={movePageUp}
-                    disabled={selectedPageIndex === null || selectedPageIndex === 0}
-                >↑ 上へ</button>
-                <button
-                    className="btn-secondary"
-                    onClick={movePageDown}
-                    disabled={selectedPageIndex === null || selectedPageIndex >= pageList.length - 1}
-                >↓ 下へ</button>
-                <button
-                    className="btn-danger"
-                    onClick={deletePage}
-                    disabled={selectedPageIndex === null}
-                >削除</button>
+            {/* pageStateタブ（6状態） */}
+            <div className="operation-tabs">
+                {PAGE_STATE_LABELS.map((label, i) => (
+                    <button
+                        key={i}
+                        onClick={() => handlePageStateTabChange(i)}
+                        className={`tab-btn${selectedPageStateTab === i ? ' active' : ''}`}
+                    >{label}</button>
+                ))}
             </div>
-
-            {/* ページ編集フォーム（非選択時グレーアウト） */}
-            <div className={`param-setter${pageFormDisabled ? ' disp-config-disabled' : ''}`}>
-                <div className="form-row">
-                    <label>表示時間(ms)</label>
-                    <input
-                        type="number"
-                        value={selectedPage?.dispTime ?? ''}
-                        disabled={pageFormDisabled}
-                        onChange={e => updatePageDispTime(e.target.value)}
+            <div className="tab-form-body">
+                <GenericItemList
+                    columns={pageColumns}
+                    rows={currentPageList.map((entry, i) => ({ key: String(i), data: entry }))}
+                    selectedKeys={selectedPageIndex !== null ? [String(selectedPageIndex)] : []}
+                    onRowClick={handlePageRowClick}
+                    tableId="dispConfigPageTable"
+                    containerId="dispConfigPageContainer"
+                />
+                {/* 操作ボタン（他リストと同じアイコン/色） */}
+                <div className="btn-group" style={{marginTop: '4px'}}>
+                    <button onClick={movePageUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>
+                    <button onClick={movePageDown} className="btn-icon" title="下に移動"><IconArrowDown/></button>
+                    <button onClick={addPage} className="btn-icon btn-primary" title="追加"><IconPlus/></button>
+                    <button onClick={deletePage} disabled={selectedPageIndex === null} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
+                </div>
+                {/* 編集フォーム（非選択時グレーアウト） */}
+                <div className={`param-setter${pageFormDisabled ? ' disp-config-disabled' : ''}`}>
+                    <div className="form-row">
+                        <label>ページ名</label>
+                        <select
+                            value={selectedPage?.pageName ?? AVAILABLE_PAGES[0]}
+                            disabled={pageFormDisabled}
+                            onChange={e => updateSelectedPage('pageName', e.target.value)}
+                        >
+                            {AVAILABLE_PAGES.map(name => (
+                                <option key={name} value={name}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-row">
+                        <label>表示時間(ms)</label>
+                        <input
+                            type="number"
+                            value={selectedPage?.dispTime ?? ''}
+                            disabled={pageFormDisabled}
+                            onChange={e => updateSelectedPage('dispTime', Number(e.target.value))}
+                        />
+                    </div>
+                    <div className="form-row">
+                        <label>表示条件</label>
+                        <select
+                            value={selectedPage?.type ?? 0}
+                            disabled={pageFormDisabled}
+                            onChange={e => updateSelectedPage('type', Number(e.target.value))}
+                        >
+                            {PAGE_TYPE_LABELS.map((label, i) => (
+                                <option key={i} value={i}>{label}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+                {/* ページ自動切換えトグル（グレーアウトなし・常時有効） */}
+                <div className="form-row" style={{marginTop: '8px'}}>
+                    <label>ページ自動切換え</label>
+                    <ToggleSwitch
+                        checked={setting.dispConfig?.isPageAuto ?? true}
+                        onChange={checked => {
+                            const _setting = structuredClone(setting)
+                            _setting.dispConfig.isPageAuto = checked
+                            setSetting(_setting)
+                        }}
                     />
                 </div>
             </div>
@@ -209,12 +270,8 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
                 tableId="dispConfigLangTable"
             />
             <div className="btn-group">
-                <button className="btn-secondary" onClick={addLang}>追加</button>
-                <button
-                    className="btn-danger"
-                    onClick={deleteLang}
-                    disabled={selectedLangIndex === null}
-                >削除</button>
+                <button className="btn-icon btn-primary" title="追加" onClick={addLang}><IconPlus/></button>
+                <button className="btn-icon btn-danger" title="削除" onClick={deleteLang} disabled={selectedLangIndex === null}><IconTrash/></button>
             </div>
 
             {/* 言語編集フォーム（非選択時グレーアウト） */}

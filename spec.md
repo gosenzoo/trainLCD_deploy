@@ -71,6 +71,7 @@ classDiagram
         +string trainTypeSub
         +string trainTypeSubEng
         +string trainTypeColor
+        +string trainTypeBackColor
         +string lineLogo
         +string lineColor
         +string carNumber
@@ -147,13 +148,15 @@ classDiagram
     }
 
     class dispConfigType {
-        +pageEntryType[] pageList
+        +pageDispListType pageDispList
         +langIdEntryType[] langIdList
+        +boolean isPageAuto
     }
 
-    class pageEntryType {
+    class pageObjType {
         +string pageName
         +number dispTime
+        +number type
     }
 
     class langIdEntryType {
@@ -176,7 +179,7 @@ classDiagram
     stationType --> lineType : lineId で参照（区間路線）
     stationType --> iconParamsType : numIconPresetKey で参照
     operationType --> iconParamsType : destinationNumIconKey で参照
-    dispConfigType "1" *-- "1..*" pageEntryType : pageList
+    dispConfigType "1" *-- "1..*" pageObjType : pageDispList (pageState→pageObj[])
     dispConfigType "1" *-- "1..*" langIdEntryType : langIdList
 ```
 
@@ -200,6 +203,7 @@ classDiagram
 | `trainType` / `trainTypeEng` | string | 列車種別（例: 急行 / Express） |
 | `trainTypeSub` / `trainTypeSubEng` | string | 種別補足テキスト |
 | `trainTypeColor` | string | 種別文字色 |
+| `trainTypeBackColor` | string | 種別背景色 |
 | `lineLogo` | string | 列車路線記号 |
 | `lineColor` | string | 列車路線色 |
 | `carNumber` | string | 現在の号車番号 |
@@ -280,14 +284,30 @@ classDiagram
 #### `dispConfigType` — 表示設定
 | フィールド | 型 | 説明 |
 |---|---|---|
-| `pageList` | `pageEntryType[]` | 表示するページのリスト（表示順） |
+| `pageDispList` | `pageDispListType` | 走行状態ごとのページリスト（`{ [pageState]: pageObjType[] }`） |
 | `langIdList` | `langIdEntryType[]` | 言語ローテーション設定リスト（順番に切り替え） |
+| `isPageAuto` | boolean | `true`: タイマーによる自動ページ切換え / `false`: ユーザー操作による手動切換え。デフォルト `true` |
 
-#### `pageEntryType` — ページ表示エントリ
+#### `pageDispListType` — ページ表示リスト
+キー: `pageState`（0〜5）、値: `pageObjType[]`。各走行状態のページ表示順リストを保持する。
+
+#### `pageObjType` — ページ表示エントリ
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` |
 | `dispTime` | number | このページを表示し続ける時間（ms） |
+| `type` | number | 表示条件（0: 無条件 / 1: nowStation.transfersがあれば / 2: 次のoperationがあれば（未実装） / 3: Messageがあれば（未実装）） |
+
+#### `pageState` — 走行状態
+| 値 | 意味 | 条件 |
+|---|---|---|
+| 0 | 始発停車 | posState=2, runState=1, isTerminal=false, isStart=true |
+| 1 | 走行 | posState=0, runState=0, isTerminal=false, isStart=false |
+| 2 | 直前 | posState=1, runState=0, isTerminal=false, isStart=false |
+| 3 | 停車 | posState=2, runState=1, isTerminal=false, isStart=false |
+| 4 | 通過 | posState=2, runState=0, isTerminal=false, isStart=false |
+| 5 | 終点停車 | posState=2, runState=1, isTerminal=true, isStart=false |
+| -1 | 無効 | 上記のいずれにも該当しない（本来取りえない） |
 
 #### `langIdEntryType` — 言語表示エントリ
 | フィールド | 型 | 説明 |
@@ -840,7 +860,9 @@ export function moveDictItemsDown<T>(
 
 #### 4.10.1 ページ設定（セクション上部）
 
-`pageList` を編集するテーブル。セクション内の最上部に配置する。
+`pageDispList` を走行状態ごとに編集するUI。セクション内の最上部に配置する。
+
+**pageStateタブ**: 6タブ（始発停車 / 走行 / 直前 / 停車 / 通過 / 終点停車）を表の上に配置し、表示・編集対象の `pageState` を切り替える。
 
 **利用可能なページ名（固定の選択肢）**:
 
@@ -857,28 +879,35 @@ export function moveDictItemsDown<T>(
 |---|---|---|
 | ページ名 | `pageName` | `isSelector: true`、クリックで行選択 |
 | 表示時間(ms) | `dispTime` | 数値 |
+| 表示条件 | `type` | 0: 無条件 / 1: 乗換あり / 2: 次運用あり / 3: Message |
 
-**ボタン**:
+**ボタン（テーブル直下・他リストと同じアイコン/色）**:
 
 | ボタン | 動作 |
 |--------|------|
-| 追加 | 利用可能なページ名を `<select>` で選択して末尾に追加（`dispTime` デフォルト: 8000） |
-| 削除 | 選択中のエントリを削除（`btn-danger`、未選択時は `disabled`） |
-| 上に移動 | 選択中のエントリを1つ上へ移動（未選択・先頭時は `disabled`） |
-| 下に移動 | 選択中のエントリを1つ下へ移動（未選択・末尾時は `disabled`） |
+| ↑（`btn-icon`） | 選択中エントリを1つ上へ移動 |
+| ↓（`btn-icon`） | 選択中エントリを1つ下へ移動 |
+| +（`btn-icon btn-primary`） | 選択行の直下（未選択時は末尾）に新規エントリを追加 |
+| ゴミ箱（`btn-icon btn-danger`） | 選択中エントリを削除 |
 
-**編集フォーム**: 非選択時もグレーアウト状態で常時表示。
+**編集フォーム（ボタンの下）**: 非選択時はグレーアウト。
 
 | ラベル | フィールド | 入力型 |
 |--------|-----------|--------|
+| ページ名 | `pageName` | `<select>`（AVAILABLE_PAGESから選択） |
 | 表示時間(ms) | `dispTime` | number |
+| 表示条件 | `type` | `<select>`（0〜3） |
+
+**ページ自動切換えトグル（編集フォームの下・常時有効）**:
+
+`dispConfig.isPageAuto` に対応するチェックボックス。ページ設定セクションの最下部に配置する。オン（`true`）でタイマー自動切換え、オフ（`false`）でユーザー操作による手動切換えになる。選択行の有無によるグレーアウトなし。
 
 **内部状態**:
 
 | state | 型 | 説明 |
 |-------|----|------|
+| `selectedPageStateTab` | `number` | 現在表示中のpageState（0〜5） |
 | `selectedPageIndex` | `number \| null` | 選択中のページエントリインデックス |
-| `newPageName` | `string` | 追加する選択中のページ名（`<select>` の値） |
 
 ---
 
@@ -2730,6 +2759,8 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 | `trainType` | `"普通"`（固定） |
 | `trainTypeEng` | `"Local"`（固定） |
 | `trainTypeColor` | `"#0185ff"`（固定） |
+| `trainTypeBackColor` | `""`（固定） |
+| `isStart` | `false`（固定） |
 
 ---
 

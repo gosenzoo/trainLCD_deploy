@@ -63,10 +63,10 @@
 
     <!-- 種別表示 -->
     <g lcdParts="group" isDraw="!isTerminal">
-      <g lcdParts="static" id="header-trainType">
-        <rect x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
-        <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="rgb(255, 51, 85)" />
-        <rect x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
+      <g lcdParts="group" id="header-trainType">
+        <rect lcdParts="static" x="21" y="22" width="363" height="108" rx="11" ry="11" fill="url(#outlineGradient)" />
+        <rect lcdParts="static" lcd-color="whole.trainTypeBackColor" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="#c6c6c6" />
+        <rect lcdParts="static" x="24" y="25" width="357" height="102" rx="11" ry="11" fill="url(#outerGradient)" style="mix-blend-mode: multiply;" />
       </g>
       <rect lcdParts="textBox" lcdText="#{whole.trainType}" lcd-animType="fade" visible="(langId == 0) or (langId == 1)" id="trainTypeText" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />
       <rect lcdParts="textBox" lcdText="#{whole.trainTypeEng}" lcd-animType="fade" visible="langId == 2" id="trainTypeTextEng" x="40" y="38" width="325" height="75" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)", "letterSpacing": {"2": "30px", "3": "20px"}, "textShadow": "3px 3px 3px rgb(50, 50, 50)"}' />

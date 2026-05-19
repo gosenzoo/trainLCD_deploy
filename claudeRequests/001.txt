@@ -1,0 +1,102 @@
+ページ送りの処理を変更します。
+まず、pageListの構造を変更します。以下のpageDispListを使用するようにします。
+pageStateは状態によって6つの値をとり、それぞれの値がpageStateオブジェクトのキーになります。
+pageObjは各状態の表示ページ情報を定義します。pageName, dispTimeは現状のページ情報と同じです。
+typeは、ページの表示有無の条件によって値が変わります。
+
+pageDispList: {pageState: pageObj[]}
+
+pageState: {
+0: 始発停車
+1: 走行
+2: 直前
+3: 停車
+4: 通過
+5: 終点停車
+}
+どの状態でのページリストかを表す
+
+pageObj:{
+pageName: string,
+dispTime: number,
+type: pageType
+}
+ページ情報それぞれ
+
+pageType: {
+0: 無条件
+1: nowStation.transfersがあれば
+2: 次のoperationがあれば
+3: Messageがあれば
+}
+ページを表示する条件
+
+上記のpageDispListデータを、settingsのpageListの代わりに使います。
+
+また、「表示設定」のページ設定もこれに合わせて変更します。
+現在の表に、「表示条件」列を追加します。
+1つの表が各pageStateに対応するpageObj[]を表すので、票の上にpageStateのタブを設けて、表示編集する表を
+切り替えるようにします。
+
+表の下の編集欄は、「上」「下」「追加」「削除」ボタンを表のすぐ下に置き(見た目はほかの表と同じく、アイコンや色を設定してください)、
+その下に「ページ名選択リスト」(現在のもの)、「表示時間テキストボックス」、「表示条件テキストボックス」を置き、
+選択中の表要素の値を編集できるようにします。
+また、現状ページ名リストの選択を変えても変更が反映されない不具合があります。合わせて修正してください。
+
+
+
+次に、Controller内のページ送り処理についてです。
+まず、pageStateを求めます。runStateとposState、isTerminal, isStart(未実装、後述)を用いて求めます。
+以下の条件で求めます。
+posState: 2, runState: 1, isTerminal: false, isStart: true なら pageState: 0
+posState: 0, runState: 0, isTerminal: false, isStart: false なら pageState: 1
+posState: 1, runState: 0, isTerminal: false, isStart: false なら pageState: 2
+posState: 2, runState: 1, isTerminal: false, isStart: false なら pageState: 3
+posState: 2, runState: 0, isTerminal: false, isStart: false なら pageState: 4
+posState: 2, runState: 1, isTerminal: true, isStart: false なら pageState: 5
+それ以外、pageState: -1(無効値、本来とりえない)
+
+次に、求めたpageStateをPageControllerに渡します。
+PageControllerはページリストを事前に渡されているものとします。
+PageControllerは、対応するページリストをpageDispListから抜き出し、
+タイマーで順番に表示します。この際、表示条件を見て、条件に当てはまらなければそのページは飛ばして
+次のページを表示します。
+
+
+
+isStartについて
+isTerminalと対になる変数で、始発駅停車中にtrueになります。それ以外falseです。
+ProgressControllerで計算し、drawParams.wholeに含んでください。
+現状では、pageType: 2,3に対応するページは未実装です。
+
+
+
+
+
+0: [
+    {pageName: "defaultLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "overLineSVG.svg", dispTime: 8000, type: 0}
+]始発停車
+1: [
+    {pageName: "defaultLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "overLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "transfers.svg", dispTime: 8000, type: 1}
+]走行
+2: [
+    {pageName: "platform.svg", dispTime: 8000, type: 0},
+    {pageName: "defaultLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "transfers.svg", dispTime: 8000, type: 1}
+]直前
+3: [
+    {pageName: "defautlLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "overLine.svg", dispTime: 8000, type: 0},
+    {pageName: "platform.svg", dispTime: 8000, type: 0}
+]停車
+4: [
+    {pageName: "transfers.svg", dispTime: 8000, type: 1},
+    {pageName: "overLine.svg", dispTime: 8000, type: 0}
+]通過
+5: [
+    {pageName: "defautlLineSVG.svg", dispTime: 8000, type: 0},
+    {pageName: "overLine.svg", dispTime: 8000, type: 0}
+]終点停車

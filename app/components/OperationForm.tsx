@@ -242,6 +242,10 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <input type="color" onChange={(e) => {formUpdated(e, 'trainTypeColor')}} value={setting.operationList[operationInd].trainTypeColor}></input>
             </div>
             <div className="form-row">
+                <label>種別背景色</label>
+                <input type="color" onChange={(e) => {formUpdated(e, 'trainTypeBackColor')}} value={setting.operationList[operationInd].trainTypeBackColor || '#000000'}></input>
+            </div>
+            <div className="form-row">
                 <label>列車路線記号</label>
                 <input type="text" onChange={(e) => {formUpdated(e, 'lineLogo')}} value={setting.operationList[operationInd].lineLogo}></input>
             </div>

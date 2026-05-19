@@ -20,7 +20,7 @@ class Controller {
      * @param {object}   settings.lineDict      - 路線辞書
      * @param {object}   settings.iconDict      - アイコン辞書
      * @param {object}   pageParams         - ページ制御パラメータ
-     * @param {string[]} pageParams.pageNameList - 表示するページ名リスト
+     * @param {object}   pageParams.pageDispList - 走行状態別ページリスト { [pageState]: pageObj[] }
      * @param {object}   langParams         - 言語制御パラメータ
      * @param {object[]} langParams.langIdList  - 言語IDと時間パラメータのリスト
      */
@@ -36,21 +36,29 @@ class Controller {
         };
         this._progressController = new ProgressController(progressParams);
 
-        // PageController初期化
+        // PageController初期化（pageDispListを渡す）
         this._pageController = new PageController(pageParams);
 
         // LangController初期化
         this._langController = new LangController(langParams);
 
-        // ProgressControllerの長時間停車コールバックを設定
-        // タイマー発火時: pageReset → langReset → onLongStopコールバックにdrawParamsを渡す
-        this._progressController.onLongStop = () => {
-            this._pageController.pageReset();
+        // PageControllerのタイマーコールバック：最新conditionDataでページを進め、langリセット後に外部通知
+        this._pageController.onPageTimer = () => {
+            const conditionData = this._getConditionData();
+            this._pageController.pageRotate(conditionData);
             this._langController.langReset();
-            if (this._onLongStop) {
-                this._onLongStop(this.getDrawParams());
-            }
+            if (this._onPageTimer) this._onPageTimer(this.getDrawParams());
         };
+
+        // ProgressControllerの長時間停車コールバック
+        this._progressController.onLongStop = () => {
+            this._updatePageState();
+            this._langController.langReset();
+            if (this._onLongStop) this._onLongStop(this.getDrawParams());
+        };
+
+        // 初期pageStateを設定してタイマーを起動する
+        this._updatePageState();
     }
 
     // ============================================================
@@ -59,17 +67,21 @@ class Controller {
 
     /**
      * 長時間停車タイマー発火時のコールバックを設定する
-     * コールバックの引数: (drawParams)
-     * @param {Function} callback
+     * @param {Function} callback - コールバックの引数: (drawParams)
      */
     set onLongStop(callback) { this._onLongStop = callback; }
 
     /**
      * 言語タイマー発火時のコールバックをLangControllerに設定する
-     * コールバックの引数: (langId, transTime, gapTime)
-     * @param {Function} callback
+     * @param {Function} callback - コールバックの引数: (langId, transTime, gapTime)
      */
     set onLangTimer(callback) { this._langController.onLangTimer = callback; }
+
+    /**
+     * ページタイマー発火時のコールバックを設定する
+     * @param {Function} callback - コールバックの引数: (drawParams)
+     */
+    set onPageTimer(callback) { this._onPageTimer = callback; }
 
     // ============================================================
     // 公開API
@@ -77,26 +89,24 @@ class Controller {
 
     /**
      * 状態単位でstep分移動し、drawParamsを返す
-     * ページ・言語をリセットする
      * @param {number} step
      * @returns {object} drawParams
      */
     moveState(step) {
         this._progressController.moveState(step);
-        this._pageController.pageReset();
+        this._updatePageState();
         this._langController.langReset();
         return this.getDrawParams();
     }
 
     /**
      * 駅単位でstep分移動し、drawParamsを返す
-     * ページ・言語をリセットする
      * @param {number} step
      * @returns {object} drawParams
      */
     moveStation(step) {
         this._progressController.moveStation(step);
-        this._pageController.pageReset();
+        this._updatePageState();
         this._langController.langReset();
         return this.getDrawParams();
     }
@@ -106,14 +116,14 @@ class Controller {
      * @returns {object} drawParams
      */
     pageRotate() {
-        this._pageController.pageRotate();
+        const conditionData = this._getConditionData();
+        this._pageController.pageRotate(conditionData);
         this._langController.langReset();
         return this.getDrawParams();
     }
 
     /**
      * 言語を一つ進めてdrawParamsを返す
-     * ※今回はタイマー方式のみ使用するため通常は呼び出さない
      * @returns {object} drawParams
      */
     langRotate() {
@@ -135,5 +145,23 @@ class Controller {
             langId: langOutput.langId,
             ...progressOutput
         };
+    }
+
+    // ============================================================
+    // プライベートヘルパー
+    // ============================================================
+
+    /**
+     * ProgressControllerからpageStateとconditionDataを取得し、
+     * PageControllerのページリストを切り替える。
+     */
+    _updatePageState() {
+        const progressOutput = this._progressController.getParams();
+        this._pageController.setPageState(progressOutput.pageState, progressOutput.conditionData);
+    }
+
+    /** ProgressControllerから最新のconditionDataを取得する */
+    _getConditionData() {
+        return this._progressController.getParams().conditionData;
     }
 }

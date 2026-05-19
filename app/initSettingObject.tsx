@@ -19,6 +19,7 @@ const initOperationObject: operationType = {
     trainTypeSub: "",
     trainTypeSubEng: "",
     trainTypeColor: "",
+    trainTypeBackColor: "",
     lineLogo: "",
     lineColor: "",
     carNumber: "",
@@ -75,23 +76,41 @@ const initLangIdEntryObject: langIdEntryType = {
     gapTime: 100
 }
 
-// ページエントリの初期値
-const initPageEntryObject: pageEntryType = {
-    pageName: "defaultLineSVG.svg",
-    dispTime: 8000
-}
-
-// 表示設定の初期値（全4ページ・日本語/ひらがな/英語の3言語ローテーション）
+// 表示設定の初期値（6走行状態×各ページリスト・日本語/ひらがな/英語の3言語ローテーション）
 const initDispConfigObject: dispConfigType = {
-    pageList: [
-        { pageName: "defaultLineSVG.svg", dispTime: 8000 },
-        { pageName: "overLineSVG.svg",    dispTime: 8000 },
-        { pageName: "transfers.svg",       dispTime: 8000 },
-        { pageName: "platform.svg",        dispTime: 8000 },
-    ],
+    isPageAuto: true,
+    pageDispList: {
+        '0': [ // 始発停車
+            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+        ],
+        '1': [ // 走行
+            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
+        ],
+        '2': [ // 直前
+            { pageName: "platform.svg",        dispTime: 11000, type: 0 },
+            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
+            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
+        ],
+        '3': [ // 停車
+            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+            { pageName: "platform.svg",        dispTime: 11000, type: 0 },
+        ],
+        '4': [ // 通過
+            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
+            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+        ],
+        '5': [ // 終点停車
+            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+        ],
+    },
     langIdList: [
         { langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 },
-        { langId: 1, displayTime: 2000, transTime: 400, gapTime: 100 },
+        { langId: 1, displayTime: 1500, transTime: 400, gapTime: 100 },
         { langId: 2, displayTime: 4000, transTime: 400, gapTime: 100 }
     ]
 }
@@ -105,4 +124,4 @@ const initSettingObject: settingType = {
     dispConfig: initDispConfigObject
 }
 
-export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject, langIdEntry: initLangIdEntryObject, pageEntry: initPageEntryObject, dispConfig: initDispConfigObject}
+export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject, langIdEntry: initLangIdEntryObject, dispConfig: initDispConfigObject}

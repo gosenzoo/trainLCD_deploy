@@ -33,15 +33,15 @@ class LangController {
 
     /**
      * 現在の言語エントリのdisplayTime後にタイマーを発火する
-     * 発火時: 次の言語へ自動進行 → コールバック呼び出し（次のlangIdを通知）→ タイマー再起動
+     * サイクル: displayTime表示 → アニメーション(transTime+gapTime) → 次のdisplayTime表示 → …
      * transTime/gapTimeは現在のlangIdのエントリから取得する（現在→次への遷移パラメータ）
      */
     _startTimer() {
         if (this._timerId) clearTimeout(this._timerId);
 
         const current = this.langIdList[this._currentIndex];
+        // displayTime後にアニメーションを開始する
         this._timerId = setTimeout(() => {
-            // transTime/gapTimeは現在のlangIdから次への遷移パラメータとして取得
             const transTime = current.transTime;
             const gapTime   = current.gapTime;
             // 次の言語に自動進行（コールバック前に進めることでgetParams()も即時反映される）
@@ -50,8 +50,10 @@ class LangController {
             if (this._onLangTimer) {
                 this._onLangTimer(this.langIdList[this._currentIndex].langId, transTime, gapTime);
             }
-            // 次のタイマーを起動
-            this._startTimer();
+            // アニメーション完了（transTime+gapTime）後に次のdisplayTimeタイマーを起動する
+            this._timerId = setTimeout(() => {
+                this._startTimer();
+            }, transTime + gapTime);
         }, current.displayTime);
     }
 

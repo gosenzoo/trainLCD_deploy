@@ -136,6 +136,23 @@ class ProgressController {
     }
 
     /**
+     * 始発かどうか
+     * 駅上かつ停車中（posState=2, runState=1）のときのみ判定し、
+     * 現在駅より前に停車駅がなければtrue（非環状のみ）。
+     * 走行中・通過中は常にfalse。
+     */
+    get isStart() {
+        if (!this.isLoop) {
+            if (this.posState !== 2 || this.runState !== 1) return false;
+            for (let i = this.currentStationInd - 1; i >= 0; i--) {
+                if (!this.passList[i]) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 終点かどうか
      * 現在位置以降に停車駅がなければtrue（非環状のみ）
      */
@@ -195,6 +212,42 @@ class ProgressController {
             overLine:          this._buildOverLine(currentStationInd, posState),
             platform:          this._buildPlatform(currentStationInd, posState),
             transfers:         this._buildTransfers(currentStationInd, posState),
+            // PageControllerに渡すページ切替情報
+            pageState:         this._computePageState(),
+            conditionData:     this._buildConditionData(),
+        };
+    }
+
+    // ============================================================
+    // 内部ヘルパー: pageState・conditionData 生成
+    // ============================================================
+
+    /**
+     * 現在の走行状態からpageState（0〜5）を求める。
+     * 定義外の組み合わせは -1（無効）を返す。
+     */
+    _computePageState() {
+        const posState   = this.posState;
+        const runState   = this.runState;
+        const isTerminal = this.isTerminal;
+        const isStart    = this.isStart;
+        if (posState === 2 && runState === 1 && !isTerminal && isStart)  return 0; // 始発停車
+        if (posState === 0 && runState === 0)                            return 1; // 走行（isTerminal無関係）
+        if (posState === 1 && runState === 0)                            return 2; // 直前（isTerminal無関係）
+        if (posState === 2 && runState === 1 && !isTerminal && !isStart) return 3; // 停車
+        if (posState === 2 && runState === 0 && !isTerminal && !isStart) return 4; // 通過
+        if (posState === 2 && runState === 1 && isTerminal  && !isStart) return 5; // 終点停車
+        return -1;
+    }
+
+    /**
+     * ページ表示条件の判定に使うデータを生成する。
+     * hasTransfers: nowStationに乗換情報があるかどうか（pageType=1の条件）
+     */
+    _buildConditionData() {
+        const displayStation = getNextStopStation(this.stationList, this.currentStationInd);
+        return {
+            hasTransfers: !!(displayStation?.transfers?.length)
         };
     }
 
@@ -262,6 +315,8 @@ class ProgressController {
             trainTypeEng:     operation.trainTypeEng || "Local",
             trainTypeSubText: operation.trainTypeSub    || "",
             trainTypeSubTextEng: operation.trainTypeSubEng || "",
+            trainTypeBackColor: operation.trainTypeBackColor || "",
+            isStart: this.isStart,
             nowStation: {
                 name:     displayStation.name,
                 kana:     displayStation.kana,

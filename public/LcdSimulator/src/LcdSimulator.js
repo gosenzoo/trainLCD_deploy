@@ -42,6 +42,11 @@ class LcdSimulator {
             this._drawer.langChange(langId, transTime, gapTime);
         };
 
+        // ページタイマー発火時: 新しいdrawParamsでSVGを再描画する
+        this._controller.onPageTimer = (drawParams) => {
+            this._render(drawParams);
+        };
+
         // 長時間停車タイマー発火時: page/langリセット後の状態でSVGを再描画する
         this._controller.onLongStop = (drawParams) => {
             this._render(drawParams);
