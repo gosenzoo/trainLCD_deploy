@@ -53,10 +53,12 @@
 
 
     <!-- 乗換欄背景 -->
-    <rect lcdParts="static" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(./defs.svg#dropShadow2)"></rect>
-    <rect lcdParts="textBox" lcdText="のりかえ" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
-    <rect lcdParts="textBox" lcdText="Transfer" x="32" y="942" width="203" height="36" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}'></rect>
-    
+    <g lcdParts="group" isDraw="platform.transfers.length >= 1">
+        <rect lcdParts="static" x="0" y="862" width="1920" height="218" fill="#ffffff" filter="url(./defs.svg#dropShadow2)"></rect>
+        <rect lcdParts="textBox" lcdText="のりかえ" x="30" y="878" width="207" height="57" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}'></rect>
+        <rect lcdParts="textBox" lcdText="Transfer" x="32" y="942" width="203" height="36" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}'></rect>
+    </g>
+
     <!-- 乗換欄1行 -->
     <g lcdParts="arrange" isDraw="platform.transfers.length == 1" arrange-interval="40">
         <rect lcdParts="arrangeArea" x="280" y="886" width="1600" height="88" fill="#d2d2d244" />
@@ -71,7 +73,7 @@
         </g>
     </g>
     <!-- 乗換欄複数行 -->
-    <g lcdParts="arrange" isDraw="platform.transfers.length != 1" arrange-axis="y" arrange-interval="5">
+    <g lcdParts="arrange" isDraw="platform.transfers.length >= 2" arrange-axis="y" arrange-interval="5">
         <rect lcdParts="arrangeArea" x="280" y="866" width="1600" height="128" fill="#999999" />
         <!-- 各行 -->
         <g lcdParts="arrange" lcd-arg="transferList:platform.transfers" lcd-fitX="true" arrange-interval="10">

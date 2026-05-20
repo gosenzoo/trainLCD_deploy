@@ -819,11 +819,13 @@ class ProgressController {
                         .filter(item => item !== null);
                 })
                 .filter(row => row.length > 0);
-            if (transfers.length === 0) transfers = [[]];
+            // 乗換要素が1つもないときは空配列を返す
+            if (transfers.length === 0) transfers = [];
         } else {
             // transferListPlatformが空の場合: 全乗換路線を1行にまとめる
             const transferItems = this._getTransferItems(displayStation.transfers);
-            transfers = transferItems.length > 0 ? [transferItems] : [[]];
+            // 乗換要素が1つもないときは空配列を返す
+            transfers = transferItems.length > 0 ? [transferItems] : [];
         }
 
         return {
