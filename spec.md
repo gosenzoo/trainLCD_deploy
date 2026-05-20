@@ -226,7 +226,7 @@ classDiagram
 | `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー |
 | `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
 | `transfers` | `transferItemType[]` | 乗換路線のリスト。各エントリに路線IDと乗換駅情報を持つ |
-| `transfersListDisp` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
+| `transferListTransfers` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
 | `isPass` | boolean | 通過駅フラグ |
 | `sectionTime` | string | 次駅までの所要時間（分） |
 | `lineId` | string | この駅以降の区間路線ID |
@@ -737,15 +737,15 @@ type GenericItemListProps<T> = {
 
 #### 「乗換一覧表示」タブの仕様
 
-- `stationType.transfersListDisp` を編集する `<textarea>` を配置する（初期値: 空文字列）
-- 値はそのまま `station.transfersListDisp` に書き込む
-- **「基本設定情報を反映」ボタン**: クリックすると、現在の `station.transfers`（`transferItemType[]`）の各インデックス（0始まり）を1行スペース区切りで `<textarea>` に書き込み `station.transfersListDisp` を更新する
+- `stationType.transferListTransfers` を編集する `<textarea>` を配置する（初期値: 空文字列）
+- 値はそのまま `station.transferListTransfers` に書き込む
+- **「基本設定情報を反映」ボタン**: クリックすると、現在の `station.transfers`（`transferItemType[]`）の各インデックス（0始まり）を1行スペース区切りで `<textarea>` に書き込み `station.transferListTransfers` を更新する
   - 例: `transfers` が3要素 → textarea 値 `"0 1 2"`（改行なし、ユーザが後で改行を挿入可能）
 
-#### `transfersListDisp` の書式と drawParams への反映ロジック
+#### `transferListTransfers` の書式と drawParams への反映ロジック
 
 ```
-transfersListDisp の例（ユーザが改行を挿入した状態）:
+transferListTransfers の例（ユーザが改行を挿入した状態）:
 "0 1\n2"
 → 1行目: インデックス 0, 1 の乗換エントリ
 → 2行目: インデックス 2 の乗換エントリ

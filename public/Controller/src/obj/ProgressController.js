@@ -333,7 +333,8 @@ class ProgressController {
                 numIcon: this._buildNumIconFromOperation(operation)
             },
             carNumber: Number(operation.carNumber) || 1,
-            direction: direction
+            direction: direction,
+            headerNumberingType: displayStation.headerNumberingType || "0"
         };
     }
 
@@ -793,7 +794,7 @@ class ProgressController {
     /**
      * platform（乗車位置案内）データを生成する
      * transferListPlatformが設定されていればそれを解析してtransfersを生成する。
-     * 空の場合は全乗換路線を1行にまとめる（transfersListDispと同形式）。
+     * 空の場合は全乗換路線を1行にまとめる（transferListTransfersと同形式）。
      */
     _buildPlatform(currentStationInd, posState) {
         const displayStation = getNextStopStation(this.stationList, currentStationInd);
@@ -847,12 +848,12 @@ class ProgressController {
         const displayStation = getNextStopStation(this.stationList, currentStationInd);
 
         let transferList;
-        if (displayStation.transfersListDisp) {
-            // transfersListDisp が設定されている場合: 改行で行を分割し、各行をスペース区切りトークンとして解釈する
+        if (displayStation.transferListTransfers) {
+            // transferListTransfers が設定されている場合: 改行で行を分割し、各行をスペース区切りトークンとして解釈する
             // 新形式: トークンは transfers のインデックス（整数）
             // 旧形式後方互換: トークンが有効インデックスでない場合は lineDict キーとして扱う
             const transfers = displayStation.transfers;
-            transferList = displayStation.transfersListDisp
+            transferList = displayStation.transferListTransfers
                 .split("\n")
                 .map(rowStr => {
                     return rowStr.split(" ")
@@ -874,7 +875,7 @@ class ProgressController {
                 })
                 .filter(row => row.length > 0); // 有効なアイテムが1件もない行は除外する
         } else {
-            // transfersListDisp が空の場合: transfers の各エントリを1行ずつ配置する
+            // transferListTransfers が空の場合: transfers の各エントリを1行ずつ配置する
             transferList = this._getTransferItems(displayStation.transfers)
                 .map(item => [item]);
         }

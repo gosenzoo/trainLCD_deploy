@@ -59,6 +59,13 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                             if (station.transferListPlatform === undefined) {
                                 station.transferListPlatform = ""
                             }
+                            if (station.headerNumberingType === undefined) {
+                                station.headerNumberingType = "0"
+                            }
+                            // transfersListDisp（旧）→ transferListTransfers（新）へマイグレーション
+                            if (station.transferListTransfers === undefined) {
+                                station.transferListTransfers = station.transfersListDisp ?? ""
+                            }
                             if (typeof station.transfers === 'string') {
                                 // 最旧形式: スペース区切り文字列 → lineId 配列 → line オブジェクト
                                 station.transfers = station.transfers

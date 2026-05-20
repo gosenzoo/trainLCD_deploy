@@ -396,7 +396,13 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     ))}
                 </select>
                 <br></br>
-                <label>ナンバリング表示形式</label>
+                <label>上部ナンバリング表示形式</label>
+                <select onChange={(e) => {formUpdated(e, 'headerNumberingType')}} value={targetStation?.headerNumberingType ?? '0'}>
+                    <option value="0">通常</option>
+                    <option value="1">地下鉄</option>
+                </select>
+                <br></br>
+                <label>下部ナンバリング表示形式</label>
                 <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType ?? '0'}>
                     <option value="0">テキスト</option>
                     <option value="1">アイコン</option>
@@ -775,8 +781,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <textarea
                     rows={8}
                     cols={30}
-                    onChange={(e) => formUpdated(e, 'transfersListDisp')}
-                    value={targetStation?.transfersListDisp ?? ''}
+                    onChange={(e) => formUpdated(e, 'transferListTransfers')}
+                    value={targetStation?.transferListTransfers ?? ''}
                 ></textarea>
                 <br></br>
                 {/* 基本設定情報を反映: transfers の各インデックス（0始まり）をスペース区切りでテキストボックスに書き込む */}
@@ -785,7 +791,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     const _setting = structuredClone(setting)
                     selectedIndexes.forEach(ind => {
                         if (_setting.stationList[ind - 1]) {
-                            _setting.stationList[ind - 1].transfersListDisp =
+                            _setting.stationList[ind - 1].transferListTransfers =
                                 _setting.stationList[ind - 1].transfers.map((_: transferItemType, i: number) => String(i)).join(' ')
                         }
                     })

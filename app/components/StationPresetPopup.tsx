@@ -44,13 +44,14 @@ const toStationType = (station: PresetStation, lineColor: string, number: string
     transferText: "",
     transferTextEng: "",
     doorSide: "left",
+    headerNumberingType: "0",
     transferListPlatform: "",
     otherLineInd: "",
     slotNum: "0",
     leftSlotInd: "0",
     otherCarNum: "0",
     otherLeftSlotInd: "0",
-    transfersListDisp: "",
+    transferListTransfers: "",
 })
 
 // 駅・路線の選択ハイライトに使うスタイル

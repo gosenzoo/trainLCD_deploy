@@ -111,8 +111,18 @@
         <rect lcdParts="textBox" lcdText="#{whole.nowStation.name}" lcd-animType="kuru" visible="langId == 0" id="header-stationNameText" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle", "letterSpacing": {"2": "110px","3": "30px", "4": "20px"}}' />
         <rect lcdParts="textBox" lcdText="#{whole.nowStation.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
         <rect lcdParts="textBox" lcdText="#{whole.nowStation.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
-        <!-- ナンバリング -->
-        <rect lcdParts="numbering" isDraw="whole.nowStation.numIcon.isDraw" lcd-numKey="#{whole.nowStation.numIcon.presetKey}" symbolText="#{whole.nowStation.numIcon.symbol}" numberText="#{whole.nowStation.numIcon.number}" lineColor="#{whole.nowStation.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+      </g>
+      <!-- ナンバリング -->
+      <rect lcdParts="numbering" isDraw="(whole.nowStation.numIcon.isDraw) and (whole.headerNumberingType == 0)" lcd-numKey="#{whole.nowStation.numIcon.presetKey}" symbolText="#{whole.nowStation.numIcon.symbol}" numberText="#{whole.nowStation.numIcon.number}" lineColor="#{whole.nowStation.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" fill="#99999930" />
+      <g lcdParts="group" isDraw="(whole.nowStation.numIcon.isDraw) and (whole.headerNumberingType == 1)">
+        <path lcdParts="static" lcd-color="whole.nowStation.numIcon.color" d="
+          M 482.5 350
+          A 114 114 1 1 1 577.5 350
+          Z
+          " fill="#660000BB" />
+        <circle lcdParts="static" lcd-color="#FFFFFF" r="87" cx="530" cy="246" fill="#00880099" />
+        <rect lcdParts="textBox" lcdText="#{whole.nowStation.numIcon.symbol}" x="490" y="172" width="80" height="59" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(0, 0, 0)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="#{whole.nowStation.numIcon.number}" x="475" y="243" width="110" height="65" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(0, 0, 0)", "textAnchor": "middle"}' />
       </g>
       <!-- つぎは、まもなく、ただいま -->
       <g lcdParts="group">
@@ -144,7 +154,11 @@
       <rect lcdParts="textBox" lcdText="#{whole.destination.kana}" lcd-animType="kuru" visible="langId == 1" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
       <rect lcdParts="textBox" lcdText="#{whole.destination.eng}" lcd-animType="kuru" visible="langId == 2" id="header-stationNameTextEng" x="690" y="140" width="1040" height="170" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(255, 255, 255)", "textAnchor": "middle"}' />
       <!-- ナンバリング -->
-      <rect lcdParts="numbering" isDraw="whole.destination.numIcon.isDraw" lcd-numKey="#{whole.destination.numIcon.presetKey}" symbolText="#{whole.destination.numIcon.symbol}" numberText="#{whole.destination.numIcon.number}" lineColor="#{whole.destination.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" />
+      <rect lcdParts="numbering" isDraw="whole.destination.numIcon.isDraw" lcd-numKey="#{whole.destination.numIcon.presetKey}" symbolText="#{whole.destination.numIcon.symbol}" numberText="#{whole.destination.numIcon.number}" lineColor="#{whole.destination.numIcon.color}" outlineWidth="5" x="482" y="152" width="163" height="162" fill="#99999940" />
     </g>
   </g>
+
+
+
+  <image href="../../../imgs/tokyu-platform.png" x="0" y="0" width="1920" height="1080" opacity="0.2" />
 </svg>

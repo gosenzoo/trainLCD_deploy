@@ -80,8 +80,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
-            transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
-            otherCarNum: "0", otherLeftSlotInd: "0", transfersListDisp: ""
+            headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
+            otherCarNum: "0", otherLeftSlotInd: "0", transferListTransfers: ""
         })
         setSetting(_setting)
         // splice の実際の挿入位置（0-based: _index）を 1-based に変換して選択する
