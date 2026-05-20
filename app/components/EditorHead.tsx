@@ -55,6 +55,10 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                         }
                         // transfers の旧形式を新形式（line オブジェクト直接保持）に変換する
                         readData.stationList.forEach((station: any) => {
+                            // transferCountLineP（旧）→ transferListPlatform（新）へマイグレーション
+                            if (station.transferListPlatform === undefined) {
+                                station.transferListPlatform = ""
+                            }
                             if (typeof station.transfers === 'string') {
                                 // 最旧形式: スペース区切り文字列 → lineId 配列 → line オブジェクト
                                 station.transfers = station.transfers

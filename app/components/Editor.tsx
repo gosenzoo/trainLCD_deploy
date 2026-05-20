@@ -40,6 +40,10 @@ const Editor = () => {
             loaded.dispConfig.isPageAuto = true;
         }
         loaded.stationList.forEach((station: any) => {
+            // transferCountLineP（旧）→ transferListPlatform（新）へマイグレーション
+            if (station.transferListPlatform === undefined) {
+                station.transferListPlatform = ""
+            }
             if (typeof station.transfers === 'string') {
                 station.transfers = station.transfers
                     ? station.transfers.split(' ').filter((id: string) => id).map((id: string) => {

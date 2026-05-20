@@ -690,10 +690,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <option value={'left'}>左</option>
                 </select>
                 <br></br>
-            </>)}
-
-            {/* ===== 路線図タブ (defaultLine) ===== */}
-            {activeSection === 'defaultLine' && (<>
                 <label>次区間所要時間(分)</label>
                 <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
                     value={targetStation?.sectionTime ?? ''}
@@ -704,6 +700,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     value={targetStation?.lineId ?? ''}
                 ></input>
                 <br></br>
+            </>)}
+
+            {/* ===== 路線図タブ (defaultLine) ===== */}
+            {activeSection === 'defaultLine' && (<>
                 <label>乗換案内</label>
                 <textarea id="transferTextInput" rows={6} cols={30} onChange={(e) => formUpdated(e, 'transferText')}
                     value={targetStation?.transferText ?? ''}
@@ -796,10 +796,26 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
 
             {/* ===== ホーム案内タブ (platform) ===== */}
             {activeSection === 'platform' && (<>
-                <label>ホーム乗換案内行ごと表示数</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'transferCountLineP')}
-                    value={targetStation?.transferCountLineP ?? ''}
-                ></input>
+                <label>乗換一覧行分割指定</label>
+                <textarea
+                    rows={4}
+                    cols={30}
+                    onChange={(e) => formUpdated(e, 'transferListPlatform')}
+                    value={targetStation?.transferListPlatform ?? ''}
+                ></textarea>
+                <br></br>
+                {/* 基本設定情報を反映: transfers の各インデックスをスペース区切り1行で書き込む */}
+                <button onClick={() => {
+                    if (!targetStation) return
+                    const _setting = structuredClone(setting)
+                    selectedIndexes.forEach(ind => {
+                        if (_setting.stationList[ind - 1]) {
+                            _setting.stationList[ind - 1].transferListPlatform =
+                                _setting.stationList[ind - 1].transfers.map((_: transferItemType, i: number) => String(i)).join(' ')
+                        }
+                    })
+                    setSetting(_setting)
+                }}>基本設定情報を反映</button>
                 <br></br>
                 <label>スロット分割数</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}

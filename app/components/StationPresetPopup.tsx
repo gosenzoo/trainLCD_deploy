@@ -44,7 +44,7 @@ const toStationType = (station: PresetStation, lineColor: string, number: string
     transferText: "",
     transferTextEng: "",
     doorSide: "left",
-    transferCountLineP: "",
+    transferListPlatform: "",
     otherLineInd: "",
     slotNum: "0",
     leftSlotInd: "0",

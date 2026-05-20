@@ -80,7 +80,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
-            transferCountLineP: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
+            transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
             otherCarNum: "0", otherLeftSlotInd: "0", transfersListDisp: ""
         })
         setSetting(_setting)

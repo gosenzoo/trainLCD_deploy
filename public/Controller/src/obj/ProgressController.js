@@ -456,8 +456,14 @@ class ProgressController {
         // 駅間にいる場合は出発済みの駅Aもgrayにするため Math.ceil を使う
         const isGrayThreshold = Math.ceil(hereDrawPos);
         const drawDispStationList = dispStationList.map((station, i) => {
-            // transfers から drawItem 配列を生成する（新・旧形式を一括処理）
+            // transferText/transferTextEngが設定されていればそれを優先し、なければtransfersから生成する
             const transferItems = this._getTransferItems(station.transfers);
+            const transfersText = station.transferText
+                ? station.transferText.split("\n").filter(line => line !== "")
+                : transferItems.map(item => item.lineIcon + item.name);
+            const transfersTextEng = station.transferTextEng
+                ? station.transferTextEng.split("\n").filter(line => line !== "")
+                : transferItems.map(item => item.lineIcon + item.eng);
             return {
                 name:            station.name,
                 kana:            station.kana || "",
@@ -467,11 +473,9 @@ class ProgressController {
                 numIconType:     station.lineNumberType || "0",
                 stationIconType: station.isPass ? "1" : "0",
                 sectionTime:     (timeList[i] >= 0) ? String(timeList[i]) : "",
-                transfersText:    transferItems.map(item => item.lineIcon + item.name),
-                transfersTextEng: transferItems.map(item => item.lineIcon + item.eng),
+                transfersText,
+                transfersTextEng,
                 isGray:          i < isGrayThreshold || station.isPass,
-                transferText:    "",
-                transferTextEng: ""
             };
         });
 
@@ -788,20 +792,46 @@ class ProgressController {
 
     /**
      * platform（乗車位置案内）データを生成する
+     * transferListPlatformが設定されていればそれを解析してtransfersを生成する。
+     * 空の場合は全乗換路線を1行にまとめる（transfersListDispと同形式）。
      */
     _buildPlatform(currentStationInd, posState) {
         const displayStation = getNextStopStation(this.stationList, currentStationInd);
-        // 全乗換路線を drawItem 配列に変換する（新・旧形式を一括処理）
-        const transferItems = this._getTransferItems(displayStation.transfers);
+
+        let transfers;
+        if (displayStation.transferListPlatform) {
+            // 改行で行分割し、各行をスペース区切りのtransfersインデックスとして解析する
+            const rawTransfers = displayStation.transfers;
+            transfers = displayStation.transferListPlatform
+                .split("\n")
+                .map(rowStr => {
+                    return rowStr.split(" ")
+                        .map(token => token.trim())
+                        .filter(token => token)
+                        .map(token => {
+                            const idx = parseInt(token);
+                            if (!isNaN(idx) && Array.isArray(rawTransfers) && idx >= 0 && idx < rawTransfers.length) {
+                                return this._transferItemToDrawItem(rawTransfers[idx]);
+                            }
+                            return null;
+                        })
+                        .filter(item => item !== null);
+                })
+                .filter(row => row.length > 0);
+            if (transfers.length === 0) transfers = [[]];
+        } else {
+            // transferListPlatformが空の場合: 全乗換路線を1行にまとめる
+            const transferItems = this._getTransferItems(displayStation.transfers);
+            transfers = transferItems.length > 0 ? [transferItems] : [[]];
+        }
 
         return {
-            transfers:         transferItems.length > 0 ? [transferItems] : [[]],
-            transferCountLineP: "",
-            otherLineInd:      "",
-            slotNum:           "0",
-            leftSlotInd:       "0",
-            otherCarNum:       "0",
-            otherLeftSlotInd:  "0"
+            transfers,
+            otherLineInd:    "",
+            slotNum:         "0",
+            leftSlotInd:     "0",
+            otherCarNum:     "0",
+            otherLeftSlotInd: "0"
         };
     }
 
