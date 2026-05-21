@@ -17,6 +17,7 @@ const AVAILABLE_PAGES = [
     "overLineSVG.svg",
     "transfers.svg",
     "platform.svg",
+    "doorAnim.svg",
 ]
 
 // pageStateの表示名（0〜5）

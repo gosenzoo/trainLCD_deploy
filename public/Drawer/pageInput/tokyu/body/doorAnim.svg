@@ -1,0 +1,82 @@
+<svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+    <!-- defs.svgから移植したグラデーション・フィルター定義 -->
+    <defs>
+        <linearGradient id="bodyHeaderGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+            <stop offset="100%" stop-color="#e4e4e4" />
+        </linearGradient>
+    </defs>
+
+    <!-- 背景 -->
+    <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#dbdbdb" />
+
+    <!-- ドア -->
+    <g lcdParts="static">
+        <!-- 右側 -->
+        <rect x="960" y="457" width="300" height="650" fill="#555555" />
+        <rect x="1026" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+        <rect x="1034" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+        <rect x="960" y="457" width="11" height="650" fill="#222222" />
+        <rect x="971" y="457" width="6" height="650" fill="#FFFFFF" />
+        <rect x="1252" y="457" width="8" height="650" fill="#AAAAAA" />
+        <rect x="960" y="457" width="300" height="20" fill="#22222250" />
+
+        <!-- 左側 -->
+        <rect x="660" y="457" width="300" height="650" fill="#555555" />
+        <rect x="710" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+        <rect x="718" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+        <rect x="949" y="457" width="11" height="650" fill="#222222" />
+        <rect x="943" y="457" width="6" height="650" fill="#FFFFFF" />
+        <rect x="660" y="457" width="8" height="650" fill="#AAAAAA" />
+        <rect x="660" y="457" width="300" height="20" fill="#22222250" />
+
+        <!-- 右側へり -->
+        <rect x="1260" y="457" width="32" height="650" fill="#f1f1f1" />
+        <line x1="1292" y1="457" x2="1292" y2="1080" stroke="#7d7d7d" stroke-width="2" />
+        <rect x="1265" y="606" width="24" height="6" fill="#aaaaaa" />
+        <rect x="1265" y="946" width="24" height="6" fill="#aaaaaa" />
+        <rect x="1265" y="612" width="10" height="334" fill="#DDDDDD" />
+        <!-- 左側へり -->
+        <rect x="628" y="457" width="32" height="650" fill="#f1f1f1" />
+        <line x1="628" y1="457" x2="628" y2="1080" stroke="#ffffff" stroke-width="2" />
+        <rect x="631" y="606" width="24" height="6" fill="#aaaaaa" />
+        <rect x="631" y="946" width="24" height="6" fill="#aaaaaa" />
+        <rect x="645" y="612" width="10" height="334" fill="#DDDDDD" />
+    </g>
+
+    <!-- 矢印 -->
+    <g lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 1)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 0))">
+        <!-- 右側矢印 -->
+        <polygon points="1300,697 1430,697 1430,640 1580,790 1430,937 1430,880 1300,880" fill="#ffb770" />
+        <!-- 右側矢印 -->
+        <polygon points="620,697 490,697 490,640 340,790 490,937 490,880 620,880" fill="#ffb770" />
+    </g>
+
+    <!-- 通行止め -->
+    <g lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 0)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 1))">
+        <circle cx="960" cy="760" r="150" fill="#ff2828" stroke="#ffffff" stroke-width="5" />
+        <rect x="847" y="732" width="226" height="56" fill="#FFFFFF" />
+    </g>
+
+    <!-- ヘッダー背景 -->
+    <rect lcdParts="static" x="0" y="350" width="1920" height="107" fill="url(#bodyHeaderGradient)" />
+    <line lcdParts="static" x1="0" y1="457" x2="1920" y2="457" stroke="#7d7d7d" stroke-width="2" />
+
+    <!-- ヘッダーテキスト -->
+    <g lcdParts="group" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 1)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 0))" lcd-color="#002b88">
+        <rect lcdParts="textBox" lcdText="こちら側のドアが開きます" x="45" y="376" width="815" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="/" x="860" y="376" width="54" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="Doors on this side will open." x="914" y="376" width="976" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "start"}' />
+    </g>
+    <g lcdParts="group" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 0)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 1))" lcd-color="#002b88">
+        <rect lcdParts="textBox" lcdText="反対側のドアが開きます" x="25" y="376" width="710" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="/" x="735" y="376" width="45" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="Doors on the opposite side will open." x="780" y="376" width="1110" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "start"}' />
+    </g>
+
+
+
+    <!-- 参考画像 -->
+    <!-- <image href="./../../../imgs/tokyu-doorAnim.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+    <image href="./../../../imgs/tokyu-doorAnim2.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+</svg>

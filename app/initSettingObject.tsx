@@ -19,7 +19,7 @@ const initOperationObject: operationType = {
     trainTypeSub: "",
     trainTypeSubEng: "",
     trainTypeColor: "",
-    trainTypeBackColor: "",
+    trainTypeBackColor: "#3d6eff",
     lineLogo: "",
     lineColor: "",
     carNumber: "",
@@ -92,6 +92,7 @@ const initDispConfigObject: dispConfigType = {
         ],
         '2': [ // 直前
             { pageName: "platform.svg",        dispTime: 11000, type: 0 },
+            { pageName: "doorAnim.svg",        dispTime: 11000, type: 0 },
             { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
             { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
         ],

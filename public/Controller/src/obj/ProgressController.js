@@ -322,7 +322,7 @@ class ProgressController {
                 kana:     displayStation.kana,
                 eng:      displayStation.eng,
                 numIcon:  this._buildNumIconFromStation(displayStation),
-                doorSide: displayStation.doorSide || "right"
+                doorSide: displayStation.doorSide === "left" ? 1 : 0
             },
             nextStopName: nextStopName,
             viaText:    operation.direction || "", // HeaderController参照: viaText → operation.direction
