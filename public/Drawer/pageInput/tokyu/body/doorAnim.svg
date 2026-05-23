@@ -5,57 +5,287 @@
             <stop offset="0%" stop-color="rgb(255, 255, 255)" />
             <stop offset="100%" stop-color="#e4e4e4" />
         </linearGradient>
+        <linearGradient id="backGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fbfbfb" />
+            <stop offset="100%" stop-color="#bbbbbb" />
+        </linearGradient>
+        <linearGradient id="sideGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fefefe" />
+            <stop offset="100%" stop-color="#bebebe" />
+        </linearGradient>
+        <linearGradient id="handrailGradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#727272" />
+            <stop offset="50%" stop-color="#e9e9e9" />
+            <stop offset="100%" stop-color="#727272" />
+        </linearGradient>
+        <linearGradient id="doorGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#909090" />
+            <stop offset="100%" stop-color="#272727" />
+        </linearGradient>
+        <linearGradient id="rightArrowGradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="5%" stop-color="#f6730400" />
+            <stop offset="40%" stop-color="#f67304" />
+            <stop offset="100%" stop-color="#f67304" />
+        </linearGradient>
+        <linearGradient id="leftArrowGradient" x1="1" y1="0" x2="0" y2="0">
+            <stop offset="5%" stop-color="#f6730400" />
+            <stop offset="40%" stop-color="#f67304" />
+            <stop offset="100%" stop-color="#f67304" />
+        </linearGradient>
+        <linearGradient id="upArrowGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b7df0" />
+            <stop offset="70%" stop-color="#3b7df0" />
+            <stop offset="100%" stop-color="#3b7df000" />
+        </linearGradient>
     </defs>
 
     <!-- 背景 -->
-    <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#dbdbdb" />
+    <rect lcdParts="static" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
 
-    <!-- ドア -->
+    <!-- 向こうに行く矢印 -->
     <g lcdParts="static">
+        <g transform="translate(960, 900)">
+            <g>
+                <g transform="translate(-960, -900)">
+                    <polygon points="960,900 1035,944 993,944 1005,985 915,985 927,944 885,944" fill="url(#upArrowGradient)">
+                        <animateTransform
+                            attributeName="transform"
+                            type="translate"
+                            values="0 30; 0 -20; 0 -20;"
+                            keyTime="0; 0.7; 1;"
+                            dur="2s"
+                            repeatCount="indefinite"
+                        />
+                        <animate
+                            attributeName="opacity"
+                            values="0; 1; 1; 0; 0;"
+                            keyTimes="0; 0.2; 0.45; 0.55; 1;"
+                            dur="2s"
+                            repeatCount="indefinite"   
+                        />
+                    </polygon>
+                </g>
+                <animateTransform
+                    attributeName="transform"
+                    type="scale"
+                    values="2.5; 0.7; 0.7;"
+                    keyTime="0; 0.7; 1;"
+                    dur="2s"
+                    repeatCount="indefinite"
+                />
+            </g>
+        </g>
+    </g>
+
+    <!-- 向こう側文字 -->
+    <rect lcdParts="textBox" lcdText="足元にご注意ください" x="755" y="810" width="410" height="52" fill="#cccccc" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill": "rgb(230, 0, 0)", "textAnchor": "middle"}' />
+    <rect lcdParts="textBox" lcdText="WATCH YOUR STEP" x="760" y="877" width="400" height="36" fill="#cccccc" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "fill": "rgb(230, 0, 0)", "textAnchor": "middle"}' lang="en" />
+
+    <!-- 開くドア -->
+    <g  visibility="visible" lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 1)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 0))">
         <!-- 右側 -->
-        <rect x="960" y="457" width="300" height="650" fill="#555555" />
-        <rect x="1026" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
-        <rect x="1034" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
-        <rect x="960" y="457" width="11" height="650" fill="#222222" />
-        <rect x="971" y="457" width="6" height="650" fill="#FFFFFF" />
-        <rect x="1252" y="457" width="8" height="650" fill="#AAAAAA" />
-        <rect x="960" y="457" width="300" height="20" fill="#22222250" />
+        <g>
+            <rect x="960" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="1026" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="1034" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="960" y="457" width="11" height="650" fill="#222222" />
+            <rect x="971" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="1252" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="960" y="457" width="300" height="20" fill="#22222250" />
+            <animateTransform
+                attributeName="transform"
+                type="translate"
+                values="0 0; 282 0; 282 0;"
+                keyTime="0; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"
+            />
+            <animate
+                attributeName="opacity"
+                values="1; 1; 1; 0;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </g>
+        <!-- 右側出現用 -->
+        <g>
+            <rect x="960" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="1026" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="1034" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="960" y="457" width="11" height="650" fill="#222222" />
+            <rect x="971" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="1252" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="960" y="457" width="300" height="20" fill="#22222250" />
+            <animate
+                attributeName="opacity"
+                values="0; 0; 0; 1;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </g>
 
         <!-- 左側 -->
-        <rect x="660" y="457" width="300" height="650" fill="#555555" />
-        <rect x="710" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
-        <rect x="718" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
-        <rect x="949" y="457" width="11" height="650" fill="#222222" />
-        <rect x="943" y="457" width="6" height="650" fill="#FFFFFF" />
-        <rect x="660" y="457" width="8" height="650" fill="#AAAAAA" />
-        <rect x="660" y="457" width="300" height="20" fill="#22222250" />
-
-        <!-- 右側へり -->
-        <rect x="1260" y="457" width="32" height="650" fill="#f1f1f1" />
-        <line x1="1292" y1="457" x2="1292" y2="1080" stroke="#7d7d7d" stroke-width="2" />
-        <rect x="1265" y="606" width="24" height="6" fill="#aaaaaa" />
-        <rect x="1265" y="946" width="24" height="6" fill="#aaaaaa" />
-        <rect x="1265" y="612" width="10" height="334" fill="#DDDDDD" />
-        <!-- 左側へり -->
-        <rect x="628" y="457" width="32" height="650" fill="#f1f1f1" />
-        <line x1="628" y1="457" x2="628" y2="1080" stroke="#ffffff" stroke-width="2" />
-        <rect x="631" y="606" width="24" height="6" fill="#aaaaaa" />
-        <rect x="631" y="946" width="24" height="6" fill="#aaaaaa" />
-        <rect x="645" y="612" width="10" height="334" fill="#DDDDDD" />
+        <g>
+            <rect x="660" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="710" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="718" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="949" y="457" width="11" height="650" fill="#222222" />
+            <rect x="943" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="660" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="660" y="457" width="300" height="20" fill="#22222250" />
+            <animateTransform
+                attributeName="transform"
+                type="translate"
+                values="0 0; -282 0; -282 0;"
+                keyTime="0; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"
+            />
+            <animate
+                attributeName="opacity"
+                values="1; 1; 1; 0;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </g>
+        <!-- 左側出現用 -->
+        <g>
+            <rect x="660" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="710" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="718" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="949" y="457" width="11" height="650" fill="#222222" />
+            <rect x="943" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="660" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="660" y="457" width="300" height="20" fill="#22222250" />
+            <animate
+                attributeName="opacity"
+                values="0; 0; 0; 1;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </g>
     </g>
+
+    <!-- 壁 -->
+    <rect lcdParts="static" id="background" x="0" y="457" width="630" height="623" fill="url(#backGradient)" />
+    <rect lcdParts="static" id="background" x="1290" y="457" width="630" height="623" fill="url(#backGradient" />
 
     <!-- 矢印 -->
     <g lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 1)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 0))">
         <!-- 右側矢印 -->
-        <polygon points="1300,697 1430,697 1430,640 1580,790 1430,937 1430,880 1300,880" fill="#ffb770" />
-        <!-- 右側矢印 -->
-        <polygon points="620,697 490,697 490,640 340,790 490,937 490,880 620,880" fill="#ffb770" />
+        <polygon points="1300,697 1430,697 1430,640 1580,790 1430,937 1430,880 1300,880" fill="url(#rightArrowGradient)" >
+            <animateTransform
+                attributeName="transform"
+                type="translate"
+                values="0 0; 200 0; 200 0;"
+                keyTime="0; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"
+            />
+            <animate
+                attributeName="opacity"
+                values="1; 1; 1; 0;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </polygon>
+        <!-- 右側矢印出現用 -->
+        <polygon points="1300,697 1430,697 1430,640 1580,790 1430,937 1430,880 1300,880" fill="url(#rightArrowGradient)" >
+            <animate
+                attributeName="opacity"
+                values="0; 0; 0; 1;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </polygon>
+        <!-- 左側矢印 -->
+        <polygon points="620,697 490,697 490,640 340,790 490,937 490,880 620,880" fill="url(#leftArrowGradient)" >
+            <animateTransform
+                attributeName="transform"
+                type="translate"
+                values="0 0; -200 0; -200 0;"
+                keyTime="0; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"
+            />
+            <animate
+                attributeName="opacity"
+                values="1; 1; 1; 0;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </polygon>
+        <!-- 左側矢印出現用 -->
+        <polygon points="620,697 490,697 490,640 340,790 490,937 490,880 620,880" fill="url(#leftArrowGradient)" >
+            <animate
+                attributeName="opacity"
+                values="0; 0; 0; 1;"
+                keyTimes="0; 0.301; 0.7; 1;"
+                dur="2s"
+                repeatCount="indefinite"   
+            />
+        </polygon>
+    </g>
+
+    <!-- 閉まっているドア -->
+    <g lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 0)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 1))">
+        <!-- 右側 -->
+        <g>
+            <rect x="960" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="1026" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="1034" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="960" y="457" width="11" height="650" fill="#222222" />
+            <rect x="971" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="1252" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="960" y="457" width="300" height="20" fill="#22222250" />
+        </g>
+
+        <!-- 左側 -->
+        <g>
+            <rect x="660" y="457" width="300" height="650" fill="url(#doorGradient)" />
+            <rect x="710" y="515" width="184" height="318" rx="42" fill="#FFFFFF" />
+            <rect x="718" y="523" width="168" height="302" rx="34" stroke="#000000" stroke-width="6" fill="#FFFFFF" />
+            <rect x="949" y="457" width="11" height="650" fill="#222222" />
+            <rect x="943" y="457" width="6" height="650" fill="#FFFFFF" />
+            <rect x="660" y="457" width="8" height="650" fill="#AAAAAA" />
+            <rect x="660" y="457" width="300" height="20" fill="#22222250" />
+        </g>
     </g>
 
     <!-- 通行止め -->
     <g lcdParts="static" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 0)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 1))">
         <circle cx="960" cy="760" r="150" fill="#ff2828" stroke="#ffffff" stroke-width="5" />
         <rect x="847" y="732" width="226" height="56" fill="#FFFFFF" />
+        <animate
+            attributeName="opacity"
+            values="1;1;0;0"
+            keyTimes="0;0.4;0.8;1"
+            dur="1.4s"
+            repeatCount="indefinite"
+        />
+    </g>
+
+    <!-- へり -->
+    <g lcdParts="static">
+        <!-- 右側へり -->
+        <rect x="1260" y="457" width="32" height="650" fill="url(#sideGradient)" />
+        <line x1="1292" y1="457" x2="1292" y2="1080" stroke="#7d7d7d" stroke-width="2" />
+        <rect x="1265" y="606" width="24" height="6" fill="#717171" />
+        <rect x="1265" y="946" width="24" height="6" fill="#717171" />
+        <rect x="1265" y="612" width="10" height="334" fill="url(#handrailGradient)" />
+        <!-- 左側へり -->
+        <rect x="628" y="457" width="32" height="650" fill="url(#sideGradient)" />
+        <line x1="628" y1="457" x2="628" y2="1080" stroke="#ffffff" stroke-width="2" />
+        <rect x="631" y="606" width="24" height="6" fill="#717171" />
+        <rect x="631" y="946" width="24" height="6" fill="#717171" />
+        <rect x="645" y="612" width="10" height="334" fill="url(#handrailGradient)" />
     </g>
 
     <!-- ヘッダー背景 -->
@@ -64,19 +294,20 @@
 
     <!-- ヘッダーテキスト -->
     <g lcdParts="group" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 1)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 0))" lcd-color="#002b88">
-        <rect lcdParts="textBox" lcdText="こちら側のドアが開きます" x="45" y="376" width="815" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
-        <rect lcdParts="textBox" lcdText="/" x="860" y="376" width="54" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
-        <rect lcdParts="textBox" lcdText="Doors on this side will open." x="914" y="376" width="976" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "start"}' />
+        <rect lcdParts="textBox" lcdText="こちら側のドアが開きます" x="45" y="376" width="815" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill" : "rgb(0, 0, 170)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="/" x="860" y="376" width="54" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "fill" : "rgb(0, 0, 170)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="Doors on this side will open." x="914" y="376" width="976" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "fill" : "rgb(0, 0, 170)", "textAnchor": "start"}' />
     </g>
     <g lcdParts="group" isDraw="((whole.direction == 0) and (whole.nowStation.doorSide == 0)) or ((whole.direction == 1) and (whole.nowStation.doorSide == 1))" lcd-color="#002b88">
-        <rect lcdParts="textBox" lcdText="反対側のドアが開きます" x="25" y="376" width="710" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
-        <rect lcdParts="textBox" lcdText="/" x="735" y="376" width="45" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
-        <rect lcdParts="textBox" lcdText="Doors on the opposite side will open." x="780" y="376" width="1110" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "start"}' />
+        <rect lcdParts="textBox" lcdText="反対側のドアが開きます" x="25" y="376" width="710" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "fill" : "rgb(0, 0, 170)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="/" x="735" y="376" width="45" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "fill" : "rgb(0, 0, 170)", "textAnchor": "middle"}' />
+        <rect lcdParts="textBox" lcdText="Doors on the opposite side will open." x="780" y="376" width="1110" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "fill" : "rgb(0, 0, 170)", "textAnchor": "start"}' />
     </g>
 
 
 
     <!-- 参考画像 -->
     <!-- <image href="./../../../imgs/tokyu-doorAnim.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
-    <image href="./../../../imgs/tokyu-doorAnim2.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" />
+    <!-- <image href="./../../../imgs/tokyu-doorAnim2.jpg" x="0" y="0" width="1920" height="1080" opacity="0.2" /> -->
+    <!-- <image href="./../../../imgs/tokyu-doorAnim3.jpg" x="0" y="0" width="1920" height="1080" opacity="0.8" /> -->
 </svg>

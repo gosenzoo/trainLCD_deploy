@@ -129,6 +129,10 @@ class LcdSimulator {
         // 既存のSVG子要素をすべて削除してから新しい描画結果を追加する
         while (this._svgEl.firstChild) this._svgEl.removeChild(this._svgEl.firstChild);
         this._svgEl.appendChild(this._drawer.draw(drawParams));
+        // bodyページのSMILアニメーションをページ切り替え時に先頭から再生する
+        this._svgEl.querySelectorAll('animate, animateTransform, animateMotion').forEach(el => {
+            try { el.beginElement(); } catch(e) {}
+        });
         if (this._onRender) this._onRender(drawParams);
     }
 }
