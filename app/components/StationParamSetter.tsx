@@ -98,9 +98,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             s.numIcon.colorMode = value as 'auto' | 'manual'
             const line = _setting.lineDict[s.lineId]
             if (value === 'auto') {
-                if (line?.color)              s.numIcon.color     = line.color
-                if (line?.symbol)             s.numIcon.symbol    = line.symbol
-                if (line?.numIconPresetKey)   s.numIcon.presetKey = line.numIconPresetKey
+                // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
+                if (line) {
+                    s.numIcon.color     = line.color
+                    s.numIcon.symbol    = line.symbol
+                    s.numIcon.presetKey = line.numIconPresetKey
+                }
             } else {
                 s.numIcon.color     = s.numIcon.manualColor
                 s.numIcon.symbol    = s.numIcon.manualSymbol
@@ -120,9 +123,12 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             s.lineId = value
             if ((s.numIcon.colorMode ?? 'auto') === 'auto') {
                 const line = _setting.lineDict[value]
-                if (line?.color)            s.numIcon.color     = line.color
-                if (line?.symbol)           s.numIcon.symbol    = line.symbol
-                if (line?.numIconPresetKey) s.numIcon.presetKey = line.numIconPresetKey
+                // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
+                if (line) {
+                    s.numIcon.color     = line.color
+                    s.numIcon.symbol    = line.symbol
+                    s.numIcon.presetKey = line.numIconPresetKey
+                }
             }
         })
         setSetting(_setting)
@@ -140,9 +146,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             if (!s) return
             s.lineId = newKey
             if ((s.numIcon.colorMode ?? 'auto') === 'auto') {
-                if (lineData.color)            s.numIcon.color     = lineData.color
-                if (lineData.symbol)           s.numIcon.symbol    = lineData.symbol
-                if (lineData.numIconPresetKey) s.numIcon.presetKey = lineData.numIconPresetKey
+                // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
+                s.numIcon.color     = lineData.color
+                s.numIcon.symbol    = lineData.symbol
+                s.numIcon.presetKey = lineData.numIconPresetKey
             }
         })
         setSetting(_setting)

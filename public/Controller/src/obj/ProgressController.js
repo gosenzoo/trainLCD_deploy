@@ -371,15 +371,6 @@ class ProgressController {
         // 所要時間リストを計算
         const timeList = this._calcTimeList(dispStationList, hereDrawPos, actualFrameNum);
 
-        // 路線名割り当て: 表示路線の種類数に応じてroot/arrow/sectionsに振り分ける
-        // dispStationListを左から走査し、連続するlineId変化を順番に収集する
-        const orderedLineIds = [];
-        for (const st of dispStationList) {
-            if (!orderedLineIds.length || orderedLineIds[orderedLineIds.length - 1] !== st.lineId) {
-                orderedLineIds.push(st.lineId);
-            }
-        }
-        const lineCount = orderedLineIds.length;
         const _lineInfo = id => ({
             name:  this._getLineField(id, "name"),
             eng:   this._getLineField(id, "eng"),
@@ -387,21 +378,39 @@ class ProgressController {
         });
         const emptyLineInfo = { name: "", eng: "", color: "" };
 
+        // グレーアウトされていないセクションの開始インデックス（hereDrawPos < i+1 を満たす最小の i）
+        // Math.floor(hereDrawPos) が整数・小数いずれでも正しく機能する
+        const nonGrayStartSection = Math.floor(hereDrawPos);
+
+        // 非グレー範囲の表示駅（始端セクションの root 側駅 〜 末端駅）
+        const nonGrayStations = dispStationList.slice(nonGrayStartSection);
+
+        // 非グレー範囲内の路線を root 側から順に収集する（連続同一路線は1エントリにまとめる）
+        const nonGrayOrderedLineIds = [];
+        for (const st of nonGrayStations) {
+            if (!nonGrayOrderedLineIds.length || nonGrayOrderedLineIds[nonGrayOrderedLineIds.length - 1] !== st.lineId) {
+                nonGrayOrderedLineIds.push(st.lineId);
+            }
+        }
+        const nonGrayLineCount = nonGrayOrderedLineIds.length;
+
+        // 路線名割り当て: 非グレー区間に複数路線がある場合のみ割り当てる
         let rootLineInfo  = emptyLineInfo;
         let arrowLineInfo = emptyLineInfo;
         const sectionLineInfos = new Array(actualFrameNum - 1).fill(null);
 
-        if (lineCount >= 2) {
-            // 2路線以上: rootに最初の路線名、arrowに最後の路線名
-            rootLineInfo  = _lineInfo(orderedLineIds[0]);
-            arrowLineInfo = _lineInfo(orderedLineIds[lineCount - 1]);
+        if (nonGrayLineCount >= 2) {
+            // 一番手前側（root 寄り）の路線名を rootSection へ
+            rootLineInfo  = _lineInfo(nonGrayOrderedLineIds[0]);
+            // 一番奥側（arrow 寄り）の路線名を arrowSection へ
+            arrowLineInfo = _lineInfo(nonGrayOrderedLineIds[nonGrayLineCount - 1]);
 
-            if (lineCount >= 3) {
-                // 3路線以上: 中間路線を各路線内で最もroot側のsectionに配置
+            if (nonGrayLineCount >= 3) {
+                // 中間路線: 各路線が非グレー範囲内で最初に現れるセクションに配置する
                 // type=1（波線section）には路線名を入れない
-                for (let k = 1; k <= lineCount - 2; k++) {
-                    const lineId = orderedLineIds[k];
-                    const firstIdx = dispStationList.findIndex(s => s.lineId === lineId);
+                for (let k = 1; k <= nonGrayLineCount - 2; k++) {
+                    const lineId = nonGrayOrderedLineIds[k];
+                    const firstIdx = dispStationList.findIndex((s, idx) => idx >= nonGrayStartSection && s.lineId === lineId);
                     if (firstIdx < 0 || firstIdx >= actualFrameNum - 1) continue;
                     if (!lineLeapPosList.includes(firstIdx + 1)) {
                         sectionLineInfos[firstIdx] = _lineInfo(lineId);
@@ -410,7 +419,7 @@ class ProgressController {
             }
         }
 
-        // sections 構築
+        // sections 構築（grayed セクションは sectionLineInfos が null のため自動的に空になる）
         const sections = [];
         for (let i = 0; i < actualFrameNum - 1; i++) {
             const isLeap = lineLeapPosList.includes(i + 1);
@@ -597,21 +606,25 @@ class ProgressController {
                 continue;
             }
             if (i % 2 === 0) {
-                // 左半分: 当該表示駅の色
-                colorList.push(dispStationList[Math.floor(i / 2)].lineColor || "rgb(200,200,200)");
+                // 左半分: 当該表示駅の次区間路線色
+                const s = dispStationList[Math.floor(i / 2)];
+                colorList.push(this._getLineField(s.lineId, "color") || "rgb(200,200,200)");
             } else {
                 // 右半分: 次の表示駅の手前にある全体リスト上の駅の色（路線色変化対応）
                 const nextDispStation = dispStationList[Math.floor(i / 2) + 1];
                 const prevId = ((nextDispStation._id - 1) + this.stationList.length) % this.stationList.length;
                 const prevStation = this.stationList[prevId];
                 colorList.push(
-                    (prevStation?.lineColor) || nextDispStation.lineColor || "rgb(200,200,200)"
+                    this._getLineField(prevStation?.lineId, "color") ||
+                    this._getLineField(nextDispStation.lineId, "color") ||
+                    "rgb(200,200,200)"
                 );
             }
         }
 
-        // 前方端: 末尾表示駅の色
-        colorList.push(dispStationList[dispStationList.length - 1].lineColor || "rgb(200,200,200)");
+        // 前方端: 末尾表示駅の次区間路線色
+        const lastDisp = dispStationList[dispStationList.length - 1];
+        colorList.push(this._getLineField(lastDisp.lineId, "color") || "rgb(200,200,200)");
 
         return colorList;
     }
@@ -737,7 +750,7 @@ class ProgressController {
         const lastStation = dispStationList[actualCount - 1];
         const hasStopAfterLast = this.stationList.slice(lastStation._id + 1).some(s => !s.isPass);
         const arrowSection = {
-            color:         lastStation.lineColor || "rgb(200,200,200)",
+            color:         this._getLineField(lastStation.lineId, "color") || "rgb(200,200,200)",
             type:          hasStopAfterLast ? 1 : 0,
             lineName:      this._getLineField(lastStation.lineId, "name"),
             lineNameEng:   this._getLineField(lastStation.lineId, "eng"),
@@ -746,11 +759,11 @@ class ProgressController {
         };
 
         // 実駅間のsections（actualCount - 1 個）
-        // color1・color2ともに駅iの色を使う（defaultLineと同じ：路線色変化は駅位置で発生）
+        // color1・color2ともに駅iの次区間路線色を使う（defaultLineと同じ：路線色変化は駅位置で発生）
         const hereDrawPosX2 = hereDrawPos * 2;
         const sections = [];
         for (let i = 0; i < actualCount - 1; i++) {
-            const stationColor = dispStationList[i].lineColor || "rgb(200,200,200)";
+            const stationColor = this._getLineField(dispStationList[i].lineId, "color") || "rgb(200,200,200)";
             const c1 = (i * 2 + 1) <= hereDrawPosX2 ? grayColor : stationColor;
             const c2 = (i * 2 + 2) <= hereDrawPosX2 ? grayColor : stationColor;
             sections.push({
