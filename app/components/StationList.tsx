@@ -91,22 +91,25 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
         let _numIcon: stationNumIconType = { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" }
         let _lineId = ""
+        let _operationId = ""
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
                 const prevStation = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]
                 // symbol/presetKey/color は前駅から引き継ぎ、number は空文字で追加する
                 _numIcon = { ...prevStation.numIcon, number: "" }
                 _lineId = prevStation.lineId
+                _operationId = prevStation.operationId
             } else {
                 const lastStation = _setting.stationList[_setting.stationList.length - 1]
                 _numIcon = { ...lastStation.numIcon }
                 _lineId = lastStation.lineId
+                _operationId = lastStation.operationId
             }
         }
         _setting.stationList.splice(_index, 0, {
             name: "", kana: "", eng: "", numIcon: _numIcon,
             lineNumberType: "0", transfers: [],
-            isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
+            isPass: false, sectionTime: "", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
             otherCarNum: "0", otherLeftSlotInd: "0", transferListTransfers: ""
@@ -284,6 +287,18 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         {
             header: '次区間所要時間',
             cell: (station) => station.sectionTime,
+        },
+        {
+            // 駅の operationId が指す運用の種別を表示し、背景色を trainTypeBackColor にする
+            header: '種別',
+            cell: (station) => {
+                const op = setting.operationDict?.[station.operationId]
+                return op?.trainType ?? ''
+            },
+            cellStyle: (station) => {
+                const op = setting.operationDict?.[station.operationId]
+                return op?.trainTypeBackColor ? { backgroundColor: op.trainTypeBackColor, color: op.trainTypeColor || '' } : {}
+            },
         },
         {
             header: '緯度',

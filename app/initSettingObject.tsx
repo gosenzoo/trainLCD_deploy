@@ -32,7 +32,6 @@ const initOperationObject: operationType = {
     isDrawStopText: false,
     isDrawLine: false,
     carLineColor: "#FFFFFF",
-    startStationInd: "0"
 }
 
 const initStationObject: stationType = {
@@ -45,6 +44,7 @@ const initStationObject: stationType = {
     isPass: false,
     sectionTime: "",
     lineId: "",
+    operationId: "",
     coordinate: [null, null],
     transferText: "",
     transferTextEng: "",
@@ -86,9 +86,10 @@ const initDispConfigObject: dispConfigType = {
             { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
         ],
         '1': [ // 走行
-            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
-            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
-            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
+            { pageName: "defaultLineSVG.svg",   dispTime: 11000, type: 0 },
+            { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
+            { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
+            { pageName: "transfers.svg",         dispTime: 11000, type: 1 },
         ],
         '2': [ // 直前
             { pageName: "platform.svg",        dispTime: 11000, type: 0 },
@@ -97,9 +98,10 @@ const initDispConfigObject: dispConfigType = {
             { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
         ],
         '3': [ // 停車
-            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
-            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
-            { pageName: "platform.svg",        dispTime: 11000, type: 0 },
+            { pageName: "defaultLineSVG.svg",   dispTime: 11000, type: 0 },
+            { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
+            { pageName: "platform.svg",          dispTime: 11000, type: 0 },
+            { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
         ],
         '4': [ // 通過
             { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
@@ -119,7 +121,7 @@ const initDispConfigObject: dispConfigType = {
 
 const initSettingObject: settingType = {
     info: initInfoObject,
-    operationList: [initOperationObject],
+    operationDict: {"0": initOperationObject},
     stationList: [],
     lineDict: {},
     iconDict: {},

@@ -57,8 +57,8 @@ window.onload = async function(){
     settings.stationList.forEach(station => {
         _numIconKeyList.add(station.numIcon?.presetKey);
     });
-    //行先駅ナンバリング
-    settings.operationList.forEach(operation => {
+    //行先駅ナンバリング（operationDict形式・旧operationList配列の両方に対応）
+    Object.values(settings.operationDict ?? settings.operationList ?? {}).forEach(operation => {
         _numIconKeyList.add(operation.destinationNumIconKey);
     })
     //アイコンリスト

@@ -35,7 +35,21 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                 reader.onload = (ee: any) => {
                     try {
                         readData = JSON.parse(ee.target.result)
-                        mergeProperties(readData.operationList, initSettingObject.operation);
+                        // operationList（旧配列形式）→ operationDict（辞書形式）へマイグレーション
+                        if ((readData as any).operationList && !readData.operationDict) {
+                            readData.operationDict = {}
+                            ;((readData as any).operationList as any[]).forEach((op: any, i: number) => {
+                                const { startStationInd: _, ...rest } = op
+                                readData.operationDict[String(i)] = rest
+                            })
+                            delete (readData as any).operationList
+                        }
+                        if (!readData.operationDict) {
+                            readData.operationDict = { "0": structuredClone(initSettingObject.operation) }
+                        }
+                        Object.values(readData.operationDict).forEach((op: any) => {
+                            mergeProperties(op, initSettingObject.operation)
+                        });
                         readData.stationList.forEach(station => {
                             mergeProperties(station, initSettingObject.station);
                         });
@@ -88,6 +102,10 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                                 if (line?.color)            station.numIcon.color     = line.color
                                 if (line?.symbol)           station.numIcon.symbol    = line.symbol
                                 if (line?.numIconPresetKey) station.numIcon.presetKey = line.numIconPresetKey
+                            }
+                            // operationId が未定義の場合は空文字で補完する
+                            if (station.operationId === undefined) {
+                                station.operationId = ""
                             }
                             // transferCountLineP（旧）→ transferListPlatform（新）へマイグレーション
                             if (station.transferListPlatform === undefined) {
@@ -199,7 +217,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
             <div className="btn-group">
                 <button onClick={(e) => {
                     let _setting = setting;
-                    _setting.operationList = readData.operationList;
+                    _setting.operationDict = readData.operationDict;
                     setSetting(_setting);
                 }}>運用読み込み</button>
                 <button onClick={(e) => {

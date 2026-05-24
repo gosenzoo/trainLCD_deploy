@@ -45,7 +45,7 @@ classDiagram
 
     class settingType {
         +infoType info
-        +operationType[] operationList
+        +operationDict : Dict~string, operationType~
         +stationType[] stationList
         +lineDict : Dict~string, lineType~
         +iconDict : Dict~string, string|iconParamsType~
@@ -84,7 +84,6 @@ classDiagram
         +boolean isDrawLine
         +string headOffset
         +string backOffset
-        +string startStationInd
     }
 
     class stationType {
@@ -97,6 +96,7 @@ classDiagram
         +boolean isPass
         +string sectionTime
         +string lineId
+        +string operationId
         +number|null[] coordinate
         +string transferText
         +string transferTextEng
@@ -174,7 +174,7 @@ classDiagram
     }
 
     settingType "1" *-- "1" infoType : info
-    settingType "1" *-- "0..*" operationType : operationList
+    settingType "1" *-- "0..*" operationType : operationDict (ID→operationType)
     settingType "1" *-- "0..*" stationType : stationList
     settingType "1" *-- "0..*" lineType : lineDict (ID→lineType)
     settingType "1" *-- "0..*" iconParamsType : iconDict (ID→iconParamsType\nor base64 string)
@@ -184,6 +184,7 @@ classDiagram
     transferItemType "1" *-- "1" transferLineType : line
     transferItemType "1" *-- "1" transferStationType : station
     stationType --> lineType : lineId で参照（区間路線）
+    stationType --> operationType : operationId で参照（区間運用）
     stationType --> iconParamsType : numIconPresetKey で参照
     operationType --> iconParamsType : destinationNumIconKey で参照
     dispConfigType "1" *-- "1..*" pageObjType : pageDispList (pageState→pageObj[])
@@ -222,7 +223,6 @@ classDiagram
 | `isDrawLine` | boolean | 号車ライン描画 ON/OFF |
 | `headOffset` / `backOffset` | string | 列車前後のオフセット（px） |
 | `carLineColor` | string | 号車ラインの色 |
-| `startStationInd` | string | 運用開始駅のインデックス |
 
 #### `stationType` — 駅設定
 | フィールド | 型 | 説明 |
@@ -248,6 +248,7 @@ classDiagram
 | `isPass` | boolean | 通過駅フラグ |
 | `sectionTime` | string | 次駅までの所要時間（分） |
 | `lineId` | string | この駅以降の区間路線ID |
+| `operationId` | string | この駅以降の区間運用ID（`operationDict` のキー）。空文字のときはフォールバック運用を使用 |
 | `coordinate` | `[number\|null, number\|null]` | 緯度・経度（GPS連動用） |
 | `transferText` / `transferTextEng` | string | 乗換案内テキスト（`:アイコンキー:` 記法対応） |
 | `doorSide` | `'left'\|'right'` | 開くドアの方向 |
@@ -314,9 +315,31 @@ classDiagram
 #### `pageObjType` — ページ表示エントリ
 | フィールド | 型 | 説明 |
 |---|---|---|
-| `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` |
+| `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` / `trainTypeChange.svg` |
 | `dispTime` | number | このページを表示し続ける時間（ms） |
-| `type` | number | 表示条件（0: 無条件 / 1: nowStation.transfersがあれば / 2: 次のoperationがあれば（未実装） / 3: Messageがあれば（未実装）） |
+| `type` | number | 表示条件（0: 無条件 / 1: nowStation.transfersがあれば / 2: 次運用あり / 3: Messageがあれば（未実装）） |
+
+#### `pageType=2`「次運用あり」の判定ロジック
+
+`_buildConditionData()` が返す `hasNextOperation: boolean` で判定する。
+
+**判定手順:**
+
+1. 現在の運用の「参照駅インデックス」を決定する
+   - `posState=0,1`（走行中・直前）: `prevInd = max(0, currentStationInd - 1)` の駅
+   - `posState=2`（停車中）: `currentStationInd` の駅
+2. 参照駅の `operationId`（= `currentOpId`）を取得する
+3. 参照駅より後の駅を順番に走査し、`operationId !== currentOpId` となる最初の駅（= 種別変更駅）を探す
+4. 種別変更駅が見つかった場合、その `operationId` で `operationDict` を参照して次の運用を取得する
+5. 次の運用が存在し、かつ現在の運用と `trainType` または `trainTypeEng` のいずれかが異なれば `hasNextOperation = true`
+   - 両方が空文字の場合は「同じ」として扱う（`"" !== ""` は false のため自然に処理される）
+
+#### ページ設定デフォルト値（`initDispConfigObject`）
+
+| pageState | ページ名 | dispTime | type | 追加位置 |
+|---|---|---|---|---|
+| 1（走行） | `trainTypeChange.svg` | 11000 | 2 | `defaultLineSVG.svg` の次 |
+| 3（停車） | `trainTypeChange.svg` | 11000 | 2 | `platform.svg` の次 |
 
 #### `pageState` — 走行状態
 | 値 | 意味 | 条件 |
@@ -627,6 +650,20 @@ type GenericItemListProps<T> = {
 
 ---
 
+### 4.X+1 `StationParamSetter` — 次区間運用セレクト
+
+「次区間路線」セレクトボックスの下に **「次区間運用」** セレクトボックスを追加する。
+
+| 項目 | 内容 |
+|---|---|
+| ラベル | 次区間運用 |
+| UI | `<select>` |
+| 先頭選択肢 | `""` / `"(なし)"` — `station.operationId` に空文字を設定する |
+| その後の選択肢 | `operationDict` の各エントリを `"[id]: [trainType] [direction] [destination]行"` 形式で表示 |
+| 値 | 選択された `operationDict` のキー文字列（`station.operationId` に格納） |
+
+---
+
 ### 4.7 `TransferLinePopup` — 接続路線追加ポップアップ
 
 `StationParamSetter` 内の「乗換路線」欄に配置するモーダルポップアップ。
@@ -780,7 +817,7 @@ type GenericItemListProps<T> = {
 
 | タブID | タブラベル | コンテンツ |
 |--------|-----------|-----------|
-| `basic` | 駅基本設定 | 駅名・かな・英語・路線記号・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア・次区間所要時間・次区間路線（`lineDict` から選択するセレクトボックス＋「新規追加」ボタン） |
+| `basic` | 駅基本設定 | 駅名・かな・英語・路線記号・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア・次区間所要時間・次区間路線（`lineDict` から選択するセレクトボックス＋「新規追加」ボタン）・次区間運用（`operationDict` から選択するセレクトボックス） |
 | `defaultLine` | 詳細路線図表示 | 乗換案内（日英テキスト）・登録路線情報を反映ボタン |
 | `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
 | `platform` | ホーム案内表示 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
@@ -928,6 +965,22 @@ export function moveDictItemsDown<T>(
 
 `GenericItemList` に `rangeStartKey?: string` prop を追加し、該当行に `range-start` クラスを付与する（`selected` より優先）。CSS は `.range-start td, .range-start th { background-color: orange; }` 相当。
 
+#### `StationList` テーブルカラム定義
+
+| カラムヘッダー | 内容 | 備考 |
+|---|---|---|
+| # | 1-based インデックス | `isSelector: true`、クリックで行選択 |
+| 駅名 | `station.name` | |
+| 駅名かな | `station.kana` | `defaultCollapsed: true` |
+| 駅名英語 | `station.eng` | `defaultCollapsed: true` |
+| ナンバリング | `numIcon` のアイコン描画 | |
+| 次区間路線 | `lineDict[station.lineId].name` | |
+| 種別 | `operationDict[station.operationId].trainType`。背景色は `operationDict[station.operationId].trainTypeBackColor` | `operationId` が空または未定義の場合は空表示 |
+| 次区間所要時間 | `station.sectionTime` | |
+| 乗換 | `station.transfers` のアイコン描画 | |
+| ドア | `station.doorSide` | |
+| 通過 | `station.isPass` | |
+
 #### UI（全リスト共通）
 
 テーブル直下の `.btn-group` に以下ボタンを追加する：
@@ -1059,76 +1112,49 @@ export function moveDictItemsDown<T>(
 
 ### 4.9 `OperationForm` — 運用タブ UI
 
-複数の運用を切り替えるUIをタブ形式で実装する。
+複数の運用を辞書形式で管理し、切り替えるUIをタブ形式で実装する。`lineDict` と同じ構造（数値文字列キー）。
+
+#### データ構造
+
+`settingType.operationDict: { [id: string]: operationType }` — キーは数値文字列（例: `"0"`, `"1"`, `"2"`）。
 
 #### レイアウト
 
 ```
 [ 運用を追加 ] [ 表示中を削除 ]
-┌──────────────┬──────────────┬──────────────┐
-│ 渋谷→元町・中華街 │ 元町・中華街→渋谷 │  ...  │  ← タブ行
-└──────────────┴──────────────┴──────────────┘
-  選択中のタブに対応するフォーム内容
+┌────────────────────┬────────────────────┬──────────┐
+│ 0: 急行 渋谷経由 元町行 │ 1: 各停 元町行       │  ...  │  ← タブ行
+└────────────────────┴────────────────────┴──────────┘
+  選択中の運用IDに対応するフォーム内容
 ```
 
 - タブは既存の `.tab-btn` / `.tab-btn.active` クラスを使用
-- 選択中の運用インデックスは `operationInd` state で管理（既存）
-- 従来の `<select>` は廃止し、タブに置き換える
-
-#### `startStationInd` の入力 UI
-
-| 項目 | 内容 |
-|------|------|
-| ラベル | 運用開始駅（旧: 設定開始駅ID） |
-| UI | `<select>` で駅リストから選択 |
-| 選択肢 | `stationList` の各駅を `[インデックス] - 駅名` 形式で列挙 |
-| 値 | 選択された駅の 0-based インデックス（文字列） |
-| 駅名が空の場合 | `[インデックス] - 駅名未定義` と表示 |
+- 選択中の運用IDは `operationId` state（文字列キー）で管理
+- `operationDict` のエントリ追加・削除はキー操作で行う（`lineDict` と同じ方式）
 
 #### タブラベルの生成ロジック
 
-タブに表示するテキスト: **「[開始駅名] → [終了駅名]」**
+タブに表示するテキスト: **「[id]: [trainType] [direction] [destination]行」**
 
-```
-getOperationTabLabel(operation, index, operationList, stationList) → string
-```
+| フィールド | 内容 |
+|---|---|
+| `id` | `operationDict` のキー |
+| `trainType` | `operation.trainType`（空の場合は省略） |
+| `direction` | `operation.direction`（空の場合は省略） |
+| `destination` | `operation.destination`（空の場合は `"行先未設定"`） |
 
-| 変数 | 内容 |
-|------|------|
-| 開始駅インデックス | `parseInt(operation.startStationInd)` |
-| 終了駅インデックス | 次の運用の `startStationInd`（そのまま）。最後の運用は `stationList.length - 1` |
-| 次の運用の決定 | `operationList` を `startStationInd` の昇順でソートし、対象運用の次のエントリを参照 |
-| 範囲外クランプ | インデックスが `[0, stationList.length - 1]` の範囲外なら近い方の端にクランプ |
-| 駅名 | `stationList[clampedIndex]?.name` が空の場合は `"駅名未定義"` を表示 |
+例: `"0: 急行 渋谷経由 元町・中華街行"` / `"1: 各停 元町・中華街行"`
 
-例：
-- `startStationInd = "0"`, 次の運用なし → `"渋谷 → 元町・中華街"`
-- `startStationInd = "-5"` → インデックス 0 にクランプ → `"渋谷 → ..."`
+#### 運用追加・削除
 
-#### 未使用運用の判定とスタイル
+| 操作 | 挙動 |
+|---|---|
+| 追加 | `operationDict` のキー最大値+1 を新キーとして空の運用を追加 |
+| 削除 | 現在選択中のキーを `operationDict` から削除。前のキーを選択状態に戻す（なければ最初のキー） |
 
-実際の表示で使われない運用（適用範囲が駅リストと重ならない）は、タブを視覚的に区別する。
+#### `startStationInd` の廃止
 
-**未使用の判定**
-
-```
-isOperationUnused(operation, index, operationList, stationList) → boolean
-```
-
-操作の適用範囲 `[startInd, endInd]` が `[0, stationList.length - 1]` と重ならない場合に `true`。
-
-| 条件 | 判定 |
-|------|------|
-| `startInd > stationList.length - 1` | 未使用（開始が範囲外） |
-| `endInd < 0` | 未使用（終了が範囲外） |
-| stationList が空 | 全運用が未使用 |
-
-※ クランプ前の生のインデックス値で判定する（クランプ後では境界ケースが消えるため）
-
-**スタイル**
-
-- タブラベルの先頭に `(未使用)` を付与
-- CSS クラス `.tab-btn--unused` を追加し、選択状態によらず暗い外観にする
+旧 `startStationInd` フィールドは廃止する。各駅が `operationId` を持つ方式に変更。フォームからも削除する。
 
 ### 4.10 駅プリセットから追加
 
@@ -2839,7 +2865,13 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 
 #### ① operation 自体が存在しない場合
 
-`operationList` が空、または現在の区間インデックスに対応するエントリが存在しない場合（`nowOperation === null`）、全フィールドをデフォルト値で構成した **フォールバック operation オブジェクト** を生成する（行先フィールドは後述の ② で補完）。
+`operationDict` が空、または現在の区間の `station.operationId` に対応するエントリが存在しない場合（`nowOperation === null`）、全フィールドをデフォルト値で構成した **フォールバック operation オブジェクト** を生成する（行先フィールドは後述の ② で補完）。
+
+**運用の決定ロジック（`LCDController.getOperation`）:**
+
+- 停車中（posState=2）: `nowStation.operationId` で `operationDict` を参照する
+- 走行中・直前（posState=0,1）: `prevStation.operationId`（前駅の `operationId`）で `operationDict` を参照する（「まもなく」段階はまだ前区間の運用を使用）
+- `operationId` が空文字または `operationDict` にキーが存在しない場合: `nowOperation = null` とし、フォールバック処理へ進む
 
 #### ② 行先パラメータが空の場合（① の後に必ず実施）
 
@@ -2859,6 +2891,49 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 | `trainTypeColor` | `"#0185ff"`（固定） |
 | `trainTypeBackColor` | `""`（固定） |
 | `isStart` | `false`（固定） |
+
+---
+
+### drawParams — `trainTypeChange` フィールド
+
+`ProgressController.getDrawParams()` が返す drawParams に `trainTypeChange` フィールドを追加する。
+
+```
+drawParams.trainTypeChange = {
+    rootType:        { name, eng, backColor }  // 現在の運用の種別
+    arrowType:       { name, eng, backColor }  // 次の運用の種別
+    changeStation:   { name, eng }             // 次運用最初の駅（種別変更駅）
+    rootLine:        { name, eng }             // 現在の参照駅の lineId が指す路線名
+    arrowLine:       { name, eng }             // 種別変更駅の lineId が指す路線名
+    rootSection:     { color }                 // 現在の区間の路線色（停車中なら次区間）
+    arrowSection:    { color }                 // 次運用最初の区間の路線色
+    leftSection:     { color }                 // 現在の運用の最後の区間の路線色
+    rightSection:    { color }                 // 次運用最初の区間の路線色
+    isDrawLinename:  boolean                   // rootLine と arrowLine が全フィールド一致するとき true
+}
+```
+
+| フィールド | 取得元 |
+|---|---|
+| `rootType.name` | 現在の運用（フォールバック適用済み）の `trainType` |
+| `rootType.eng` | 現在の運用の `trainTypeEng` |
+| `rootType.backColor` | 現在の運用の `trainTypeBackColor` |
+| `arrowType.name` | 次の運用（operationDict から直接取得、フォールバックなし）の `trainType` |
+| `arrowType.eng` | 次の運用の `trainTypeEng` |
+| `arrowType.backColor` | 次の運用の `trainTypeBackColor` |
+| `changeStation.name` | 種別変更駅（最初に operationId が変わる駅）の `name` |
+| `changeStation.eng` | 種別変更駅の `eng` |
+| `rootLine.name` | `lineDict[参照駅.lineId].name`（参照駅 = 現在運用を決定した駅） |
+| `rootLine.eng` | `lineDict[参照駅.lineId].eng` |
+| `arrowLine.name` | `lineDict[種別変更駅.lineId].name` |
+| `arrowLine.eng` | `lineDict[種別変更駅.lineId].eng` |
+| `rootSection.color` | 現在の区間の路線色。posState=2（停車中）なら `lineDict[currentStation.lineId].color`（次区間）、それ以外は `lineDict[prevStation.lineId].color` |
+| `arrowSection.color` | 次運用最初の区間の路線色 = `lineDict[種別変更駅.lineId].color` |
+| `leftSection.color` | 現在の運用の最後の区間の路線色 = `lineDict[種別変更駅直前の駅.lineId].color` |
+| `rightSection.color` | 次運用最初の区間の路線色 = `lineDict[種別変更駅.lineId].color`（`arrowSection.color` と同値） |
+| `isDrawLinename` | `rootLine` と `arrowLine` のいずれかのフィールドが異なるとき `true`、全フィールド一致のとき `false` |
+
+次の運用が存在しない場合（`hasNextOperation=false`）でも `trainTypeChange` フィールドは常に生成し、各フィールドを空文字で埋めた構造体を返す。`trainTypeChange.svg` 側で表示条件（type=2）によって非表示にされるため、`null` にはしない。
 
 ---
 

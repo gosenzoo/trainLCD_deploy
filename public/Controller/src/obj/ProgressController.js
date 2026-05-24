@@ -6,15 +6,23 @@
 class ProgressController {
     /**
      * @param {object} progressParams
-     * @param {object[]}  progressParams.stationList   - 全駅リスト
-     * @param {object[]}  progressParams.operationList - 運行情報リスト
-     * @param {object}    progressParams.info          - 全体設定（isLoop等）
-     * @param {object}    progressParams.lineDict      - 路線辞書
-     * @param {object}    progressParams.iconDict      - アイコン辞書
+     * @param {object[]}  progressParams.stationList    - 全駅リスト
+     * @param {object}    progressParams.operationDict  - 運用辞書（ID→operationType）
+     * @param {object}    progressParams.info           - 全体設定（isLoop等）
+     * @param {object}    progressParams.lineDict       - 路線辞書
+     * @param {object}    progressParams.iconDict       - アイコン辞書
      */
     constructor(progressParams) {
         this.stationList   = progressParams.stationList;
-        this.operationList = progressParams.operationList;
+        // 旧形式（operationList配列）との後方互換: 辞書形式に変換する
+        if (progressParams.operationDict) {
+            this.operationDict = progressParams.operationDict;
+        } else if (progressParams.operationList) {
+            this.operationDict = {};
+            progressParams.operationList.forEach((op, i) => { this.operationDict[String(i)] = op; });
+        } else {
+            this.operationDict = {};
+        }
         this.info          = progressParams.info;
         this.lineDict      = progressParams.lineDict;
         this.iconDict      = progressParams.iconDict;
@@ -212,6 +220,8 @@ class ProgressController {
             overLine:          this._buildOverLine(currentStationInd, posState),
             platform:          this._buildPlatform(currentStationInd, posState),
             transfers:         this._buildTransfers(currentStationInd, posState),
+            // 種別変更案内（次運用が存在しない場合はnull）
+            trainTypeChange:   this._buildTrainTypeChange(),
             // PageControllerに渡すページ切替情報
             pageState:         this._computePageState(),
             conditionData:     this._buildConditionData(),
@@ -242,12 +252,122 @@ class ProgressController {
 
     /**
      * ページ表示条件の判定に使うデータを生成する。
-     * hasTransfers: nowStationに乗換情報があるかどうか（pageType=1の条件）
+     * hasTransfers: 次停車駅に乗換情報があるかどうか（pageType=1の条件）
+     * hasNextOperation: 次運用が存在しかつ種別が異なるかどうか（pageType=2の条件）
      */
     _buildConditionData() {
         const displayStation = getNextStopStation(this.stationList, this.currentStationInd);
+
+        // 現在の運用の種別（rawのoperationDict値を使用）
+        // posState=0,1（走行中・まもなく）は前駅、posState=2（ただいま）は現在駅を参照する
+        const refInd = this.posState !== 2 ? Math.max(0, this.currentStationInd - 1) : this.currentStationInd;
+        const refOpId = this.stationList[refInd]?.operationId ?? '';
+        const currentRawOp = (refOpId && this.operationDict[refOpId]) ? this.operationDict[refOpId] : {};
+
+        // 次運用との種別比較（どちらかが異なればhasNextOperation=true）
+        const nextOpResult = this._findNextOperation();
+        let hasNextOperation = false;
+        if (nextOpResult) {
+            const { nextOperation } = nextOpResult;
+            hasNextOperation = (currentRawOp.trainType    !== nextOperation.trainType ||
+                                currentRawOp.trainTypeEng !== nextOperation.trainTypeEng);
+        }
+
         return {
-            hasTransfers: !!(displayStation?.transfers?.length)
+            hasTransfers:     !!(displayStation?.transfers?.length),
+            hasNextOperation
+        };
+    }
+
+    /**
+     * 現在の運用からoperationIdが変わる最初の駅を探して次運用情報を返す
+     * posState=0（走行中）は前駅を基準、それ以外は現在駅を基準として前方を走査する
+     * @returns {{ nextOperation: object, changeStation: object, changeStationInd: number } | null}
+     */
+    _findNextOperation() {
+        // 参照インデックス: 走行中・まもなく(posState=0,1)は前駅、ただいま(posState=2)は現在駅
+        const refInd = this.posState !== 2 ? Math.max(0, this.currentStationInd - 1) : this.currentStationInd;
+        const refOperationId = this.stationList[refInd]?.operationId ?? '';
+
+        // refIndより前方の駅を順に走査し、operationIdが変わる最初の駅を探す
+        for (let i = refInd + 1; i < this.stationList.length; i++) {
+            const st = this.stationList[i];
+            const stOpId = st.operationId ?? '';
+            if (stOpId !== refOperationId) {
+                // operationIdが変わる駅を発見: 対応する運用を取得する
+                const nextOp = (stOpId && this.operationDict[stOpId]) ? this.operationDict[stOpId] : null;
+                if (!nextOp) return null;
+                return { nextOperation: nextOp, changeStation: st, changeStationInd: i };
+            }
+        }
+        return null;
+    }
+
+    /**
+     * trainTypeChange（種別変更案内）データを生成する
+     * 次運用が存在しない場合は null を返す
+     * @returns {{ rootType, arrowType, changeStation, rootLine, arrowLine } | null}
+     */
+    _buildTrainTypeChange() {
+        const nextOpResult = this._findNextOperation();
+        if (!nextOpResult) return null;
+
+        const { nextOperation, changeStation, changeStationInd } = nextOpResult;
+        const operation = this._resolveOperation();
+
+        // 参照駅（現在区間の路線取得に使用）: 走行中・まもなく(posState=0,1)は前駅、ただいま(posState=2)は現在駅
+        const refInd = this.posState !== 2 ? Math.max(0, this.currentStationInd - 1) : this.currentStationInd;
+        const refStation = this.stationList[refInd];
+
+        // rootSection: 現在の区間色（posState=2停車中は次区間=currentStation.lineId、それ以外は前駅.lineId）
+        const rootSectionInd = this.posState === 2 ? this.currentStationInd : Math.max(0, this.currentStationInd - 1);
+        const rootSectionColor = this._getLineField(this.stationList[rootSectionInd]?.lineId, "color");
+
+        // leftSection: 現在の運用の最後の区間 = 種別変更駅直前の駅のlineId
+        const leftSectionStation = changeStationInd > 0 ? this.stationList[changeStationInd - 1] : changeStation;
+        const leftSectionColor = this._getLineField(leftSectionStation?.lineId, "color");
+
+        // arrowSection・rightSection: 次運用最初の区間 = 種別変更駅のlineId
+        const arrowRightColor = this._getLineField(changeStation.lineId, "color");
+
+        return {
+            // 現在の種別
+            rootType: {
+                name:      operation.trainType         || "",
+                eng:       operation.trainTypeEng      || "",
+                backColor: operation.trainTypeBackColor || ""
+            },
+            // 次の種別
+            arrowType: {
+                name:      nextOperation.trainType         || "",
+                eng:       nextOperation.trainTypeEng      || "",
+                backColor: nextOperation.trainTypeBackColor || ""
+            },
+            // 種別が変わる駅
+            changeStation: {
+                name: changeStation.name || "",
+                eng:  changeStation.eng  || ""
+            },
+            // 現在区間の路線名
+            rootLine: {
+                name: this._getLineField(refStation?.lineId, "name"),
+                eng:  this._getLineField(refStation?.lineId, "eng")
+            },
+            // 次運用最初の区間の路線名
+            arrowLine: {
+                name: this._getLineField(changeStation.lineId, "name"),
+                eng:  this._getLineField(changeStation.lineId, "eng")
+            },
+            // rootLineとarrowLineのいずれかのフィールドが異なるときtrue（路線名表示判定に使用）
+            isDrawLinename: this._getLineField(refStation?.lineId, "name") !== this._getLineField(changeStation.lineId, "name") ||
+                            this._getLineField(refStation?.lineId, "eng")  !== this._getLineField(changeStation.lineId, "eng"),
+            // 現在の区間色（停車中なら次区間）
+            rootSection:  { color: rootSectionColor },
+            // 次運用最初の区間色（arrowSectionとrightSectionは同値）
+            arrowSection: { color: arrowRightColor },
+            // 現在の運用の最後の区間色
+            leftSection:  { color: leftSectionColor },
+            rightSection: { color: arrowRightColor }
         };
     }
 
@@ -256,7 +376,15 @@ class ProgressController {
     // ============================================================
 
     _resolveOperation() {
-        const raw = getOperationForSection(this.operationList, this.sectionInd);
+        // 走行中・まもなく（posState=0,1）は前駅の operationId を使用し、ただいま（posState=2）のみ現在駅に切り替える
+        let operationId;
+        if (this.posState !== 2) {
+            const prevInd = Math.max(0, this.currentStationInd - 1);
+            operationId = this.stationList[prevInd]?.operationId ?? '';
+        } else {
+            operationId = this.stationList[this.currentStationInd]?.operationId ?? '';
+        }
+        const raw = (operationId && this.operationDict[operationId]) ? this.operationDict[operationId] : null;
         // isPass=falseの末尾駅を行先フォールバックとして取得
         const lastStop = [...this.stationList].reverse().find(s => !s.isPass)
             ?? this.stationList[this.stationList.length - 1];

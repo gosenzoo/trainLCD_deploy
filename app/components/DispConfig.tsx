@@ -18,6 +18,7 @@ const AVAILABLE_PAGES = [
     "transfers.svg",
     "platform.svg",
     "doorAnim.svg",
+    "trainTypeChange.svg",
 ]
 
 // pageStateの表示名（0〜5）

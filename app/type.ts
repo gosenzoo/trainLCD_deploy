@@ -51,7 +51,7 @@ type dispConfigType = {
 
 type settingType = {
     info: infoType,
-    operationList: operationType[],
+    operationDict: {[id: string]: operationType},
     stationList: stationType[],
     lineDict: {[id: string]: lineType},
     iconDict: {[id: string]: string | iconParamsType},
@@ -90,7 +90,6 @@ type operationType = {
     isDrawStopText: boolean,
     isDrawLine: boolean,
     carLineColor: string,
-    startStationInd: string
 }
 
 // 駅ナンバリングアイコン情報（symbol/number/presetKey/color をひとまとめにする）
@@ -120,6 +119,7 @@ type stationType = {
     isPass: boolean,
     sectionTime: string,
     lineId: string,
+    operationId: string,
     coordinate: [number | null, number | null],
     transferText: string,
     transferTextEng: string,
@@ -151,7 +151,7 @@ type iconParamsType = {
     symbol: string
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
     'otherCarNum' | 'otherLeftSlotInd' | 'transferListTransfers'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' | 'numIconPresetKey'
@@ -159,4 +159,4 @@ type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' 
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
 type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
-    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'startStationInd'
+    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor'

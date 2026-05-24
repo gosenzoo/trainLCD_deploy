@@ -43,6 +43,7 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     isPass: false,
     sectionTime: "",
     lineId: "",
+    operationId: "",
     coordinate: [null, null],
     transferText: "",
     transferTextEng: "",

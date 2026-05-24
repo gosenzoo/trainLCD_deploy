@@ -253,7 +253,7 @@
 
         const drawParams = controller.getDrawParams();
         updateDisplay(drawParams, `初期化完了: ${settings.info?.settingName ?? ''}`);
-        addLog(`駅数: ${settings.stationList?.length ?? 0}、運用数: ${settings.operationList?.length ?? 0}`);
+        addLog(`駅数: ${settings.stationList?.length ?? 0}、運用数: ${Object.keys(settings.operationDict ?? settings.operationList ?? {}).length}`);
       } catch (e) {
         document.getElementById('params-json').textContent = 'エラー: ' + e.message;
         addLog('読み込み失敗: ' + e.message);

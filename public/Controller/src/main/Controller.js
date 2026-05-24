@@ -15,10 +15,10 @@ class Controller {
     /**
      * @param {object}   settings           - データ作成画面からの設定オブジェクト
      * @param {object}   settings.info      - 全体設定
-     * @param {object[]} settings.operationList - 運行情報リスト
-     * @param {object[]} settings.stationList   - 駅リスト
-     * @param {object}   settings.lineDict      - 路線辞書
-     * @param {object}   settings.iconDict      - アイコン辞書
+     * @param {object}   settings.operationDict  - 運用辞書（ID→operationType）
+     * @param {object[]} settings.stationList    - 駅リスト
+     * @param {object}   settings.lineDict       - 路線辞書
+     * @param {object}   settings.iconDict       - アイコン辞書
      * @param {object}   pageParams         - ページ制御パラメータ
      * @param {object}   pageParams.pageDispList - 走行状態別ページリスト { [pageState]: pageObj[] }
      * @param {object}   langParams         - 言語制御パラメータ
@@ -29,7 +29,8 @@ class Controller {
         // ProgressController用パラメータをsettingsから抽出して初期化
         const progressParams = {
             stationList:   settings.stationList,
-            operationList: settings.operationList,
+            operationDict: settings.operationDict,
+            operationList: settings.operationList,  // 旧形式との後方互換のため渡す（ProgressController側で変換）
             info:          settings.info,
             lineDict:      settings.lineDict,
             iconDict:      settings.iconDict

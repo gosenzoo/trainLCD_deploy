@@ -30,6 +30,18 @@ const Editor = () => {
             return;
         }
         const loaded = JSON.parse(lcdStrageItem);
+        // operationList（旧配列形式）→ operationDict（辞書形式）へマイグレーション
+        if (loaded.operationList && !loaded.operationDict) {
+            loaded.operationDict = {}
+            ;(loaded.operationList as any[]).forEach((op: any, i: number) => {
+                const { startStationInd: _, ...rest } = op
+                loaded.operationDict[String(i)] = rest
+            })
+            delete loaded.operationList
+        }
+        if (!loaded.operationDict || Object.keys(loaded.operationDict).length === 0) {
+            loaded.operationDict = structuredClone(initSettingObject.setting.operationDict)
+        }
         if (!loaded.dispConfig) {
             loaded.dispConfig = structuredClone(initSettingObject.dispConfig);
         }
@@ -78,6 +90,10 @@ const Editor = () => {
                 if (line?.color)            station.numIcon.color     = line.color
                 if (line?.symbol)           station.numIcon.symbol    = line.symbol
                 if (line?.numIconPresetKey) station.numIcon.presetKey = line.numIconPresetKey
+            }
+            // operationId が未定義の場合は空文字で補完する
+            if (station.operationId === undefined) {
+                station.operationId = ""
             }
             // transferCountLineP（旧）→ transferListPlatform（新）へマイグレーション
             if (station.transferListPlatform === undefined) {

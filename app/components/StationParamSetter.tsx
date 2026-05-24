@@ -569,6 +569,24 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <button className="btn-primary" onClick={() => setIsLineAddPopupOpen(true)}>新規追加</button>
                 </div>
                 <br></br>
+                <label>次区間運用</label>
+                {/* operationDict に登録された運用を数値キー昇順で列挙し、選択結果を operationId に保存する */}
+                <select onChange={(e) => formUpdated(e, 'operationId')} value={targetStation?.operationId ?? ''}>
+                    <option value="">（なし）</option>
+                    {Object.entries(setting.operationDict ?? {})
+                        .sort((a, b) => Number(a[0]) - Number(b[0]))
+                        .map(([key, op]) => {
+                            const parts: string[] = [key + ':']
+                            if (op.trainType) parts.push(op.trainType)
+                            if (op.direction) parts.push(op.direction)
+                            parts.push((op.destination || '行先未設定') + '行')
+                            return (
+                                <option key={key} value={key}>{parts.join(' ')}</option>
+                            )
+                        })
+                    }
+                </select>
+                <br></br>
                 <label>開くドア</label>
                 <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide ?? 'right'}>
                     <option value={'right'}>右</option>
