@@ -91,9 +91,7 @@ classDiagram
         +string name
         +string kana
         +string eng
-        +string number
-        +string lineColor
-        +string numIconPresetKey
+        +stationNumIconType numIcon
         +string lineNumberType
         +transferItemType[] transfers
         +boolean isPass
@@ -109,6 +107,13 @@ classDiagram
         +string leftSlotInd
         +string otherCarNum
         +string otherLeftSlotInd
+    }
+
+    class stationNumIconType {
+        +string symbol
+        +string number
+        +string presetKey
+        +string color
     }
 
     class transferItemType {
@@ -139,6 +144,8 @@ classDiagram
         +string kana
         +string eng
         +string color
+        +string symbol
+        +string numIconPresetKey
     }
 
     class iconParamsType {
@@ -221,10 +228,21 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `name` / `kana` / `eng` | string | 駅名（日本語・かな・英語） |
-| `number` | string | 駅ナンバリング（例: `TY 01`） |
-| `lineColor` | string | この駅の路線カラー（HEX） |
-| `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー |
+| `numIcon` | `stationNumIconType` | ナンバリングアイコン情報（下表） |
 | `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
+
+**`stationNumIconType`**（`stationType.numIcon` の型）
+
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `symbol` | string | 有効路線記号（例: `TY`）。`colorMode` が `'auto'` のとき `lineDict[lineId].symbol` が自動書き込みされる |
+| `number` | string | 駅番号部分（例: `01`）。旧形式 `TY 01` はマイグレーションで分割 |
+| `presetKey` | string | 有効ナンバリングプリセットキー。`colorMode` が `'auto'` のとき `lineDict[lineId].numIconPresetKey` が自動書き込みされる |
+| `color` | string | 有効色（HEX）。`colorMode` が `'auto'` のとき `lineDict[lineId].color` が自動書き込みされる。drawParams・ProgressController はこのフィールドのみ参照する |
+| `manualSymbol` | string | 手動設定路線記号。`colorMode` に関わらず保持され、路線記号入力欄には常にこの値を表示する |
+| `manualPresetKey` | string | 手動設定プリセットキー。`colorMode` に関わらず保持され、ナンバリング記号セレクトには常にこの値を表示する |
+| `manualColor` | string | 手動設定色（HEX）。`colorMode` に関わらず保持され、カラーピッカーには常にこの値を表示する |
+| `colorMode` | `'auto'\|'manual'` | `symbol`・`presetKey`・`color` の一括取得モード。`'auto'`: colorMode 切替・lineId 変更時に3フィールドを路線設定値で自動更新 / `'manual'`: 各有効フィールド = 対応する manual* フィールド。デフォルト `'auto'`。未設定時は `'auto'` として扱う |
 | `transfers` | `transferItemType[]` | 乗換路線のリスト。各エントリに路線IDと乗換駅情報を持つ |
 | `transferListTransfers` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
 | `isPass` | boolean | 通過駅フラグ |
@@ -271,6 +289,8 @@ classDiagram
 | `lineIconKey` | string | 路線アイコンの `iconDict` キー |
 | `name` / `kana` / `eng` | string | 路線名（日本語・かな・英語） |
 | `color` | string | 路線カラー（HEX） |
+| `symbol` | string | 路線記号テキスト（例: `TY`） |
+| `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー（例: `N_tokyu`） |
 
 #### `iconParamsType` — アイコンパラメータ（プリセット型）
 | フィールド | 型 | 説明 |
@@ -357,6 +377,8 @@ graph TD
     StationList --> MapComponent
     StationParamSetter --> TransferLinePopup
     TransferLinePopup --> GenericItemList
+    LineAddPopup["LineAddPopup\n路線追加ポップアップ"]
+    StationParamSetter --> LineAddPopup
 ```
 
 ### 4.2 セクションアコーディオン
@@ -566,6 +588,45 @@ type GenericItemListProps<T> = {
 
 ---
 
+### 4.X `LineAddPopup` — 路線追加ポップアップ
+
+`StationParamSetter` の「次区間路線」セレクトボックス右横に配置した **「新規追加」ボタン**（`btn-primary`）を押下すると表示されるモーダル。`LineList` の路線編集フォームと同一の入力項目（テーブルを除く）を持ち、確定すると `lineDict` に路線を追加し、選択中駅の `lineId` を新しいキーに設定する。
+
+#### 表示トリガー
+
+`StationParamSetter` の「次区間路線」行に「新規追加」ボタン（`btn-primary`）を追加する。クリックで `LineAddPopup` を表示する。
+
+#### ポップアップ内容
+
+`LineList` の路線編集フォームと同一構成（テーブルを除く）：
+
+| フィールド | 内容 |
+|-----------|------|
+| 路線記号（アイコン）| アイコンプレビュー＋「新規追加」ボタン＋「リストから選択」ボタン。`IconNewPopup` / `IconListPopup` を入れ子で使用 |
+| 路線名 | テキスト入力 |
+| 路線名かな | テキスト入力（変更時に英語を自動生成） |
+| 路線名英語 | テキスト入力 |
+| 路線記号（symbol） | テキスト入力 |
+| 路線カラー | カラーピッカー |
+| ナンバリング記号 | セレクトボックス（`numberIndexes` 準拠） |
+
+フッターに **「追加」ボタン**（`btn-primary`）と **「閉じる」ボタン** を配置する。
+
+#### 追加ボタン押下時の動作
+
+1. `lineDict` の既存キーの最大値 + 1 を新しいキーとして路線エントリを追加する
+2. 選択中の全駅の `lineId` を新しいキーに設定する
+3. `colorMode === 'auto'` の駅は `numIcon.color` / `numIcon.symbol` / `numIcon.presetKey` を新路線の値で上書きする
+4. ポップアップを閉じる
+
+#### 実装上の注意
+
+- アイコン管理（`IconNewPopup`/`IconListPopup`）は `setting`/`setSetting` を受け取って処理する
+- `lineDict` への追加と駅の `lineId` 更新は **単一の `setSetting` 呼び出し** で行い、state の二重更新を避ける
+- ポップアップ内のフォームは全てローカル state で管理し、「追加」押下時に `onAdd(lineData: lineType)` コールバックで親に渡す
+
+---
+
 ### 4.7 `TransferLinePopup` — 接続路線追加ポップアップ
 
 `StationParamSetter` 内の「乗換路線」欄に配置するモーダルポップアップ。
@@ -696,7 +757,7 @@ type GenericItemListProps<T> = {
 
 #### 入れ子アコーディオン（詳細設定）
 
-`StationParamSetter` 内の「次区間所要時間(分)」以降の項目（次区間路線ID・乗換案内・乗換案内英語・ホーム乗換案内行ごと表示数・スロット関連・向側列車設定）を `AccordionSection` で包み、**デフォルト閉じ** で表示する。
+`StationParamSetter` 内の「次区間所要時間(分)」以降の項目（次区間路線・乗換案内・乗換案内英語・ホーム乗換案内行ごと表示数・スロット関連・向側列車設定）を `AccordionSection` で包み、**デフォルト閉じ** で表示する。
 
 - タイトル: `詳細設定`
 - `defaultOpen={false}` を指定する
@@ -719,11 +780,33 @@ type GenericItemListProps<T> = {
 
 | タブID | タブラベル | コンテンツ |
 |--------|-----------|-----------|
-| `basic` | 駅基本設定 | 駅名・かな・英語・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア |
-| `defaultLine` | 詳細路線図表示 | 次区間所要時間・次区間路線ID・乗換案内（日英テキスト）・登録路線情報を反映ボタン |
+| `basic` | 駅基本設定 | 駅名・かな・英語・路線記号・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア・次区間所要時間・次区間路線（`lineDict` から選択するセレクトボックス＋「新規追加」ボタン） |
+| `defaultLine` | 詳細路線図表示 | 乗換案内（日英テキスト）・登録路線情報を反映ボタン |
 | `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
 | `platform` | ホーム案内表示 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
 | `map` | マップ | 既存の MapComponent（現在開発中） |
+
+#### ナンバリング連番入力
+
+駅一覧ボタン行（「ナンバリング補完降順」の右隣）に「ナンバリング連番入力」ボタンを配置する（トグルではなく通常ボタン）。
+
+押下するとモーダルポップアップ（`.modal-backdrop` / `.modal-dialog`）を表示する。
+
+**ポップアップ内容**
+
+| 要素 | 内容 |
+|------|------|
+| 「開始」テキストボックス | 連番の開始数値を入力する（数値として解釈；非数値の場合は何もしない） |
+| 「順序」セレクトボックス | 「昇順」（デフォルト）/ 「降順」 |
+| 「決定」ボタン（`btn-primary`） | 選択駅に連番を適用して閉じる |
+| 「閉じる」ボタン | 何もせず閉じる |
+
+**決定時の動作**
+
+- 選択中の駅を `stationList` 上の位置順（上から下、インデックス昇順）に並べ替える
+- 先頭駅に `開始` の値を、以降は昇順（+1）または降順（−1）でインクリメントして `numIcon.number` に書き込む
+- 数値が 0〜9 の場合は `"0"` を前置して 2 桁にそろえる
+- `numIcon` のその他フィールド（symbol・presetKey・color・colorMode 等）は変更しない
 
 #### 「詳細路線図表示」タブの「登録路線情報を反映」ボタン仕様
 
@@ -829,6 +912,21 @@ export function moveDictItemsDown<T>(
 |------|------------------------|
 | `isMultiSelect = false` | クリックした1行のみ選択 |
 | `isMultiSelect = true`  | クリックで選択トグル（追加/解除） |
+
+#### 連続選択モード（`StationList` のみ）
+
+`isMultiSelect = false` の時のみ有効。`isRangeSelectMode: boolean` と `rangeStartIndex: number | null`（1-based）で管理する。
+
+| 操作 | 動作 |
+|------|------|
+| 選択中の駅をクリック | 「連続選択」モードへ移行。`selectedIndexes` を空にし、`rangeStartIndex` に当該インデックスを記録 |
+| 連続選択モード中に別の駅をクリック | `rangeStartIndex` からクリック駅までの全インデックスを `selectedIndexes` にセットし、モード解除 |
+| 連続選択モード中に `rangeStartIndex` の駅をクリック | モード解除、当該駅のみを通常選択状態に戻す |
+| `isMultiSelect` を ON に切り替え | 連続選択モードを強制解除 |
+
+連続選択モード中は、起点駅（`rangeStartIndex`）の行背景を **オレンジ**（`range-start` クラス）で表示し、青ハイライト（`selected`）は当てない。
+
+`GenericItemList` に `rangeStartKey?: string` prop を追加し、該当行に `range-start` クラスを付与する（`selected` より優先）。CSS は `.range-start td, .range-start th { background-color: orange; }` 相当。
 
 #### UI（全リスト共通）
 

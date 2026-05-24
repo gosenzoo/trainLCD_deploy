@@ -267,16 +267,17 @@ class ProgressController {
     // 内部ヘルパー: 数値アイコン生成
     // ============================================================
 
-    /** stationオブジェクトからNumIconを生成する */
+    /** stationオブジェクトからNumIconを生成する（station.numIcon サブオブジェクトを参照） */
     _buildNumIconFromStation(station) {
-        const hasNumber = !!(station.number);
-        const parsed = parseStationNumber(station.number);
+        const ni = station.numIcon || {};
+        const hasNumber = !!(ni.number);
+        // color には auto/manual を問わず有効色が書き込まれているため直接参照する
         return {
             isDraw:    hasNumber,
-            presetKey: station.numIconPresetKey || "",
-            symbol:    parsed.symbol,
-            number:    parsed.number,
-            color:     station.lineColor || ""
+            presetKey: ni.presetKey || "",
+            symbol:    ni.symbol    || "",
+            number:    ni.number    || "",
+            color:     ni.color     || ""
         };
     }
 

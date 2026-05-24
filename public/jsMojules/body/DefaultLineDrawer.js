@@ -123,25 +123,26 @@ class DefaultLineDrawer{
         //ナンバリングの上端位置
         let numIconTop = this.lineY;
         
-        // ナンバリング
-        if(station.number === ""){
+        // ナンバリング（station.numIcon サブオブジェクトを参照）
+        const numIcon = station.numIcon || {};
+        if(!numIcon.isDraw){
             //ナンバリングがない場合は何もしない
 
             numIconTop = this.lineY;
         }
-        else if(station.lineNumberType === "0"){
+        else if(station.numIconType === "0"){
             //ナンバリング文字表示の場合
             const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
 
-            stationParts.appendChild(this.textDrawer.create(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+            stationParts.appendChild(this.textDrawer.create(`${numIcon.symbol}-${numIcon.number}`, numRect).element); //ナンバリングを追加
 
             numIconTop = parseFloat(numRect.getAttribute("y"));
         }
-        else if(station.lineNumberType === "1"){
+        else if(station.numIconType === "1"){
             //ナンバリングアイコン表示の場合
             const numIconRect = this.mapSVG.querySelector("#body-defaultLine-numIconRect").cloneNode(true); //ナンバリングアイコン用矩形
 
-            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(station.numIconPresetKey, station.number.split(' ')[0], station.number.split(' ')[1], station.lineColor, {
+            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(numIcon.presetKey, numIcon.symbol, numIcon.number, numIcon.color, {
                 x: parseFloat(numIconRect.getAttribute("x")),
                 y: parseFloat(numIconRect.getAttribute("y")),
                 width: parseFloat(numIconRect.getAttribute("width")),
@@ -154,7 +155,7 @@ class DefaultLineDrawer{
         //駅名下端位置を調整
         const stNameBottom = numIconTop - nameGap; //駅名下端のY座標を計算
         stNameRect.setAttribute("height", stNameBottom - parseFloat(stNameRect.getAttribute("y"))); //駅名rectの高さを調整
-        
+
         //stationParts.appendChild(stNameRect)
         //駅名
         let nameText = station.name;
@@ -223,25 +224,26 @@ class DefaultLineDrawer{
         //ナンバリングの上端位置
         let numIconTop = this.lineY;
         
-        // ナンバリング
-        if(station.number === ""){
+        // ナンバリング（station.numIcon サブオブジェクトを参照）
+        const numIcon = station.numIcon || {};
+        if(!numIcon.isDraw){
             //ナンバリングがない場合は何もしない
 
             numIconTop = this.lineY;
         }
-        else if(station.lineNumberType === "0"){
+        else if(station.numIconType === "0"){
             //ナンバリング文字表示の場合
             const numRect = this.mapSVG.querySelector("#body-defaultLine-numRect").cloneNode(true); //ナンバリング用矩形
 
-            stationParts.appendChild(this.textDrawer.create(`${station.number.split(' ')[0]}-${station.number.split(' ')[1]}`, numRect).element); //ナンバリングを追加
+            stationParts.appendChild(this.textDrawer.create(`${numIcon.symbol}-${numIcon.number}`, numRect).element); //ナンバリングを追加
 
             numIconTop = parseFloat(numRect.getAttribute("y"));
         }
-        else if(station.lineNumberType === "1"){
+        else if(station.numIconType === "1"){
             //ナンバリングアイコン表示の場合
             const numIconRect = this.mapSVG.querySelector("#body-defaultLine-numIconRect").cloneNode(true); //ナンバリングアイコン用矩形
 
-            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(station.numIconPresetKey, station.number.split(' ')[0], station.number.split(' ')[1], station.lineColor, {
+            stationParts.appendChild(this.numIconDrawer.createNumIconFromPreset(numIcon.presetKey, numIcon.symbol, numIcon.number, numIcon.color, {
                 x: parseFloat(numIconRect.getAttribute("x")),
                 y: parseFloat(numIconRect.getAttribute("y")),
                 width: parseFloat(numIconRect.getAttribute("width")),

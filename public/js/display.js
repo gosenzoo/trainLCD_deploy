@@ -55,7 +55,7 @@ window.onload = async function(){
     //各駅ナンバリング
     const _numIconKeyList = new Set();
     settings.stationList.forEach(station => {
-        _numIconKeyList.add(station.numIconPresetKey);
+        _numIconKeyList.add(station.numIcon?.presetKey);
     });
     //行先駅ナンバリング
     settings.operationList.forEach(operation => {

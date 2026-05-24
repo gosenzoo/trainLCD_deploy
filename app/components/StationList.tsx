@@ -22,10 +22,16 @@ type TabType = 'basic' | 'defaultLine' | 'transfersDisp' | 'platform' | 'map';
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
-    const [isNumberDescending, setIsNumberDescending] = useState<boolean>(false)
+    // 連続選択モード（複数選択OFFの時のみ有効）
+    const [isRangeSelectMode, setIsRangeSelectMode] = useState<boolean>(false)
+    const [rangeStartIndex, setRangeStartIndex] = useState<number | null>(null)
     const [activeTab, setActiveTab] = useState<TabType>('basic')
     // 駅プリセットポップアップの表示状態
     const [isPresetPopupOpen, setIsPresetPopupOpen] = useState<boolean>(false)
+    // ナンバリング連番入力ポップアップの状態
+    const [isSeqInputOpen, setIsSeqInputOpen] = useState<boolean>(false)
+    const [seqStart, setSeqStart] = useState<string>('01')
+    const [seqOrder, setSeqOrder] = useState<'asc' | 'desc'>('asc')
 
     const presetIconDict = loadIconPresetTexts()
 
@@ -35,7 +41,32 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const handleRowClick = (key: string) => {
         const rowIndex = parseInt(key) + 1  // 0-based key → 1-based rowIndex に変換
         if (!isMultiSelect) {
-            setSelectedIndexes([rowIndex])
+            if (!isRangeSelectMode) {
+                if (selectedIndexes.includes(rowIndex) && selectedIndexes.length === 1) {
+                    // 1駅のみ選択中にその駅を再クリック → 連続選択モードへ移行
+                    setIsRangeSelectMode(true)
+                    setRangeStartIndex(rowIndex)
+                    setSelectedIndexes([])
+                } else {
+                    // 未選択駅クリック、または複数選択中の1駅クリック → その駅のみ選択
+                    setSelectedIndexes([rowIndex])
+                }
+            } else {
+                // 連続選択モード中
+                if (rowIndex === rangeStartIndex) {
+                    // 起点駅を再クリック → モード解除、起点駅を通常選択に戻す
+                    setIsRangeSelectMode(false)
+                    setRangeStartIndex(null)
+                    setSelectedIndexes([rowIndex])
+                } else {
+                    // 別の駅をクリック → 起点〜クリック駅の範囲を全選択してモード解除
+                    const min = Math.min(rangeStartIndex!, rowIndex)
+                    const max = Math.max(rangeStartIndex!, rowIndex)
+                    setSelectedIndexes(Array.from({ length: max - min + 1 }, (_, i) => min + i))
+                    setIsRangeSelectMode(false)
+                    setRangeStartIndex(null)
+                }
+            }
         } else {
             let _selectedIndexes = [...selectedIndexes]
             if (selectedIndexes.includes(rowIndex)) {
@@ -58,26 +89,23 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             _index = Math.min(selectedIndexes[selectedIndexes.length - 1], _setting.stationList.length)
         }
 
-        let _number = ""
-        let _color = ""
+        let _numIcon: stationNumIconType = { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" }
         let _lineId = ""
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
-                _number = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].number
-                let nextNumber = String(Number(_number.split(" ")[1]) + (isNumberDescending ? -1 : 1))
-                nextNumber = nextNumber.length === 1 ? "0" + nextNumber : nextNumber
-                _number = (_number.includes(" ") ? _number.split(" ")[0] : _number) + ((nextNumber === "NaN") ? "" : " " + nextNumber)
-                _color = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineColor
-                _lineId = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1].lineId
+                const prevStation = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]
+                // symbol/presetKey/color は前駅から引き継ぎ、number は空文字で追加する
+                _numIcon = { ...prevStation.numIcon, number: "" }
+                _lineId = prevStation.lineId
             } else {
-                _number = _setting.stationList[_setting.stationList.length - 1].number
-                _color = _setting.stationList[_setting.stationList.length - 1].lineColor
-                _lineId = _setting.stationList[_setting.stationList.length - 1].lineId
+                const lastStation = _setting.stationList[_setting.stationList.length - 1]
+                _numIcon = { ...lastStation.numIcon }
+                _lineId = lastStation.lineId
             }
         }
         _setting.stationList.splice(_index, 0, {
-            name: "", kana: "", eng: "", number: _number, lineColor: _color,
-            numIconPresetKey: "N_tokyu", lineNumberType: "0", transfers: [],
+            name: "", kana: "", eng: "", numIcon: _numIcon,
+            lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "", lineId: _lineId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
@@ -148,6 +176,25 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         setSetting(_setting)
     }
 
+    // ナンバリング連番入力: 選択駅をリスト順にソートし、指定開始番号から連番を書き込む
+    const applySeqNumbering = () => {
+        const startNum = Number(seqStart)
+        if (isNaN(startNum)) return
+        // 選択駅をリスト上の位置順（インデックス昇順）に並べる
+        const sortedIndexes = [...selectedIndexes].sort((a, b) => a - b)
+        const _setting = structuredClone(setting)
+        sortedIndexes.forEach((ind, offset) => {
+            const station = _setting.stationList[ind - 1]
+            if (!station) return
+            const num = startNum + (seqOrder === 'asc' ? offset : -offset)
+            // 0〜9 は 2 桁にゼロ埋めする
+            const numStr = (num >= 0 && num <= 9) ? '0' + String(num) : String(num)
+            station.numIcon.number = numStr
+        })
+        setSetting(_setting)
+        setIsSeqInputOpen(false)
+    }
+
     const passBoxChanged = (e: any, index: number) => {
         const _setting = structuredClone(setting)
         _setting.stationList[index].isPass = e.target.checked
@@ -175,15 +222,32 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         {
             header: '駅名かな',
             cell: (station) => station.kana,
+            collapsible: true,       // 列の折りたたみを許可する
+            defaultCollapsed: true,  // デフォルトで折りたたむ
         },
         {
             header: '駅名英語',
             cell: (station) => station.eng,
+            collapsible: true,       // 列の折りたたみを許可する
+            defaultCollapsed: true,  // デフォルトで折りたたむ
         },
         {
             header: 'ナンバリング',
-            cell: (station) => station.number,
-            cellStyle: (station) => ({ backgroundColor: station.lineColor }),  // 路線カラーをセル背景に反映
+            // numIcon サブオブジェクトの各フィールドを使って NumIcon を生成して表示する
+            cell: (station) => {
+                const { presetKey, symbol, number, color } = station.numIcon
+                // presetKey が設定されていれば symbol/number が空でも画像を生成する（空文字のまま渡す）
+                if (presetKey) {
+                    const html = createNumIconFromPreset(presetIconDict, presetKey, symbol, number, color)?.outerHTML
+                    if (html) return <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} />
+                }
+                return <>{symbol} {number}</>
+            },
+        },
+        {
+            header: '次区間路線',
+            cell: (station) => setting.lineDict[station.lineId]?.name,
+            cellStyle: (station) => ({ backgroundColor: setting.lineDict[station.lineId]?.color }),  // 路線カラーをセル背景に反映
         },
         {
             header: '乗換路線',
@@ -216,11 +280,6 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         {
             header: 'ドア',
             cell: (station) => station.doorSide === 'left' ? '左' : '右',
-        },
-        {
-            header: '次区間路線名',
-            cell: (station) => setting.lineDict[station.lineId]?.name,
-            cellStyle: (station) => ({ backgroundColor: setting.lineDict[station.lineId]?.color }),  // 路線カラーをセル背景に反映
         },
         {
             header: '次区間所要時間',
@@ -275,6 +334,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 onRowClick={handleRowClick}
                 tableId="stationsTable"
                 containerId="stationsTableContainer"
+                rangeStartKey={rangeStartIndex !== null ? String(rangeStartIndex - 1) : undefined}
             />
             <div className="btn-group" style={{marginTop: '10px'}}>
                 {/* 上矢印・下矢印・追加(+)・削除(ゴミ箱) をSVGアイコンで表示 */}
@@ -284,17 +344,51 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 <button onClick={deleteStation} className="btn-icon btn-danger" title="駅削除"><IconTrash/></button>
                 {/* 複数選択トグルボタン */}
                 <button
-                    onClick={() => setIsMultiSelect(v => !v)}
+                    onClick={() => {
+                        // 複数選択ON切り替え時に連続選択モードを強制解除する
+                        if (!isMultiSelect) {
+                            setIsRangeSelectMode(false)
+                            setRangeStartIndex(null)
+                        }
+                        setIsMultiSelect(v => !v)
+                    }}
                     className={`btn-toggle${isMultiSelect ? ' btn-toggle--active' : ''}`}
                 >複数選択</button>
                 <button onClick={allSelectButtonClicked}>全選択/解除</button>
                 <button onClick={reverseButtonClilcked}>反転</button>
-                {/* ナンバリング補完降順トグルボタン */}
-                <button
-                    onClick={() => setIsNumberDescending(v => !v)}
-                    className={`btn-toggle${isNumberDescending ? ' btn-toggle--active' : ''}`}
-                >ナンバリング補完降順</button>
+                <button onClick={() => setIsSeqInputOpen(true)}>ナンバリング連番入力</button>
             </div>
+
+            {/* ナンバリング連番入力ポップアップ */}
+            {isSeqInputOpen && (
+                <div className="modal-backdrop" onClick={() => setIsSeqInputOpen(false)}>
+                    <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+                        <div className="modal-title-row">
+                            <p className="modal-title">ナンバリング連番入力</p>
+                            <button className="modal-close-btn" onClick={() => setIsSeqInputOpen(false)} title="閉じる">×</button>
+                        </div>
+                        <div className="form-row">
+                            <label>開始</label>
+                            <input
+                                type="text"
+                                value={seqStart}
+                                onChange={e => setSeqStart(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-row">
+                            <label>順序</label>
+                            <select value={seqOrder} onChange={e => setSeqOrder(e.target.value as 'asc' | 'desc')}>
+                                <option value="asc">昇順</option>
+                                <option value="desc">降順</option>
+                            </select>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-primary" onClick={applySeqNumbering}>決定</button>
+                            <button onClick={() => setIsSeqInputOpen(false)}>閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* 駅設定エリアのタブ切り替え（5タブ） */}
             <div className="operation-tabs">
                 <button onClick={() => setActiveTab('basic')} className={`tab-btn${activeTab === 'basic' ? ' active' : ''}`}>駅基本設定</button>

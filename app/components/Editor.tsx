@@ -39,7 +39,46 @@ const Editor = () => {
         if (loaded.dispConfig.isPageAuto === undefined) {
             loaded.dispConfig.isPageAuto = true;
         }
+        // lineDict の各路線に symbol/numIconPresetKey がなければ空文字で補完する
+        Object.values(loaded.lineDict ?? {}).forEach((line: any) => {
+            if (line.symbol === undefined) line.symbol = ""
+            if (line.numIconPresetKey === undefined) line.numIconPresetKey = ""
+        })
         loaded.stationList.forEach((station: any) => {
+            // numIcon サブオブジェクトへのマイグレーション（旧: symbol/number/numIconPresetKey/lineColor が平坦）
+            if (station.numIcon === undefined) {
+                // さらに旧形式（symbol 分離前）: number が "TY 01" 形式の場合はスペースで分割する
+                const rawNumber = station.number ?? ''
+                const hasSymbol = station.symbol !== undefined
+                const spaceIdx = hasSymbol ? -1 : rawNumber.indexOf(' ')
+                station.numIcon = {
+                    symbol:    hasSymbol ? (station.symbol ?? '') : (spaceIdx !== -1 ? rawNumber.slice(0, spaceIdx) : ''),
+                    number:    hasSymbol ? rawNumber : (spaceIdx !== -1 ? rawNumber.slice(spaceIdx + 1) : rawNumber),
+                    presetKey: station.numIconPresetKey ?? '',
+                    color:     station.lineColor ?? '',
+                }
+            }
+            // colorMode が未定義の場合は 'auto' を補完する
+            if (station.numIcon.colorMode === undefined) {
+                station.numIcon.colorMode = 'auto'
+            }
+            // manual* が未定義の場合は有効値フィールドを引き継ぐ
+            if (station.numIcon.manualColor === undefined) {
+                station.numIcon.manualColor = station.numIcon.color ?? ''
+            }
+            if (station.numIcon.manualSymbol === undefined) {
+                station.numIcon.manualSymbol = station.numIcon.symbol ?? ''
+            }
+            if (station.numIcon.manualPresetKey === undefined) {
+                station.numIcon.manualPresetKey = station.numIcon.presetKey ?? ''
+            }
+            // auto モード時は lineId が指す路線の設定値を3フィールドに書き込む
+            if (station.numIcon.colorMode === 'auto' && station.lineId) {
+                const line = loaded.lineDict?.[station.lineId]
+                if (line?.color)            station.numIcon.color     = line.color
+                if (line?.symbol)           station.numIcon.symbol    = line.symbol
+                if (line?.numIconPresetKey) station.numIcon.presetKey = line.numIconPresetKey
+            }
             // transferCountLineP（旧）→ transferListPlatform（新）へマイグレーション
             if (station.transferListPlatform === undefined) {
                 station.transferListPlatform = ""

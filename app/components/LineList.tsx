@@ -6,6 +6,7 @@ import kanaToAlphabet from '../modules/KanaConverter'
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
+import { numberIndexes } from '../modules/presetIndex'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
@@ -85,7 +86,9 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             name: "",
             kana: "",
             eng: "",
-            color: ""
+            color: "",
+            symbol: "",
+            numIconPresetKey: "",
         }
         setSetting(_setting)
         // 追加した路線を自動選択する
@@ -108,6 +111,16 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             _setting.lineDict[key][field] = e.target.value
             if(field === "kana"){
                 _setting.lineDict[key].eng = kanaToAlphabet(e.target.value, 1)
+            }
+            // autoモードの駅に color/symbol/numIconPresetKey の変更を即時反映する
+            if (field === 'color' || field === 'symbol' || field === 'numIconPresetKey') {
+                _setting.stationList.forEach(station => {
+                    if (station.lineId === key && station.numIcon.colorMode === 'auto') {
+                        if (field === 'color')            station.numIcon.color     = e.target.value
+                        if (field === 'symbol')           station.numIcon.symbol    = e.target.value
+                        if (field === 'numIconPresetKey') station.numIcon.presetKey = e.target.value
+                    }
+                })
             }
         })
         setSetting(_setting)
@@ -247,10 +260,27 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 />
             </div>
             <div className="form-row">
+                <label>路線記号</label>
+                <input type="text" id="lineSymbolInput" onChange={(e) => formUpdated(e, 'symbol')}
+                    value={selectedLine?.symbol ?? ''}
+                />
+            </div>
+            <div className="form-row">
                 <label>路線カラー</label>
                 <input type="color" id="lineColorInput" onChange={(e) => formUpdated(e, 'color')}
                     value={selectedLine?.color ?? ''}
                 />
+            </div>
+            <div className="form-row">
+                <label>ナンバリング記号</label>
+                <select id="lineNumIconPresetKeyInput" onChange={(e) => formUpdated(e, 'numIconPresetKey')}
+                    value={selectedLine?.numIconPresetKey ?? ''}
+                >
+                    <option value="">（なし）</option>
+                    {numberIndexes.map(num => (
+                        <option key={num.key} value={num.key}>{num.name}</option>
+                    ))}
+                </select>
             </div>
         </div>
     )

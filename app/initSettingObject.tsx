@@ -39,9 +39,7 @@ const initStationObject: stationType = {
     name: "",
     kana: "",
     eng: "",
-    number: "",
-    lineColor: "",
-    numIconPresetKey: "N_tokyu",
+    numIcon: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" },
     lineNumberType: "0",
     transfers: [],
     isPass: false,
@@ -67,6 +65,8 @@ const initLineObject = {
     kana: "",
     eng: "",
     color: "",
+    symbol: "",
+    numIconPresetKey: "",
 }
 
 // 言語エントリの初期値（日本語）

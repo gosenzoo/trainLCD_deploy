@@ -28,13 +28,16 @@ type PrevStationRef = {
 }
 
 // プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
-const toStationType = (station: PresetStation, lineColor: string, number: string): stationType => ({
+const toStationType = (station: PresetStation, lineColor: string, numberStr: string): stationType => {
+    // lineConnectDB の駅ナンバリング（例: "TY 01"）をスペースで分割して symbol/number に振り分ける
+    const spaceIdx = numberStr.indexOf(' ')
+    const symbol = spaceIdx !== -1 ? numberStr.slice(0, spaceIdx) : ''
+    const number = spaceIdx !== -1 ? numberStr.slice(spaceIdx + 1) : numberStr
+    return {
     name: station.name,
     kana: station.kana,
     eng: station.eng,
-    number,
-    lineColor,
-    numIconPresetKey: "N_tokyu",  // 暫定デフォルト
+    numIcon: { symbol, number, presetKey: "N_tokyu", color: lineColor, manualSymbol: symbol, manualPresetKey: "N_tokyu", manualColor: lineColor, colorMode: "manual" },
     lineNumberType: "0",
     transfers: [],
     isPass: false,
@@ -52,7 +55,8 @@ const toStationType = (station: PresetStation, lineColor: string, number: string
     otherCarNum: "0",
     otherLeftSlotInd: "0",
     transferListTransfers: "",
-})
+    }
+}
 
 // 駅・路線の選択ハイライトに使うスタイル
 const highlightStyle = {

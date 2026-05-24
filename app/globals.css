@@ -451,6 +451,13 @@ tr:hover td {
   font-weight: 700;
 }
 
+/* 連続選択モードの起点駅：選択可能セル（th.range-start）のみオレンジ背景 */
+#stationsTable th.range-start {
+  background: #ff990033 !important;
+  color: #cc6600 !important;
+  font-weight: 700;
+}
+
 /* ============================================
    路線テーブル
    ============================================ */

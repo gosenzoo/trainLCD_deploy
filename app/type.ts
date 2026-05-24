@@ -93,13 +93,28 @@ type operationType = {
     startStationInd: string
 }
 
+// 駅ナンバリングアイコン情報（symbol/number/presetKey/color をひとまとめにする）
+type stationNumIconType = {
+    // 有効値（drawParams で参照）: auto 時は lineDict の路線設定値が自動書き込みされる
+    symbol: string,
+    number: string,
+    presetKey: string,
+    color: string,
+    // 手動設定値: colorMode に関わらず保持され、UI 入力欄には常にこれを表示する
+    manualSymbol: string,
+    manualPresetKey: string,
+    manualColor: string,
+    // symbol・presetKey・color の一括取得モード
+    // 'auto': colorMode 切替・lineId 変更時に3フィールドを路線設定値で自動更新
+    // 'manual': 各有効フィールド = 対応する manual* フィールド
+    colorMode: 'auto' | 'manual',
+}
+
 type stationType = {
     name: string,
     kana: string,
     eng: string,
-    number: string,
-    lineColor: string,
-    numIconPresetKey:string,
+    numIcon: stationNumIconType,
     lineNumberType: string,
     transfers: transferItemType[],
     isPass: boolean,
@@ -125,6 +140,8 @@ type lineType = {
     kana: string,
     eng: string,
     color: string,
+    symbol: string,
+    numIconPresetKey: string,
 }
 
 
@@ -134,10 +151,10 @@ type iconParamsType = {
     symbol: string
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'number' | 'lineColor' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'numIconPresetKey' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'lineId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
     'otherCarNum' | 'otherLeftSlotInd' | 'transferListTransfers'
 
-type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color'
+type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' | 'numIconPresetKey'
 
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
