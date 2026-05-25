@@ -111,6 +111,8 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             {/* タブに接続するフォーム本体: tab-form-body クラスで上端ボーダーとz-indexを設定 */}
             <div className="tab-form-body">
             {operation && (<>
+            <fieldset>
+            <legend>表示</legend>
             <div className="form-row">
                 <label>進行方向</label>
                 <select onChange={(e) => formUpdated(e, 'leftOrRight')} value={operation.leftOrRight}>
@@ -130,6 +132,9 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <label>次停車駅表示</label>
                 <ToggleSwitch checked={operation.isDrawStopText} onChange={(v) => toggleUpdated(v, 'isDrawStopText')} />
             </div>
+            </fieldset>
+            <fieldset>
+            <legend>行先</legend>
             <div className="form-row">
                 <label>行き先</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'destination')} value={operation.destination} />
@@ -162,6 +167,9 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <label>経由等</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'direction')} value={operation.direction} />
             </div>
+            </fieldset>
+            <fieldset>
+            <legend>種別</legend>
             <div className="form-row">
                 <label>種別</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'trainType')} value={operation.trainType} />
@@ -186,6 +194,7 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <label>種別背景色</label>
                 <input type="color" onChange={(e) => formUpdated(e, 'trainTypeBackColor')} value={operation.trainTypeBackColor || '#000000'} />
             </div>
+            </fieldset>
             <div className="form-row">
                 <label>列車路線記号</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'lineLogo')} value={operation.lineLogo} />

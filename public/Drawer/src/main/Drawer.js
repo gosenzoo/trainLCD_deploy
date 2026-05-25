@@ -451,6 +451,9 @@ class Drawer {
                 MulShadowUtil.applyMulShadow(obj._element, tbShadow, this._defsEl);
             }
             return obj;
+        } else if (lcdParts === 'text') {
+            // lcdParts="text" → TextBlockObj（改行対応テキストブロック）
+            return new TextBlockObj(element, this._drawParams, {}, this.textDrawer);
         } else if (lcdParts === 'numbering') {
             // NumIconObj はビルド時点で描画要素を持たないため shadowId 適用はスキップする
             return new NumIconObj(element, this._drawParams, {}, this.numIconDrawer);

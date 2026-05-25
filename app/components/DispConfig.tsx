@@ -19,13 +19,14 @@ const AVAILABLE_PAGES = [
     "platform.svg",
     "doorAnim.svg",
     "trainTypeChange.svg",
+    "infoMessage.svg",
 ]
 
 // pageStateの表示名（0〜5）
 const PAGE_STATE_LABELS = ['始発停車', '走行', '直前', '停車', '通過', '終点停車']
 
 // pageTypeの表示名（0〜3）
-const PAGE_TYPE_LABELS = ['無条件', '乗換あり', '次運用あり', 'Message']
+const PAGE_TYPE_LABELS = ['無条件', '乗換あり', '次運用あり', 'メッセージあり']
 
 // 言語IDに対応する表示名（0:日本語, 1:ひらがな, 2:英語）
 const LANG_NAMES: Record<number, string> = {

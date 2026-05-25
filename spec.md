@@ -50,6 +50,11 @@ classDiagram
         +lineDict : Dict~string, lineType~
         +iconDict : Dict~string, string|iconParamsType~
         +dispConfigType dispConfig
+        +messageType message
+    }
+
+    class messageType {
+        +string text
     }
 
     class infoType {
@@ -179,6 +184,7 @@ classDiagram
     settingType "1" *-- "0..*" lineType : lineDict (ID→lineType)
     settingType "1" *-- "0..*" iconParamsType : iconDict (ID→iconParamsType\nor base64 string)
     settingType "1" *-- "1" dispConfigType : dispConfig
+    settingType "1" *-- "1" messageType : message
 
     stationType "1" *-- "0..*" transferItemType : transfers
     transferItemType "1" *-- "1" transferLineType : line
@@ -315,9 +321,9 @@ classDiagram
 #### `pageObjType` — ページ表示エントリ
 | フィールド | 型 | 説明 |
 |---|---|---|
-| `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` / `trainTypeChange.svg` |
+| `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` / `trainTypeChange.svg` / `infoMessage.svg` |
 | `dispTime` | number | このページを表示し続ける時間（ms） |
-| `type` | number | 表示条件（0: 無条件 / 1: nowStation.transfersがあれば / 2: 次運用あり / 3: Messageがあれば（未実装）） |
+| `type` | number | 表示条件（0: 無条件 / 1: 乗換あり / 2: 次運用あり / 3: メッセージあり）|
 
 #### `pageType=2`「次運用あり」の判定ロジック
 
@@ -334,12 +340,20 @@ classDiagram
 5. 次の運用が存在し、かつ現在の運用と `trainType` または `trainTypeEng` のいずれかが異なれば `hasNextOperation = true`
    - 両方が空文字の場合は「同じ」として扱う（`"" !== ""` は false のため自然に処理される）
 
+#### `pageType=3`「メッセージあり」の判定ロジック
+
+`_buildConditionData()` が返す `hasMessage: boolean` で判定する。
+
+**判定条件:** `settings.message?.text` が空文字でない場合に `true`
+
 #### ページ設定デフォルト値（`initDispConfigObject`）
 
 | pageState | ページ名 | dispTime | type | 追加位置 |
 |---|---|---|---|---|
 | 1（走行） | `trainTypeChange.svg` | 11000 | 2 | `defaultLineSVG.svg` の次 |
+| 1（走行） | `infoMessage.svg` | 11000 | 3 | `transfers.svg` の次 |
 | 3（停車） | `trainTypeChange.svg` | 11000 | 2 | `platform.svg` の次 |
+| 3（停車） | `infoMessage.svg` | 11000 | 3 | `trainTypeChange.svg` の次 |
 
 #### `pageState` — 走行状態
 | 値 | 意味 | 条件 |
@@ -374,6 +388,7 @@ graph TD
     DisplayToolbar["DisplayToolbar\n表示ボタン（sticky）"]
     EditorHead["EditorHead\nファイル操作・全体設定"]
     OperationForm["OperationForm\n運用設定フォーム"]
+    MessageForm["MessageForm\nメッセージ設定フォーム"]
     StationList["StationList\n駅一覧テーブル"]
     LineList["LineList\n路線一覧テーブル"]
     IconList["IconList\nアイコン一覧テーブル"]
@@ -387,6 +402,7 @@ graph TD
     Editor --> DisplayToolbar
     Editor --> EditorHead
     Editor --> OperationForm
+    Editor --> MessageForm
     Editor --> StationList
     Editor --> LineList
     Editor --> IconList
@@ -1156,6 +1172,25 @@ export function moveDictItemsDown<T>(
 
 旧 `startStationInd` フィールドは廃止する。各駅が `operationId` を持つ方式に変更。フォームからも削除する。
 
+### `MessageForm` — メッセージ設定フォーム
+
+Editor上でOperationFormセクションの次に配置する独立したアコーディオンセクション。`setting.message` を編集するUIを提供する。
+
+#### Props
+
+| prop | 型 | 説明 |
+|---|---|---|
+| `setting` | `settingType` | 設定オブジェクト |
+| `setSetting` | `Dispatch<SetStateAction<settingType>>` | 設定更新関数 |
+
+#### UI構成
+
+- **メッセージ** テキストエリア（複数行入力可能、`setting.message.text` に対応）
+
+#### 対応するデータ
+
+`settingType.message: { text: string }` — `infoMessage.svg` 表示時に参照するテキスト。空文字の場合、pageType=3 のページは表示されない。
+
 ### 4.10 駅プリセットから追加
 
 #### 概要
@@ -1504,6 +1539,7 @@ lcdDisplay システムの詳細仕様は `public/lcdDisplay/doc/` を参照。
 | `SlotObj` | `lcdParts="slot"` | `GObj` | スロット配置ロジック |
 | `StaticObj` | `lcdParts="static"` | `LcdPartsObj` | `_node`（クローンSVG要素） |
 | `TextBoxObj` | `lcdParts="textBox"` | `LcdPartsObj` | テキスト描画 |
+| `TextBlockObj` | `lcdParts="text"` | `LcdPartsObj` | 改行対応テキスト描画 |
 
 **`GObj`（新規）**
 
@@ -1757,6 +1793,7 @@ if (flushProxy) flushProxy();
 | `lcdParts="group"` | `GroupObj`（子要素を再帰的に処理） |
 | `lcdParts="static"` | `StaticObj` |
 | `lcdParts="textBox"` | `TextBoxObj`（drawParams・args={} で構築） |
+| `lcdParts="text"` | `TextBlockObj`（drawParams・args={} で構築） |
 | `lcdParts="arrange"` | `ArrangeObj`（`setSize()` まで完了） |
 | `lcdParts` なし | **スキップ（子孫ごと無視）** |
 
@@ -3309,3 +3346,113 @@ else:
 | ファイル | 対象 |
 |---|---|
 | `public/lcdDisplay/ArrangeObj.js` | コンストラクタに `_alignedColPositions` 追加、`_prepareAlignment` 書き換え、`setSize` の `_prepareAlignment` 呼び出し引数更新・pass3 crossSize 維持、`getElement` に絶対 x 配置ブランチ追加 |
+
+---
+
+### 7.17 lcdParts="text" — TextBlockObj の実装
+
+#### 概要
+
+`lcdParts="text"` は `<g>` 要素に指定し、改行を含むテキストを複数行で描画するブロック要素。  
+各行の描画処理は `TextBoxObj` と同じ `textDrawer.create()` を使用する。
+
+#### SVG 記述例
+
+```xml
+<g lcdParts="text"
+   lcd-holAlign="center"
+   lcd-verAlign="top"
+   interval="4"
+   lcdText="#{message}\n2行目テキスト">
+  <rect lcdParts="textArea" x="10" y="20" width="300" height="80"/>
+  <rect lcdParts="textLine" height="24"
+        data-style='{"fill":"#ffffff","fontSize":20,"fontFamily":"BIZ UDGothic"}'/>
+</g>
+```
+
+#### 属性仕様
+
+| 属性 | デフォルト | 説明 |
+|---|---|---|
+| `lcdText` | `""` | 描画テキスト。`#{...}` 変数参照と `\n` による改行をサポート |
+| `lcd-holAlign` | `"left"` | 水平揃え: `left` / `center` / `right` |
+| `lcd-verAlign` | `"top"` | 垂直揃え: `top` / `center` / `bottom` |
+| `interval` | `0` | 行間ピクセル数 |
+| `breakType` | `"0"` | `"0"`: 従来通り（幅超過時に圧縮）/ `"1"`: 圧縮なしで収まる文字数で自動折り返し |
+
+#### 子要素
+
+| `lcdParts` 値 | 要素 | 役割 |
+|---|---|---|
+| `textArea` | `<rect>` | テキストブロック全体の範囲（x, y, width, height）を定義 |
+| `textLine` | `<rect>` | 1 行分のスタイル定義。`height` で行高さを指定。`data-style` 属性に TextBoxObj と同形式の JSON スタイルを記述 |
+
+- `textLine` は 1 つだけ配置し、全行で共通使用する。
+- `textLine` の横幅は `textArea` の width に従う（`textLine` の width 属性は無視する）。
+
+#### レイアウトアルゴリズム
+
+```
+lcdText を \n で分割 → segments[]
+
+breakType="1" の場合: 各 segment を自動折り返しして lines[] に展開する
+  fontSize = textDrawer.getFontSize(lineH, fontFamily, lang)
+  segment ごとに再帰的に折り返す:
+    if getTextWidth(segment) <= areaW: lines に追加（折り返し不要）
+    else: 二分探索で収まる最大文字数 k を求め、
+          lines に segment[0..k] を追加し、残り segment[k..] を再帰的に処理する
+
+breakType="0" の場合: segments をそのまま lines[] として使用する
+
+lineH   = textLine.height
+N       = lines.length
+totalH  = lineH * N + interval * (N - 1)
+
+lcd-verAlign に応じてブロック先頭 y（blockStartY）を計算:
+  top    → blockStartY = textArea.y
+  center → blockStartY = textArea.y + (textArea.height - totalH) / 2
+  bottom → blockStartY = textArea.y + textArea.height - totalH
+
+各行 i (0-indexed):
+  lineY = blockStartY + i * (lineH + interval)
+  // textArea の下端を超える行はスキップ
+  if lineY + lineH > textArea.y + textArea.height: continue
+
+  x      = textArea.x
+  width  = textArea.width
+  axis   = lcd-holAlign → textAnchor ("left"→"start", "center"→"middle", "right"→"end")
+  textDrawer.create(lines[i], { x, y: lineY, width, height: lineH, styleJson, lang, axis, ... })
+```
+
+#### 変数参照
+
+`lcdText` の `#{...}` は `LcdPartsObj.resolveTemplate()` で解決する。  
+`\n` による改行は `resolveTemplate` 呼び出し後に `split('\n')` で分割する。
+
+#### TextBlockObj クラス設計
+
+```javascript
+class TextBlockObj extends LcdPartsObj {
+    constructor(svgDom, drawParams, args, textDrawer) {
+        super(svgDom, drawParams, args);
+        // textArea, textLine を svgDom の子要素から取得
+        // lcdText を resolveTemplate で解決し \n で分割
+        // 各行に対し textDrawer.create() を呼んで SVG 要素を生成
+        // 結果を this._groupEl (<g>) に蓄積
+    }
+    getElement(ctx) {
+        // this._groupEl を返す（_wrapTransform を適用）
+    }
+    langChange(transTime, gapTime) {
+        this._applyVisibleAnim(transTime, gapTime);
+    }
+}
+```
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `public/Drawer/src/objects/TextBlockObj.js` | 新規作成 |
+| `public/Drawer/src/main/Drawer.js` | `_buildNode()` に `lcdParts="text"` ケースを追加 |
+| `public/display.html` | `<script src="./Drawer/src/objects/TextBlockObj.js">` を追加 |

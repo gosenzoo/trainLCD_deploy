@@ -32,7 +32,7 @@ type langIdEntryType = {
 }
 
 // ページ表示エントリ（ページ名・表示時間・表示条件の組）
-// type: 0=無条件 / 1=乗換あり / 2=次運用あり（未実装） / 3=Message（未実装）
+// type: 0=無条件 / 1=乗換あり / 2=次運用あり / 3=メッセージあり
 type pageObjType = {
     pageName: string,
     dispTime: number,
@@ -49,13 +49,19 @@ type dispConfigType = {
     isPageAuto: boolean  // true: タイマー自動切換え / false: ユーザー操作による手動切換え
 }
 
+// メッセージ設定（infoMessage.svg 表示時に参照する）
+type messageType = {
+    text: string
+}
+
 type settingType = {
     info: infoType,
     operationDict: {[id: string]: operationType},
     stationList: stationType[],
     lineDict: {[id: string]: lineType},
     iconDict: {[id: string]: string | iconParamsType},
-    dispConfig: dispConfigType
+    dispConfig: dispConfigType,
+    message: messageType
 }
 
 type infoType = {

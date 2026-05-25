@@ -117,9 +117,11 @@ class PageController {
     _isPageValid(page, conditionData) {
         if (!page) return false;
         const type = page.type ?? 0;
-        if (type === 0) return true;                           // 無条件
-        if (type === 1) return !!(conditionData?.hasTransfers); // 乗換あり
-        return true; // type 2,3 は未実装→常に表示
+        if (type === 0) return true;                                    // 無条件
+        if (type === 1) return !!(conditionData?.hasTransfers);         // 乗換あり
+        if (type === 2) return !!(conditionData?.hasNextOperation);     // 次運用あり
+        if (type === 3) return !!(conditionData?.hasMessage);           // メッセージあり
+        return true;
     }
 
     /** pageOutput を返す */

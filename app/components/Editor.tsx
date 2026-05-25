@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import EditorHead from "./EditorHead"
 import OperationForm from './OperationForm'
+import MessageForm from './MessageForm'
 import StationList from "./StationList"
 import LineList from "./LineList"
 import IconList from './IconList'
@@ -170,6 +171,9 @@ const Editor = () => {
                 </AccordionSection>
                 <AccordionSection title="運用設定">
                     <OperationForm setting={setting} setSetting={setSetting}/>
+                </AccordionSection>
+                <AccordionSection title="メッセージ設定" defaultOpen={false}>
+                    <MessageForm setting={setting} setSetting={setSetting}/>
                 </AccordionSection>
                 <AccordionSection title="路線登録" defaultOpen={false}>
                     <LineList setting={setting} setSetting={setSetting}/>

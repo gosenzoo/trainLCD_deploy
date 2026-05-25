@@ -1,0 +1,33 @@
+<svg id="display" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+    <!-- defs.svgから移植したグラデーション・フィルター定義 -->
+    <defs>
+        <linearGradient id="bodyHeaderGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgb(255, 255, 255)" />
+            <stop offset="100%" stop-color="#e4e4e4" />
+        </linearGradient>
+    </defs>
+
+    <!-- 背景 -->
+    <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
+
+    <!-- テキストフォーム -->
+    <rect lcdParts="static" x="50" y="447" width="1820" height="550" fill="#ffffff" style="filter: drop-shadow(1px 2px 1px black);" />
+
+    <!-- ヘッダー背景 -->
+    <rect lcdParts="static" x="0" y="350" width="1920" height="107" fill="url(#bodyHeaderGradient)" />
+    <line lcdParts="static" x1="0" y1="457" x2="1920" y2="457" stroke="#7d7d7d" stroke-width="2" />
+
+    <!-- ヘッダーテキスト -->
+    <rect lcdParts="textBox" lcdText="運行情報" x="525" y="376" width="260" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600", "textAnchor": "middle"}' />
+    <rect lcdParts="textBox" lcdText="/" x="785" y="376" width="64" height="62" fill="#999999" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "400", "textAnchor": "middle"}' />
+    <rect lcdParts="textBox" lcdText="Train Information" x="849" y="376" width="550" height="62" fill="#999999" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "middle"}' />
+
+    <!-- テキストボックス -->
+    <g lcdParts="text" lcdText="#{message.text}" lcd-holAlign="left" lcd-verAlign="top" interval="25" breakType="1">
+        <rect lcdParts="textArea" x="60" y="500" width="1800" height="460" fill="#bbbbbb80" />
+        <rect lcdParts="textLine" x="60" y="500" width="1800" height="50" fill="#bbbbbb80" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600"}' />
+    </g>
+
+    <!-- 参考画像 -->
+    <image href="../../../imgs/tokyu-infoMessage.jpg" x="0" y="0" width="1920" height="1080" opacity="0.5" />
+</svg>

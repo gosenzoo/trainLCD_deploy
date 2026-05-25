@@ -26,6 +26,8 @@ class ProgressController {
         this.info          = progressParams.info;
         this.lineDict      = progressParams.lineDict;
         this.iconDict      = progressParams.iconDict;
+        // メッセージ設定（type=3条件判定用）
+        this.message       = progressParams.message ?? {};
 
         // 全駅に通し番号 _id を付与
         this.stationList.forEach((station, i) => { station._id = i; });
@@ -222,6 +224,8 @@ class ProgressController {
             transfers:         this._buildTransfers(currentStationInd, posState),
             // 種別変更案内（次運用が存在しない場合はnull）
             trainTypeChange:   this._buildTrainTypeChange(),
+            // メッセージ（settings.message をそのまま渡す）
+            message:           this.message ?? {},
             // PageControllerに渡すページ切替情報
             pageState:         this._computePageState(),
             conditionData:     this._buildConditionData(),
@@ -254,6 +258,7 @@ class ProgressController {
      * ページ表示条件の判定に使うデータを生成する。
      * hasTransfers: 次停車駅に乗換情報があるかどうか（pageType=1の条件）
      * hasNextOperation: 次運用が存在しかつ種別が異なるかどうか（pageType=2の条件）
+     * hasMessage: settings.message.textが空でないかどうか（pageType=3の条件）
      */
     _buildConditionData() {
         const displayStation = getNextStopStation(this.stationList, this.currentStationInd);
@@ -275,7 +280,8 @@ class ProgressController {
 
         return {
             hasTransfers:     !!(displayStation?.transfers?.length),
-            hasNextOperation
+            hasNextOperation,
+            hasMessage:       !!(this.message?.text)
         };
     }
 

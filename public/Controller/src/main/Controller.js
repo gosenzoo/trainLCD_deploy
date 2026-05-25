@@ -33,7 +33,8 @@ class Controller {
             operationList: settings.operationList,  // 旧形式との後方互換のため渡す（ProgressController側で変換）
             info:          settings.info,
             lineDict:      settings.lineDict,
-            iconDict:      settings.iconDict
+            iconDict:      settings.iconDict,
+            message:       settings.message         // メッセージ設定（type=3条件判定に使用）
         };
         this._progressController = new ProgressController(progressParams);
 

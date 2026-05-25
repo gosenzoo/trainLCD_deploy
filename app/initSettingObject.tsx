@@ -90,6 +90,7 @@ const initDispConfigObject: dispConfigType = {
             { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
             { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
             { pageName: "transfers.svg",         dispTime: 11000, type: 1 },
+            { pageName: "infoMessage.svg",       dispTime: 11000, type: 3 },
         ],
         '2': [ // 直前
             { pageName: "platform.svg",        dispTime: 11000, type: 0 },
@@ -102,6 +103,7 @@ const initDispConfigObject: dispConfigType = {
             { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
             { pageName: "platform.svg",          dispTime: 11000, type: 0 },
             { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
+            { pageName: "infoMessage.svg",       dispTime: 11000, type: 3 },
         ],
         '4': [ // 通過
             { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
@@ -125,7 +127,8 @@ const initSettingObject: settingType = {
     stationList: [],
     lineDict: {},
     iconDict: {},
-    dispConfig: initDispConfigObject
+    dispConfig: initDispConfigObject,
+    message: { text: "" }
 }
 
 export default {setting: initSettingObject, info: initInfoObject, operation: initOperationObject, station: initStationObject, line: initLineObject, langIdEntry: initLangIdEntryObject, dispConfig: initDispConfigObject}
