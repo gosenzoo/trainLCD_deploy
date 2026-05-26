@@ -346,6 +346,62 @@ classDiagram
 
 **判定条件:** `settings.message?.text` が空文字でない場合に `true`
 
+#### `infoMessage.svg` 複数ページ対応
+
+メッセージが長い場合、コントローラ側で複数ページに分割して順番に表示する。
+
+**定数（ProgressController.js にハードコード）:**
+
+| 定数 | 説明 |
+|---|---|
+| `INFO_MSG_MAX_LINE_NUM` | 1 ページに表示できる最大行数 |
+| `INFO_MSG_MAX_CHAR_NUM` | 1 行の最大文字数（これを超えると次の行に折り返す） |
+
+**ページ分割アルゴリズム（`_buildInfoMsgPages()`）:**
+
+```
+message.text を \n で分割 → paragraphs[]
+各 paragraph を MAX_CHAR_NUM 文字ごとに折り返す → allLines[]
+allLines を MAX_LINE_NUM 行ごとに区切る → pages[]（各要素は \n 結合済みのテキスト）
+```
+
+**`conditionData` への追加フィールド:**
+
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `infoMsgTotalPage` | number | メッセージの総ページ数（1以上。メッセージなしのときも 1） |
+
+**`drawParams` への追加フィールド:**
+
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `pages.nowPage` | number | 現在表示中のページ番号（1-indexed） |
+| `pages.totalPage` | number | 総ページ数 |
+| `message.text` | string | 現在ページのテキスト（\n 結合済み） |
+
+**PageController の infoMessage 特別処理（案B）:**
+
+`infoMessage.svg` 表示中に `pageRotate(conditionData)` が呼ばれたとき:
+
+```
+if currentPage === 'infoMessage.svg':
+    if _infoMsgNowPage < conditionData.infoMsgTotalPage - 1:
+        _infoMsgNowPage++          // 次サブページへ（pageDispList は進めない）
+        _startTimer()
+        return
+    _infoMsgNowPage = 0            // 全サブページ完了: リセット
+
+// 通常の次ページへ進む
+_currentIndex = (_currentIndex + 1) % _currentList.length
+...
+```
+
+`setPageState()` 呼び出し時（駅・状態移動）は `_infoMsgNowPage = 0` にリセットする。
+
+**Controller.getDrawParams() の変更:**
+
+`_pageController.getParams()` から `infoMsgNowPage`（0-indexed）を取得し、`progressController.getParams(infoMsgNowPage)` に渡す。ProgressController はこれを使って当該ページのテキストを `message.text` に格納し `pages` フィールドを生成する。
+
 #### ページ設定デフォルト値（`initDispConfigObject`）
 
 | pageState | ページ名 | dispTime | type | 追加位置 |

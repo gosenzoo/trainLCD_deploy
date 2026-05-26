@@ -3,6 +3,11 @@
 // 列車の路線上の位置・走行状態・長時間停車を管理し、
 // drawParamsのうち page・langId 以外の全フィールドを生成する
 // ============================================================
+
+// infoMessage ページ分割定数（1ページの最大行数 / 1行の最大文字数）
+const INFO_MSG_MAX_LINE_NUM = 6;
+const INFO_MSG_MAX_CHAR_NUM = 33;
+
 class ProgressController {
     /**
      * @param {object} progressParams
@@ -194,8 +199,9 @@ class ProgressController {
 
     /**
      * progressOutput（drawParamsのうちpage・langId以外の全フィールド）を返す
+     * @param {number} [infoMsgNowPage=0] - 現在表示中の infoMessage サブページ番号（0-indexed）
      */
-    getParams() {
+    getParams(infoMsgNowPage = 0) {
         const posState         = this.posState;
         const currentStationInd = this.currentStationInd;
         const isTerminal       = this.isTerminal;
@@ -224,8 +230,9 @@ class ProgressController {
             transfers:         this._buildTransfers(currentStationInd, posState),
             // 種別変更案内（次運用が存在しない場合はnull）
             trainTypeChange:   this._buildTrainTypeChange(),
-            // メッセージ（settings.message をそのまま渡す）
-            message:           this.message ?? {},
+            // メッセージ: 現在サブページのテキストと総ページ数を格納する
+            message:           this._buildMessageOutput(infoMsgNowPage),
+            pages:             this._buildPagesOutput(infoMsgNowPage),
             // PageControllerに渡すページ切替情報
             pageState:         this._computePageState(),
             conditionData:     this._buildConditionData(),
@@ -281,7 +288,9 @@ class ProgressController {
         return {
             hasTransfers:     !!(displayStation?.transfers?.length),
             hasNextOperation,
-            hasMessage:       !!(this.message?.text)
+            hasMessage:       !!(this.message?.text),
+            // PageController が infoMessage サブページを判断するために使用する
+            infoMsgTotalPage: this._buildInfoMsgPages().length,
         };
     }
 
@@ -1103,5 +1112,70 @@ class ProgressController {
         }
         // 新・旧配列形式: _transferItemToDrawItem に委譲
         return transfers.map(t => this._transferItemToDrawItem(t)).filter(item => item !== null);
+    }
+
+    // ============================================================
+    // infoMessage ページ分割ヘルパー
+    // ============================================================
+
+    /**
+     * message.text を MAX_CHAR_NUM / MAX_LINE_NUM に基づいてページ配列に分割する。
+     * 各要素は \n 結合済みの文字列。メッセージなしのときは [''] を返す。
+     */
+    _buildInfoMsgPages() {
+        const text = this.message?.text ?? '';
+        if (!text) return [''];
+
+        // \n で段落分割し、各段落を MAX_CHAR_NUM 文字ごとに折り返して全行リストを作る
+        const allLines = [];
+        for (const para of text.split('\n')) {
+            if (!para) { allLines.push(''); continue; }
+            let rest = para;
+            while (rest.length > INFO_MSG_MAX_CHAR_NUM) {
+                allLines.push(rest.slice(0, INFO_MSG_MAX_CHAR_NUM));
+                rest = rest.slice(INFO_MSG_MAX_CHAR_NUM);
+            }
+            allLines.push(rest);
+        }
+
+        // MAX_LINE_NUM 行ごとにページ分割する
+        const pages = [];
+        for (let i = 0; i < allLines.length; i += INFO_MSG_MAX_LINE_NUM) {
+            pages.push(allLines.slice(i, i + INFO_MSG_MAX_LINE_NUM).join('\n'));
+        }
+        return pages.length > 0 ? pages : [''];
+    }
+
+    /**
+     * 現在サブページのテキストを持つ message オブジェクトを返す
+     * @param {number} infoMsgNowPage - 0-indexed サブページ番号
+     */
+    _buildMessageOutput(infoMsgNowPage) {
+        const pages = this._buildInfoMsgPages();
+        const raw = pages[infoMsgNowPage] ?? pages[0] ?? '';
+        // 半角英数記号・スペースを全角に変換して返す
+        return { text: this._toFullWidth(raw) };
+    }
+
+    /**
+     * 半角ASCII印字可能文字（0x21〜0x7E）を全角（0xFF01〜0xFF5E）へ、
+     * 半角スペース（0x20）を全角スペース（U+3000）へ変換する
+     */
+    _toFullWidth(str) {
+        return str
+            .replace(/[\x21-\x7E]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0xFEE0))
+            .replace(/\x20/g, '　');
+    }
+
+    /**
+     * drawParams.pages フィールドを返す（nowPage は 1-indexed）
+     * @param {number} infoMsgNowPage - 0-indexed サブページ番号
+     */
+    _buildPagesOutput(infoMsgNowPage) {
+        const pages = this._buildInfoMsgPages();
+        return {
+            nowPage:   infoMsgNowPage + 1,
+            totalPage: pages.length,
+        };
     }
 }

@@ -9,7 +9,7 @@ class PageController {
      * @param {object} pageParams
      * @param {object} pageParams.pageDispList - { [pageState: string]: pageObj[] }
      *   pageObj: { pageName: string, dispTime: number, type: number }
-     *   type: 0=無条件 / 1=乗換あり / 2=次運用あり（未実装） / 3=Message（未実装）
+     *   type: 0=無条件 / 1=乗換あり / 2=次運用あり / 3=メッセージあり
      * @param {boolean} [pageParams.isPageAuto=true] - true: タイマー自動切換え / false: 手動切換えのみ
      */
     constructor(pageParams) {
@@ -20,6 +20,8 @@ class PageController {
         this._currentIndex   = 0;
         this._timerId        = null;
         this._onPageTimer    = null;
+        // infoMessage サブページ管理（0-indexed）
+        this._infoMsgNowPage = 0;
     }
 
     /**
@@ -51,6 +53,8 @@ class PageController {
         this._currentPageState = pageState;
         this._currentList      = this.pageDispList[String(pageState)] ?? [];
         this._currentIndex     = 0;
+        // 駅・状態が変わったら infoMessage サブページをリセットする
+        this._infoMsgNowPage   = 0;
         this._skipInvalidPages(conditionData);
         this._startTimer();
     }
@@ -62,6 +66,19 @@ class PageController {
      */
     pageRotate(conditionData) {
         if (this._currentList.length === 0) return;
+
+        // infoMessage.svg 表示中: まだサブページがあれば次サブページへ進む（pageDispList は進めない）
+        if (this.currentPageName === 'infoMessage.svg') {
+            const totalPage = conditionData?.infoMsgTotalPage ?? 1;
+            if (this._infoMsgNowPage < totalPage - 1) {
+                this._infoMsgNowPage++;
+                this._startTimer();
+                return;
+            }
+            // 全サブページ完了: サブページカウンタをリセットして通常の次ページへ進む
+            this._infoMsgNowPage = 0;
+        }
+
         this._currentIndex = (this._currentIndex + 1) % this._currentList.length;
         this._skipInvalidPages(conditionData);
         this._startTimer();
@@ -73,7 +90,8 @@ class PageController {
      * @param {object} conditionData
      */
     pageReset(conditionData) {
-        this._currentIndex = 0;
+        this._currentIndex   = 0;
+        this._infoMsgNowPage = 0;
         this._skipInvalidPages(conditionData);
         this._startTimer();
     }
@@ -112,7 +130,6 @@ class PageController {
 
     /**
      * ページの表示条件を判定する。
-     * type 2,3 は未実装のため常にtrue（表示する）。
      */
     _isPageValid(page, conditionData) {
         if (!page) return false;
@@ -126,6 +143,10 @@ class PageController {
 
     /** pageOutput を返す */
     getParams() {
-        return { page: this.currentPageName };
+        return {
+            page:            this.currentPageName,
+            // infoMessage サブページ番号（0-indexed）。ProgressController.getParams() に渡す
+            infoMsgNowPage:  this._infoMsgNowPage,
+        };
     }
 }

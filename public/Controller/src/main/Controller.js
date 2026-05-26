@@ -140,7 +140,8 @@ class Controller {
     getDrawParams() {
         const pageOutput     = this._pageController.getParams();
         const langOutput     = this._langController.getParams();
-        const progressOutput = this._progressController.getParams();
+        // infoMsgNowPage（0-indexed）を渡すことで現在サブページのテキストと pages フィールドを生成させる
+        const progressOutput = this._progressController.getParams(pageOutput.infoMsgNowPage);
 
         return {
             page:   pageOutput.page,

@@ -28,6 +28,12 @@
         <rect lcdParts="textLine" x="60" y="500" width="1800" height="50" fill="#bbbbbb80" data-style='{"fontFamily": "BIZ UDGothic", "fontWeight": "600"}' />
     </g>
 
+    <!-- ページ数 -->
+    <rect lcdParts="textBox" lcdText="#{pages.nowPage}" x="1729" y="1010" width="65" height="42" fill="#bbbbbb80" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "end"}' />
+    <rect lcdParts="textBox" lcdText="／" x="1794" y="1008" width="49" height="47" fill="#bbbbbb80" data-style='{"fontFamily": "sans-serif", "fontWeight": "600", "textAnchor": "middle"}' />
+    <rect lcdParts="textBox" lcdText="#{pages.totalPage}" x="1843" y="1010" width="65" height="42" fill="#bbbbbb80" data-style='{"fontFamily": "sans-serif", "fontWeight": "400", "textAnchor": "start"}' />
+
+
     <!-- 参考画像 -->
     <image href="../../../imgs/tokyu-infoMessage.jpg" x="0" y="0" width="1920" height="1080" opacity="0.5" />
 </svg>
