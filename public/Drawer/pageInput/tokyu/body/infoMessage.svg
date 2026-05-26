@@ -7,7 +7,7 @@
         </linearGradient>
         <!-- CSS filter: drop-shadow は iOS Safari で動作しないため SVG ネイティブフィルターを使用する -->
         <filter id="rectShadow" x="-1%" y="-2%" width="102%" height="106%">
-            <feDropShadow dx="1" dy="2" stdDeviation="1" flood-color="black" flood-opacity="1" />
+            <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="black" flood-opacity="1" />
         </filter>
     </defs>
 
