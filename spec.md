@@ -1,4 +1,4 @@
-# LCDシミュレーター 仕様書
+﻿# LCDシミュレーター 仕様書
 
 ## 1. 概要
 
@@ -252,7 +252,7 @@ classDiagram
 | `transfers` | `transferItemType[]` | 乗換路線のリスト。各エントリに路線IDと乗換駅情報を持つ |
 | `transferListTransfers` | string | 乗換一覧表示の行分割指定。スペース区切りの路線IDと改行の組み合わせ。空の場合は `transfers` をもとに自動生成 |
 | `isPass` | boolean | 通過駅フラグ |
-| `sectionTime` | string | 次駅までの所要時間（分） |
+| `sectionTime` | string | 次駅までの所要時間（分）。駅追加時のデフォルト値は `"0"` |
 | `lineId` | string | この駅以降の区間路線ID |
 | `operationId` | string | この駅以降の区間運用ID（`operationDict` のキー）。空文字のときはフォールバック運用を使用 |
 | `coordinate` | `[number\|null, number\|null]` | 緯度・経度（GPS連動用） |
@@ -532,6 +532,15 @@ type ColumnDef<T> = {
     header: string                              // <th> ヘッダーテキスト
     cell: (row: T, key: string) => React.ReactNode  // セル内容の描画関数
     isSelector?: boolean  // true のとき <th> として描画しクリックで行選択
+    cellStyle?: (row: T, key: string) => React.CSSProperties  // <td> 自体に適用するスタイル
+    collapsible?: boolean
+    defaultCollapsed?: boolean
+    // 半セルずれた色帯列として描画する場合に指定する（後述「半セルずれ列」参照）。
+    // 指定した場合、cell・cellStyle の戻り値は無視され、GenericItemList が自動描画する
+    halfCellColor?: (row: T) => string | undefined
+    // 半セルずれたテキスト列として描画する場合に指定する（後述「半セルずれ列」参照）。
+    // 指定した場合、cell・cellStyle の戻り値は無視され、GenericItemList が自動描画する
+    halfCellText?: (row: T) => string
 }
 
 // Props
@@ -542,8 +551,45 @@ type GenericItemListProps<T> = {
     onRowClick: (key: string) => void   // 行クリック時のコールバック
     tableId?: string
     containerId?: string
+    rangeStartKey?: string
 }
 ```
+
+#### 半セルずれ列（`halfCellColor` / `halfCellText`）
+
+「この駅以降の区間」のような、**行そのものではなく行と行の間（区間）に属する値**を、見た目上その行の縦方向中央（半セル下）を境界として表示するための汎用機能。`stationList` の `lineId`（路線列）のように、今後も同種の列が追加される可能性があるため、列ごとに1つの関数を指定するだけで実装できるようにしている。
+
+いずれも指定した列は `cell` を無視し、`GenericItemList` が `rows` 配列上の **ひとつ前の行** のデータを自動的に取得して描画する（先頭行には「ひとつ前の行」が存在しないため、無色・空文字として扱う）。`cellStyle` は併用可能で、`width` など任意のスタイルを指定できる（`background`・`padding`・`border-bottom` は自動生成の値で常に上書きされる）。
+
+**`halfCellBorder?: 'auto' | 'always' | 'never'`** — 半セル境界線の表示方法を指定する（`halfCellColor` / `halfCellText` 共通、省略時は `'auto'`）。
+
+| 値 | 動作 |
+|---|---|
+| `'auto'`（デフォルト） | 前の行の値と当該行の値が異なる場合のみ境界線を表示する（同じ値が続く区間で不要な線が入るのを防ぐ） |
+| `'always'` | 値の一致・不一致に関わらず、常に境界線を表示する |
+| `'never'` | 境界線を表示しない |
+
+**`halfCellColor?: (row: T) => string | undefined`** — 色帯列用。
+
+- `<td>` の `background` を縦方向の `linear-gradient` として描画する（上半分 = ひとつ前の行の色、下半分 = 当該行の色）。値が未設定の場合は `var(--bg-base)`（通常時のセル背景色）を使う
+- `halfCellBorder` の判定に従い、境界線を表示する場合は中央（`calc(50% - 0.5px)` 〜 `calc(50% + 0.5px)`）に `var(--border)` 色の1px境界線を色停止点として挟む
+- グラデーションの色停止点は `<td>` 自身の最終的な描画サイズに対して解決されるため、`<td>` の高さが行の高さから暗黙的に決まる場合でも安定して中央で分割される（`position: absolute` や子要素のパーセント高さ指定は使わない）
+- `<td>` の `padding` は `0`、`border-bottom` は `none` に固定する（境界線は上記のグラデーション内で描画するため）
+- 行をまたいだ透過・はみ出し表示は行わない（最終行の帯は自身の行の下半分で止まる）
+
+**`halfCellText?: (row: T) => string`** — テキスト列用。
+
+- `<td>` 内には**当該行自身の値を1つだけ**表示する。ひとつ前の行の値は画面には表示しない（2つ並べて表示することは想定しない）が、境界線を表示するかどうかの判定のためだけに内部的に取得し、当該行の値と比較する
+- `<td>` 内に1つの要素を `position: absolute; top: 50%; left: 0; right: 0; height: 100%; display: flex; align-items: center; justify-content: center;` で配置する。これにより要素は当該行の縦方向中央から次行の縦方向中央まで（= 半セルずれたセル）を占め、`display: flex` の中央揃えにより値が1つだけそのセルの中央に表示される
+- `halfCellBorder` の判定に従い、境界線を表示する場合は上記要素の上端に `border-top: 1px solid var(--border)` を描画する（= 当該行の縦方向中央が境界線になる）
+- `<td>` の `background-color` は、**選択中の行は `var(--bg-base)`（通常時のセル背景色）、未選択の行は `transparent`** にする
+  - 未選択時に透明にするのは、上記の要素が次行の領域までオーバーフローして描画されるため、次行の `<td>` が不透明だと自分のテキストの下側が隠れてしまうのを防ぐため
+  - 選択中の行を不透明にするのは、`tr.selected` のハイライト色（`background: var(--accent-dim) !important`）が透明な `<td>` を通して見えてしまうのを防ぐため（この場合、ひとつ前の行からオーバーフローしてきたテキストの下側は隠れるが、行選択時の一時的な見た目として許容する）
+- `<td>` の `border-bottom`（半セルずれていない通常の行境界線）は非表示にする（詳細は次項「半セルずれ列の行境界線」を参照）
+
+##### 半セルずれ列の行境界線
+
+`halfCellColor` / `halfCellText` のいずれを指定した列も、**半セルずれていない位置（通常の行境界、`<td>` の上端・下端）の境界線は表示しない**（`border-bottom: none` を常に適用する）。半セルずれた列の境界線は、上記の各方式で縦方向中央にのみ表示する。
 
 #### データの正規化
 
@@ -1043,6 +1089,9 @@ export function moveDictItemsDown<T>(
 |---|---|---|
 | # | 1-based インデックス | `isSelector: true`、クリックで行選択 |
 | 駅名 | `station.name` | |
+| 通過 | `station.isPass` に応じた表示切替（下記参照） | クリックで `isPass` をトグル |
+| 路線 | `lineDict[station.lineId].color` の帯表示（下記参照） | 区間ごとの路線カラー表示 |
+| 運用 | `station.operationId`（下記参照） | 区間ごとの運用番号表示 |
 | 駅名かな | `station.kana` | `defaultCollapsed: true` |
 | 駅名英語 | `station.eng` | `defaultCollapsed: true` |
 | ナンバリング | `numIcon` のアイコン描画 | |
@@ -1051,7 +1100,40 @@ export function moveDictItemsDown<T>(
 | 次区間所要時間 | `station.sectionTime` | |
 | 乗換 | `station.transfers` のアイコン描画 | |
 | ドア | `station.doorSide` | |
-| 通過 | `station.isPass` | |
+
+##### 通過列の表示仕様
+
+チェックボックスは表示せず、セル内のテキストをクリックすることで `station.isPass` をトグルする。
+
+- `isPass === true` の場合: `レ` を表示する
+- `isPass === false` の場合: 始点駅（先頭駅、積算時間 `0`）からその駅までの積算所要時間を数値のみで表示する
+  - 積算時間 = 先頭駅から当該駅の **直前の駅** までの各駅の `sectionTime` の合計（先頭駅自身は `0`）
+  - 区間内のいずれかの駅で `sectionTime` が空文字（数値変換できない）場合、その駅以降の積算時間は計算不能として `-` を表示する
+
+##### 路線列の表示仕様
+
+`station.lineId` は「この駅以降の区間路線ID」であるため、`GenericItemList` の **`halfCellColor` 列**（4.5節参照）として実装する。
+
+```typescript
+halfCellColor: (station) => setting.lineDict[station.lineId]?.color
+```
+
+これにより、見た目上はその駅の行の縦方向中央（半セル下）を境界として、ひとつ前の駅の色 → 当該駅の色へと縦グラデーションで表示される（詳細な描画規則は 4.5節「半セルずれ列」を参照）。
+
+##### テーブルヘッダーの重なり対策（CSS）
+
+`#stationsTable` は `thead th` に `position: sticky; top: 0;` を適用してスクロール時にヘッダー行を固定表示している。この sticky 指定は **`thead th` にのみ** 適用し、`tbody` 側の `<th>`（`駅名` 列の選択セル）には適用しない。また `thead th` には明示的に `z-index` を設定し、`tbody` 側の `position: relative` を使うセルより常に手前に描画されるようにする。これにより、上方向スクロール時に本文側のセルがヘッダーに重なって表示される問題を防ぐ。
+
+##### 運用列の表示仕様
+
+`station.operationId` は「この駅以降の区間運用ID」であるため、`GenericItemList` の **`halfCellText` 列**（4.5節参照）として実装する。`halfCellBorder` は `'always'` を指定し、値の一致・不一致に関わらず各セル（半セル）ごとに区切り線を表示する。
+
+```typescript
+halfCellText: (station) => station.operationId || '-',
+halfCellBorder: 'always',
+```
+
+これにより、セル中央には当該駅自身の運用番号が1つだけ表示される（ひとつ前の駅の運用番号は表示しない）。`halfCellBorder: 'always'` のため、運用番号の一致・不一致に関わらず、セルの縦方向中央には常に区切り線が表示される（詳細な描画規則は 4.5節「半セルずれ列」を参照）。
 
 #### UI（全リスト共通）
 
@@ -1427,7 +1509,7 @@ sequenceDiagram
 
 | 種別 | 実装 | 使用箇所 |
 |------|------|----------|
-| 駅通過判定（`isPass`） | `<input type="checkbox">` のまま | `StationList` 通過列 |
+| 駅通過判定（`isPass`） | クリックでトグルするテキスト表示（チェックボックスなし） | `StationList` 通過列（4.9節参照） |
 | トグルスイッチ | `<ToggleSwitch>` コンポーネント | 設定値の ON/OFF |
 | トグルボタン | `<button className="btn-toggle">` | モード切替・操作フラグ |
 

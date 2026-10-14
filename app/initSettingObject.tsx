@@ -42,7 +42,7 @@ const initStationObject: stationType = {
     lineNumberType: "0",
     transfers: [],
     isPass: false,
-    sectionTime: "",
+    sectionTime: "0",
     lineId: "",
     operationId: "",
     coordinate: [null, null],

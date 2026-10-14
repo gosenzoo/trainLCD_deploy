@@ -109,7 +109,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         _setting.stationList.splice(_index, 0, {
             name: "", kana: "", eng: "", numIcon: _numIcon,
             lineNumberType: "0", transfers: [],
-            isPass: false, sectionTime: "", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
+            isPass: false, sectionTime: "0", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
             otherCarNum: "0", otherLeftSlotInd: "0", transferListTransfers: ""
@@ -198,29 +198,66 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         setIsSeqInputOpen(false)
     }
 
-    const passBoxChanged = (e: any, index: number) => {
+    const togglePass = (index: number) => {
         const _setting = structuredClone(setting)
-        _setting.stationList[index].isPass = e.target.checked
+        _setting.stationList[index].isPass = !_setting.stationList[index].isPass
         setSetting(_setting)
+    }
+
+    // 始点駅（先頭駅）からindex駅の直前の駅までのsectionTimeを積算する
+    // 途中にsectionTimeが数値変換できない駅があれば計算不能として "-" を返す
+    const calcCumulativeTime = (stationList: stationType[], index: number): string => {
+        let sum = 0
+        for (let i = 0; i < index; i++) {
+            const t = Number(stationList[i].sectionTime)
+            if (stationList[i].sectionTime === "" || isNaN(t)) return "-"
+            sum += t
+        }
+        return String(sum)
     }
 
     // 駅一覧テーブルのカラム定義
     const stationColumns: ColumnDef<stationType>[] = [
         {
-            header: '通過',
-            // key（0-based）をそのままインデックスとして使用
-            cell: (station, key) => (
-                <input
-                    type="checkbox"
-                    onChange={(e) => passBoxChanged(e, parseInt(key))}
-                    checked={station.isPass}
-                />
-            ),
-        },
-        {
             header: '駅名',
             isSelector: true,  // クリックで行選択
             cell: (station) => station.name,
+        },
+        {
+            header: '通過',
+            // key（0-based）をそのままインデックスとして使用
+            // チェックボックスは使わず、セル内の任意の場所のクリックでisPassをトグルする
+            // isPass=true: 「レ」を表示 / isPass=false: 始点駅からの積算所要時間を表示
+            cell: (station, key) => {
+                const index = parseInt(key)
+                return (
+                    // margin: -(td の padding) と同じ値を指定し、セル全面をクリック領域にする
+                    <span
+                        onClick={() => togglePass(index)}
+                        style={{ cursor: 'pointer', display: 'block', margin: '-7px -12px', padding: '7px 12px' }}
+                    >
+                        {station.isPass ? 'レ' : calcCumulativeTime(setting.stationList, index)}
+                    </span>
+                )
+            },
+        },
+        {
+            header: '路線',
+            // station.lineIdは「この駅以降の区間路線」を表すため、GenericItemListのhalfCellColor
+            // （半セルずれた色帯列）として描画する。cellは使わないダミー関数を渡しておく。
+            cell: () => null,
+            cellStyle: () => ({ width: '16px' }),
+            halfCellColor: (station) => setting.lineDict[station.lineId]?.color,
+        },
+        {
+            header: '運用',
+            // station.operationIdは「この駅以降の区間運用」を表すため、GenericItemListのhalfCellText
+            // （半セルずれたテキスト列）として描画する。cellは使わないダミー関数を渡しておく。
+            // halfCellBorder: 'always' により、値の一致・不一致に関わらず各セルごとに区切り線を表示する
+            cell: () => null,
+            cellStyle: () => ({ width: '36px' }),
+            halfCellText: (station) => station.operationId || '-',
+            halfCellBorder: 'always',
         },
         {
             header: '駅名かな',

@@ -421,16 +421,20 @@ tr:hover td {
 #stationsTable th {
   border-bottom: 1px solid var(--border);
   background: var(--bg-overlay);
-  position: sticky;
-  top: 0;
 }
 
+/* ヘッダー行（thead）の th のみを固定表示にする。tbody側のth（駅名列の選択セル）は
+   このセレクタの対象外とし、スクロール時にヘッダーと重なって表示されるのを防ぐ */
 #stationsTable thead th {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
   border-top: none;
+  position: sticky;
+  top: 0;
+  /* tbody側のposition: relativeなセル（路線列など）より常に手前に描画する */
+  z-index: 2;
 }
 
 #stationsTable tr:first-child th {
