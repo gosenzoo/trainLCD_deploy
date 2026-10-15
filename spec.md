@@ -648,7 +648,9 @@ type GenericItemListProps<T> = {
 - `GROUPED_HEADER_ROW_HEIGHT`（`GROUPED_HEADER_HEIGHT` の半分、`2.2em`）を1行あたりの固定高さとする
 - **折りたたみ中の列・グループ**: 従来通り `rowSpan={2}`、`height: GROUPED_HEADER_HEIGHT` の縦書きセル1つで描画する（他の列が2行ともそれぞれ直接のセルで `GROUPED_HEADER_ROW_HEIGHT` を確保しているため、`rowSpan` セルも安定して2行分＝`GROUPED_HEADER_HEIGHT` の高さになる）
 - **入れ子でない通常列（折りたたまれていない状態）**: `rowSpan` は使わず、1行目・2行目それぞれに実セルを描画する
-  - 1行目の `<th>`: `height: GROUPED_HEADER_ROW_HEIGHT`、`position: relative`、`border-bottom: none`（2行目との間の分割線を非表示にする）。内部に `position: absolute; top: 0; height: GROUPED_HEADER_HEIGHT;` の `div` を配置し、`display: flex; align-items: center; justify-content: center;` で見出しテキストを描画する。この `div` は1行目の高さ（`GROUPED_HEADER_ROW_HEIGHT`）を超えて2行目の領域までオーバーフローして描画されるため、見出しテキストはヘッダー2行分（`GROUPED_HEADER_HEIGHT`）の縦方向中央に配置される
+  - 1行目の `<th>`: `height: GROUPED_HEADER_ROW_HEIGHT`、`position: relative`、`padding: 0`、`border-bottom: none`（2行目との間の分割線を非表示にする）。内部に `position: absolute; top: 0; height: GROUPED_HEADER_HEIGHT;` の `div` を配置し、`display: flex; align-items: center; justify-content: center;` で見出しテキストを描画する。この `div` は1行目の高さ（`GROUPED_HEADER_ROW_HEIGHT`）を超えて2行目の領域までオーバーフローして描画されるため、見出しテキストはヘッダー2行分（`GROUPED_HEADER_HEIGHT`）の縦方向中央に配置される
+    - **判明した問題**: `<th>` 自身に `padding` を指定しない場合、各テーブルのCSS（`td, th { padding: 7px 12px; }`）由来のデフォルトの `padding`（左右12pxずつ）が適用される。一方、列の幅を確保している `widthSpacerStyle` 自身にも左右12pxずつの `padding` があるため、`<th>` 自身の `padding` と合わせて**左右の余白が二重**になり（合計で左右12px×2＝48px）、入れ子グループの子カラム（`<th>` 自身は `padding: 0` で、余白は `widthSpacerStyle` の左右12px×1＝24pxのみ）よりヘッダーが不必要に広くなっていた（Chrome実機で、同じ2文字の見出しでも `<th>` の幅が約71px対約48pxと大きく異なることを計測して確認）
+    - 対策として、`<th>` 自身にも `padding: 0` を指定し、余白を `widthSpacerStyle` 側の左右12pxずつのみに統一する（入れ子グループの子カラムと同じ余白幅になる）
   - 2行目の `<th>`: `height: GROUPED_HEADER_ROW_HEIGHT`、`background: transparent`。内容は空（見えないプレースホルダー）。背景を透明にすることで、1行目からオーバーフローしてきた見出しテキストが隠れないようにする。`border-bottom` は上書きせず、他の列・グループと同様に各テーブルのCSS（`#stationsTable th { border-bottom: 1px solid var(--border); }` 等）由来のデフォルトの境界線をそのまま表示する（この2行目がヘッダーの実際の最下段にあたるため、ここで境界線を消すとヘッダー全体の下側境界線が入れ子でない列だけ欠けてしまう）
   - これにより、入れ子でない列は**常に2行それぞれに直接のセルを持つ**ため、`columns` 内の他の列・グループの状態（折りたたみ・展開）に関わらず、2行目の高さが不安定になることはない
   - **判明した問題**: `<th>` 自身の背景色（`#stationsTable th { background: var(--bg-overlay); }` 等、各テーブルのCSSで指定）は1行目の `<th>` 自身の実際のボックス（`GROUPED_HEADER_ROW_HEIGHT` 分のみ）にしか適用されない。2行目のプレースホルダーは `background: transparent` のため、入れ子でない列は見出し全体の**上半分にしか背景色が描画されない**不具合が生じていた（Chrome実機の `getComputedStyle` で、1行目 `background-color: rgb(28, 33, 40)`（＝ `--bg-overlay`）、2行目 `rgba(0, 0, 0, 0)` と計測して確認）
@@ -1186,6 +1188,9 @@ export function moveDictItemsDown<T>(
 | 次駅までの<br/>所要時間 | `station.sectionTime` | ヘッダーは `<br/>` で2行に改行表示 |
 | 乗換 | `station.transfers` のアイコン描画 | |
 | ドア | `station.doorSide` | |
+| 座標（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（駅名多言語と同じ構造） | 子カラム: 緯度・経度 |
+| ├ 緯度 | `station.coordinate[0]` | 個別の折りたたみはしない |
+| ├ 経度 | `station.coordinate[1]` | 個別の折りたたみはしない |
 
 ##### 通過列の表示仕様
 

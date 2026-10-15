@@ -333,12 +333,15 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             cell: (station) => station.sectionTime,
         },
         {
-            header: '緯度',
-            cell: (station) => station.coordinate[0] ?? '',
-        },
-        {
-            header: '経度',
-            cell: (station) => station.coordinate[1] ?? '',
+            // 「緯度」「経度」を1つの見出しの下にまとめ、まとめて折りたたみ可能にする（駅名多言語と同じ構造）。
+            // 子カラム自体は個別に折りたたみできない
+            groupHeader: '座標',
+            collapsible: true,       // 列の折りたたみを許可する
+            defaultCollapsed: true,  // デフォルトで折りたたむ
+            columns: [
+                { header: '緯度', cell: (station) => station.coordinate[0] ?? '' },
+                { header: '経度', cell: (station) => station.coordinate[1] ?? '' },
+            ],
         },
     ]
 

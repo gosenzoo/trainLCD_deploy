@@ -338,6 +338,7 @@ function GenericItemList<T,>({
                                     style={{
                                         ...nestedHeaderCellStyle,
                                         position: 'relative',
+                                        padding: 0,
                                         height: GROUPED_HEADER_ROW_HEIGHT,
                                         borderBottom: 'none',
                                         ...(col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : {}),
@@ -388,7 +389,7 @@ function GenericItemList<T,>({
                                 // このセルがヘッダーの実際の最下段にあたるため、border-bottomは上書きせず
                                 // 他の列・グループと同様にCSS側のデフォルトの境界線をそのまま表示する
                                 return (
-                                    <th key={i} style={{ height: GROUPED_HEADER_ROW_HEIGHT, background: 'transparent' }} />
+                                    <th key={i} style={{ height: GROUPED_HEADER_ROW_HEIGHT, padding: 0, background: 'transparent' }} />
                                 )
                             })}
                         </tr>
