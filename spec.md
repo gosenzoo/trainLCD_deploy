@@ -254,7 +254,7 @@ classDiagram
 | `isPass` | boolean | 通過駅フラグ |
 | `sectionTime` | string | 次駅までの所要時間（分）。駅追加時のデフォルト値は `"0"` |
 | `lineId` | string | この駅以降の区間路線ID |
-| `operationId` | string | この駅以降の区間運用ID（`operationDict` のキー）。空文字のときはフォールバック運用を使用 |
+| `operationId` | string | この駅以降の区間運用ID（`operationDict` のキー）。空文字のときはフォールバック運用を使用。駅追加時のデフォルト値は、1つ前の駅があればその駅の `operationId` を引き継ぎ、なければ `"0"` |
 | `coordinate` | `[number\|null, number\|null]` | 緯度・経度（GPS連動用） |
 | `transferText` / `transferTextEng` | string | 乗換案内テキスト（`:アイコンキー:` 記法対応） |
 | `doorSide` | `'left'\|'right'` | 開くドアの方向 |
@@ -476,31 +476,54 @@ graph TD
     StationParamSetter --> LineAddPopup
 ```
 
-### 4.2 セクションアコーディオン
+### 4.2 サイドバーナビゲーション
 
-`Editor` 内の各セクション（ファイル操作・運用設定・駅設定・路線登録・アイコン登録・表示設定）は、見出し行クリックで本体を開閉するアコーディオン形式とする。
+`Editor` 内の各セクション（ファイル操作・駅設定・運用設定・メッセージ設定・路線登録・アイコン登録・表示設定）は、画面左端の**サイドバー**に大項目として一覧表示し、選択した1項目のみをメインエリアに表示する形式とする（アコーディオン形式は廃止）。
 
 #### 動作仕様
 
-- 各セクションに `isOpen: boolean` state を持ち、初期値はすべて `true`（展開済み）
-- 見出し行（`.section-header`）をクリック/タップすると `isOpen` をトグルする
-- `isOpen === false` のとき本体（`.section-body`）を非表示にする（`display: none`）
-- 開閉状態を示す矢印アイコン（`▼` / `▶`）を見出し右端に表示する
+- `activeSectionId: string` state で選択中のセクションを管理する（排他選択、常に1つだけ選択される）
+- 初期値は `"station"`（駅設定）
+- サイドバー項目（`.editor-sidebar-item`）をクリックすると `activeSectionId` を更新する
+- メインエリア（`.editor-content`）には `activeSectionId` に対応するセクションのコンポーネントのみを描画する（他のセクションはマウントしない）
+- 選択中の項目は `.editor-sidebar-item--active` クラスでハイライトする
+- 幅の狭い画面（モバイル等）でも、横タブ等への切り替えは行わず、幅を詰めた縦サイドバーのまま表示する
+- サイドバーの横幅は狭くし、各項目は**アイコンを上、キャプション（小さい文字）を下**に縦に並べる形式で表示する（テキストのみの横並びラベルは廃止）
+- `.editor-sidebar` の上端は `.editor-content`（編集画面）の上端と揃える（`.editor-layout` の `align-items: flex-start` による通常のフロー配置のみとし、`position: sticky` のような固定高さの推測値に依存するオフセットは使わない）
+
+#### セクション一覧
+
+| `activeSectionId` | 表示名 | アイコン | 内容コンポーネント |
+|---|---|---|---|
+| `file` | ファイル操作 | `IconFileOps`（フォルダ） | `EditorHead` |
+| `station` | 駅設定 | `IconStation`（電車正面） | `StationList` |
+| `operation` | 運用設定 | `IconOperation`（旗） | `OperationForm` |
+| `message` | メッセージ設定 | `IconMessage`（吹き出し） | `MessageForm` |
+| `line` | 路線登録 | `IconLineReg`（駅2つを結ぶ線） | `LineList` |
+| `icon` | アイコン登録 | `IconShapes`（円と三角形） | `IconList` |
+| `dispConfig` | 表示設定 | `IconDisplay`（モニター） | `DispConfig` |
+
+アイコンは `app/components/SvgIcons.tsx` に既存の矢印・プラス・ゴミ箱アイコンと同じ方式（`viewBox="0 0 16 16"`、`fill="currentColor"`、塗りのみでくり抜きなし）で追加する。
 
 #### 実装方針
 
-- `Editor.tsx` の各 `editor-section` div を **`AccordionSection`** コンポーネントに置き換える
-- `AccordionSection` は `title: string` と `children` を受け取る汎用コンポーネントとして `app/components/AccordionSection.tsx` に定義する
-- 各子コンポーネント（`EditorHead` など）の内部 `<h2>` 見出しは不要になるため削除する
+- `Editor.tsx` 内に `sections: { id: string, title: string, icon: React.FC, element: React.ReactNode }[]` を定義し、サイドバーの一覧描画とメインエリアの描画の両方をこの配列から行う
+- サイドバー項目は `<button>` 内にアイコンコンポーネントとキャプション `<span>` を縦に並べて配置する
+- 旧 `AccordionSection` コンポーネント（`app/components/AccordionSection.tsx`）は本構成では使用しないため削除する
+- 各子コンポーネント（`EditorHead` など）の内部 `<h2>` 見出しは引き続き不要（メインエリア側で選択中セクションのタイトルを見出しとして表示する）
 
 #### CSS クラス
 
 | クラス | 役割 |
 |--------|------|
-| `.section-header` | クリック可能な見出し行（`cursor: pointer`） |
-| `.section-header-title` | 見出しテキスト（既存 `h2` スタイルを流用） |
-| `.section-header-arrow` | 開閉矢印（右端に配置） |
-| `.section-body` | 開閉対象の本体コンテンツ領域 |
+| `.editor-layout` | サイドバーとメインエリアを横並びにするコンテナ（旧 `.editor-container` を置き換え） |
+| `.editor-sidebar` | 左端の縦サイドバー（狭い固定幅） |
+| `.editor-sidebar-item` | サイドバーの各項目ボタン（`flex-direction: column` でアイコン・キャプションを縦並び） |
+| `.editor-sidebar-item-icon` | アイコン表示領域 |
+| `.editor-sidebar-item-caption` | アイコン下の小さいキャプション文字 |
+| `.editor-sidebar-item--active` | 選択中の項目のハイライト |
+| `.editor-content` | 選択中セクションを表示するメインエリア |
+| `.editor-content-title` | メインエリア上部に表示する選択中セクションの見出し |
 
 ### 4.4 表示ツールバー（sticky ツールバー）
 
@@ -529,7 +552,7 @@ CSS クラス: `.display-toolbar`
 ```typescript
 // カラム定義
 type ColumnDef<T> = {
-    header: string                              // <th> ヘッダーテキスト
+    header: React.ReactNode                     // <th> ヘッダー内容（文字列または <br/> を含むJSXなど）
     cell: (row: T, key: string) => React.ReactNode  // セル内容の描画関数
     isSelector?: boolean  // true のとき <th> として描画しクリックで行選択
     cellStyle?: (row: T, key: string) => React.CSSProperties  // <td> 自体に適用するスタイル
@@ -541,11 +564,22 @@ type ColumnDef<T> = {
     // 半セルずれたテキスト列として描画する場合に指定する（後述「半セルずれ列」参照）。
     // 指定した場合、cell・cellStyle の戻り値は無視され、GenericItemList が自動描画する
     halfCellText?: (row: T) => string
+    // セルクリック時のコールバック（isSelector以外の列で使用可能。halfCellColor・halfCellText列でも使用できる）。
+    // 行データ・キー・クリックイベントを受け取る。指定した列はマウスホバー時にカーソルがポインタになる
+    onClick?: (row: T, key: string, event: React.MouseEvent<HTMLElement>) => void
+}
+
+// カラムグループ定義（後述「カラムグループ」参照）
+type ColumnGroup<T> = {
+    groupHeader: React.ReactNode   // グループ見出し（ヘッダー1行目にcolspanで表示）
+    collapsible?: boolean          // true のときグループ見出しクリックで子列をまとめて折りたたみ可能にする
+    defaultCollapsed?: boolean     // true のとき初期状態で折りたたまれた状態にする
+    columns: ColumnDef<T>[]        // グループに含める子カラム定義（子カラム自体は個別に折りたたみできない）
 }
 
 // Props
 type GenericItemListProps<T> = {
-    columns: ColumnDef<T>[]
+    columns: (ColumnDef<T> | ColumnGroup<T>)[]
     rows: { key: string; data: T }[]    // 表示データ（key で行を識別）
     selectedKeys: string[]
     onRowClick: (key: string) => void   // 行クリック時のコールバック
@@ -590,6 +624,59 @@ type GenericItemListProps<T> = {
 ##### 半セルずれ列の行境界線
 
 `halfCellColor` / `halfCellText` のいずれを指定した列も、**半セルずれていない位置（通常の行境界、`<td>` の上端・下端）の境界線は表示しない**（`border-bottom: none` を常に適用する）。半セルずれた列の境界線は、上記の各方式で縦方向中央にのみ表示する。
+
+#### カラムグループ（`ColumnGroup`）
+
+複数の `ColumnDef` を1つの折りたたみ可能な見出しの下にまとめて表示するための機能。例えば `StationList` の「駅名かな」「駅名英語」を「駅名多言語」という1つの見出しの下にまとめ、見出しクリックで両方をまとめて折りたためるようにする場合に使う。
+
+- `columns` 配列には `ColumnDef<T>` と `ColumnGroup<T>` を混在させてよい
+- **`columns` に `ColumnGroup` が1つ以上含まれる場合のみ**、ヘッダーを2行構成（`<thead>` 内に2つの `<tr>`）にする。`ColumnGroup` を含まないテーブル（`LineList`・`IconList` など）は従来通り1行のみのヘッダーのままとし、見た目は変えない
+- グループは `groupHeader` を `colSpan={columns.length}` で子カラムの数だけ横に広げて1行目に表示し、2行目に子カラムのヘッダーを並べる（`collapsible` の場合はクリックで折りたたみ可能。`.section-header` と同様、折りたたみ中は × の代わりに `▶` を付けた縦書き表示にし、`rowSpan={2}` で2行分の高さをまるごと占める。グループは入れ子構造のため、展開時は1行目・2行目に分かれて表示され、通常列とは異なり分割線が入ることがある）
+- グループが折りたたまれている場合、本文側（`<tbody>`）もグループの子カラム全体を幅ゼロの1つの `<td>` に置き換える（既存の単一列折りたたみと同じ見た目）。展開中は子カラムをそれぞれ通常のセルとして描画する（`isSelector`・`halfCellColor`・`halfCellText`・`onClick` など、通常の `ColumnDef` の描画規則がそのまま適用される）
+- 子カラム自体には `collapsible`・`defaultCollapsed` を設定しない（個別の折りたたみは行わない。グループ単位でのみ折りたたむ）
+
+#### 折りたたみ中の縦書きヘッダーの高さ
+
+列（または列グループ）を折りたたんだときの縦書き見出し（`writing-mode: vertical-rl`）は、**▶ を含めて3文字ごとに `<br/>` で改行**を入れる（`renderCollapsedLabel` 関数）。これにより、見出しの文字数に関わらず縦書きテキストの高さは常に「3文字分」に収まり（4文字目以降は折り返して横方向に新しい列として広がる）、自動折り返し（`white-space`/`max-height` によるブラウザ依存の折り返し）には依存しない。
+
+#### ヘッダー2行分の固定高さ・入れ子でない列の表示
+
+`columns` に `ColumnGroup` が1つ以上含まれる場合、ヘッダー2行分（`<thead>` 内の2つの `<tr>`）の合計高さを、常に一定の固定値（`GROUPED_HEADER_HEIGHT` ＝ `4.4em`）にする。この値は元々「おおよそ4文字分」の縦書きテキストに合わせて決めた概算値だが、折りたたみ時の改行文字数（3文字／回）とは独立した定数であり、折り返し文字数を変更しても連動して変わるものではない。
+
+**判明した問題**: 当初は `rowSpan={2}` のセルに `height: GROUPED_HEADER_HEIGHT` を指定する方式を試みたが、Chrome実機で計測したところ、2行とも `rowSpan` のみに頼っている状態（= どの列・グループも1行目・2行目を直接占めるセルを持たない状態。全列が折りたたまれている場合に発生）では、`rowSpan` セルの高さが1行目・2行目にどう配分されるかはブラウザ任せで信頼できず（実測で合計高さが指定値の `4.4em` 相当に届かず、1行目が0pxになる例を確認）、展開時との高さが一致しなかった。このため、**入れ子でない通常列・折りたたみ中の列も、2行目に直接のセル（＝`rowSpan` に頼らないセル）を必ず持たせる**ことで、1行目・2行目それぞれの高さをブラウザの配分任せにせず固定する方式に変更した。
+
+- `GROUPED_HEADER_ROW_HEIGHT`（`GROUPED_HEADER_HEIGHT` の半分、`2.2em`）を1行あたりの固定高さとする
+- **折りたたみ中の列・グループ**: 従来通り `rowSpan={2}`、`height: GROUPED_HEADER_HEIGHT` の縦書きセル1つで描画する（他の列が2行ともそれぞれ直接のセルで `GROUPED_HEADER_ROW_HEIGHT` を確保しているため、`rowSpan` セルも安定して2行分＝`GROUPED_HEADER_HEIGHT` の高さになる）
+- **入れ子でない通常列（折りたたまれていない状態）**: `rowSpan` は使わず、1行目・2行目それぞれに実セルを描画する
+  - 1行目の `<th>`: `height: GROUPED_HEADER_ROW_HEIGHT`、`position: relative`、`border-bottom: none`（2行目との間の分割線を非表示にする）。内部に `position: absolute; top: 0; height: GROUPED_HEADER_HEIGHT;` の `div` を配置し、`display: flex; align-items: center; justify-content: center;` で見出しテキストを描画する。この `div` は1行目の高さ（`GROUPED_HEADER_ROW_HEIGHT`）を超えて2行目の領域までオーバーフローして描画されるため、見出しテキストはヘッダー2行分（`GROUPED_HEADER_HEIGHT`）の縦方向中央に配置される
+  - 2行目の `<th>`: `height: GROUPED_HEADER_ROW_HEIGHT`、`background: transparent`。内容は空（見えないプレースホルダー）。背景を透明にすることで、1行目からオーバーフローしてきた見出しテキストが隠れないようにする。`border-bottom` は上書きせず、他の列・グループと同様に各テーブルのCSS（`#stationsTable th { border-bottom: 1px solid var(--border); }` 等）由来のデフォルトの境界線をそのまま表示する（この2行目がヘッダーの実際の最下段にあたるため、ここで境界線を消すとヘッダー全体の下側境界線が入れ子でない列だけ欠けてしまう）
+  - これにより、入れ子でない列は**常に2行それぞれに直接のセルを持つ**ため、`columns` 内の他の列・グループの状態（折りたたみ・展開）に関わらず、2行目の高さが不安定になることはない
+  - **判明した問題**: `<th>` 自身の背景色（`#stationsTable th { background: var(--bg-overlay); }` 等、各テーブルのCSSで指定）は1行目の `<th>` 自身の実際のボックス（`GROUPED_HEADER_ROW_HEIGHT` 分のみ）にしか適用されない。2行目のプレースホルダーは `background: transparent` のため、入れ子でない列は見出し全体の**上半分にしか背景色が描画されない**不具合が生じていた（Chrome実機の `getComputedStyle` で、1行目 `background-color: rgb(28, 33, 40)`（＝ `--bg-overlay`）、2行目 `rgba(0, 0, 0, 0)` と計測して確認）
+    - 対策として、1行目の見出しテキスト用の `div`（`position: absolute; height: GROUPED_HEADER_HEIGHT;`）に `backgroundColor: 'var(--bg-overlay)'` を指定し、背景の描画もテキストと同じ「2行分の高さを持つ絶対配置要素」に委ねる。`position: absolute` の要素は1行目の `<th>` 自身の高さ（サイジング）には寄与しないため、2行目の領域まで背景色を拡張してもレイアウト（各行の固定高さ）には影響しない。2行目のプレースホルダーは `background: transparent` のままとする（1行目からオーバーフローして描画される背景色付き `div` が、2行目の静的コンテンツより手前（上）にペイントされるため、透明な2行目セルを通して正しく見える）
+- **グループ自身（展開時）**: 1行目の `colSpan` 見出し・2行目の子カラム見出しのどちらにも `height: GROUPED_HEADER_ROW_HEIGHT` を明示する
+  - **判明した問題**: 高さ指定なしだと、見出しテキストが通常のフロー（`padding` 込み）で描画されるため自然な高さが `GROUPED_HEADER_ROW_HEIGHT` を超えてしまい、入れ子でない列（`position: absolute` で高さに影響しない）より行全体が高くなっていた（Chrome実機で、折りたたみ時48px・展開時64pxと不一致を計測）
+  - 入れ子でない列と同様、`position: relative` の `<th>`（`padding: 0`）の内部に `position: absolute; height: GROUPED_HEADER_ROW_HEIGHT;` の `div` を配置し、見出しテキストはそちらに描画する（幅の確保については次項）
+
+##### `position: absolute` にしたことによる幅崩れとその対策
+
+見出しテキストを `position: absolute` の `div` に移したことで、そのテキストは `<th>` 自身の**幅**のサイジングに寄与しなくなる（本文側にデータがない状態のテーブルでは、列が幅ゼロに潰れる不具合が発生した）。
+
+- **判明した問題1（検討のみ、不採用）**: 当初は、見た目に影響しない非表示テキスト（`visibility: hidden` の `<span>`、幅確保用スペーサー）を `<th>` 内の通常のフローに別途描画し、そのテキストで幅だけを確保する方式を検討したが、以下の問題が判明したため不採用とした
+  - `visibility: hidden` の要素も通常のフローとして高さに影響する。特に「次駅までの所要時間」列のように見出しに `<br/>` を含む場合、スペーサーも2行分になり高さへの影響が大きくなる。`maxHeight: 0` と `overflow: hidden` で抑えようとしたが、`max-height` は `display: inline`（`<span>` のデフォルト）の要素には効かない（CSS仕様上、非置換インライン要素に `height`/`max-height`/`min-height` は適用されない）ため、`display: inline-block` を追加してようやく `max-height: 0` が効くようにできた
+  - それでもなお、Chrome実機で計測したところ1行目の高さが2行目よりわずかに高くなり、入れ子ヘッダーが下にはみ出す不具合が解消しなかった。スペーサー自身の `getBoundingClientRect()` の高さがすでに0になっている状態でも、`display: none` でスペーサーを完全に取り除くと高さが正しい値（1行目・2行目とも同じ値）に揃うことを確認した。これは、インラインレベルの要素がフォントメトリクスに基づく行ボックスの高さ（いわゆる "strut"）に影響を与えるためで、要素自身の計測高さが0であっても親の行の高さを押し上げてしまう
+- **判明した問題2**: 上記のstrut問題を避けるため、一旦は本文側のテキストでサイジングする方式自体を諦め、`<th>` に直接固定の `minWidth`（`nestedHeaderCellStyle` ＝ `{ minWidth: '4em' }`）だけを指定する方式に変更した。これで高さの不具合は解消したが、見出しテキストが4文字分より長い列（例: 「ナンバリング乗換路線」等）で、列の実際の幅が見出しテキストの幅に対して不足し、テキストが列の外へはみ出て表示される不具合が新たに発生した
+- **最終的な対策**: 幅確保用スペーサーを**`display: block`** で描画する方式に変更した（`widthSpacerStyle`）。`visibility: hidden`、`whiteSpace: nowrap`、`height: 0`、`overflow: hidden` を指定し、実際の見出しテキストをそのままスペーサーの内容として描画する。ブロックレベルボックスはインライン行ボックスに一切参加しないため、`display: inline-block` 版で問題になったフォントメトリクス由来のstrutが原理的に発生せず、`height: 0` の指定がそのまま親の高さに反映される（Chrome実機で、スペーサー追加後も1行目・2行目の高さが変化しないことを確認済み）。一方で `white-space: nowrap` により、スペーサーの内容的な幅（≒ 見出しテキストの自然な幅）はそのまま `<th>` 自身の幅サイジングに反映されるため、見出しテキストがどんな長さでも列の幅がそれに追従し、はみ出さなくなる。`nestedHeaderCellStyle` の固定 `minWidth: '4em'` は、本文側・スペーサー側のどちらも幅を決定できない空のテーブルに対する保険として、`widthSpacerStyle` と併用で残す
+
+#### 列境界の縦線
+
+`GenericItemList` を使う各テーブル（`#stationsTable` / `#linesTable` / `#iconTable`）の CSS に、列と列の境目を示す縦の境界線を追加する。ヘッダー（`thead`）・本文（`tbody`）の両方が対象。
+
+- 各テーブルの `td`、`th` セレクタに `border-right: 1px solid var(--border)` を追加する
+- `table { border-collapse: collapse; }` が既に指定されているため、隣接するセルの境界線は1本に結合されて描画される
+- `:first-child { border-left: none; }` は既存のCSSに用意済み（テーブル左端の二重線を防ぐため）。同様に `:last-child { border-right: none; }` を追加し、テーブル右端（`#stationsTableContainer` 等コンテナ自身の `border` のすぐ内側）で縦線が二重にならないようにする
+- 入れ子ヘッダーの1行目（`colSpan` の `<th>`、例: 「駅名多言語」グループ見出し）は、2列分の幅をまとめた1つのセルであるため、`border-right` だけではその右端（グループ全体の境界）にしか縦線が引けず、内部の子カラム（「駅名かな」「駅名英語」）同士の境目には表示されない。これは意図的な仕様とする（1行目は1つの見出しとしてまとまって見せるため、内部の境目を示す線は1行目には引かない）
+  - 2行目は子カラムごとに実セル（`<th>`）が分かれているため、そちらには通常の `border-right`（本節冒頭のルール）がそのまま適用され、子カラム間の縦線が表示される
+  - **判明した問題（検討のみ、不採用）**: 一時期、2行目の子カラムの実セル自身の右端を基準に、`position: absolute` の縦線用 `div` を1行目の領域まで伸ばして描画する方式を試みたが、「2行目にも1行目にも線が表示される」仕様自体が過剰であることが判明し、不採用とした（この方式ではさらに、`position: absolute` の `right` オフセットが `<th>` の**パディング境界**を基準に計算されるため、新たに追加した `border-right: 1px solid` の分だけ本来の境界線より内側にずれて描画される不具合もあった）
 
 #### データの正規化
 
@@ -1092,12 +1179,11 @@ export function moveDictItemsDown<T>(
 | 通過 | `station.isPass` に応じた表示切替（下記参照） | クリックで `isPass` をトグル |
 | 路線 | `lineDict[station.lineId].color` の帯表示（下記参照） | 区間ごとの路線カラー表示 |
 | 運用 | `station.operationId`（下記参照） | 区間ごとの運用番号表示 |
-| 駅名かな | `station.kana` | `defaultCollapsed: true` |
-| 駅名英語 | `station.eng` | `defaultCollapsed: true` |
+| 駅名多言語（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（下記参照） | 子カラム: 駅名かな・駅名英語 |
+| ├ 駅名かな | `station.kana` | 個別の折りたたみはしない |
+| ├ 駅名英語 | `station.eng` | 個別の折りたたみはしない |
 | ナンバリング | `numIcon` のアイコン描画 | |
-| 次区間路線 | `lineDict[station.lineId].name` | |
-| 種別 | `operationDict[station.operationId].trainType`。背景色は `operationDict[station.operationId].trainTypeBackColor` | `operationId` が空または未定義の場合は空表示 |
-| 次区間所要時間 | `station.sectionTime` | |
+| 次駅までの<br/>所要時間 | `station.sectionTime` | ヘッダーは `<br/>` で2行に改行表示 |
 | 乗換 | `station.transfers` のアイコン描画 | |
 | ドア | `station.doorSide` | |
 
@@ -1119,6 +1205,14 @@ halfCellColor: (station) => setting.lineDict[station.lineId]?.color
 ```
 
 これにより、見た目上はその駅の行の縦方向中央（半セル下）を境界として、ひとつ前の駅の色 → 当該駅の色へと縦グラデーションで表示される（詳細な描画規則は 4.5節「半セルずれ列」を参照）。
+
+**路線セルクリック時の吹き出し表示**: `onClick`（4.5節参照）で、クリックされたセルの `station.lineId` に対応する `lineDict` の情報を吹き出し（`LineInfoBalloon` コンポーネント）で表示する。
+
+- 表示内容: 路線名（`line.name`）・路線名かな（`line.kana`）・路線名英語（`line.eng`）・路線記号の画像（`line.numIconPresetKey` の `createNumIconFromPreset` に `line.symbol`・`line.color` を渡して生成したSVG）
+- `lineId` が未設定、または `lineDict` に該当エントリが存在しない場合は吹き出しを表示しない
+- 吹き出しはクリックされた位置（`event.clientX` / `event.clientY`）を基準に `position: fixed` で表示する
+- 閉じる操作: 吹き出し右上の「×」ボタンをクリック、または吹き出し外側をクリック（`mousedown` を `document` で監視し、吹き出し自身の要素に含まれないクリックで閉じる）
+- 別の路線セルをクリックした場合は、表示中の吹き出しの内容を新しいセルの路線情報に切り替える
 
 ##### テーブルヘッダーの重なり対策（CSS）
 
@@ -1342,7 +1436,7 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 | ファイル | 列構成 |
 |----------|--------|
 | `public/csv/presetLines/stationDB.csv` | 駅ID, 駅名, 駅名かな, 駅名英語 |
-| `public/csv/presetLines/lineDB.csv` | 路線ID, 路線名, 路線名かな, 路線名英語, 路線カラー |
+| `public/csv/presetLines/lineDB.csv` | 路線ID, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, アイコン（ナンバリングプリセット名） |
 | `public/csv/presetLines/lineConnectDB.csv` | 路線ID, 駅ID, 駅ナンバリング |
 
 - **駅ID**: 全駅にわたって一意な識別子
@@ -1365,7 +1459,10 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 
 ```typescript
 type Props = {
-    onAdd: (stations: stationType[]) => void   // 追加確定時のコールバック
+    setting: settingType  // lineDict・iconDict の既存エントリを参照するために使用（読み取り専用）
+    // 追加確定時のコールバック。stations に加え、新規作成が必要な lineDict・iconDict の
+    // エントリ（既存と重複しないもの）を渡す
+    onAdd: (result: { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> }) => void
     onClose: () => void
 }
 ```
@@ -1453,18 +1550,35 @@ type PrevStationRef = {
 
 駅選択リストと同形式のリストとして、路線選択・駅選択の右に並べて表示する。各区間を `前駅名 → 次駅名（路線名）` の形式で1行ずつ表示する。クリックによる削除機能はない。
 
-**`stationType` への変換**（CSVから取得できるフィールドのみ設定、その他は未定）:
+**`stationType` への変換**（CSVから取得できるフィールドのみ設定、その他は暫定デフォルト値）:
 
 | stationType フィールド | 設定値 |
 |------------------------|--------|
 | `name` | 駅名（stationDB） |
 | `kana` | 駅名かな（stationDB） |
 | `eng` | 駅名英語（stationDB） |
-| `lineColor` | 路線カラー（lineDB から所属路線で引く） |
-| `number` | 空文字固定（CSVに列なし） |
-| その他フィールド | 未定（暫定デフォルト値） |
+| `numIcon.symbol` / `numIcon.number` | 駅ナンバリング（lineConnectDB）をスペースで分割 |
+| `numIcon.color` / `numIcon.manualColor` | 路線カラー（lineDB から所属路線で引く） |
+| `lineId` | 下記「lineDict・iconDict への解決」で解決した `lineDict` のキー |
+| `operationId` | `"0"` 固定（全駅に0番目の運用を設定する） |
+| その他フィールド | 暫定デフォルト値 |
 
 **挿入位置**: 未定（暫定: `stationList` 末尾）
+
+**`lineDict`・`iconDict` への解決**:
+
+各区間の路線（`PresetLine`）は、以下の手順で `lineDict`・`iconDict` のキーに解決する。同じプリセット路線が複数区間・複数駅にまたがって使われる場合（同一路線上を複数回クリックして区間を追加した場合や、別の「駅プリセットから追加」操作で同じ路線を再度使った場合）は、1つの `lineDict` エントリにまとめる（重複登録しない）。
+
+1. **路線記号アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`numIconPresetKey` が両方とも空でない場合、`{ presetType: numIconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+   - 見つかった場合: そのキーを再利用する
+   - 見つからない場合: `line_{路線ID}` をベースにした一意なキー（衝突時は `line_{路線ID}_2` のように連番を付与）で新規作成する
+   - `symbol`・`numIconPresetKey` のいずれかが空の場合は作成しない（`lineIconKey` は空文字のまま）
+2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey` が全て**完全一致**するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+   - 見つかった場合: そのキーを再利用する
+   - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
+3. 区間内の各駅の `lineId` に、解決した `lineDict` のキーを設定する（区間内の全ての駅に同じキーを設定する。連続区間が同一路線を continuing する場合、接続駅の重複除去により同じ駅の二重登録は発生しないが、路線が変わる乗り換え区間では同一駅が異なる `lineId` を持つ行として複数回登録されることがある。これは既存の「連続区間の接続駅の重複除去」ロジック（同一路線IDの場合のみ有効）による既存動作である）
+
+新規作成された `lineDict`・`iconDict` のエントリは `onAdd` の戻り値（`newLines`・`newIcons`）として呼び出し元に渡され、呼び出し元（`StationList.handlePresetAdd`）が `setting.lineDict`・`setting.iconDict` にマージする。
 
 #### 状態管理
 

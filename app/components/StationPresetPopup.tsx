@@ -8,7 +8,10 @@ import {
 } from '../modules/loadStationPresets'
 
 type Props = {
-    onAdd: (stations: stationType[]) => void   // 追加確定時のコールバック
+    setting: settingType  // lineDict・iconDict の既存エントリを参照するために使用（読み取り専用）
+    // 追加確定時のコールバック。stations に加え、新規作成が必要な lineDict・iconDict の
+    // エントリ（既存と重複しないもの）を渡す
+    onAdd: (result: { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> }) => void
     onClose: () => void
 }
 
@@ -28,7 +31,8 @@ type PrevStationRef = {
 }
 
 // プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
-const toStationType = (station: PresetStation, lineColor: string, numberStr: string): stationType => {
+// lineId: この駅以降の区間路線ID（resolveLineKey で解決した lineDict のキー）
+const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string): stationType => {
     // lineConnectDB の駅ナンバリング（例: "TY 01"）をスペースで分割して symbol/number に振り分ける
     const spaceIdx = numberStr.indexOf(' ')
     const symbol = spaceIdx !== -1 ? numberStr.slice(0, spaceIdx) : ''
@@ -42,8 +46,8 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     transfers: [],
     isPass: false,
     sectionTime: "0",
-    lineId: "",
-    operationId: "",
+    lineId,
+    operationId: "0",  // プリセットから追加する全駅に0番目の運用を設定する
     coordinate: [null, null],
     transferText: "",
     transferTextEng: "",
@@ -59,6 +63,37 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     }
 }
 
+// iconDict内に presetType・symbol・color が完全一致するエントリがあればそのキーを返す
+const findMatchingIconKey = (iconDict: settingType['iconDict'], params: iconParamsType): string | undefined => {
+    return Object.keys(iconDict).find(key => {
+        const v = iconDict[key]
+        return typeof v !== 'string' && v.presetType === params.presetType && v.symbol === params.symbol && v.color === params.color
+    })
+}
+
+// iconDictに存在しない一意なキーをbaseから生成する（衝突時は連番を付与）
+const generateUniqueIconKey = (iconDict: settingType['iconDict'], base: string): string => {
+    if (!Object.keys(iconDict).includes(base)) return base
+    let i = 2
+    while (Object.keys(iconDict).includes(`${base}_${i}`)) i++
+    return `${base}_${i}`
+}
+
+// lineDict内に name・kana・eng・color・symbol・numIconPresetKey が完全一致するエントリがあればそのキーを返す
+const findMatchingLineKey = (lineDict: settingType['lineDict'], line: PresetLine): string | undefined => {
+    return Object.keys(lineDict).find(key => {
+        const l = lineDict[key]
+        return l.name === line.name && l.kana === line.kana && l.eng === line.eng &&
+            l.color === line.color && l.symbol === line.symbol && l.numIconPresetKey === line.numIconPresetKey
+    })
+}
+
+// lineDictの既存キー（数値）から次の新規キーを生成する
+const generateNextLineKey = (existingKeys: string[]): string => {
+    const nums = existingKeys.map(Number).filter(n => !isNaN(n))
+    return String(nums.length > 0 ? Math.max(...nums) + 1 : 0)
+}
+
 // 駅・路線の選択ハイライトに使うスタイル
 const highlightStyle = {
     background: 'var(--accent-dim)',
@@ -66,7 +101,7 @@ const highlightStyle = {
     fontWeight: 700,
 } as const
 
-const StationPresetPopup: React.FC<Props> = ({ onAdd, onClose }) => {
+const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [lines, setLines] = useState<PresetLine[]>([])
     const [allStations, setAllStations] = useState<PresetStation[]>([])
     const [lineConnects, setLineConnects] = useState<PresetLineConnect[]>([])
@@ -148,19 +183,63 @@ const StationPresetPopup: React.FC<Props> = ({ onAdd, onClose }) => {
         setSelectedLineId(null)
     }
 
-    // 各区間から駅を展開し、連続区間の接続駅の重複を除去して stationType[] に変換
-    const extractStationsFromSections = (): stationType[] => {
+    // 各区間から駅を展開し、連続区間の接続駅の重複を除去して stationType[] に変換する。
+    // 同時に、各区間の路線（PresetLine）を lineDict・iconDict のキーに解決する。
+    // 既存の setting.lineDict/iconDict、または今回の呼び出し内で新規作成した分と完全一致する
+    // エントリがあればそれを再利用し、同じ路線が複数区間・複数駅にまたがっても1つのエントリにまとめる。
+    const extractStationsFromSections = (): { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> } => {
         const result: stationType[] = []
+        const newLines: Record<string, lineType> = {}
+        const newIcons: Record<string, iconParamsType> = {}
+        // プリセット路線ID → 解決済み lineDict キーのキャッシュ（同じプリセット路線の再解決を避ける）
+        const resolvedKeyByPresetLineId: Record<string, string> = {}
         // 前の区間の最後の lineConnects エントリキー（重複除去用）
         let lastKey: string | null = null
+
+        // プリセット路線を lineDict のキーに解決する（未登録の場合は iconDict・lineDict に新規追加する）
+        const resolveLineKey = (presetLine: PresetLine): string => {
+            const cached = resolvedKeyByPresetLineId[presetLine.id]
+            if (cached !== undefined) return cached
+
+            // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
+            let lineIconKey = ''
+            if (presetLine.symbol && presetLine.numIconPresetKey) {
+                const iconParams: iconParamsType = { presetType: presetLine.numIconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
+                const allIconsSoFar = { ...setting.iconDict, ...newIcons }
+                const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
+                if (existingIconKey) {
+                    lineIconKey = existingIconKey
+                } else {
+                    lineIconKey = generateUniqueIconKey(allIconsSoFar, `line_${presetLine.id}`)
+                    newIcons[lineIconKey] = iconParams
+                }
+            }
+
+            // 路線本体の解決: 既存lineDict → 今回新規作成分の順に完全一致するものを探す
+            const allLinesSoFar = { ...setting.lineDict, ...newLines }
+            let lineKey = findMatchingLineKey(allLinesSoFar, presetLine)
+            if (!lineKey) {
+                lineKey = generateNextLineKey(Object.keys(allLinesSoFar))
+                newLines[lineKey] = {
+                    name: presetLine.name, kana: presetLine.kana, eng: presetLine.eng,
+                    color: presetLine.color, symbol: presetLine.symbol, numIconPresetKey: presetLine.numIconPresetKey,
+                    lineIconKey,
+                }
+            }
+            resolvedKeyByPresetLineId[presetLine.id] = lineKey
+            return lineKey
+        }
 
         for (const section of stagingList) {
             const connects = lineConnects.filter(c => c.lineId === section.lineId)
             const { prevIndex, nextIndex } = section
             if (prevIndex < 0 || nextIndex < 0 || prevIndex >= connects.length || nextIndex >= connects.length) continue
 
+            const presetLine = lines.find(l => l.id === section.lineId)
+            const lineColor = presetLine?.color ?? ''
+            const resolvedLineKey = presetLine ? resolveLineKey(presetLine) : ''
+
             // 前駅→次駅の方向（昇順 or 降順）にインデックスを列挙
-            const lineColor = lines.find(l => l.id === section.lineId)?.color ?? ''
             const indices: number[] = []
             if (prevIndex <= nextIndex) {
                 for (let i = prevIndex; i <= nextIndex; i++) indices.push(i)
@@ -175,10 +254,10 @@ const StationPresetPopup: React.FC<Props> = ({ onAdd, onClose }) => {
                 if (key === lastKey) continue
                 lastKey = key
                 const station = allStations.find(s => s.id === connect.stationId)
-                if (station) result.push(toStationType(station, lineColor, connect.number))
+                if (station) result.push(toStationType(station, lineColor, connect.number, resolvedLineKey))
             }
         }
-        return result
+        return { stations: result, newLines, newIcons }
     }
 
     // 戻るボタン → 末尾の区間を削除し、前駅を巻き戻す

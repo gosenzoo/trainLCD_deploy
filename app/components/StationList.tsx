@@ -4,13 +4,14 @@ import React, { useState } from 'react'
 import "../type"
 import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
-import GenericItemList, { ColumnDef } from './GenericItemList'
+import GenericItemList, { ColumnDef, ColumnGroup } from './GenericItemList'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import StationPresetPopup from './StationPresetPopup'
+import LineInfoBalloon from './LineInfoBalloon'
 
 type stationListProps = {
     setting: settingType,
@@ -32,6 +33,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isSeqInputOpen, setIsSeqInputOpen] = useState<boolean>(false)
     const [seqStart, setSeqStart] = useState<string>('01')
     const [seqOrder, setSeqOrder] = useState<'asc' | 'desc'>('asc')
+    // 路線セルクリック時に表示する吹き出しの状態（対象の路線とクリック位置）
+    const [lineInfoBalloon, setLineInfoBalloon] = useState<{ line: lineType, x: number, y: number } | null>(null)
 
     const presetIconDict = loadIconPresetTexts()
 
@@ -91,7 +94,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
         let _numIcon: stationNumIconType = { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" }
         let _lineId = ""
-        let _operationId = ""
+        // 1つ前の駅がなければ0番目の運用をデフォルトにする
+        let _operationId = "0"
         if (_setting.stationList.length > 0) {
             if(selectedIndexes.length > 0){
                 const prevStation = _setting.stationList[selectedIndexes[selectedIndexes.length - 1] - 1]
@@ -162,10 +166,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         setSelectedIndexes(newSelected.map(i => i + 1))
     }
 
-    // プリセットポップアップから受け取った駅リストを stationList 末尾に追加する（暫定）
-    const handlePresetAdd = (stations: stationType[]) => {
+    // プリセットポップアップから受け取った駅リストを stationList 末尾に追加する（暫定）。
+    // 同時に、プリセットの路線から新規作成された lineDict・iconDict のエントリをマージする
+    const handlePresetAdd = (result: { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> }) => {
         const _setting = structuredClone(setting)
-        _setting.stationList.push(...stations)
+        Object.assign(_setting.lineDict, result.newLines)
+        Object.assign(_setting.iconDict, result.newIcons)
+        _setting.stationList.push(...result.stations)
         setSetting(_setting)
     }
 
@@ -217,7 +224,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     }
 
     // 駅一覧テーブルのカラム定義
-    const stationColumns: ColumnDef<stationType>[] = [
+    const stationColumns: (ColumnDef<stationType> | ColumnGroup<stationType>)[] = [
         {
             header: '駅名',
             isSelector: true,  // クリックで行選択
@@ -248,6 +255,12 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             cell: () => null,
             cellStyle: () => ({ width: '16px' }),
             halfCellColor: (station) => setting.lineDict[station.lineId]?.color,
+            // クリックで路線情報（路線名・かな・英語・記号画像）を吹き出しで表示する
+            onClick: (station, _key, e) => {
+                const line = setting.lineDict[station.lineId]
+                if (!line) return
+                setLineInfoBalloon({ line, x: e.clientX, y: e.clientY })
+            },
         },
         {
             header: '運用',
@@ -260,16 +273,15 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             halfCellBorder: 'always',
         },
         {
-            header: '駅名かな',
-            cell: (station) => station.kana,
+            // 「駅名かな」「駅名英語」を1つの見出しの下にまとめ、まとめて折りたたみ可能にする。
+            // 子カラム自体は個別に折りたたみできない
+            groupHeader: '駅名多言語',
             collapsible: true,       // 列の折りたたみを許可する
             defaultCollapsed: true,  // デフォルトで折りたたむ
-        },
-        {
-            header: '駅名英語',
-            cell: (station) => station.eng,
-            collapsible: true,       // 列の折りたたみを許可する
-            defaultCollapsed: true,  // デフォルトで折りたたむ
+            columns: [
+                { header: '駅名かな', cell: (station) => station.kana },
+                { header: '駅名英語', cell: (station) => station.eng },
+            ],
         },
         {
             header: 'ナンバリング',
@@ -283,11 +295,6 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 }
                 return <>{symbol} {number}</>
             },
-        },
-        {
-            header: '次区間路線',
-            cell: (station) => setting.lineDict[station.lineId]?.name,
-            cellStyle: (station) => ({ backgroundColor: setting.lineDict[station.lineId]?.color }),  // 路線カラーをセル背景に反映
         },
         {
             header: '乗換路線',
@@ -322,20 +329,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             cell: (station) => station.doorSide === 'left' ? '左' : '右',
         },
         {
-            header: '次区間所要時間',
+            header: <>次駅までの<br/>所要時間</>,
             cell: (station) => station.sectionTime,
-        },
-        {
-            // 駅の operationId が指す運用の種別を表示し、背景色を trainTypeBackColor にする
-            header: '種別',
-            cell: (station) => {
-                const op = setting.operationDict?.[station.operationId]
-                return op?.trainType ?? ''
-            },
-            cellStyle: (station) => {
-                const op = setting.operationDict?.[station.operationId]
-                return op?.trainTypeBackColor ? { backgroundColor: op.trainTypeBackColor, color: op.trainTypeColor || '' } : {}
-            },
         },
         {
             header: '緯度',
@@ -373,6 +368,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             {/* 駅プリセットポップアップ */}
             {isPresetPopupOpen && (
                 <StationPresetPopup
+                    setting={setting}
                     onAdd={handlePresetAdd}
                     onClose={() => setIsPresetPopupOpen(false)}
                 />
@@ -388,6 +384,16 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 containerId="stationsTableContainer"
                 rangeStartKey={rangeStartIndex !== null ? String(rangeStartIndex - 1) : undefined}
             />
+
+            {/* 路線セルクリック時の路線情報吹き出し */}
+            {lineInfoBalloon && (
+                <LineInfoBalloon
+                    line={lineInfoBalloon.line}
+                    x={lineInfoBalloon.x}
+                    y={lineInfoBalloon.y}
+                    onClose={() => setLineInfoBalloon(null)}
+                />
+            )}
             <div className="btn-group" style={{marginTop: '10px'}}>
                 {/* 上矢印・下矢印・追加(+)・削除(ゴミ箱) をSVGアイコンで表示 */}
                 <button onClick={moveUp} className="btn-icon" title="上に移動"><IconArrowUp/></button>

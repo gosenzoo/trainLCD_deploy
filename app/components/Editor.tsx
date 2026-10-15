@@ -8,7 +8,7 @@ import StationList from "./StationList"
 import LineList from "./LineList"
 import IconList from './IconList'
 import DispConfig from './DispConfig'
-import AccordionSection from './AccordionSection'
+import { IconFileOps, IconStation, IconOperation, IconMessage, IconLineReg, IconShapes, IconDisplay } from './SvgIcons'
 import "../type"
 import initSettingObject from '../initSettingObject'
 
@@ -22,6 +22,9 @@ const Editor = () => {
 
     // 表示タイプ状態を Editor で管理し、sticky ツールバーの「表示」ボタンから参照する
     const [displayType, setDisplayType] = useState<string>("tokyu")
+
+    // サイドバーで選択中のセクションID（排他選択、常に1つだけ選択される）
+    const [activeSectionId, setActiveSectionId] = useState<string>("station")
 
     // localStorageから設定を読み込み、旧形式を正規化して state に反映する
     const loadFromLocalStorage = () => {
@@ -147,9 +150,25 @@ const Editor = () => {
 
     console.log(presetIconDict)
 
+    // サイドバーに表示するセクション一覧。id・表示名・アイコン・内容コンポーネントをここで一元管理する
+    const sections: { id: string, title: string, icon: React.FC, element: React.ReactNode }[] = [
+        {
+            id: "file", title: "ファイル操作", icon: IconFileOps,
+            element: <EditorHead setting={setting} setSetting={setSetting}
+                displayType={displayType} setDisplayType={setDisplayType}/>,
+        },
+        { id: "station", title: "駅設定", icon: IconStation, element: <StationList setting={setting} setSetting={setSetting}/> },
+        { id: "operation", title: "運用設定", icon: IconOperation, element: <OperationForm setting={setting} setSetting={setSetting}/> },
+        { id: "message", title: "メッセージ設定", icon: IconMessage, element: <MessageForm setting={setting} setSetting={setSetting}/> },
+        { id: "line", title: "路線登録", icon: IconLineReg, element: <LineList setting={setting} setSetting={setSetting}/> },
+        { id: "icon", title: "アイコン登録", icon: IconShapes, element: <IconList setting={setting} setSetting={setSetting}/> },
+        { id: "dispConfig", title: "表示設定", icon: IconDisplay, element: <DispConfig setting={setting} setSetting={setSetting}/> },
+    ]
+    const activeSection = sections.find(s => s.id === activeSectionId) ?? sections[0]
+
     return(
         <div>
-            {/* editor-container の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
+            {/* editor-layout の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
             <div className="display-toolbar">
                 {/* LcdSimulator画面を別タブで開く */}
                 <button onClick={() => window.open('/LcdSimulator/index.html', '_blank')} className="btn-secondary">LCDシミュレータ</button>
@@ -160,30 +179,29 @@ const Editor = () => {
                 <button onClick={loadFromLocalStorage}>LocalStorageから読み込み</button>
                 <button onClick={openDisplay} className="btn-primary">表示</button>
             </div>
-            <div className="editor-container">
-                {/* 各セクションをアコーディオン形式で表示 */}
-                <AccordionSection title="ファイル操作">
-                    <EditorHead setting={setting} setSetting={setSetting}
-                        displayType={displayType} setDisplayType={setDisplayType}/>
-                </AccordionSection>
-                <AccordionSection title="駅設定">
-                    <StationList setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
-                <AccordionSection title="運用設定">
-                    <OperationForm setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
-                <AccordionSection title="メッセージ設定" defaultOpen={false}>
-                    <MessageForm setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
-                <AccordionSection title="路線登録" defaultOpen={false}>
-                    <LineList setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
-                <AccordionSection title="アイコン登録" defaultOpen={false}>
-                    <IconList setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
-                <AccordionSection title="表示設定" defaultOpen={false}>
-                    <DispConfig setting={setting} setSetting={setSetting}/>
-                </AccordionSection>
+            <div className="editor-layout">
+                {/* 左端のセクション選択サイドバー（アイコン＋キャプションの縦並び） */}
+                <nav className="editor-sidebar">
+                    {sections.map(s => {
+                        const Icon = s.icon
+                        return (
+                            <button
+                                key={s.id}
+                                className={`editor-sidebar-item${s.id === activeSectionId ? ' editor-sidebar-item--active' : ''}`}
+                                onClick={() => setActiveSectionId(s.id)}
+                                title={s.title}
+                            >
+                                <span className="editor-sidebar-item-icon"><Icon/></span>
+                                <span className="editor-sidebar-item-caption">{s.title}</span>
+                            </button>
+                        )
+                    })}
+                </nav>
+                {/* 選択中セクションのみを表示するメインエリア */}
+                <div className="editor-content">
+                    <h2 className="editor-content-title">{activeSection.title}</h2>
+                    {activeSection.element}
+                </div>
             </div>
         </div>
     )

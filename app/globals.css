@@ -118,83 +118,115 @@ h2 {
 }
 
 /* ============================================
-   エディターコンテナ
+   エディターレイアウト（サイドバー + メインエリア）
    ============================================ */
-.editor-container {
+.editor-layout {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 20px;
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
   gap: 20px;
   /* スマホで横スクロールが発生しないよう幅を制限する */
   overflow-x: hidden;
 }
 
-/* セクションカード（アコーディオン外枠） */
-.editor-section {
+/* 左端のセクション選択サイドバー（狭い固定幅、縦並び）。
+   .editor-layout の align-items: flex-start により上端が .editor-content と揃う
+   （position: sticky 等の推測値によるオフセットは使わない） */
+.editor-sidebar {
+  flex: 0 0 64px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  /* 内容が溢れても親を突き破らないよう制限する */
-  min-width: 0;
-  overflow: hidden;
+  padding: 6px;
 }
 
-/* アコーディオン見出し行 */
-.section-header {
+/* アイコンを上・キャプションを下に配置する縦並びボタン */
+.editor-sidebar-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 14px 24px;
+  gap: 2px;
+  padding: 8px 2px;
+  border: none;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  user-select: none;
-  border-bottom: 1px solid var(--border);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: none;
+  color: var(--text-primary);
   transition: background-color var(--transition);
 }
 
-.section-header:hover {
+.editor-sidebar-item:hover {
   background-color: var(--bg-overlay);
 }
 
-/* 閉じた状態は下辺のボーダーと角丸を調整 */
-.section-header--closed {
-  border-bottom: none;
-  border-radius: var(--radius-lg);
+.editor-sidebar-item--active {
+  background-color: var(--accent-dim);
+  color: var(--accent-hover);
 }
 
-/* 見出しテキスト（既存の h2 スタイルと統一） */
-.section-header-title {
+.editor-sidebar-item-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.editor-sidebar-item-caption {
+  font-family: 'BIZ UDGothic', sans-serif;
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 選択中セクションを表示するメインエリア */
+.editor-content {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+/* メインエリア上部に表示する選択中セクションの見出し（旧 .section-header-title を流用） */
+.editor-content-title {
   font-family: 'BIZ UDGothic', sans-serif;
   font-weight: 700;
   font-size: 1rem;
   color: var(--text-primary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin: 0;
-}
-
-/* 開閉矢印 */
-.section-header-arrow {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-/* アコーディオン本体コンテンツ */
-.section-body {
-  padding: 20px 24px;
+  margin: 0 0 16px;
 }
 
 @media (max-width: 640px) {
-  .editor-container {
+  .editor-layout {
     padding: 12px 12px;
+    gap: 10px;
   }
-  .section-header {
-    padding: 12px 14px;
+  .editor-sidebar {
+    flex: 0 0 52px;
+    padding: 4px;
   }
-  .section-body {
+  .editor-sidebar-item {
+    padding: 6px 2px;
+  }
+  .editor-sidebar-item-icon {
+    font-size: 1.1rem;
+  }
+  .editor-sidebar-item-caption {
+    font-size: 0.56rem;
+  }
+  .editor-content {
     padding: 14px 14px;
   }
 }
@@ -415,12 +447,19 @@ tr:hover td {
 
 #stationsTable td {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-base);
 }
 
 #stationsTable th {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-overlay);
+}
+
+#stationsTable td:last-child,
+#stationsTable th:last-child {
+  border-right: none;
 }
 
 /* ヘッダー行（thead）の th のみを固定表示にする。tbody側のth（駅名列の選択セル）は
@@ -483,14 +522,21 @@ tr:hover td {
 
 #linesTable td {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-base);
 }
 
 #linesTable th {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-overlay);
   position: sticky;
   top: 0;
+}
+
+#linesTable td:last-child,
+#linesTable th:last-child {
+  border-right: none;
 }
 
 #linesTable thead th {
@@ -539,14 +585,21 @@ tr:hover td {
 
 #iconTable td {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-base);
 }
 
 #iconTable th {
   border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--bg-overlay);
   position: sticky;
   top: 0;
+}
+
+#iconTable td:last-child,
+#iconTable th:last-child {
+  border-right: none;
 }
 
 #iconTable thead th {
@@ -653,6 +706,44 @@ tr:hover td {
   flex: 1;
   max-height: none;
   min-height: 0;
+}
+
+/* 路線セルクリック時の吹き出し（StationList の路線列） */
+.line-info-balloon {
+  z-index: 1200;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.line-info-balloon-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.line-info-balloon-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.line-info-balloon-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* タイトル行（× ボタンと横並びにするためのラッパー） */

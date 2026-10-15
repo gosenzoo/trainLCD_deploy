@@ -14,6 +14,8 @@ export type PresetLine = {
     kana: string
     eng: string
     color: string         // 路線カラー（HEX）
+    symbol: string        // 路線記号
+    numIconPresetKey: string  // ナンバリングアイコンのプリセット名
 }
 
 // 路線接続データ: 同一路線IDの行を上から順に並べると路線上の駅順序になる
@@ -59,6 +61,8 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
                 kana: cols[2]?.trim() ?? '',
                 eng: cols[3]?.trim() ?? '',
                 color: cols[4]?.trim() ?? '',
+                symbol: cols[5]?.trim() ?? '',
+                numIconPresetKey: cols[6]?.trim() ?? '',
             }
         })
         .filter(l => l.id !== '')
