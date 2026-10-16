@@ -5,6 +5,9 @@ export type PresetStation = {
     name: string
     kana: string
     eng: string
+    // 路線図の配置に使う座標（現在は仮値。未設定の場合は null）
+    lat: number | null
+    lon: number | null
     // 所属路線は lineConnectDB から導出する（このオブジェクトには持たない）
 }
 
@@ -35,11 +38,18 @@ export const loadStationDB = async (): Promise<PresetStation[]> => {
         .filter(line => line.trim() !== '')
         .map(line => {
             const cols = line.split(',')
+            // 数値として解釈できない場合は null（座標未設定の駅として扱う）
+            const num = (v: string | undefined) => {
+                const n = Number(v?.trim())
+                return v?.trim() && !isNaN(n) ? n : null
+            }
             return {
                 id: cols[0]?.trim() ?? '',
                 name: cols[1]?.trim() ?? '',
                 kana: cols[2]?.trim() ?? '',
                 eng: cols[3]?.trim() ?? '',
+                lat: num(cols[4]),
+                lon: num(cols[5]),
             }
         })
         .filter(s => s.id !== '')

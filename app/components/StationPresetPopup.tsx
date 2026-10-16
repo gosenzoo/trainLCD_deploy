@@ -6,6 +6,7 @@ import {
     loadLineDB, loadStationDB, loadLineConnectDB,
     PresetLine, PresetStation, PresetLineConnect
 } from '../modules/loadStationPresets'
+import StationPresetMap from './StationPresetMap'
 
 type Props = {
     setting: settingType  // lineDict・iconDict の既存エントリを参照するために使用（読み取り専用）
@@ -120,6 +121,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
     // 追加一覧（区間オブジェクトの配列）
     const [stagingList, setStagingList] = useState<StationSection[]>([])
+    // 選択UIの表示切替（list: 従来のリスト選択 / map: 路線図からの選択）
+    const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
     const [loadError, setLoadError] = useState<string | null>(null)
 
     // マウント時に CSV を読み込む
@@ -283,6 +286,19 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         return { stations: result, newLines, newIcons }
     }
 
+    // 路線図から駅が選ばれたときの処理。
+    // 区間の路線・駅順インデックスは StationPresetMap 側で解決済みのものを受け取る
+    const handleMapSelect = (lineId: string, prevIndex: number, nextIndex: number, station: PresetStation) => {
+        if (prevStation === null) {
+            // 始点駅の選択（この時点では区間を作らない）
+            setPrevStation({ station, lineId, index: nextIndex })
+            return
+        }
+        setStagingList(prev => [...prev, { lineId, prevIndex, nextIndex }])
+        // 選択駅を新しい始点駅にする
+        setPrevStation({ station, lineId, index: nextIndex })
+    }
+
     // 戻るボタン → 末尾の区間を削除し、前駅を巻き戻す
     const handleBack = () => {
         if (stagingList.length === 0) return
@@ -331,6 +347,11 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
     // ガイダンステキストを状態に応じて生成
     const getGuidanceText = (): string => {
+        // 路線図は駅を直接クリックするため、路線選択の案内は出さない
+        if (viewMode === 'map') {
+            if (prevStation === null) return '路線図から開始駅を選択してください'
+            return `「${prevStation.station.name}」からハイライトされた駅を選択してください`
+        }
         if (prevStation === null) {
             if (selectedLineId === null) return '開始駅の路線を選択してください'
             return '開始駅を選択してください'
@@ -344,12 +365,19 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     return (
         // 枠外クリックで閉じる
         <div className="modal-backdrop" onClick={onClose}>
-            <div className="modal-dialog modal-dialog--tall" style={{ width: 'min(700px, 90vw)' }}
+            <div className="modal-dialog modal-dialog--tall" style={{ width: viewMode === 'map' ? 'min(1100px, 95vw)' : 'min(700px, 90vw)' }}
                 onClick={e => e.stopPropagation()}>
                 {/* タイトル行: 右端に × ボタンを配置 */}
                 <div className="modal-title-row">
                     <p className="modal-title">駅プリセットから追加</p>
                     <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
+                </div>
+
+                {/* 選択方法の切り替え（仮実装のため従来のリスト選択も残す）。
+                    追加一覧・始点駅の状態は共通なので、途中で切り替えても続きから操作できる */}
+                <div className="btn-group" style={{ marginBottom: 0 }}>
+                    <button className={viewMode === 'list' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('list')}>リストから選択</button>
+                    <button className={viewMode === 'map' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('map')}>路線図から選択</button>
                 </div>
 
                 {loadError && (
@@ -363,6 +391,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
                 {/* 路線選択・駅選択・追加一覧を左から横並びに配置 */}
                 <div style={{ display: 'flex', gap: '12px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                    {viewMode === 'list' ? (<>
                     {/* 路線選択リスト（常に操作可、選択中路線をハイライト） */}
                     <div style={{ flex: '0 0 160px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線選択</div>
@@ -429,6 +458,22 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                             )}
                         </div>
                     </div>
+
+                    </>) : (
+                    /* 路線図から選択（仮実装）。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる */
+                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線図</div>
+                        <div style={{ flex: 1, minHeight: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                            <StationPresetMap
+                                lines={lines}
+                                allStations={allStations}
+                                lineConnects={lineConnects}
+                                startStationId={prevStation?.station.id ?? null}
+                                onSelect={handleMapSelect}
+                            />
+                        </div>
+                    </div>
+                    )}
 
                     {/* 追加一覧リスト（駅選択の右に同形式で配置） */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
