@@ -246,7 +246,7 @@
                 <!-- 駅名 -->
                 <g lcdParts="group" lcd-fitY="true">
                     <rect lcdParts="groupArea" x="1713" y="359" width="52" height="474" />
-                    <rect lcdParts="textBox" lcdText="#{$dispStation.eng}" x="1740" y="789" width="490" height="43" transform="rotate(-60, 1740, 833)" fill="#99999950"  data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
+                    <rect lcdParts="textBox" lcdText="#{$dispStation.eng}" lcd-fitDir="localX" x="1740" y="789" width="490" height="43" transform="rotate(-60, 1740, 833)" fill="#99999950"  data-style='{"fontFamily": "sans-serif", "fontWeight": "500", "textAnchor": "start"}' lang="en" />
                 </g>
                 <!-- ナンバリング次 -->
                 <!-- <rect lcdParts="textBox" lcdText="#{$dispStation.numIconNext.symbol}-#{$dispStation.numIconNext.number}" isDraw="($dispStation.numIconType == 0) and ($dispStation.numIconNext.isDraw)" lcd-minComRatio="1" lcd-holAlign="center" x="1640" y="686" width="108" height="31" fill="#96a9ff" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" /> -->

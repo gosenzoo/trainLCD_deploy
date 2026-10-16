@@ -69,6 +69,59 @@ class GroupObj extends GObj {
         return { width, height };
     }
 
+    // transform文字列から rotate(angle, cx, cy) を取り出す（該当しなければ null）
+    static _parseRotate(transformStr) {
+        if (!transformStr) return null;
+        const m = transformStr.match(/rotate\(\s*([-\d.e+]+)\s*[,\s]\s*([-\d.e+]+)\s*[,\s]\s*([-\d.e+]+)\s*\)/);
+        if (!m) return null;
+        return { angle: parseFloat(m[1]), cx: parseFloat(m[2]), cy: parseFloat(m[3]) };
+    }
+
+    // lcd-fitDir で「オブジェクト基準の方向」に圧縮する子要素を処理する。
+    // 子自身を setSize で縮めたうえで、ラッパーのスケールを打ち消す transform を返す
+    // （Map<child, transform文字列>）。回転の外側で非一様スケールをかけるとシアー歪みが
+    // 出るため、スケールを回転の内側（＝子自身のサイズ）に移すのが目的。
+    _prepareLocalFitChildren() {
+        const wrappers = new Map();
+        const sx = this._sx, sy = this._sy;
+        // 一様スケールならシアーは発生しないので従来通りで良い
+        if (sx === sy) return wrappers;
+
+        for (const child of this.children) {
+            const dir = child.fitDir;
+            if (dir !== 'localX' && dir !== 'localY') continue;
+            const rot = GroupObj._parseRotate(child._transform);
+            if (!rot) continue;
+
+            const w = child.width, h = child.height;
+            const rad = rot.angle * Math.PI / 180;
+            const sin = Math.abs(Math.sin(rad)), cos = Math.abs(Math.cos(rad));
+            // 回転後の外接矩形の高さ: H = kx*w*|sinθ| + ky*h*|cosθ|
+            // 従来（screenY）と同じ高さに収まるよう目標値を決め、未知数を解く
+            const targetH = sy * (w * sin + h * cos);
+            let kx = 1, ky = 1;
+            if (dir === 'localY') {
+                const denom = h * cos;
+                ky = denom > 0 ? (targetH - w * sin) / denom : 0;
+            } else {
+                const denom = w * sin;
+                kx = denom > 0 ? (targetH - h * cos) / denom : 0;
+            }
+            // 解が存在しない（0以下）場合は従来動作にフォールバックする
+            if (!(kx > 0) || !(ky > 0)) {
+                console.warn(`[GroupObj] lcd-fitDir="${dir}" は幾何的に解が存在しないため screenY にフォールバックします`, child._svgDom || child);
+                continue;
+            }
+
+            child.setSize(w * kx, h * ky);
+            // ラッパーの scale(sx,sy) を打ち消しつつ、回転中心が従来のスケール後と
+            // 同じ位置に来るよう平行移動する（W = scale(1/sx,1/sy) translate(cx(sx-1), cy(sy-1))）
+            const ax = rot.cx * (sx - 1), ay = rot.cy * (sy - 1);
+            wrappers.set(child, `scale(${1 / sx},${1 / sy}) translate(${ax},${ay})`);
+        }
+        return wrappers;
+    }
+
     // ctx: { resolveValue, exprParser } | null
     // visible=false でも null を返さず visibility:hidden のノードを返す（アニメーション対応）
     getElement(ctx = null) {
@@ -96,6 +149,10 @@ class GroupObj extends GObj {
             g.setAttribute('transform', transformStr);
         }
 
+        // lcd-fitDir="localX"/"localY" の回転子要素は、ラッパーのスケールを打ち消して
+        // 自分の座標系で縮める（回転の外側で非一様スケールをかけるとシアー歪みが出るため）
+        const localFitWrappers = this._hasGroupArea ? this._prepareLocalFitChildren() : null;
+
         // ctx.noFilterSinkがある場合、transformをラップしたプロキシsinkを生成して子へ渡す
         const { childCtx, flushProxy } = this._proxyChildSink(ctx, transformStr);
 
@@ -103,7 +160,14 @@ class GroupObj extends GObj {
         for (const child of this.children) {
             const el = child.getElement(childCtx);
             if (!el) continue;
-            this._placeChild(el, child, filteredG, g, childCtx);
+            const wrapTr = localFitWrappers ? localFitWrappers.get(child) : null;
+            let node = el;
+            if (wrapTr) {
+                node = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                node.setAttribute('transform', wrapTr);
+                node.appendChild(el);
+            }
+            this._placeChild(node, child, filteredG, g, childCtx);
         }
         this._finalizeFilterSplit(g, filteredG);
         // proxySinkの要素をtransformラッパーで包んで親sinkへ転送する

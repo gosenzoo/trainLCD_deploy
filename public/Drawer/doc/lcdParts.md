@@ -75,6 +75,20 @@
 | `lcd-holAlign` | string | `left` | y軸arrange内でのcross方向（横）の揃え位置。`left` / `center` / `right`。 |
 | `lcd-margin` | number | `0` | cross方向の揃えで使うマージン（px）。`top`/`bottom`/`left`/`right` 揃え時のみ有効。 |
 | `lcd-minComRatio` | number | `0` | 圧縮の最小比率（0〜1）。この比率を下限として確保する。 |
+| `lcd-fitDir` | string | `screenY` | 親 group の fit 圧縮をかける方向。`screenY`（従来通り画面の縦方向）/ `localY` / `localX`（オブジェクト基準＝回転前の座標系の縦/横方向）。後述。 |
+
+#### lcd-fitDir の動作詳細
+
+`lcdParts="group"` は `groupArea` に収めるため、配下をラッパー `<g>` の `scale(sx, sy)` でまとめて縮小する。このスケールは子要素自身の `transform`（`rotate` など）の**外側**に適用されるため、回転した子に非一様スケール（`sx ≠ sy`）がかかると直交性が崩れ、**平行四辺形状（ひし形）に歪む**。
+
+`lcd-fitDir` に `localX` / `localY` を指定した回転要素は、ラッパーのスケールを打ち消したうえで、`setSize` により**自分の座標系で**縮められる。変換の線形部分が `Diag(sx,sy)·Rot(θ)`（シアーあり）から `Rot(θ)·Diag(kx,ky)`（シアーなし）に変わるため歪まない。
+
+圧縮率は、回転後の外接矩形の高さが従来（`screenY`）と一致するよう決定する。回転角 θ、ローカル寸法 w×h のとき `H = kx·w·|sinθ| + ky·h·|cosθ|` であり、目標 `H = sy·(w·|sinθ| + h·|cosθ|)` から
+
+- `localY`: `ky = (H − w·|sinθ|) / (h·|cosθ|)`
+- `localX`: `kx = (H − h·|cosθ|) / (w·|sinθ|)`
+
+を得る。求めた比率が 0 以下になる場合は幾何的に解が存在しないため、`screenY` の従来動作にフォールバックし、コンソールに警告を出す。
 
 #### lcd-fitX / lcd-fitY の動作詳細
 

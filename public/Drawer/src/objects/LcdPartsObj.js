@@ -40,6 +40,10 @@ class LcdPartsObj {
         this.noFilterZ       = attr('noFilterZ') || 'up';
         // transform属性: getElement出力をラッパー<g>で包んで変換を付与する（null=変換なし）
         this._transform      = attr('transform') || null;
+        // lcd-fitDir属性: 親groupのfit圧縮をどの方向にかけるか。
+        // 'screenY'（デフォルト）=従来通り画面の縦方向（回転要素ではシアー歪みが出る）
+        // 'localY' / 'localX' = オブジェクト基準（回転前の座標系）の縦/横方向に圧縮する
+        this.fitDir          = attr('lcd-fitDir') || 'screenY';
         // 親コンテナから継承した色オーバーライド（null=指定なし）
         this.colorOverride   = colorOverride;
     }

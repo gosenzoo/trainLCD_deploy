@@ -3774,3 +3774,58 @@ class TextBlockObj extends LcdPartsObj {
 | `public/Drawer/src/objects/TextBlockObj.js` | 新規作成 |
 | `public/Drawer/src/main/Drawer.js` | `_buildNode()` に `lcdParts="text"` ケースを追加 |
 | `public/display.html` | `<script src="./Drawer/src/objects/TextBlockObj.js">` を追加 |
+
+### 7.18 GroupObj — 回転要素の圧縮方向指定（`lcd-fitDir`）
+
+#### 背景・不具合
+
+`lcdParts="group"` は `groupArea` に収めるため、`getElement()` で配下全体をラッパー `<g>` の `transform="translate(tx,ty) scale(sx,sy)"` でまとめてスケールする。このスケールは**子要素自身の `transform`（`rotate` など）の外側**に適用されるため、回転した子に非一様スケール（`sx ≠ sy`）がかかると、回転後の座標系で縦横が別々に縮むことになり、**直交性が崩れて平行四辺形状（ひし形）に歪む**。
+
+`defaultLineSVG.svg` の英語駅名は `transform="rotate(-60, 1634, 680)"` を持ち、親グループが `lcd-fitY="true"` のため、駅名が長い場合にこの歪みが発生していた。Chrome実機で描画行列を分解し、2軸のなす角が **79.66°**（直交なら90°）であることを確認した。
+
+#### 仕様
+
+回転を持つ要素に対し、圧縮方向を選べる属性 `lcd-fitDir` を追加する。
+
+| 値 | 意味 |
+|---|---|
+| `screenY`（デフォルト） | 従来どおり、画面の縦方向に圧縮する（回転要素では歪みが発生する） |
+| `localY` | オブジェクト基準の縦方向（回転前の座標系のY方向）に圧縮する |
+| `localX` | オブジェクト基準の横方向（回転前の座標系のX方向）に圧縮する。横書きテキストではベースライン方向＝文字の進行方向にあたる |
+
+デフォルトを `screenY` とすることで、属性を指定していない既存の要素の見た目は一切変わらない。
+
+#### 圧縮率の算出
+
+回転角 θ、要素のローカル寸法 w×h のとき、画面上の外接矩形（AABB）の高さは次式で表される。
+
+```
+H = kx·w·|sinθ| + ky·h·|cosθ|
+```
+
+従来（`screenY`）と同じ高さに収めるため、目標の高さを `H = sy × (w·|sinθ| + h·|cosθ|)` とし、各モードで未知数を解く。
+
+- `localY`: `ky = (H − w·|sinθ|) / (h·|cosθ|)`（`kx = 1`）
+- `localX`: `kx = (H − h·|cosθ|) / (w·|sinθ|)`（`ky = 1`）
+
+求めた比率が **0以下になる場合は幾何的に解が存在しない**ため、`screenY` の従来動作にフォールバックし、コンソールに警告を出す。例えば英語駅名（w=333, h=70, θ=60°, sy=0.811）では `localY` の解が `ky = −0.74` となり成立しないが、`localX` は `kx = 0.788` で成立する。
+
+#### 実装方針
+
+歪みの原因が「回転の外側での非一様スケール」であるため、`localX` / `localY` の要素は**ラッパーのスケールをかけず、子自身のサイズを縮める**方式とする。
+
+1. `GroupObj.getElement()` で、各子の `lcd-fitDir` を確認する
+2. `localX` / `localY` の子は、上式で求めた比率を使って `child.setSize(w·kx, h·ky)` を呼ぶ。`TextBoxObj` はこれを受けて自分の座標系で再描画するため、`TextDrawer` の既存のベースライン方向圧縮（`textLength`）がそのまま働く
+3. その子は**スケールを持たない別のラッパー `<g>`** に入れて出力する。位置は、回転中心 P が従来のスケール後と同じ位置に来るよう `translate(Px·sx + tx − Px, Py·sy + ty − Py)` を与える
+
+これにより、変換の線形部分が `Diag(sx,sy)·Rot(θ)`（シアーあり）から `Rot(θ)·Diag(kx,ky)`（シアーなし）に変わる。
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `public/Drawer/src/objects/LcdPartsObj.js` | `lcd-fitDir` 属性の読み取りを追加 |
+| `public/Drawer/src/objects/GroupObj.js` | `getElement()` に回転子要素の個別スケール処理を追加 |
+| `public/Drawer/pageInput/tokyu/body/defaultLineSVG.svg` | 英語駅名に `lcd-fitDir="localX"` を付与 |
+| `public/Drawer/pageInput/tokyu/body/overLineSVG.svg` | 同上 |
+| `public/Drawer/doc/lcdParts.md` | 属性表に `lcd-fitDir` を追記 |
