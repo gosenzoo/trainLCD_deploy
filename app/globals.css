@@ -457,11 +457,6 @@ tr:hover td {
   background: var(--bg-overlay);
 }
 
-#stationsTable td:last-child,
-#stationsTable th:last-child {
-  border-right: none;
-}
-
 /* ヘッダー行（thead）の th のみを固定表示にする。tbody側のth（駅名列の選択セル）は
    このセレクタの対象外とし、スクロール時にヘッダーと重なって表示されるのを防ぐ */
 #stationsTable thead th {
@@ -534,11 +529,6 @@ tr:hover td {
   top: 0;
 }
 
-#linesTable td:last-child,
-#linesTable th:last-child {
-  border-right: none;
-}
-
 #linesTable thead th {
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -595,11 +585,6 @@ tr:hover td {
   background: var(--bg-overlay);
   position: sticky;
   top: 0;
-}
-
-#iconTable td:last-child,
-#iconTable th:last-child {
-  border-right: none;
 }
 
 #iconTable thead th {

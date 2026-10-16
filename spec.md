@@ -556,15 +556,10 @@ type ColumnDef<T> = {
     cell: (row: T, key: string) => React.ReactNode  // セル内容の描画関数
     isSelector?: boolean  // true のとき <th> として描画しクリックで行選択
     cellStyle?: (row: T, key: string) => React.CSSProperties  // <td> 自体に適用するスタイル
+    headerWidth?: string  // ヘッダーが確保する幅を固定する（後述「ヘッダー幅の固定」参照）
     collapsible?: boolean
     defaultCollapsed?: boolean
-    // 半セルずれた色帯列として描画する場合に指定する（後述「半セルずれ列」参照）。
-    // 指定した場合、cell・cellStyle の戻り値は無視され、GenericItemList が自動描画する
-    halfCellColor?: (row: T) => string | undefined
-    // 半セルずれたテキスト列として描画する場合に指定する（後述「半セルずれ列」参照）。
-    // 指定した場合、cell・cellStyle の戻り値は無視され、GenericItemList が自動描画する
-    halfCellText?: (row: T) => string
-    // セルクリック時のコールバック（isSelector以外の列で使用可能。halfCellColor・halfCellText列でも使用できる）。
+    // セルクリック時のコールバック（isSelector以外の列で使用可能）。
     // 行データ・キー・クリックイベントを受け取る。指定した列はマウスホバー時にカーソルがポインタになる
     onClick?: (row: T, key: string, event: React.MouseEvent<HTMLElement>) => void
 }
@@ -589,42 +584,6 @@ type GenericItemListProps<T> = {
 }
 ```
 
-#### 半セルずれ列（`halfCellColor` / `halfCellText`）
-
-「この駅以降の区間」のような、**行そのものではなく行と行の間（区間）に属する値**を、見た目上その行の縦方向中央（半セル下）を境界として表示するための汎用機能。`stationList` の `lineId`（路線列）のように、今後も同種の列が追加される可能性があるため、列ごとに1つの関数を指定するだけで実装できるようにしている。
-
-いずれも指定した列は `cell` を無視し、`GenericItemList` が `rows` 配列上の **ひとつ前の行** のデータを自動的に取得して描画する（先頭行には「ひとつ前の行」が存在しないため、無色・空文字として扱う）。`cellStyle` は併用可能で、`width` など任意のスタイルを指定できる（`background`・`padding`・`border-bottom` は自動生成の値で常に上書きされる）。
-
-**`halfCellBorder?: 'auto' | 'always' | 'never'`** — 半セル境界線の表示方法を指定する（`halfCellColor` / `halfCellText` 共通、省略時は `'auto'`）。
-
-| 値 | 動作 |
-|---|---|
-| `'auto'`（デフォルト） | 前の行の値と当該行の値が異なる場合のみ境界線を表示する（同じ値が続く区間で不要な線が入るのを防ぐ） |
-| `'always'` | 値の一致・不一致に関わらず、常に境界線を表示する |
-| `'never'` | 境界線を表示しない |
-
-**`halfCellColor?: (row: T) => string | undefined`** — 色帯列用。
-
-- `<td>` の `background` を縦方向の `linear-gradient` として描画する（上半分 = ひとつ前の行の色、下半分 = 当該行の色）。値が未設定の場合は `var(--bg-base)`（通常時のセル背景色）を使う
-- `halfCellBorder` の判定に従い、境界線を表示する場合は中央（`calc(50% - 0.5px)` 〜 `calc(50% + 0.5px)`）に `var(--border)` 色の1px境界線を色停止点として挟む
-- グラデーションの色停止点は `<td>` 自身の最終的な描画サイズに対して解決されるため、`<td>` の高さが行の高さから暗黙的に決まる場合でも安定して中央で分割される（`position: absolute` や子要素のパーセント高さ指定は使わない）
-- `<td>` の `padding` は `0`、`border-bottom` は `none` に固定する（境界線は上記のグラデーション内で描画するため）
-- 行をまたいだ透過・はみ出し表示は行わない（最終行の帯は自身の行の下半分で止まる）
-
-**`halfCellText?: (row: T) => string`** — テキスト列用。
-
-- `<td>` 内には**当該行自身の値を1つだけ**表示する。ひとつ前の行の値は画面には表示しない（2つ並べて表示することは想定しない）が、境界線を表示するかどうかの判定のためだけに内部的に取得し、当該行の値と比較する
-- `<td>` 内に1つの要素を `position: absolute; top: 50%; left: 0; right: 0; height: 100%; display: flex; align-items: center; justify-content: center;` で配置する。これにより要素は当該行の縦方向中央から次行の縦方向中央まで（= 半セルずれたセル）を占め、`display: flex` の中央揃えにより値が1つだけそのセルの中央に表示される
-- `halfCellBorder` の判定に従い、境界線を表示する場合は上記要素の上端に `border-top: 1px solid var(--border)` を描画する（= 当該行の縦方向中央が境界線になる）
-- `<td>` の `background-color` は、**選択中の行は `var(--bg-base)`（通常時のセル背景色）、未選択の行は `transparent`** にする
-  - 未選択時に透明にするのは、上記の要素が次行の領域までオーバーフローして描画されるため、次行の `<td>` が不透明だと自分のテキストの下側が隠れてしまうのを防ぐため
-  - 選択中の行を不透明にするのは、`tr.selected` のハイライト色（`background: var(--accent-dim) !important`）が透明な `<td>` を通して見えてしまうのを防ぐため（この場合、ひとつ前の行からオーバーフローしてきたテキストの下側は隠れるが、行選択時の一時的な見た目として許容する）
-- `<td>` の `border-bottom`（半セルずれていない通常の行境界線）は非表示にする（詳細は次項「半セルずれ列の行境界線」を参照）
-
-##### 半セルずれ列の行境界線
-
-`halfCellColor` / `halfCellText` のいずれを指定した列も、**半セルずれていない位置（通常の行境界、`<td>` の上端・下端）の境界線は表示しない**（`border-bottom: none` を常に適用する）。半セルずれた列の境界線は、上記の各方式で縦方向中央にのみ表示する。
-
 #### カラムグループ（`ColumnGroup`）
 
 複数の `ColumnDef` を1つの折りたたみ可能な見出しの下にまとめて表示するための機能。例えば `StationList` の「駅名かな」「駅名英語」を「駅名多言語」という1つの見出しの下にまとめ、見出しクリックで両方をまとめて折りたためるようにする場合に使う。
@@ -632,7 +591,15 @@ type GenericItemListProps<T> = {
 - `columns` 配列には `ColumnDef<T>` と `ColumnGroup<T>` を混在させてよい
 - **`columns` に `ColumnGroup` が1つ以上含まれる場合のみ**、ヘッダーを2行構成（`<thead>` 内に2つの `<tr>`）にする。`ColumnGroup` を含まないテーブル（`LineList`・`IconList` など）は従来通り1行のみのヘッダーのままとし、見た目は変えない
 - グループは `groupHeader` を `colSpan={columns.length}` で子カラムの数だけ横に広げて1行目に表示し、2行目に子カラムのヘッダーを並べる（`collapsible` の場合はクリックで折りたたみ可能。`.section-header` と同様、折りたたみ中は × の代わりに `▶` を付けた縦書き表示にし、`rowSpan={2}` で2行分の高さをまるごと占める。グループは入れ子構造のため、展開時は1行目・2行目に分かれて表示され、通常列とは異なり分割線が入ることがある）
-- グループが折りたたまれている場合、本文側（`<tbody>`）もグループの子カラム全体を幅ゼロの1つの `<td>` に置き換える（既存の単一列折りたたみと同じ見た目）。展開中は子カラムをそれぞれ通常のセルとして描画する（`isSelector`・`halfCellColor`・`halfCellText`・`onClick` など、通常の `ColumnDef` の描画規則がそのまま適用される）
+- グループが折りたたまれている場合、本文側（`<tbody>`）もグループの子カラム全体を幅ゼロの1つの `<td>` に置き換える（既存の単一列折りたたみと同じ見た目）。展開中は子カラムをそれぞれ通常のセルとして描画する（`isSelector`・`onClick` など、通常の `ColumnDef` の描画規則がそのまま適用される）
+
+##### 折りたたみ中のセルの斜線
+
+折りたたまれている列・グループの本文側（`<tbody>`）のセルには、**全ての行に斜線を1本引く**（内容が隠れていることを示すため）。
+
+- `background-image` に `linear-gradient` を指定し、左下から右上へ向かう1pxの斜線（`var(--border)` 色）を描画する。線以外の部分は透明にし、CSS側で指定されているセルの背景色（`#stationsTable td { background: var(--bg-base); }` など）や行ホバー・選択時の背景色をそのまま活かす
+- `background-image` は longhand のインラインスタイルとして指定するため、CSS側の `background` ショートハンド（行ホバー時の `tr:hover td` など）に上書きされず、斜線は常に表示される
+- ヘッダー側（折りたたみ中の縦書きラベルのセル）には斜線を引かない
 - 子カラム自体には `collapsible`・`defaultCollapsed` を設定しない（個別の折りたたみは行わない。グループ単位でのみ折りたたむ）
 
 #### 折りたたみ中の縦書きヘッダーの高さ
@@ -669,13 +636,24 @@ type GenericItemListProps<T> = {
 - **判明した問題2**: 上記のstrut問題を避けるため、一旦は本文側のテキストでサイジングする方式自体を諦め、`<th>` に直接固定の `minWidth`（`nestedHeaderCellStyle` ＝ `{ minWidth: '4em' }`）だけを指定する方式に変更した。これで高さの不具合は解消したが、見出しテキストが4文字分より長い列（例: 「ナンバリング乗換路線」等）で、列の実際の幅が見出しテキストの幅に対して不足し、テキストが列の外へはみ出て表示される不具合が新たに発生した
 - **最終的な対策**: 幅確保用スペーサーを**`display: block`** で描画する方式に変更した（`widthSpacerStyle`）。`visibility: hidden`、`whiteSpace: nowrap`、`height: 0`、`overflow: hidden` を指定し、実際の見出しテキストをそのままスペーサーの内容として描画する。ブロックレベルボックスはインライン行ボックスに一切参加しないため、`display: inline-block` 版で問題になったフォントメトリクス由来のstrutが原理的に発生せず、`height: 0` の指定がそのまま親の高さに反映される（Chrome実機で、スペーサー追加後も1行目・2行目の高さが変化しないことを確認済み）。一方で `white-space: nowrap` により、スペーサーの内容的な幅（≒ 見出しテキストの自然な幅）はそのまま `<th>` 自身の幅サイジングに反映されるため、見出しテキストがどんな長さでも列の幅がそれに追従し、はみ出さなくなる。`nestedHeaderCellStyle` の固定 `minWidth: '4em'` は、本文側・スペーサー側のどちらも幅を決定できない空のテーブルに対する保険として、`widthSpacerStyle` と併用で残す
 
+##### ヘッダー幅の固定（`headerWidth`）
+
+通常、列の幅は上記の `widthSpacerStyle`（見出しテキストの自然な幅＋左右12pxずつの余白）と `nestedHeaderCellStyle` の `minWidth: 4em` の大きい方を下限として決まる。しかし、本文のセルがテキストではなく細い図形のみで構成される列（運用列・路線列の縦線表示など）では、この既定の下限では必要以上に列が広くなる。
+
+`ColumnDef.headerWidth` に CSS の長さ（例: `'32px'`）を指定した列は、その値をヘッダーが確保する幅として固定する。
+
+- `<th>` に `width` と `minWidth` の両方として適用する（`minWidth` も上書きすることで、既定の `minWidth: 4em` の下限を外す）
+- その列の `widthSpacerStyle` の左右 `padding` を `0` にする（指定した幅がそのまま列幅になるようにするため。見出しテキスト自体の幅より小さい値を指定した場合は、テキストの幅が下限になる）
+- 省略した列は従来どおりの幅決定ルールのまま（見た目は変わらない）
+
 #### 列境界の縦線
 
 `GenericItemList` を使う各テーブル（`#stationsTable` / `#linesTable` / `#iconTable`）の CSS に、列と列の境目を示す縦の境界線を追加する。ヘッダー（`thead`）・本文（`tbody`）の両方が対象。
 
 - 各テーブルの `td`、`th` セレクタに `border-right: 1px solid var(--border)` を追加する
 - `table { border-collapse: collapse; }` が既に指定されているため、隣接するセルの境界線は1本に結合されて描画される
-- `:first-child { border-left: none; }` は既存のCSSに用意済み（テーブル左端の二重線を防ぐため）。同様に `:last-child { border-right: none; }` を追加し、テーブル右端（`#stationsTableContainer` 等コンテナ自身の `border` のすぐ内側）で縦線が二重にならないようにする
+- `:first-child { border-left: none; }` は既存のCSSに用意済み（テーブル左端の二重線を防ぐため）
+- **`:last-child { border-right: none; }` は使わない**: ヘッダーが2行構成の場合、2行目には折りたたみ中の列のセルが存在しない（`rowSpan` で1行目が2行分を占めるため）ので、`:last-child` が実際の右端列とは別の列（例: 「座標」グループが折りたたまれているときの「次駅までの所要時間」のプレースホルダー）に一致してしまい、本来必要な縦線が消える。また `#stationsTableContainer` は縦スクロールバーの分だけテーブルの右端がコンテナの枠線から離れるため、右端の縦線が二重になる問題は実際には起きない
 - 入れ子ヘッダーの1行目（`colSpan` の `<th>`、例: 「駅名多言語」グループ見出し）は、2列分の幅をまとめた1つのセルであるため、`border-right` だけではその右端（グループ全体の境界）にしか縦線が引けず、内部の子カラム（「駅名かな」「駅名英語」）同士の境目には表示されない。これは意図的な仕様とする（1行目は1つの見出しとしてまとまって見せるため、内部の境目を示す線は1行目には引かない）
   - 2行目は子カラムごとに実セル（`<th>`）が分かれているため、そちらには通常の `border-right`（本節冒頭のルール）がそのまま適用され、子カラム間の縦線が表示される
   - **判明した問題（検討のみ、不採用）**: 一時期、2行目の子カラムの実セル自身の右端を基準に、`position: absolute` の縦線用 `div` を1行目の領域まで伸ばして描画する方式を試みたが、「2行目にも1行目にも線が表示される」仕様自体が過剰であることが判明し、不採用とした（この方式ではさらに、`position: absolute` の `right` オフセットが `<th>` の**パディング境界**を基準に計算されるため、新たに追加した `border-right: 1px solid` の分だけ本来の境界線より内側にずれて描画される不具合もあった）
@@ -1176,11 +1154,10 @@ export function moveDictItemsDown<T>(
 
 | カラムヘッダー | 内容 | 備考 |
 |---|---|---|
-| # | 1-based インデックス | `isSelector: true`、クリックで行選択 |
-| 駅名 | `station.name` | |
+| 運用 | 縦線＋横棒（下記参照） | 区間ごとの運用を縦線で表現。クリックで運用情報の吹き出しを表示 |
+| 路線 | 路線色の縦線＋〇マーカー（下記参照） | 区間ごとの路線を縦線で表現。クリックで路線情報の吹き出しを表示 |
+| 駅名 | `station.name` | `isSelector: true`、クリックで行選択 |
 | 通過 | `station.isPass` に応じた表示切替（下記参照） | クリックで `isPass` をトグル |
-| 路線 | `lineDict[station.lineId].color` の帯表示（下記参照） | 区間ごとの路線カラー表示 |
-| 運用 | `station.operationId`（下記参照） | 区間ごとの運用番号表示 |
 | 駅名多言語（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（下記参照） | 子カラム: 駅名かな・駅名英語 |
 | ├ 駅名かな | `station.kana` | 個別の折りたたみはしない |
 | ├ 駅名英語 | `station.eng` | 個別の折りたたみはしない |
@@ -1201,15 +1178,36 @@ export function moveDictItemsDown<T>(
   - 積算時間 = 先頭駅から当該駅の **直前の駅** までの各駅の `sectionTime` の合計（先頭駅自身は `0`）
   - 区間内のいずれかの駅で `sectionTime` が空文字（数値変換できない）場合、その駅以降の積算時間は計算不能として `-` を表示する
 
-##### 路線列の表示仕様
+##### 運用列・路線列の表示仕様（鉄道路線図風）
 
-`station.lineId` は「この駅以降の区間路線ID」であるため、`GenericItemList` の **`halfCellColor` 列**（4.5節参照）として実装する。
+両列とも **駅名列の左**（テーブル最左）に配置し、`station.operationId` / `station.lineId` が「この駅以降の区間」を表すことを利用して、区間を**縦線**で表現する。
 
-```typescript
-halfCellColor: (station) => setting.lineDict[station.lineId]?.color
-```
+描画は `StationList` 側の通常の `cell` として実装する。ひとつ前の駅のデータは `cell(station, key)` の `key`（0-based インデックス）から `setting.stationList[index - 1]` で取得する（描画は1つの `<td>` の内部だけで完結し、行をまたぐ描画は不要なため、`GenericItemList` 側に専用の仕組みは設けない）。
 
-これにより、見た目上はその駅の行の縦方向中央（半セル下）を境界として、ひとつ前の駅の色 → 当該駅の色へと縦グラデーションで表示される（詳細な描画規則は 4.5節「半セルずれ列」を参照）。
+**共通の描画規則**
+
+- `<td>` には `cellStyle` で `position: relative`、`padding: 0`、`border-bottom: none` を指定する（行ごとの横罫線は引かない。縦線が罫線で分断されるのを防ぐため）
+- 本文が細い縦線のみで文字を含まないため、列幅は `headerWidth: '32px'`（前述「ヘッダー幅の固定」参照）で固定し、既定の幅決定ルールより狭くする
+- セル内に `position: absolute; inset: 0` のコンテナを置き、セルの高さいっぱいを描画領域にする
+- **上半分の線**（セル上端〜セル中央）: ひとつ前の駅の区間を表す。**先頭駅（index 0）には描画しない**
+- **下半分の線**（セル中央〜セル下端）: 当該駅自身の区間を表す。**最終駅には描画しない**
+- 線は太さ 3px で、セルの水平中央に配置する
+
+**運用列**
+
+- 線の色: `var(--text-primary)` 固定。`operationId` が未設定の区間は線を描画しない
+- **横棒**: ひとつ前の駅と `operationId` が異なる駅（＝運用が切り替わる駅）のセル中央にのみ描画する。**先頭駅には描画しない**（先頭駅は「ひとつ前の駅」が無いため切替駅とはみなさない）
+  - サイズは幅 14px・高さ 3px、色は線と同じ `var(--text-primary)`
+- 運用番号のテキストは表示しない（運用の内容はクリック時の吹き出しで確認する）
+- クリック時: `OperationInfoBalloon` を表示する（下記参照）
+
+**路線列**
+
+- 線の色: 上半分はひとつ前の駅の `lineDict[lineId].color`、下半分は当該駅の `lineDict[lineId].color`。色が取得できない場合はその半分の線を描画しない
+- **〇マーカー**: **全駅**のセル中央に描画する。中心が白、輪が路線色の「白抜き」の円（鉄道路線図の駅マーカー風）
+  - 輪の色は通常は当該駅の路線色とするが、ひとつ前の駅と `lineId` が異なる駅（＝路線が切り替わる駅）は**黒**にする。先頭駅は切替駅とはみなさない
+  - 路線色が取得できない駅は輪の色を `var(--text-muted)` とする
+- クリック時: 既存の `LineInfoBalloon` を表示する（従来どおり）
 
 **路線セルクリック時の吹き出し表示**: `onClick`（4.5節参照）で、クリックされたセルの `station.lineId` に対応する `lineDict` の情報を吹き出し（`LineInfoBalloon` コンポーネント）で表示する。
 
@@ -1223,16 +1221,41 @@ halfCellColor: (station) => setting.lineDict[station.lineId]?.color
 
 `#stationsTable` は `thead th` に `position: sticky; top: 0;` を適用してスクロール時にヘッダー行を固定表示している。この sticky 指定は **`thead th` にのみ** 適用し、`tbody` 側の `<th>`（`駅名` 列の選択セル）には適用しない。また `thead th` には明示的に `z-index` を設定し、`tbody` 側の `position: relative` を使うセルより常に手前に描画されるようにする。これにより、上方向スクロール時に本文側のセルがヘッダーに重なって表示される問題を防ぐ。
 
-##### 運用列の表示仕様
+**判明した問題**: ヘッダーが2行構成のとき（`ColumnGroup` を含むテーブル）、入れ子でない列・グループの `<th>` には、内部の絶対配置要素の基準にするためインラインスタイルで `position: relative` を指定していた。インラインスタイルはCSSの `position: sticky` を上書きするため、これらのセルだけ固定表示されず、スクロールすると本文と一緒に流れてしまう不具合が生じていた（折りたたみ中の縦書きセルはインラインの `position` 指定が無いため固定されており、不具合は入れ子でない列にのみ現れていた）。
 
-`station.operationId` は「この駅以降の区間運用ID」であるため、`GenericItemList` の **`halfCellText` 列**（4.5節参照）として実装する。`halfCellBorder` は `'always'` を指定し、値の一致・不一致に関わらず各セル（半セル）ごとに区切り線を表示する。
+- 対策として、これらの `<th>` のインラインスタイルを `position: relative` から **`position: sticky`** に変更する。`sticky` も「位置指定された要素」であり絶対配置の子要素の containing block になるため、見出しテキスト用の絶対配置 `div` の基準としてはそのまま機能する
+- 2行構成のヘッダーでは、1行目と2行目が同じ `top: 0` で固定されると重なってしまうため、**2行目のセルには `top` に1行分の高さ（`GROUPED_HEADER_ROW_HEIGHT`）を指定**し、1行目のすぐ下に固定されるようにする。1行目のセルと、2行分を `rowSpan` で占める折りたたみ中のセルは `top: 0` のままとする
 
-```typescript
-halfCellText: (station) => station.operationId || '-',
-halfCellBorder: 'always',
-```
+**判明した問題（ヘッダー下側の境界線が消える）**: `border-collapse: collapse` のテーブルでは、隣接するセルで結合された境界線は個々のセルではなく**テーブル自身が描画する**ため、`position: sticky` で固定されたセルには追従しない。その結果、スクロールするとヘッダー下側の境界線だけが本文と一緒に流れて見えなくなっていた（Chrome実機で、`scrollTop: 0` では見えていた線がスクロール後に消えることを確認）。なお列同士の縦の境界線はセルと一緒に描画されるため影響を受けない。
 
-これにより、セル中央には当該駅自身の運用番号が1つだけ表示される（ひとつ前の駅の運用番号は表示しない）。`halfCellBorder: 'always'` のため、運用番号の一致・不一致に関わらず、セルの縦方向中央には常に区切り線が表示される（詳細な描画規則は 4.5節「半セルずれ列」を参照）。
+- 対策として、ヘッダーの最下段にあたるセルに `box-shadow: inset 0 -1px 0 var(--border)` を指定する。`box-shadow` は境界線と違い要素自身が描画するため、sticky で固定されたセルにも追従する
+- このとき、同じセルの `border-bottom` は `none` にする。両方を残すと、スクロール位置が先頭（固定されていない状態）のときに境界線と `box-shadow` の線が隣り合って描画され、**二重線**に見えてしまうため
+- 対象は「ヘッダーの一番下に接しているセル」のみとする。具体的には、2行構成の場合は**2行目のセル**と**2行分を `rowSpan` で占める折りたたみ中のセル**、1行構成（`ColumnGroup` を含まないテーブル）の場合は**全てのヘッダーセル**。2行構成の1行目のセルには指定しない（1行目と2行目の間に分割線が入ってしまうため）
+
+##### 運用情報の吹き出し表示（`OperationInfoBalloon`）
+
+運用列のセルをクリックすると、その駅の `operationId` に対応する `operationDict` の運用情報を吹き出しで表示する。
+
+- `operationId` が未設定、または `operationDict` に該当エントリが存在しない場合は吹き出しを表示しない
+- クリック判定はセル全体とする（縦線は細く、線そのものだけを判定対象にすると押しにくいため）
+- 表示位置・閉じる操作・デザインは `LineInfoBalloon` と共通とする（クリック位置を基準に `position: fixed` で表示、右上の「×」ボタンまたは吹き出し外側のクリックで閉じる、同じ CSS クラスを使用）
+- 別の運用セルをクリックした場合は、表示中の吹き出しの内容を新しいセルの運用情報に切り替える
+
+**表示項目**
+
+| 項目 | 参照するフィールド |
+|---|---|
+| 運用ID | `station.operationId`（`operationDict` のキー） |
+| 行先 | `operation.destination` |
+| 行先かな | `operation.destinationKana` |
+| 行先英語 | `operation.destinationEng` |
+| 種別 | `operation.trainType` |
+| 種別英語 | `operation.trainTypeEng` |
+| 経由等 | `operation.direction` |
+| 号車 | `operation.carNumber` |
+| 行先番号 | `operation.destinationNum` を記号と番号に分割し、`operation.destinationNumIconKey`・`operation.destinationColor` とあわせて `createNumIconFromPreset` で生成したSVG |
+
+`destinationNum` の分割規則は `public/Controller/src/utility/utils.js` の `parseStationNumber` と同じとする。半角スペースがあればそこで分割し（例: `"H 08"` → 記号 `H` / 番号 `08`）、なければ非数字と数字の境界で分割する（例: `"TY01"` → 記号 `TY` / 番号 `01`）。
 
 #### UI（全リスト共通）
 

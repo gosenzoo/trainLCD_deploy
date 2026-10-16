@@ -12,24 +12,16 @@ export type ColumnDef<T> = {
     isSelector?: boolean
     // <td> 自体に適用するスタイル（背景色など）。isSelector が true の列には無効。
     cellStyle?: (row: T, key: string) => React.CSSProperties
+    // ヘッダーが確保する幅を固定する（CSSの長さ。例: '32px'）。
+    // 本文が細い図形のみで文字を含まない列など、既定の幅決定ルール
+    // （見出しテキストの幅＋左右の余白、および nestedHeaderCellStyle の minWidth）では
+    // 広くなりすぎる列で使う。指定するとその列の幅確保用スペーサーの左右paddingも0になる
+    headerWidth?: string
     // true のとき列ヘッダーに × ボタンを表示し、折りたたみ可能にする
     collapsible?: boolean
     // true のとき初期状態で折りたたまれた状態にする（collapsible と併用）
     defaultCollapsed?: boolean
-    // 半セルずれた色帯列として描画する場合に指定する（「この駅以降の区間路線」のような、
-    // 行と行の間（区間）に属する値の表示に使う）。指定した場合、cell は無視される。
-    // 前の行の値と当該行の値から縦グラデーション背景を自動生成する（詳細はrenderHalfCellColorTdのコメント参照）。
-    // cellStyle を併用した場合、width など任意のスタイルを指定できる
-    // （background・padding・borderBottom は常に自動生成の値で上書きされる）
-    halfCellColor?: (row: T) => string | undefined
-    // 半セルずれたテキスト列として描画する場合に指定する。指定した場合、cell は無視される。
-    // 当該行自身の値を1つだけセル中央に表示する（前の行の値は境界線の判定にのみ使用し、表示はしない）。
-    // cellStyle の扱いはhalfCellColorと同様
-    halfCellText?: (row: T) => string
-    // halfCellColor・halfCellText共通: 半セル境界線の表示方法。省略時は'auto'
-    // 'auto': 前後の値が異なる場合のみ表示 / 'always': 常に表示 / 'never': 表示しない
-    halfCellBorder?: 'auto' | 'always' | 'never'
-    // セルクリック時のコールバック（isSelector以外の列で使用可能。halfCellColor・halfCellText列でも使用できる）
+    // セルクリック時のコールバック（isSelector以外の列で使用可能）
     onClick?: (row: T, key: string, event: React.MouseEvent<HTMLElement>) => void
 }
 
@@ -69,59 +61,6 @@ type GenericItemListProps<T> = {
     rangeStartKey?: string
 }
 
-// halfCellBorderの指定とprev/this値の比較から、境界線を表示するかどうかを判定する
-function shouldShowHalfCellBorder(border: 'auto' | 'always' | 'never' | undefined, valuesDiffer: boolean): boolean {
-    if (border === 'always') return true
-    if (border === 'never') return false
-    return valuesDiffer  // 'auto'（デフォルト）
-}
-
-// halfCellColor列のtdを描画する。
-// <td>自体のbackgroundを縦方向グラデーションにすることで、前の行の色→当該行の色を
-// 半セルずれた境界（中央）で表示する。グラデーションの色停止点は<td>自身の最終的な
-// 描画サイズに対して解決されるため、<td>の高さが行の高さから暗黙的に決まる場合でも
-// 安定して中央で分割できる（position: absoluteや子要素のパーセント高さ指定は使わない）。
-function renderHalfCellColorTd<T>(getColor: (row: T) => string | undefined, data: T, prevData: T | undefined, key: React.Key, baseStyle: React.CSSProperties, border: 'auto' | 'always' | 'never' | undefined, onClick: ((e: React.MouseEvent<HTMLElement>) => void) | undefined) {
-    const prevColor = (prevData ? getColor(prevData) : undefined) || 'var(--bg-base)'
-    const thisColor = getColor(data) || 'var(--bg-base)'
-    const background = shouldShowHalfCellBorder(border, prevColor !== thisColor)
-        ? `linear-gradient(to bottom, ${prevColor} 0, ${prevColor} calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), ${thisColor} calc(50% + 0.5px), ${thisColor} 100%)`
-        : (prevColor === thisColor ? prevColor : `linear-gradient(to bottom, ${prevColor} 0, ${prevColor} 50%, ${thisColor} 50%, ${thisColor} 100%)`)
-    return <td key={key} onClick={onClick} style={{ ...baseStyle, padding: 0, borderBottom: 'none', background, cursor: onClick ? 'pointer' : undefined }} />
-}
-
-// halfCellText列のtdを描画する。
-// 表示するテキストは当該行自身の値を1つだけ表示する（2つ並べて表示はしない）。
-// ひとつ前の行の値は、境界線を表示するかどうかの判定にのみ内部的に使用する。
-// 子要素をposition: absolute; top: 50%; height: 100%で配置することで、当該行の縦方向中央
-// から次行の縦方向中央まで（= 半セルずれたセル）を占める領域を作り、その中をflexで中央揃え
-// することで、tdの高さが行の高さから暗黙的に決まる場合でも値が1つだけ確実にその中央に表示される。
-function renderHalfCellTextTd<T>(getText: (row: T) => string, data: T, prevData: T | undefined, key: React.Key, baseStyle: React.CSSProperties, border: 'auto' | 'always' | 'never' | undefined, isSelected: boolean, onClick: ((e: React.MouseEvent<HTMLElement>) => void) | undefined) {
-    const prevText = prevData ? getText(prevData) : ''
-    const thisText = getText(data)
-    const showBorder = shouldShowHalfCellBorder(border, prevText !== thisText)
-    return (
-        <td key={key} onClick={onClick} style={{
-            ...baseStyle,
-            position: 'relative',
-            padding: 0,
-            cursor: onClick ? 'pointer' : undefined,
-            // 半セルずれていない通常の行境界線は表示しない（境界線は半セルの境界にのみ描画する）
-            borderBottom: 'none',
-            // 未選択時は透明にし、次行からオーバーフローしてくる要素（＝次行自身のテキスト）が
-            // 隠れないようにする。選択中の行は tr.selected のハイライト色が透過して見えないよう
-            // 不透明にする（この場合、前行からオーバーフローしてきたテキストの下側は隠れるが、
-            // 選択時の一時的な見た目として許容する）
-            backgroundColor: isSelected ? 'var(--bg-base)' : 'transparent',
-        }}>
-            <div style={{
-                position: 'absolute', top: '50%', left: 0, right: 0, height: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderTop: showBorder ? '1px solid var(--border)' : undefined,
-            }}>{thisText}</div>
-        </td>
-    )
-}
 
 // ColumnGroupを含むテーブルでの、ヘッダー2行分の固定高さ（おおよそ「4文字分」の概算値）と、
 // その半分（1行あたり）の高さ。rowSpan={2}のセルの高さ配分はブラウザ依存で不安定なため
@@ -154,6 +93,20 @@ const widthSpacerStyle: React.CSSProperties = {
 // 本文側・スペーサー側のどちらも幅を決定できない「データが空のテーブル」に対する保険として、
 // 最低限の幅を確保しておく（widthSpacerStyleと併用）
 const nestedHeaderCellStyle: React.CSSProperties = { minWidth: '4em' }
+
+// ヘッダー最下段のセルに引く下側境界線。border-collapseのテーブルでは結合された境界線を
+// テーブル自身が描画するためposition: stickyのセルに追従せず、スクロール時に消えてしまう。
+// box-shadowは要素自身が描画するため、固定されたセルでも常に表示される。
+// border-bottomを残すと、スクロール位置が先頭のときに両方の線が隣り合って二重線に見えるため消す
+const headerBottomBorderStyle: React.CSSProperties = {
+    borderBottom: 'none',
+    boxShadow: 'inset 0 -1px 0 var(--border)',
+}
+
+// 折りたたみ中の列・グループの本文セルに引く斜線（左下から右上へ1本）。
+// background-image（longhand）で指定することで、CSS側のbackgroundショートハンド
+// （行ホバー時の背景色など）に上書きされず、セルの背景色はそのまま活かせる
+const collapsedCellDiagonal = 'linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px))'
 
 // 折りたたみ中の縦書き見出し（writing-mode: vertical-rl）のスタイル
 const collapsedHeaderStyle: React.CSSProperties = {
@@ -198,21 +151,13 @@ function GenericItemList<T,>({
 
     // 1つの通常カラムの本文セル（<td>/<th>）を描画する。トップレベルの列・グループの子列どちらからも呼ばれる。
     // isCollapsed は呼び出し元が判定して渡す（子列は個別折りたたみがないため常にfalse）
-    const renderBodyCell = (col: ColumnDef<T>, data: T, key: string, rowIndex: number, cellKey: React.Key, isCollapsed: boolean) => {
+    const renderBodyCell = (col: ColumnDef<T>, data: T, key: string, cellKey: React.Key, isCollapsed: boolean) => {
         if (col.collapsible && isCollapsed) {
-            return <td key={cellKey} style={{ width: 0, padding: 0, overflow: 'hidden' }} />
+            return <td key={cellKey} style={{ width: 0, padding: 0, overflow: 'hidden', backgroundImage: collapsedCellDiagonal }} />
         }
-        // ひとつ前の行のデータ（半セルずれ列で使用。先頭行には存在しない）
-        const prevData = rowIndex > 0 ? rows[rowIndex - 1].data : undefined
         const handleCellClick = col.onClick
             ? (e: React.MouseEvent<HTMLElement>) => col.onClick!(data, key, e)
             : undefined
-        if (col.halfCellColor) {
-            return renderHalfCellColorTd(col.halfCellColor, data, prevData, cellKey, col.cellStyle ? col.cellStyle(data, key) : {}, col.halfCellBorder, handleCellClick)
-        }
-        if (col.halfCellText) {
-            return renderHalfCellTextTd(col.halfCellText, data, prevData, cellKey, col.cellStyle ? col.cellStyle(data, key) : {}, col.halfCellBorder, selectedKeys.includes(key), handleCellClick)
-        }
         return col.isSelector ? (
             // isSelector: true の列は <th> として描画し、クリックで onRowClick を呼ぶ
             // range-start は選択可能セルのみに付与する（行全体には付与しない）
@@ -255,7 +200,7 @@ function GenericItemList<T,>({
                                             rowSpan={hasGroups ? 2 : undefined}
                                             onClick={() => expandCol(i)}
                                             title="クリックして展開"
-                                            style={{ ...collapsedHeaderStyle, height: hasGroups ? GROUPED_HEADER_HEIGHT : undefined }}
+                                            style={{ ...collapsedHeaderStyle, height: hasGroups ? GROUPED_HEADER_HEIGHT : undefined, ...headerBottomBorderStyle }}
                                         >
                                             {renderCollapsedLabel(col.groupHeader)}
                                         </th>
@@ -273,7 +218,10 @@ function GenericItemList<T,>({
                                         title={col.collapsible ? '列を折りたたむ' : undefined}
                                         style={{
                                             ...nestedHeaderCellStyle,
-                                            position: 'relative', padding: 0, height: GROUPED_HEADER_ROW_HEIGHT,
+                                            // CSS側のposition: stickyを打ち消さないようrelativeではなくstickyを使う
+                                            // （stickyも絶対配置の子要素のcontaining blockになる）
+                                            position: 'sticky', top: 0,
+                                            padding: 0, height: GROUPED_HEADER_ROW_HEIGHT,
                                             ...(col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : {}),
                                         }}
                                     >
@@ -316,7 +264,7 @@ function GenericItemList<T,>({
                                         key={i}
                                         onClick={col.collapsible ? () => collapseCol(i) : undefined}
                                         title={col.collapsible ? '列を折りたたむ' : undefined}
-                                        style={col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : undefined}
+                                        style={{ ...headerBottomBorderStyle, ...(col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : {}) }}
                                     >
                                         {col.header}
                                         {col.collapsible && (
@@ -337,14 +285,18 @@ function GenericItemList<T,>({
                                     title={col.collapsible ? '列を折りたたむ' : undefined}
                                     style={{
                                         ...nestedHeaderCellStyle,
-                                        position: 'relative',
+                                        // CSS側のposition: stickyを打ち消さないようrelativeではなくstickyを使う
+                                        position: 'sticky',
+                                        top: 0,
                                         padding: 0,
                                         height: GROUPED_HEADER_ROW_HEIGHT,
                                         borderBottom: 'none',
+                                        // headerWidth指定時はnestedHeaderCellStyleのminWidthも上書きし、既定の下限を外す
+                                        ...(col.headerWidth ? { width: col.headerWidth, minWidth: col.headerWidth } : {}),
                                         ...(col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : {}),
                                     }}
                                 >
-                                    <div style={widthSpacerStyle}>
+                                    <div style={col.headerWidth ? { ...widthSpacerStyle, padding: 0 } : widthSpacerStyle}>
                                         {col.header}
                                         {col.collapsible && <>×</>}
                                     </div>
@@ -373,7 +325,8 @@ function GenericItemList<T,>({
                                     // 展開中のグループ: 子カラムの見出しを並べる。1行目と同じ理由で、
                                     // position: absoluteの中央揃えdivに文字を入れて自然な高さへの影響をなくす
                                     return col.columns.map((child, j) => (
-                                        <th key={`${i}-${j}`} style={{ ...nestedHeaderCellStyle, position: 'relative', padding: 0, height: GROUPED_HEADER_ROW_HEIGHT }}>
+                                        // 2行目は1行目のすぐ下に固定する（topを0にすると1行目と重なってしまう）
+                                        <th key={`${i}-${j}`} style={{ ...nestedHeaderCellStyle, position: 'sticky', top: GROUPED_HEADER_ROW_HEIGHT, padding: 0, height: GROUPED_HEADER_ROW_HEIGHT, ...headerBottomBorderStyle }}>
                                             <div style={widthSpacerStyle}>{child.header}</div>
                                             <div style={{
                                                 position: 'absolute', top: 0, left: 0, right: 0, height: GROUPED_HEADER_ROW_HEIGHT,
@@ -389,26 +342,26 @@ function GenericItemList<T,>({
                                 // このセルがヘッダーの実際の最下段にあたるため、border-bottomは上書きせず
                                 // 他の列・グループと同様にCSS側のデフォルトの境界線をそのまま表示する
                                 return (
-                                    <th key={i} style={{ height: GROUPED_HEADER_ROW_HEIGHT, padding: 0, background: 'transparent' }} />
+                                    <th key={i} style={{ position: 'sticky', top: GROUPED_HEADER_ROW_HEIGHT, height: GROUPED_HEADER_ROW_HEIGHT, padding: 0, background: 'transparent', ...headerBottomBorderStyle }} />
                                 )
                             })}
                         </tr>
                     )}
                 </thead>
                 <tbody>
-                    {rows.map(({ key, data }, rowIndex) => (
+                    {rows.map(({ key, data }) => (
                         <tr key={key} className={selectedKeys.includes(key) ? 'selected' : ''}>
                             {columns.map((col, i) => {
                                 if (isColumnGroup(col)) {
                                     const isCollapsed = collapsedCols.has(i)
-                                    // グループが折りたたまれている場合: 幅ゼロの空セル1つに置き換える
+                                    // グループが折りたたまれている場合: 幅ゼロの空セル1つに置き換える（斜線を引く）
                                     if (col.collapsible && isCollapsed) {
-                                        return <td key={i} style={{ width: 0, padding: 0, overflow: 'hidden' }} />
+                                        return <td key={i} style={{ width: 0, padding: 0, overflow: 'hidden', backgroundImage: collapsedCellDiagonal }} />
                                     }
                                     // 展開中: 子カラムをそれぞれ通常のセルとして描画する（個別の折りたたみはない）
-                                    return col.columns.map((child, j) => renderBodyCell(child, data, key, rowIndex, `${i}-${j}`, false))
+                                    return col.columns.map((child, j) => renderBodyCell(child, data, key, `${i}-${j}`, false))
                                 }
-                                return renderBodyCell(col, data, key, rowIndex, i, collapsedCols.has(i))
+                                return renderBodyCell(col, data, key, i, collapsedCols.has(i))
                             })}
                         </tr>
                     ))}

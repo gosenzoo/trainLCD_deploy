@@ -12,10 +12,27 @@ import { IconArrowUp, IconArrowDown, IconPlus, IconTrash } from './SvgIcons'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import StationPresetPopup from './StationPresetPopup'
 import LineInfoBalloon from './LineInfoBalloon'
+import OperationInfoBalloon from './OperationInfoBalloon'
 
 type stationListProps = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
+}
+
+// 運用列・路線列（鉄道路線図風の縦線表示）で共通して使うスタイル。
+// セル全面を描画領域にするため padding を消し、縦線が行ごとの横罫線で分断されないよう
+// border-bottom も消す（中の絶対配置要素の基準にするため position: relative にする）
+const RAIL_LINE_WIDTH = 3
+// 本文は細い縦線のみで文字を含まないため、見出しテキスト基準の既定の幅決定ルールでは広くなりすぎる。
+// headerWidth で列幅を明示的に狭く固定する
+const RAIL_COLUMN_WIDTH = '32px'
+const railCellStyle: React.CSSProperties = {
+    position: 'relative', padding: 0, borderBottom: 'none',
+}
+// 区間を表す縦線1本分のスタイル（top / height / background は呼び出し側で指定する）
+const railLineStyle: React.CSSProperties = {
+    position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+    width: `${RAIL_LINE_WIDTH}px`, background: 'var(--text-primary)',
 }
 // タブID: 表示アプリ側の命名に合わせる（defaultLine=路線図, platform=ホーム案内）
 type TabType = 'basic' | 'defaultLine' | 'transfersDisp' | 'platform' | 'map';
@@ -35,6 +52,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [seqOrder, setSeqOrder] = useState<'asc' | 'desc'>('asc')
     // 路線セルクリック時に表示する吹き出しの状態（対象の路線とクリック位置）
     const [lineInfoBalloon, setLineInfoBalloon] = useState<{ line: lineType, x: number, y: number } | null>(null)
+    // 運用セルクリック時に表示する吹き出しの状態（対象の運用IDと運用データ、クリック位置）
+    const [operationInfoBalloon, setOperationInfoBalloon] = useState<{ operationId: string, operation: operationType, x: number, y: number } | null>(null)
 
     const presetIconDict = loadIconPresetTexts()
 
@@ -226,6 +245,76 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     // 駅一覧テーブルのカラム定義
     const stationColumns: (ColumnDef<stationType> | ColumnGroup<stationType>)[] = [
         {
+            header: '運用',
+            // station.operationIdは「この駅以降の区間運用」を表すため、区間を縦線で表現する。
+            // 上半分＝ひとつ前の駅の区間 / 下半分＝当該駅自身の区間。運用が切り替わる駅には横棒を付ける
+            cell: (station, key) => {
+                const index = parseInt(key)
+                const prev = index > 0 ? setting.stationList[index - 1] : undefined
+                const isLast = index === setting.stationList.length - 1
+                // 先頭駅の上半分・最終駅の下半分には線を引かない（両端は〇／横棒で止める）
+                const upperOn = prev !== undefined && !!prev.operationId
+                const lowerOn = !isLast && !!station.operationId
+                // 運用が切り替わる駅にのみ横棒を描画する（先頭駅は「ひとつ前の駅」が無いため対象外）
+                const isChange = prev !== undefined && prev.operationId !== station.operationId
+                return (
+                    <div style={{ position: 'absolute', inset: 0 }}>
+                        {upperOn && <div style={{ ...railLineStyle, top: 0, height: '50%' }} />}
+                        {lowerOn && <div style={{ ...railLineStyle, top: '50%', height: '50%' }} />}
+                        {isChange && (
+                            <div style={{
+                                position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                                width: '14px', height: `${RAIL_LINE_WIDTH}px`, background: 'var(--text-primary)',
+                            }} />
+                        )}
+                    </div>
+                )
+            },
+            cellStyle: () => railCellStyle,
+            headerWidth: RAIL_COLUMN_WIDTH,
+            // クリックでその駅以降の区間の運用情報を吹き出しで表示する
+            onClick: (station, _key, e) => {
+                const operation = setting.operationDict[station.operationId]
+                if (!operation) return
+                setOperationInfoBalloon({ operationId: station.operationId, operation, x: e.clientX, y: e.clientY })
+            },
+        },
+        {
+            header: '路線',
+            // station.lineIdは「この駅以降の区間路線」を表すため、区間を路線色の縦線で表現する。
+            // 上半分＝ひとつ前の駅の区間の色 / 下半分＝当該駅自身の区間の色。
+            // 全駅のセル中央に白抜きの〇マーカーを置き、路線が切り替わる駅は輪を黒にする
+            cell: (station, key) => {
+                const index = parseInt(key)
+                const prev = index > 0 ? setting.stationList[index - 1] : undefined
+                const isLast = index === setting.stationList.length - 1
+                const prevColor = prev ? setting.lineDict[prev.lineId]?.color : undefined
+                const thisColor = setting.lineDict[station.lineId]?.color
+                // 路線が切り替わる駅は〇の輪を黒にする（先頭駅は「ひとつ前の駅」が無いため対象外）
+                const isChange = prev !== undefined && prev.lineId !== station.lineId
+                const markerColor = isChange ? '#000' : (thisColor || 'var(--text-muted)')
+                return (
+                    <div style={{ position: 'absolute', inset: 0 }}>
+                        {prevColor && <div style={{ ...railLineStyle, top: 0, height: '50%', background: prevColor }} />}
+                        {!isLast && thisColor && <div style={{ ...railLineStyle, top: '50%', height: '50%', background: thisColor }} />}
+                        <div style={{
+                            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                            width: '11px', height: '11px', borderRadius: '50%', boxSizing: 'border-box',
+                            border: `3px solid ${markerColor}`, background: '#fff',
+                        }} />
+                    </div>
+                )
+            },
+            cellStyle: () => railCellStyle,
+            headerWidth: RAIL_COLUMN_WIDTH,
+            // クリックで路線情報（路線名・かな・英語・記号画像）を吹き出しで表示する
+            onClick: (station, _key, e) => {
+                const line = setting.lineDict[station.lineId]
+                if (!line) return
+                setLineInfoBalloon({ line, x: e.clientX, y: e.clientY })
+            },
+        },
+        {
             header: '駅名',
             isSelector: true,  // クリックで行選択
             cell: (station) => station.name,
@@ -247,30 +336,6 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     </span>
                 )
             },
-        },
-        {
-            header: '路線',
-            // station.lineIdは「この駅以降の区間路線」を表すため、GenericItemListのhalfCellColor
-            // （半セルずれた色帯列）として描画する。cellは使わないダミー関数を渡しておく。
-            cell: () => null,
-            cellStyle: () => ({ width: '16px' }),
-            halfCellColor: (station) => setting.lineDict[station.lineId]?.color,
-            // クリックで路線情報（路線名・かな・英語・記号画像）を吹き出しで表示する
-            onClick: (station, _key, e) => {
-                const line = setting.lineDict[station.lineId]
-                if (!line) return
-                setLineInfoBalloon({ line, x: e.clientX, y: e.clientY })
-            },
-        },
-        {
-            header: '運用',
-            // station.operationIdは「この駅以降の区間運用」を表すため、GenericItemListのhalfCellText
-            // （半セルずれたテキスト列）として描画する。cellは使わないダミー関数を渡しておく。
-            // halfCellBorder: 'always' により、値の一致・不一致に関わらず各セルごとに区切り線を表示する
-            cell: () => null,
-            cellStyle: () => ({ width: '36px' }),
-            halfCellText: (station) => station.operationId || '-',
-            halfCellBorder: 'always',
         },
         {
             // 「駅名かな」「駅名英語」を1つの見出しの下にまとめ、まとめて折りたたみ可能にする。
@@ -395,6 +460,17 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     x={lineInfoBalloon.x}
                     y={lineInfoBalloon.y}
                     onClose={() => setLineInfoBalloon(null)}
+                />
+            )}
+
+            {/* 運用セルクリック時の運用情報吹き出し */}
+            {operationInfoBalloon && (
+                <OperationInfoBalloon
+                    operationId={operationInfoBalloon.operationId}
+                    operation={operationInfoBalloon.operation}
+                    x={operationInfoBalloon.x}
+                    y={operationInfoBalloon.y}
+                    onClose={() => setOperationInfoBalloon(null)}
                 />
             )}
             <div className="btn-group" style={{marginTop: '10px'}}>
