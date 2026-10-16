@@ -57,6 +57,17 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     const presetIconDict = loadIconPresetTexts()
 
+    // ナンバリングアイコン1つ分を描画する。
+    // presetKey が設定されていれば symbol/number が空でも画像を生成する（空文字のまま渡す）
+    const renderNumIcon = (numIcon: stationNumIconType): React.ReactNode => {
+        const { presetKey, symbol, number, color } = numIcon
+        if (presetKey) {
+            const html = createNumIconFromPreset(presetIconDict, presetKey, symbol, number, color)?.outerHTML
+            if (html) return <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} />
+        }
+        return <>{symbol} {number}</>
+    }
+
     // GenericItemList は 0-based string key を返す。
     // 内部では StationParamSetter・MapComponent との互換性のため 1-based number で管理し、
     // GenericItemList との境界でのみ相互変換する。
@@ -131,6 +142,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         }
         _setting.stationList.splice(_index, 0, {
             name: "", kana: "", eng: "", numIcon: _numIcon,
+            // 2つ目のナンバリングは路線をまたぐ駅でのみ使うため、前駅から引き継がず常に空で追加する
+            numIconNext: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" },
             lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "0", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
@@ -350,16 +363,14 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         },
         {
             header: 'ナンバリング',
-            // numIcon サブオブジェクトの各フィールドを使って NumIcon を生成して表示する
-            cell: (station) => {
-                const { presetKey, symbol, number, color } = station.numIcon
-                // presetKey が設定されていれば symbol/number が空でも画像を生成する（空文字のまま渡す）
-                if (presetKey) {
-                    const html = createNumIconFromPreset(presetIconDict, presetKey, symbol, number, color)?.outerHTML
-                    if (html) return <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} />
-                }
-                return <>{symbol} {number}</>
-            },
+            // numIcon（今までの路線）と numIconNext（次の路線）を横に並べて表示する。
+            // numIconNext は路線をまたぐ駅でのみ使うため、number が空の駅は描画しない
+            cell: (station) => (
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    {renderNumIcon(station.numIcon)}
+                    {station.numIconNext?.number ? renderNumIcon(station.numIconNext) : null}
+                </div>
+            ),
         },
         {
             header: '乗換路線',

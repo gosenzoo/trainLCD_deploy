@@ -26,6 +26,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     const [lineFormIconPickerMode, setLineFormIconPickerMode] = useState<'new' | 'list' | null>(null)
     // 路線追加ポップアップの表示状態
     const [isLineAddPopupOpen, setIsLineAddPopupOpen] = useState<boolean>(false)
+    // 「路線記号２」エリアの開閉状態（路線をまたぐ駅でのみ使うため初期状態は折りたたみ）
+    const [isNumIconNextOpen, setIsNumIconNextOpen] = useState<boolean>(false)
     // 乗換路線リストの選択インデックス（0-based、null: 未選択）
     const [transferSelectedIndex, setTransferSelectedIndex] = useState<number | null>(null)
     // 路線記号アイコンリストの選択インデックス（0-based、null: 未選択）
@@ -37,83 +39,87 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
 
     const presetIconDict = loadIconPresetTexts()
 
+    // 編集対象のナンバリング欄。'numIcon': 路線記号（今までの路線） / 'numIconNext': 路線記号２（次の路線）
+    type NumIconTarget = 'numIcon' | 'numIconNext'
+
     // numIcon サブオブジェクトのフィールドを更新するハンドラ
-    const numIconUpdated = (value: string, field: keyof stationNumIconType) => {
+    const numIconUpdated = (value: string, field: keyof stationNumIconType, target: NumIconTarget) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const s = _setting.stationList[ind - 1]
             // keyof のユニオン型と string の不一致を抑制するため as never でキャストする
-            if (s) s.numIcon[field] = value as never
+            if (s) s[target][field] = value as never
         })
         setSetting(_setting)
     }
 
     // カラーピッカー変更: manualColor を更新し、手動モードなら color（有効色）も同時に更新する
-    const manualColorUpdated = (value: string) => {
+    const manualColorUpdated = (value: string, target: NumIconTarget) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const s = _setting.stationList[ind - 1]
             if (!s) return
-            s.numIcon.manualColor = value
-            if (s.numIcon.colorMode !== 'auto') s.numIcon.color = value
+            s[target].manualColor = value
+            if (s[target].colorMode !== 'auto') s[target].color = value
         })
         setSetting(_setting)
     }
 
     // 路線記号入力変更: manualSymbol を更新し、手動モードなら symbol（有効値）も同時に更新する
-    const manualSymbolUpdated = (value: string) => {
+    const manualSymbolUpdated = (value: string, target: NumIconTarget) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const s = _setting.stationList[ind - 1]
             if (!s) return
-            s.numIcon.manualSymbol = value
-            if (s.numIcon.colorMode !== 'auto') s.numIcon.symbol = value
+            s[target].manualSymbol = value
+            if (s[target].colorMode !== 'auto') s[target].symbol = value
         })
         setSetting(_setting)
     }
 
     // ナンバリング記号セレクト変更: manualPresetKey を更新し、手動モードなら presetKey（有効値）も同時に更新する
-    const manualPresetKeyUpdated = (value: string) => {
+    const manualPresetKeyUpdated = (value: string, target: NumIconTarget) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const s = _setting.stationList[ind - 1]
             if (!s) return
-            s.numIcon.manualPresetKey = value
-            if (s.numIcon.colorMode !== 'auto') s.numIcon.presetKey = value
+            s[target].manualPresetKey = value
+            if (s[target].colorMode !== 'auto') s[target].presetKey = value
         })
         setSetting(_setting)
     }
 
     // colorMode 変更: auto → 路線設定値を3フィールドに書き込む / manual → manual* から各有効値を復元する
-    const colorModeUpdated = (value: string) => {
+    const colorModeUpdated = (value: string, target: NumIconTarget) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
         selectedIndexes.forEach(ind => {
             const s = _setting.stationList[ind - 1]
             if (!s) return
-            s.numIcon.colorMode = value as 'auto' | 'manual'
+            s[target].colorMode = value as 'auto' | 'manual'
             const line = _setting.lineDict[s.lineId]
             if (value === 'auto') {
                 // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
                 if (line) {
-                    s.numIcon.color     = line.color
-                    s.numIcon.symbol    = line.symbol
-                    s.numIcon.presetKey = line.numIconPresetKey
+                    s[target].color     = line.color
+                    s[target].symbol    = line.symbol
+                    s[target].presetKey = line.numIconPresetKey
                 }
             } else {
-                s.numIcon.color     = s.numIcon.manualColor
-                s.numIcon.symbol    = s.numIcon.manualSymbol
-                s.numIcon.presetKey = s.numIcon.manualPresetKey
+                s[target].color     = s[target].manualColor
+                s[target].symbol    = s[target].manualSymbol
+                s[target].presetKey = s[target].manualPresetKey
             }
         })
         setSetting(_setting)
     }
 
     // 次区間路線（lineId）変更: auto モードなら路線設定値を3フィールドに書き込む（未定義も auto として扱う）
+    // numIcon・numIconNext はどちらも次区間路線を参照するため、auto の欄をまとめて更新する
     const lineIdUpdated = (value: string) => {
         if (!setting) return
         const _setting: settingType = structuredClone(setting)
@@ -121,15 +127,15 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             const s = _setting.stationList[ind - 1]
             if (!s) return
             s.lineId = value
-            if ((s.numIcon.colorMode ?? 'auto') === 'auto') {
-                const line = _setting.lineDict[value]
+            const line = _setting.lineDict[value]
+            if (!line) return
+            ;(['numIcon', 'numIconNext'] as NumIconTarget[]).forEach(target => {
+                if ((s[target]?.colorMode ?? 'auto') !== 'auto') return
                 // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
-                if (line) {
-                    s.numIcon.color     = line.color
-                    s.numIcon.symbol    = line.symbol
-                    s.numIcon.presetKey = line.numIconPresetKey
-                }
-            }
+                s[target].color     = line.color
+                s[target].symbol    = line.symbol
+                s[target].presetKey = line.numIconPresetKey
+            })
         })
         setSetting(_setting)
     }
@@ -329,6 +335,67 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     // transfers は transferItemType[] として扱う
     const transfersArr: transferItemType[] = targetStation?.transfers ?? []
 
+    // ナンバリング設定欄（路線記号／路線記号２で共通）を描画する。
+    // bare が true の場合は fieldset で包まず入力欄のみを返す（呼び出し側が折りたたみ用の枠を持つため）
+    const renderNumIconFields = (target: NumIconTarget, bare = false) => {
+        const numIcon = targetStation?.[target]
+        const isAuto = numIcon?.colorMode === 'auto'
+        const fields = (
+            <>
+                <label>路線記号</label>
+                {/* 自動モード時は disabled。値は常に manualSymbol を表示する */}
+                <input type="text" id={target === 'numIcon' ? 'symbolInput' : undefined}
+                    disabled={isAuto}
+                    onChange={(e) => manualSymbolUpdated(e.target.value, target)}
+                    value={numIcon?.manualSymbol ?? ''}
+                ></input>
+                <br></br>
+                <label>ナンバリング</label>
+                <input type="text" id={target === 'numIcon' ? 'numberInput' : undefined}
+                    onChange={(e) => numIconUpdated(e.target.value, 'number', target)}
+                    value={numIcon?.number ?? ''}
+                ></input>
+                <br></br>
+                <label>路線カラー</label>
+                {/* 自動モード時は disabled。値は常に manualColor を表示する */}
+                <input
+                    type="color"
+                    id={target === 'numIcon' ? 'lineColorInput' : undefined}
+                    disabled={isAuto}
+                    onChange={(e) => manualColorUpdated(e.target.value, target)}
+                    value={numIcon?.manualColor || '#000000'}
+                ></input>
+                <br></br>
+                <label>ナンバリング記号</label>
+                {/* 自動モード時は disabled。値は常に manualPresetKey を表示する */}
+                <select
+                    disabled={isAuto}
+                    onChange={(e) => manualPresetKeyUpdated(e.target.value, target)}
+                    value={numIcon?.manualPresetKey ?? ''}
+                >
+                    {numberIndexes.map(num => (
+                        <option key={num.key} value={num.key}>{num.name}</option>
+                    ))}
+                </select>
+                <br></br>
+                <label>路線カラー設定</label>
+                {/* auto: lineId 変更・モード切替時に symbol・presetKey・color を路線設定値で自動更新 */}
+                <select onChange={(e) => colorModeUpdated(e.target.value, target)} value={numIcon?.colorMode ?? 'auto'}>
+                    <option value="auto">自動</option>
+                    <option value="manual">手動</option>
+                </select>
+                <br></br>
+            </>
+        )
+        if (bare) return fields
+        return (
+            <fieldset style={{marginBottom: '6px'}}>
+                <legend>路線記号</legend>
+                {fields}
+            </fieldset>
+        )
+    }
+
     // 乗換路線を上に移動する
     const moveTransferUp = () => {
         if (transferSelectedIndex === null) return
@@ -507,51 +574,18 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     ></input>
                     <br></br>
                 </fieldset>
-                {/* ── 路線記号グループ ── */}
+                {/* ── 路線記号グループ（numIcon: 今までの路線 / numIconNext: 次の路線） ── */}
+                {renderNumIconFields('numIcon')}
+                {/* 路線記号２は路線をまたぐ駅でのみ使うため、エリアごと折りたたみ可能にし初期状態は閉じておく */}
                 <fieldset style={{marginBottom: '6px'}}>
-                    <legend>路線記号</legend>
-                    <label>路線記号</label>
-                    {/* 自動モード時は disabled。値は常に manualSymbol を表示する */}
-                    <input type="text" id="symbolInput"
-                        disabled={targetStation?.numIcon.colorMode === 'auto'}
-                        onChange={(e) => manualSymbolUpdated(e.target.value)}
-                        value={targetStation?.numIcon.manualSymbol ?? ''}
-                    ></input>
-                    <br></br>
-                    <label>ナンバリング</label>
-                    <input type="text" id="numberInput" onChange={(e) => numIconUpdated(e.target.value, 'number')}
-                        value={targetStation?.numIcon.number ?? ''}
-                    ></input>
-                    <br></br>
-                    <label>路線カラー</label>
-                    {/* 自動モード時は disabled。値は常に manualColor を表示する */}
-                    <input
-                        type="color"
-                        id="lineColorInput"
-                        disabled={targetStation?.numIcon.colorMode === 'auto'}
-                        onChange={(e) => manualColorUpdated(e.target.value)}
-                        value={targetStation?.numIcon.manualColor || '#000000'}
-                    ></input>
-                    <br></br>
-                    <label>ナンバリング記号</label>
-                    {/* 自動モード時は disabled。値は常に manualPresetKey を表示する */}
-                    <select
-                        disabled={targetStation?.numIcon.colorMode === 'auto'}
-                        onChange={(e) => manualPresetKeyUpdated(e.target.value)}
-                        value={targetStation?.numIcon.manualPresetKey ?? ''}
+                    <legend
+                        onClick={() => setIsNumIconNextOpen(v => !v)}
+                        style={{cursor: 'pointer', userSelect: 'none'}}
+                        title={isNumIconNextOpen ? '折りたたむ' : '展開する'}
                     >
-                        {numberIndexes.map(num => (
-                            <option key={num.key} value={num.key}>{num.name}</option>
-                        ))}
-                    </select>
-                    <br></br>
-                    <label>路線カラー設定</label>
-                    {/* auto: lineId 変更・モード切替時に symbol・presetKey・color を路線設定値で自動更新 */}
-                    <select onChange={(e) => colorModeUpdated(e.target.value)} value={targetStation?.numIcon.colorMode ?? 'auto'}>
-                        <option value="auto">自動</option>
-                        <option value="manual">手動</option>
-                    </select>
-                    <br></br>
+                        路線記号２ {isNumIconNextOpen ? '×' : '▶'}
+                    </legend>
+                    {isNumIconNextOpen && renderNumIconFields('numIconNext', true)}
                 </fieldset>
                 <label>次区間路線</label>
                 {/* lineDict に登録された路線を数値キー昇順で列挙し、選択結果を lineId に保存する。auto モード時は路線色も同時に更新する */}

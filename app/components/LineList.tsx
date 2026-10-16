@@ -115,11 +115,14 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             // autoモードの駅に color/symbol/numIconPresetKey の変更を即時反映する
             if (field === 'color' || field === 'symbol' || field === 'numIconPresetKey') {
                 _setting.stationList.forEach(station => {
-                    if (station.lineId === key && station.numIcon.colorMode === 'auto') {
-                        if (field === 'color')            station.numIcon.color     = e.target.value
-                        if (field === 'symbol')           station.numIcon.symbol    = e.target.value
-                        if (field === 'numIconPresetKey') station.numIcon.presetKey = e.target.value
-                    }
+                    if (station.lineId !== key) return
+                    // numIcon・numIconNext とも auto の場合のみ追従させる（どちらも参照先は次区間路線）
+                    const targets = [station.numIcon, station.numIconNext].filter(n => n?.colorMode === 'auto')
+                    targets.forEach(numIcon => {
+                        if (field === 'color')            numIcon.color     = e.target.value
+                        if (field === 'symbol')           numIcon.symbol    = e.target.value
+                        if (field === 'numIconPresetKey') numIcon.presetKey = e.target.value
+                    })
                 })
             }
         })

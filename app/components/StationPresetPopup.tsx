@@ -30,18 +30,28 @@ type PrevStationRef = {
     index: number
 }
 
-// プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
-// lineId: この駅以降の区間路線ID（resolveLineKey で解決した lineDict のキー）
-const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string): stationType => {
-    // lineConnectDB の駅ナンバリング（例: "TY 01"）をスペースで分割して symbol/number に振り分ける
+// lineConnectDB の駅ナンバリング（例: "TY 01"）をスペースで分割し、ナンバリングアイコン情報を組み立てる。
+// プリセット取り込みは値を確定させて書き込むため colorMode は常に manual にする
+const toNumIcon = (numberStr: string, lineColor: string): stationNumIconType => {
     const spaceIdx = numberStr.indexOf(' ')
     const symbol = spaceIdx !== -1 ? numberStr.slice(0, spaceIdx) : ''
     const number = spaceIdx !== -1 ? numberStr.slice(spaceIdx + 1) : numberStr
+    return { symbol, number, presetKey: "N_tokyu", color: lineColor, manualSymbol: symbol, manualPresetKey: "N_tokyu", manualColor: lineColor, colorMode: "manual" }
+}
+
+// 空の2つ目のナンバリング（路線をまたぐ駅でのみ値が入る）
+const emptyNumIconNext = (): stationNumIconType =>
+    ({ symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" })
+
+// プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
+// lineId: この駅以降の区間路線ID（resolveLineKey で解決した lineDict のキー）
+const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string): stationType => {
     return {
     name: station.name,
     kana: station.kana,
     eng: station.eng,
-    numIcon: { symbol, number, presetKey: "N_tokyu", color: lineColor, manualSymbol: symbol, manualPresetKey: "N_tokyu", manualColor: lineColor, colorMode: "manual" },
+    numIcon: toNumIcon(numberStr, lineColor),
+    numIconNext: emptyNumIconNext(),
     lineNumberType: "0",
     transfers: [],
     isPass: false,
@@ -195,6 +205,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         const resolvedKeyByPresetLineId: Record<string, string> = {}
         // 前の区間の最後の lineConnects エントリキー（重複除去用）
         let lastKey: string | null = null
+        // 直前に result へ追加した駅のプリセット駅ID（路線をまたぐ接続駅の統合判定用）
+        let lastStationId: string | null = null
 
         // プリセット路線を lineDict のキーに解決する（未登録の場合は iconDict・lineDict に新規追加する）
         const resolveLineKey = (presetLine: PresetLine): string => {
@@ -254,7 +266,18 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 if (key === lastKey) continue
                 lastKey = key
                 const station = allStations.find(s => s.id === connect.stationId)
-                if (station) result.push(toStationType(station, lineColor, connect.number, resolvedLineKey))
+                if (!station) continue
+                // 路線が変わる接続駅（前区間の最終駅＝次区間の開始駅）は1行に統合する。
+                // numIcon（前の路線）はそのまま残し、次の路線のナンバリングを numIconNext に入れる。
+                // lineId は「この駅以降の区間路線ID」なので次の路線で上書きする
+                const prev = result[result.length - 1]
+                if (prev && lastStationId === station.id) {
+                    prev.numIconNext = toNumIcon(connect.number, lineColor)
+                    prev.lineId = resolvedLineKey
+                    continue
+                }
+                result.push(toStationType(station, lineColor, connect.number, resolvedLineKey))
+                lastStationId = station.id
             }
         }
         return { stations: result, newLines, newIcons }

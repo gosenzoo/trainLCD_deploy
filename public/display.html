@@ -209,9 +209,11 @@
             const pageNameList = [...new Set(Object.values(pageDispList).flat().map(e => e.pageName))];
 
             // settings 内の全 numIconPresetKey を重複なしで収集する
-            // 収集元: stationList[i].numIcon.presetKey / transfers[j].station.type / operationDict の各運用の destinationNumIconKey
+            // 収集元: stationList[i].numIcon.presetKey / stationList[i].numIconNext.presetKey
+            //        / transfers[j].station.type / operationDict の各運用の destinationNumIconKey
             const numIconPresetKeys = [...new Set([
                 ...settings.stationList.map(s => s.numIcon?.presetKey).filter(k => k),
+                ...settings.stationList.map(s => s.numIconNext?.presetKey).filter(k => k),
                 ...settings.stationList.flatMap(s => (s.transfers || []).map(t => t.station?.type).filter(k => k)),
                 ...Object.values(settings.operationDict ?? settings.operationList ?? {}).map(op => op.destinationNumIconKey).filter(k => k),
             ])];

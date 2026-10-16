@@ -103,6 +103,10 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                                 if (line?.symbol)           station.numIcon.symbol    = line.symbol
                                 if (line?.numIconPresetKey) station.numIcon.presetKey = line.numIconPresetKey
                             }
+                            // 2つ目のナンバリング（numIconNext）が未定義の場合は空の手動モードで補完する
+                            if (station.numIconNext === undefined) {
+                                station.numIconNext = { symbol: '', number: '', presetKey: 'N_tokyu', color: '', manualSymbol: '', manualPresetKey: 'N_tokyu', manualColor: '', colorMode: 'manual' }
+                            }
                             // operationId が未定義の場合は空文字で補完する
                             if (station.operationId === undefined) {
                                 station.operationId = ""

@@ -234,10 +234,11 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `name` / `kana` / `eng` | string | 駅名（日本語・かな・英語） |
-| `numIcon` | `stationNumIconType` | ナンバリングアイコン情報（下表） |
+| `numIcon` | `stationNumIconType` | ナンバリングアイコン情報（下表）。路線をまたぐ駅では**ひとつ前の区間（今までの路線）**のナンバリングを保持する |
+| `numIconNext` | `stationNumIconType` | 2つ目のナンバリングアイコン情報（`numIcon` と同じ型）。路線をまたぐ駅で**次の区間（次の路線）**のナンバリングを保持する。使わない駅では `number` を空にしておく |
 | `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
 
-**`stationNumIconType`**（`stationType.numIcon` の型）
+**`stationNumIconType`**（`stationType.numIcon` / `stationType.numIconNext` の型）
 
 | フィールド | 型 | 説明 |
 |---|---|---|
@@ -1161,13 +1162,39 @@ export function moveDictItemsDown<T>(
 | 駅名多言語（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（下記参照） | 子カラム: 駅名かな・駅名英語 |
 | ├ 駅名かな | `station.kana` | 個別の折りたたみはしない |
 | ├ 駅名英語 | `station.eng` | 個別の折りたたみはしない |
-| ナンバリング | `numIcon` のアイコン描画 | |
+| ナンバリング | `numIcon` のアイコン描画。`numIconNext` があれば右に並べて2つ表示（下記参照） | |
 | 次駅までの<br/>所要時間 | `station.sectionTime` | ヘッダーは `<br/>` で2行に改行表示 |
 | 乗換 | `station.transfers` のアイコン描画 | |
 | ドア | `station.doorSide` | |
 | 座標（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（駅名多言語と同じ構造） | 子カラム: 緯度・経度 |
 | ├ 緯度 | `station.coordinate[0]` | 個別の折りたたみはしない |
 | ├ 経度 | `station.coordinate[1]` | 個別の折りたたみはしない |
+
+##### 2つ目のナンバリング（`numIconNext`）
+
+路線をまたぐ駅は、ひとつ前の区間（今までの路線）と次の区間（次の路線）の2つの駅番号を持つ。これを表現するため、`stationType` に `numIcon` と同じ型の `numIconNext` を追加する。
+
+- **意味**: `numIcon` ＝ 今までの路線のナンバリング、`numIconNext` ＝ 次の路線のナンバリング
+- **既定値**: 全フィールド空文字（`presetKey` / `manualPresetKey` のみ `"N_tokyu"`）、`colorMode` は `'manual'`。2つ目は使わない駅のほうが多い任意項目のため、既定では自動補完を行わない
+- **`colorMode: 'auto'` の挙動**: `numIcon` と同じく `lineDict[station.lineId]`（次区間路線）の `symbol`・`numIconPresetKey`・`color` を参照する。`numIcon` の自動補完が働く場面（次区間路線の変更、路線カラー設定の切替、`LineList` での路線情報変更）では `numIconNext` も同じ条件で追従する
+- **駅情報表（`StationList`）の「ナンバリング」列**: `numIcon` のアイコンを描画し、その**右に並べて** `numIconNext` のアイコンを描画する。`numIconNext.number` が空の駅は2つ目を描画しない（`presetKey` だけが入っている駅で空のアイコンが並ぶのを防ぐため）
+- **LCD表示側は路線図（defaultLine）ページのみ対応する**。ヘッダー（現在駅の大きい表示）と追加路線図（overLine）は `numIcon` のみを参照する従来の動作のままとする（下記参照）
+
+##### LCD表示側（路線図ページ）への反映
+
+路線図ページの描画は、drawParams の `defaultLine.dispStationList[i].numIconNext` を通して行う。この枠組みは既に用意されているため、エディタ側の値を流し込む変更だけで表示できる。
+
+- **既存の仕組み**: `drawParamsSpec.md` に `numIconNext`（乗換先路線のナンバリングアイコン）が定義済みで、`defaultLineSVG.svg` にもテキスト形式・アイコン形式それぞれの描画指定がある。これらは `<g lcdParts="arrange" arrange-axis="y">` の中にあるため、`numIcon` と `numIconNext` の両方が `isDraw: true` のときは自動で縦に並ぶ（座標指定は同じだが arrange が再配置する）
+- **変更点1**: `ProgressController._buildNumIconFromStation()` に参照するフィールド名の引数を追加し、`_buildDispStationList()` の `numIconNext` を `isDraw: false` のハードコードから `station.numIconNext` 由来の値に変更する。`isDraw` は `number` が空でないかで決まるため、2つ目を使わない駅では従来どおり描画されない
+- **変更点2**: ナンバリングアイコンのSVGプリセットを事前読み込みしている箇所（`public/display.html`・`public/LcdSimulator/index.html`・`public/js/display.js`）の収集対象に `numIconNext.presetKey` を追加する。これがないとアイコン形式のとき2つ目のプリセットが読み込まれず描画できない
+- **未対応**: 追加路線図（overLine）の `numIconSub` は `ProgressController` 側が `isDraw: false` のまま、`overLineSVG.svg` 側も描画指定がコメントアウトされたままとする。ヘッダーのSVGには2つ目のナンバリング用の枠自体が無いため、対応する場合はSVGテンプレートの追加が必要
+
+##### 「路線記号２」設定エリア（`StationParamSetter`）
+
+既存の「路線記号」`fieldset` の下に、`numIconNext` を編集する「路線記号２」エリアを追加する。
+
+- 入力項目は「路線記号」エリアと同一（路線記号・ナンバリング・路線カラー・ナンバリング記号・路線カラー設定）で、編集対象が `numIconNext` になる
+- **エリアごと折りたたみ可能**とし、**初期状態は折りたたみ**。`legend` をクリックで開閉し、折りたたみ中は `▶`、展開中は `×` を見出しに付ける（テーブルの列折りたたみと同じ記号の使い分け）
 
 ##### 通過列の表示仕様
 
@@ -1556,6 +1583,17 @@ type PrevStationRef = {
 3. 区間をまたいで同じ駅IDが重複する場合は除去する（連続区間の接続駅が重複しないよう処理）
 4. 列挙した駅IDで stationDB を引いて `toStationType` に変換する
 
+**路線をまたぐ駅（乗り換えで路線が変わる接続駅）の扱い**
+
+区間と区間で路線が変わる場合、その接続駅は「前の区間の最終駅」と「次の区間の開始駅」の両方に現れる。この駅は**1つの駅にまとめ**、2つのナンバリングを持たせる。
+
+- `numIcon` ＝ **前の路線**のナンバリング（接続駅として最初に登録されたときの値をそのまま残す）
+- `numIconNext` ＝ **次の路線**のナンバリング（`lineConnectDB` の次路線側の駅ナンバリングを、次路線の `color`・プリセットキーとあわせて設定する）
+- `lineId` ＝ **次の路線**の解決済みキーで上書きする（`lineId` は「この駅以降の区間路線ID」のため）
+- どちらの `colorMode` も `'manual'` とする（プリセット取り込みは値を確定させて書き込むため）
+
+これにより、従来は同一駅が異なる `lineId` を持つ行として二重に登録されていた挙動を、2つのナンバリングを持つ1行に統合する。
+
 **路線選択リストの表示範囲**:
 
 | 状態 | 表示する路線 |
@@ -1604,7 +1642,7 @@ type PrevStationRef = {
 2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey` が全て**完全一致**するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
-3. 区間内の各駅の `lineId` に、解決した `lineDict` のキーを設定する（区間内の全ての駅に同じキーを設定する。連続区間が同一路線を continuing する場合、接続駅の重複除去により同じ駅の二重登録は発生しないが、路線が変わる乗り換え区間では同一駅が異なる `lineId` を持つ行として複数回登録されることがある。これは既存の「連続区間の接続駅の重複除去」ロジック（同一路線IDの場合のみ有効）による既存動作である）
+3. 区間内の各駅の `lineId` に、解決した `lineDict` のキーを設定する（区間内の全ての駅に同じキーを設定する。路線が変わる接続駅は前項「路線をまたぐ駅の扱い」に従って1行に統合し、`lineId` は次の路線のキーで上書きする）
 
 新規作成された `lineDict`・`iconDict` のエントリは `onAdd` の戻り値（`newLines`・`newIcons`）として呼び出し元に渡され、呼び出し元（`StationList.handlePresetAdd`）が `setting.lineDict`・`setting.iconDict` にマージする。
 

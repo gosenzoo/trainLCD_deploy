@@ -56,6 +56,8 @@ window.onload = async function(){
     const _numIconKeyList = new Set();
     settings.stationList.forEach(station => {
         _numIconKeyList.add(station.numIcon?.presetKey);
+        // 路線をまたぐ駅の2つ目のナンバリング用プリセット
+        _numIconKeyList.add(station.numIconNext?.presetKey);
     });
     //行先駅ナンバリング（operationDict形式・旧operationList配列の両方に対応）
     Object.values(settings.operationDict ?? settings.operationList ?? {}).forEach(operation => {

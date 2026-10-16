@@ -410,9 +410,12 @@ class ProgressController {
     // 内部ヘルパー: 数値アイコン生成
     // ============================================================
 
-    /** stationオブジェクトからNumIconを生成する（station.numIcon サブオブジェクトを参照） */
-    _buildNumIconFromStation(station) {
-        const ni = station.numIcon || {};
+    /**
+     * stationオブジェクトからNumIconを生成する。
+     * field で参照するサブオブジェクトを切り替える（"numIcon": 今までの路線 / "numIconNext": 次の路線）
+     */
+    _buildNumIconFromStation(station, field = "numIcon") {
+        const ni = station[field] || {};
         const hasNumber = !!(ni.number);
         // color には auto/manual を問わず有効色が書き込まれているため直接参照する
         return {
@@ -623,7 +626,8 @@ class ProgressController {
                 kana:            station.kana || "",
                 eng:             station.eng  || "",
                 numIcon:         this._buildNumIconFromStation(station),
-                numIconNext:     { isDraw: false, presetKey: "", symbol: "", number: "", color: "" },
+                // 路線をまたぐ駅の2つ目のナンバリング（number が空の駅は isDraw が false になり描画されない）
+                numIconNext:     this._buildNumIconFromStation(station, "numIconNext"),
                 numIconType:     station.lineNumberType || "0",
                 stationIconType: station.isPass ? "1" : "0",
                 sectionTime:     (timeList[i] >= 0) ? String(timeList[i]) : "",

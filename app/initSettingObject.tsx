@@ -39,6 +39,8 @@ const initStationObject: stationType = {
     kana: "",
     eng: "",
     numIcon: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" },
+    // 2つ目のナンバリングは任意項目のため、既定では自動補完しない（colorMode: manual）
+    numIconNext: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" },
     lineNumberType: "0",
     transfers: [],
     isPass: false,

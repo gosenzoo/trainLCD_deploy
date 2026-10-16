@@ -120,6 +120,9 @@ type stationType = {
     kana: string,
     eng: string,
     numIcon: stationNumIconType,
+    // 2つ目のナンバリング（路線をまたぐ駅で「次の路線」側の駅番号を保持する）。
+    // numIcon は「今までの路線」側を保持する。使わない駅は number を空にしておく
+    numIconNext: stationNumIconType,
     lineNumberType: string,
     transfers: transferItemType[],
     isPass: boolean,
