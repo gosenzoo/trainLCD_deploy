@@ -103,9 +103,18 @@ h2 {
   margin-right: 12px;
 }
 
-/* タイトルの右に置く「表示」ボタン */
+/* タイトルの右に置くバージョン表示 */
+.app-header-version {
+  margin-left: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  align-self: flex-end;
+  padding-bottom: 4px;
+}
+
+/* ヘッダーの右端に置く「表示」ボタン */
 .app-header-display-btn {
-  margin-left: 16px;
+  margin-left: auto;
 }
 
 /* ============================================

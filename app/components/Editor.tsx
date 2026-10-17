@@ -12,6 +12,7 @@ import DispConfig from './DispConfig'
 import { IconFileOps, IconStation, IconOperation, IconMessage, IconLineReg, IconShapes, IconDisplay } from './SvgIcons'
 import "../type"
 import initSettingObject from '../initSettingObject'
+import { APP_VERSION } from '../version'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
@@ -175,6 +176,13 @@ const Editor = () => {
             console.warn('lcdStrage のデータを読み込めなかったため初期値で起動します（自動保存は行いません）', e)
         }
     }, [])
+
+    // 設定データのバージョン情報（0_metadata.version）を常に現在のアプリのバージョンにそろえる（7.39節）。
+    // 読み込んだ古いデータ（0_metadata がない・バージョンが違う）は、正規化後のこの時点で現在のバージョンになる
+    useEffect(() => {
+        if (setting['0_metadata']?.version === APP_VERSION) return
+        setSetting(prev => ({ ...prev, '0_metadata': { version: APP_VERSION } }))
+    }, [setting])
 
     // 設定が変わるたびに、最後の変更から AUTO_SAVE_DELAY ミリ秒後にまとめて保存する
     useEffect(() => {

@@ -8,7 +8,7 @@ export default function Home() {
       {/* ヘッダーは「表示」ボタンが設定の state を使うため Editor 内で描画する */}
       <Editor/>
       <footer className="app-footer">
-        <p>LCDシミュレーター — 鉄道LCD行先表示器シミュレーション</p>
+        <p>ポケットLCD — 鉄道LCD行先表示器シミュレーション</p>
       </footer>
     </div>
   );

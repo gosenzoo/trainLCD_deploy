@@ -54,7 +54,13 @@ type messageType = {
     text: string
 }
 
+// 設定データのバージョン情報（7.39節）
+type metadataType = {
+    version: string,  // 設定データを保存したアプリのバージョンの数字（付記は含めない。例: 0.1.0）
+}
+
 type settingType = {
+    "0_metadata": metadataType,
     info: infoType,
     operationDict: {[id: string]: operationType},
     stationList: stationType[],

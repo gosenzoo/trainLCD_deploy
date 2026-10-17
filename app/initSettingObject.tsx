@@ -1,4 +1,5 @@
 import "./type"
+import { APP_VERSION } from "./version"
 
 const initInfoObject: infoType = {
     settingName: "",
@@ -124,6 +125,8 @@ const initDispConfigObject: dispConfigType = {
 }
 
 const initSettingObject: settingType = {
+    // 設定データのバージョン情報（現在のアプリのバージョン）
+    "0_metadata": { version: APP_VERSION },
     info: initInfoObject,
     operationDict: {"0": initOperationObject},
     stationList: [],
