@@ -36,3 +36,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python のキャッシュ（駅プリセットの生成スクリプト）
+__pycache__/
