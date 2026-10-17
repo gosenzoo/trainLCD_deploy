@@ -33,6 +33,10 @@ const BUTTON_ZOOM_STEP = 1.5
 // 緯度・経度1度あたりの距離（km）
 const KM_PER_DEG_LAT = 110.57
 const KM_PER_DEG_LON = 111.32
+// 並走区間で路線を横に並べる間隔（px）。線の太さと同じにして隙間なく接するようにする
+const PARALLEL_SPACING = 6
+// クリック判定を広げる幅（px）
+const HIT_MARGIN = 6
 
 // km 単位の平面座標（ワールド座標）
 type Pos = { x: number, y: number }
@@ -57,6 +61,46 @@ const computeFitView = (bounds: Bounds, size: Size): View => {
     const cx = (bounds.minX + bounds.maxX) / 2
     const cy = (bounds.minY + bounds.maxY) / 2
     return { scale: s, offsetX: cx - size.w / 2 / s, offsetY: cy - size.h / 2 / s }
+}
+
+// 並走区間で横にずらした折れ線の points 文字列を作る。
+// pts: 駅の画面座標、edges[i]: pts[i]→pts[i+1] の辺の垂直方向（単位ベクトル）とずらし量（px）
+const offsetPolylinePoints = (pts: Pos[], edges: { nx: number, ny: number, off: number }[]): string => {
+    const out: string[] = []
+    for (let i = 0; i < pts.length; i++) {
+        const prev = i > 0 ? edges[i - 1] : undefined
+        const next = i < edges.length ? edges[i] : undefined
+        let ox = 0, oy = 0
+        if (prev && next) {
+            const dot = prev.nx * next.nx + prev.ny * next.ny
+            if (prev.off === next.off && prev.off !== 0 && dot > 0) {
+                // 前後のずらし量が同じ: ずらした2本の線の交点（マイター）。
+                // 交点ベクトル = (n1 + n2) × off / (1 + n1・n2)。鋭い折れ角で遠くなりすぎないよう off の2倍までに抑える
+                // （dot <= 0 は折り返しに近い、または前後で基準方向が逆向きの場合なので中間点にする）
+                ox = (prev.nx + next.nx) * prev.off / (1 + dot)
+                oy = (prev.ny + next.ny) * prev.off / (1 + dot)
+                const len = Math.hypot(ox, oy)
+                const maxLen = Math.abs(prev.off) * 2
+                if (len > maxLen) {
+                    ox = ox / len * maxLen
+                    oy = oy / len * maxLen
+                }
+            } else {
+                // ずらし量が異なる（並走の本数が変わる駅など）: 前後の辺でずらした点の中間
+                ox = (prev.nx * prev.off + next.nx * next.off) / 2
+                oy = (prev.ny * prev.off + next.ny * next.off) / 2
+            }
+        } else {
+            // 始点・終点: 接する辺のずらし量だけずらす
+            const e = prev ?? next
+            if (e) {
+                ox = e.nx * e.off
+                oy = e.ny * e.off
+            }
+        }
+        out.push(`${pts[i].x + ox},${pts[i].y + oy}`)
+    }
+    return out.join(' ')
 }
 
 const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect }) => {
@@ -101,11 +145,68 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         return { worldById: result, bounds: b }
     }, [allStations])
 
-    // 路線ごとの折れ線（ワールド座標）とその範囲。画面外の路線を描画しない判定に使う
-    const linePaths = useMemo(() => {
-        return lines.map(line => {
-            const order = orderByLine.get(line.id) ?? []
-            const pts = order.map(sid => worldById.get(sid)).filter((p): p is Pos => !!p)
+    // 並走区間の平行描画に必要な情報をデータ読み込み時に1回だけ計算する。
+    // - linePaths: 路線ごとの折れ線（ワールド座標）とその範囲、各辺の垂直方向・ずらし量
+    // - nodeShapes: 駅ごとのノード形状（並走本数の最大値と、線を並べた向き）
+    const { linePaths, nodeShapes } = useMemo(() => {
+        // 路線ごとに、座標のある駅だけを駅順に並べる
+        const seqByLine = lines.map(line => {
+            const ids = (orderByLine.get(line.id) ?? []).filter(sid => worldById.has(sid))
+            return { line, ids }
+        })
+
+        // 同じ2駅を結ぶ辺を、向きを問わず1つの辺グループにまとめる。
+        // 各路線がその辺を最初に進んだ向き（from → to）も覚えておく
+        type EdgeGroup = { lineIds: string[], dirByLine: Map<string, [string, string]>, nx: number, ny: number }
+        const groups = new Map<string, EdgeGroup>()
+        const edgeKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`)
+        for (const { line, ids } of seqByLine) {
+            for (let i = 0; i + 1 < ids.length; i++) {
+                const a = ids[i], b = ids[i + 1]
+                if (a === b) continue
+                const key = edgeKey(a, b)
+                let g = groups.get(key)
+                if (!g) {
+                    g = { lineIds: [], dirByLine: new Map(), nx: 0, ny: 0 }
+                    groups.set(key, g)
+                }
+                // 同じ路線が同じ辺を2回通る場合は1本として数える
+                if (!g.dirByLine.has(line.id)) {
+                    g.lineIds.push(line.id)
+                    g.dirByLine.set(line.id, [a, b])
+                }
+            }
+        }
+        // グループ内の路線を路線IDの数値順に並べ、最も小さい路線の進む向きを基準方向とする。
+        // 垂直方向は基準方向を時計回りに90°回した向き（y軸下向きの座標系で (-dy, dx)）
+        for (const g of groups.values()) {
+            g.lineIds.sort((a, b) => Number(a) - Number(b) || (a < b ? -1 : a > b ? 1 : 0))
+            const [from, to] = g.dirByLine.get(g.lineIds[0])!
+            const p1 = worldById.get(from)!, p2 = worldById.get(to)!
+            const dx = p2.x - p1.x, dy = p2.y - p1.y
+            const len = Math.hypot(dx, dy)
+            // 2駅が同じ座標の場合は向きが決まらないため、ずらさない
+            if (len > 0) {
+                g.nx = -dy / len
+                g.ny = dx / len
+            }
+        }
+
+        // 路線ごとの折れ線。各辺に垂直方向とずらし量（px）を持たせる
+        const paths = seqByLine.map(({ line, ids }) => {
+            const pts = ids.map(sid => worldById.get(sid)!)
+            const edges: { nx: number, ny: number, off: number }[] = []
+            for (let i = 0; i + 1 < ids.length; i++) {
+                const g = ids[i] === ids[i + 1] ? undefined : groups.get(edgeKey(ids[i], ids[i + 1]))
+                if (!g) {
+                    edges.push({ nx: 0, ny: 0, off: 0 })
+                    continue
+                }
+                // 並び順 k、本数 n のとき (k − (n − 1) / 2) × 間隔 だけずらす
+                const k = g.lineIds.indexOf(line.id)
+                const n = g.lineIds.length
+                edges.push({ nx: g.nx, ny: g.ny, off: (k - (n - 1) / 2) * PARALLEL_SPACING })
+            }
             const b: Bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
             for (const p of pts) {
                 if (p.x < b.minX) b.minX = p.x
@@ -113,8 +214,19 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 if (p.x > b.maxX) b.maxX = p.x
                 if (p.y > b.maxY) b.maxY = p.y
             }
-            return { line, pts, bounds: b }
+            return { line, pts, edges, bounds: b }
         }).filter(lp => lp.pts.length >= 2)
+
+        // 駅ごとのノード形状: 接する辺グループの路線数の最大値 m と、その辺グループの垂直方向
+        const shapes = new Map<string, { m: number, nx: number, ny: number }>()
+        for (const [key, g] of groups) {
+            const n = g.lineIds.length
+            for (const sid of key.split('|')) {
+                const cur = shapes.get(sid)
+                if (!cur || n > cur.m) shapes.set(sid, { m: n, nx: g.nx, ny: g.ny })
+            }
+        }
+        return { linePaths: paths, nodeShapes: shapes }
     }, [lines, orderByLine, worldById])
 
     // 始点駅を通る路線のID集合（始点未選択なら全路線）
@@ -404,14 +516,15 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 })}
 
                 {/* 路線（駅順に駅ノードを結ぶ折れ線）。ハイライト対象外はグレーで描画する */}
-                {linePaths.map(({ line, pts, bounds: lb }) => {
+                {/* 並走区間では路線ごとに横へずらした平行線になる */}
+                {linePaths.map(({ line, pts, edges, bounds: lb }) => {
                     // 路線の範囲が表示範囲と重ならなければ描画しない
                     if (lb.maxX < visMinX || lb.minX > visMaxX || lb.maxY < visMinY || lb.minY > visMaxY) return null
                     const isActive = activeLineIds.has(line.id)
                     return (
                         <polyline
                             key={line.id}
-                            points={pts.map(w => `${(w.x - offsetX) * scale},${(w.y - offsetY) * scale}`).join(' ')}
+                            points={offsetPolylinePoints(pts.map(toScreen), edges)}
                             fill="none"
                             stroke={isActive ? (line.color || '#888') : 'var(--border)'}
                             strokeWidth={isActive ? 6 : 4}
@@ -428,6 +541,13 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                     const isSelectable = isStart ? false : selectableIds.has(station.id)
                     const fill = isStart ? '#ff9800' : isSelectable ? '#ffffff' : 'var(--bg-overlay)'
                     const clickable = isStart ? false : isSelectable
+                    // 並走本数 m が2以上の駅はカプセル型。長手方向は線を並べた向き（辺グループの垂直方向）
+                    const shape = nodeShapes.get(station.id)
+                    const m = shape?.m ?? 1
+                    const capLen = (m - 1) * PARALLEL_SPACING + NODE_R * 2
+                    const angle = shape ? Math.atan2(shape.ny, shape.nx) * 180 / Math.PI : 0
+                    // 駅名はノードの右端のさらに右に置く（カプセルを回転させたときの x 方向の半幅）
+                    const halfW = m > 1 && shape ? (capLen / 2 - NODE_R) * Math.abs(shape.nx) + NODE_R : NODE_R
                     // クリックはコンテナの pointerup で判定するため、ここでは駅IDを属性に持たせるだけにする
                     return (
                         <g
@@ -438,10 +558,18 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                                 opacity: isStart || isSelectable ? 1 : 0.3,
                             }}
                         >
-                            <circle cx={p.x} cy={p.y} r={NODE_R} fill={fill} stroke="var(--text-primary)" strokeWidth={2} />
+                            {m > 1 ? (
+                                <rect
+                                    x={-capLen / 2} y={-NODE_R} width={capLen} height={NODE_R * 2} rx={NODE_R}
+                                    transform={`translate(${p.x},${p.y}) rotate(${angle})`}
+                                    fill={fill} stroke="var(--text-primary)" strokeWidth={2}
+                                />
+                            ) : (
+                                <circle cx={p.x} cy={p.y} r={NODE_R} fill={fill} stroke="var(--text-primary)" strokeWidth={2} />
+                            )}
                             {(showLabels || isStart) && (
                                 <text
-                                    x={p.x + NODE_R + 3}
+                                    x={p.x + halfW + 3}
                                     y={p.y + 4}
                                     fontSize="13"
                                     fill={isStart ? '#ff9800' : isSelectable ? 'var(--text-primary)' : 'var(--text-muted)'}
@@ -450,8 +578,17 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                                     {station.name}
                                 </text>
                             )}
-                            {/* クリック判定を広げるための透明な円（ラベルと重なっても押しやすくする） */}
-                            {clickable && <circle cx={p.x} cy={p.y} r={NODE_R + 6} fill="transparent" />}
+                            {/* クリック判定を広げるための透明な円（ラベルと重なっても押しやすくする）。カプセル型では同じ向きのカプセルを広げる */}
+                            {clickable && (m > 1 ? (
+                                <rect
+                                    x={-capLen / 2 - HIT_MARGIN} y={-NODE_R - HIT_MARGIN}
+                                    width={capLen + HIT_MARGIN * 2} height={(NODE_R + HIT_MARGIN) * 2} rx={NODE_R + HIT_MARGIN}
+                                    transform={`translate(${p.x},${p.y}) rotate(${angle})`}
+                                    fill="transparent"
+                                />
+                            ) : (
+                                <circle cx={p.x} cy={p.y} r={NODE_R + HIT_MARGIN} fill="transparent" />
+                            ))}
                         </g>
                     )
                 })}
