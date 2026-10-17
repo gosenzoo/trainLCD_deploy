@@ -1,0 +1,930 @@
+{
+ "lines": [
+  {
+   "no": 96,
+   "name": "小浜線",
+   "kana": "おばません",
+   "eng": "Obama Line",
+   "color": "#4CAF50",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "敦賀",
+     "kana": "つるが",
+     "eng": "Tsuruga",
+     "lat": 35.645,
+     "lon": 136.0753,
+     "number": ""
+    },
+    {
+     "name": "西敦賀",
+     "kana": "にしつるが",
+     "eng": "Nishi-Tsuruga",
+     "lat": 35.6489,
+     "lon": 136.0436,
+     "number": ""
+    },
+    {
+     "name": "粟野",
+     "kana": "あわの",
+     "eng": "Awano",
+     "lat": 35.6302,
+     "lon": 136.0062,
+     "number": ""
+    },
+    {
+     "name": "東美浜",
+     "kana": "ひがしみはま",
+     "eng": "Higashi-Mihama",
+     "lat": 35.608,
+     "lon": 135.9693,
+     "number": ""
+    },
+    {
+     "name": "美浜",
+     "kana": "みはま",
+     "eng": "Mihama",
+     "lat": 35.6033,
+     "lon": 135.9435,
+     "number": ""
+    },
+    {
+     "name": "気山",
+     "kana": "きやま",
+     "eng": "Kiyama",
+     "lat": 35.5915,
+     "lon": 135.902,
+     "number": ""
+    },
+    {
+     "name": "三方",
+     "kana": "みかた",
+     "eng": "Mikata",
+     "lat": 35.5585,
+     "lon": 135.9047,
+     "number": ""
+    },
+    {
+     "name": "藤井",
+     "kana": "ふじい",
+     "eng": "Fujii",
+     "lat": 35.5417,
+     "lon": 135.8936,
+     "number": ""
+    },
+    {
+     "name": "十村",
+     "kana": "とむら",
+     "eng": "Tomura",
+     "lat": 35.5285,
+     "lon": 135.8768,
+     "number": ""
+    },
+    {
+     "name": "大鳥羽",
+     "kana": "おおとば",
+     "eng": "Otoba",
+     "lat": 35.5017,
+     "lon": 135.8343,
+     "number": ""
+    },
+    {
+     "name": "若狭有田",
+     "kana": "わかさありた",
+     "eng": "Wakasa-Arita",
+     "lat": 35.4949,
+     "lon": 135.8175,
+     "number": ""
+    },
+    {
+     "name": "上中",
+     "kana": "かみなか",
+     "eng": "Kaminaka",
+     "lat": 35.4813,
+     "lon": 135.8072,
+     "number": ""
+    },
+    {
+     "name": "新平野",
+     "kana": "しんひらの",
+     "eng": "Shin-Hirano",
+     "lat": 35.4917,
+     "lon": 135.7826,
+     "number": ""
+    },
+    {
+     "name": "東小浜",
+     "kana": "ひがしおばま",
+     "eng": "Higashi-Obama",
+     "lat": 35.491,
+     "lon": 135.7621,
+     "number": ""
+    },
+    {
+     "name": "小浜",
+     "kana": "おばま",
+     "eng": "Obama",
+     "lat": 35.4943,
+     "lon": 135.7472,
+     "number": ""
+    },
+    {
+     "name": "勢浜",
+     "kana": "せいはま",
+     "eng": "Seihama",
+     "lat": 35.4966,
+     "lon": 135.7212,
+     "number": ""
+    },
+    {
+     "name": "加斗",
+     "kana": "かと",
+     "eng": "Kato",
+     "lat": 35.4917,
+     "lon": 135.6969,
+     "number": ""
+    },
+    {
+     "name": "若狭本郷",
+     "kana": "わかさほんごう",
+     "eng": "Wakasa-Hongo",
+     "lat": 35.4887,
+     "lon": 135.6611,
+     "number": ""
+    },
+    {
+     "name": "若狭和田",
+     "kana": "わかさわだ",
+     "eng": "Wakasa-Wada",
+     "lat": 35.4902,
+     "lon": 135.6229,
+     "number": ""
+    },
+    {
+     "name": "若狭高浜",
+     "kana": "わかさたかはま",
+     "eng": "Wakasa-Takahama",
+     "lat": 35.4882,
+     "lon": 135.5508,
+     "number": ""
+    },
+    {
+     "name": "三松",
+     "kana": "みつまつ",
+     "eng": "Mitsumatsu",
+     "lat": 35.487,
+     "lon": 135.527,
+     "number": ""
+    },
+    {
+     "name": "青郷",
+     "kana": "あおのごう",
+     "eng": "Aonogo",
+     "lat": 35.4848,
+     "lon": 135.4966,
+     "number": ""
+    },
+    {
+     "name": "松尾寺",
+     "kana": "まつのおでら",
+     "eng": "Matsunoodera",
+     "lat": 35.4803,
+     "lon": 135.4532,
+     "number": ""
+    },
+    {
+     "name": "東舞鶴",
+     "kana": "ひがしまいづる",
+     "eng": "Higashi-Maizuru",
+     "lat": 35.4688,
+     "lon": 135.3946,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 97,
+   "name": "九頭竜線",
+   "kana": "くずりゅうせん",
+   "eng": "Kuzuryu Line",
+   "color": "#1E88E5",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "越前花堂",
+     "kana": "えちぜんはなんどう",
+     "eng": "Echizen-Hanando",
+     "lat": 36.042,
+     "lon": 136.2164,
+     "number": ""
+    },
+    {
+     "name": "六条",
+     "kana": "ろくじょう",
+     "eng": "Rokujo",
+     "lat": 36.0247,
+     "lon": 136.2252,
+     "number": ""
+    },
+    {
+     "name": "足羽",
+     "kana": "あすわ",
+     "eng": "Asuwa",
+     "lat": 36.0172,
+     "lon": 136.2433,
+     "number": ""
+    },
+    {
+     "name": "越前東郷",
+     "kana": "えちぜんとうごう",
+     "eng": "Echizen-Togo",
+     "lat": 36.0052,
+     "lon": 136.2618,
+     "number": ""
+    },
+    {
+     "name": "一乗谷",
+     "kana": "いちじょうだに",
+     "eng": "Ichijodani",
+     "lat": 36.0003,
+     "lon": 136.2898,
+     "number": ""
+    },
+    {
+     "name": "越前高田",
+     "kana": "えちぜんたかだ",
+     "eng": "Echizen-Takada",
+     "lat": 35.9978,
+     "lon": 136.3133,
+     "number": ""
+    },
+    {
+     "name": "市波",
+     "kana": "いちなみ",
+     "eng": "Ichinami",
+     "lat": 35.9872,
+     "lon": 136.326,
+     "number": ""
+    },
+    {
+     "name": "小和清水",
+     "kana": "こわしょうず",
+     "eng": "Kowashozu",
+     "lat": 35.9805,
+     "lon": 136.3399,
+     "number": ""
+    },
+    {
+     "name": "美山",
+     "kana": "みやま",
+     "eng": "Miyama",
+     "lat": 35.9779,
+     "lon": 136.3609,
+     "number": ""
+    },
+    {
+     "name": "越前薬師",
+     "kana": "えちぜんやくし",
+     "eng": "Echizen-Yakushi",
+     "lat": 35.9772,
+     "lon": 136.381,
+     "number": ""
+    },
+    {
+     "name": "越前大宮",
+     "kana": "えちぜんおおみや",
+     "eng": "Echizen-Omiya",
+     "lat": 35.9786,
+     "lon": 136.4053,
+     "number": ""
+    },
+    {
+     "name": "計石",
+     "kana": "はかりいし",
+     "eng": "Hakariishi",
+     "lat": 35.9805,
+     "lon": 136.4208,
+     "number": ""
+    },
+    {
+     "name": "牛ケ原",
+     "kana": "うしがはら",
+     "eng": "Ushigahara",
+     "lat": 35.9817,
+     "lon": 136.4589,
+     "number": ""
+    },
+    {
+     "name": "北大野",
+     "kana": "きたおおの",
+     "eng": "Kita-Ono",
+     "lat": 35.9876,
+     "lon": 136.4799,
+     "number": ""
+    },
+    {
+     "name": "越前大野",
+     "kana": "えちぜんおおの",
+     "eng": "Echizen-Ono",
+     "lat": 35.9813,
+     "lon": 136.495,
+     "number": ""
+    },
+    {
+     "name": "越前田野",
+     "kana": "えちぜんたの",
+     "eng": "Echizen-Tano",
+     "lat": 35.9721,
+     "lon": 136.5155,
+     "number": ""
+    },
+    {
+     "name": "越前富田",
+     "kana": "えちぜんとみだ",
+     "eng": "Echizen-Tomida",
+     "lat": 35.9625,
+     "lon": 136.5331,
+     "number": ""
+    },
+    {
+     "name": "下唯野",
+     "kana": "しもゆいの",
+     "eng": "Shimo-Yuino",
+     "lat": 35.9552,
+     "lon": 136.5476,
+     "number": ""
+    },
+    {
+     "name": "柿ケ島",
+     "kana": "かきがしま",
+     "eng": "Kakigashima",
+     "lat": 35.9547,
+     "lon": 136.5702,
+     "number": ""
+    },
+    {
+     "name": "勝原",
+     "kana": "かどはら",
+     "eng": "Kadohara",
+     "lat": 35.9498,
+     "lon": 136.5912,
+     "number": ""
+    },
+    {
+     "name": "越前下山",
+     "kana": "えちぜんしもやま",
+     "eng": "Echizen-Shimoyama",
+     "lat": 35.9445,
+     "lon": 136.6214,
+     "number": ""
+    },
+    {
+     "name": "九頭竜湖",
+     "kana": "くずりゅうこ",
+     "eng": "Kuzuryuko",
+     "lat": 35.9417,
+     "lon": 136.6544,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 98,
+   "name": "七尾線",
+   "kana": "ななおせん",
+   "eng": "Nanao Line",
+   "color": "#902C40",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "津幡",
+     "kana": "つばた",
+     "eng": "Tsubata",
+     "lat": 36.6694,
+     "lon": 136.7283,
+     "number": ""
+    },
+    {
+     "name": "中津幡",
+     "kana": "なかつばた",
+     "eng": "Naka-Tsubata",
+     "lat": 36.6764,
+     "lon": 136.7238,
+     "number": ""
+    },
+    {
+     "name": "本津幡",
+     "kana": "ほんつばた",
+     "eng": "Hon-Tsubata",
+     "lat": 36.6828,
+     "lon": 136.7213,
+     "number": ""
+    },
+    {
+     "name": "能瀬",
+     "kana": "のせ",
+     "eng": "Nose",
+     "lat": 36.6997,
+     "lon": 136.723,
+     "number": ""
+    },
+    {
+     "name": "宇野気",
+     "kana": "うのけ",
+     "eng": "Unoke",
+     "lat": 36.7356,
+     "lon": 136.7125,
+     "number": ""
+    },
+    {
+     "name": "横山",
+     "kana": "よこやま",
+     "eng": "Yokoyama",
+     "lat": 36.7598,
+     "lon": 136.7187,
+     "number": ""
+    },
+    {
+     "name": "高松",
+     "kana": "たかまつ",
+     "eng": "Takamatsu",
+     "lat": 36.7856,
+     "lon": 136.7302,
+     "number": ""
+    },
+    {
+     "name": "免田",
+     "kana": "めんでん",
+     "eng": "Menden",
+     "lat": 36.81,
+     "lon": 136.7465,
+     "number": ""
+    },
+    {
+     "name": "宝達",
+     "kana": "ほうだつ",
+     "eng": "Hodatsu",
+     "lat": 36.8297,
+     "lon": 136.7584,
+     "number": ""
+    },
+    {
+     "name": "敷浪",
+     "kana": "しきなみ",
+     "eng": "Shikinami",
+     "lat": 36.8505,
+     "lon": 136.7666,
+     "number": ""
+    },
+    {
+     "name": "南羽咋",
+     "kana": "みなみはくい",
+     "eng": "Minami-Hakui",
+     "lat": 36.8724,
+     "lon": 136.7729,
+     "number": ""
+    },
+    {
+     "name": "羽咋",
+     "kana": "はくい",
+     "eng": "Hakui",
+     "lat": 36.8937,
+     "lon": 136.7816,
+     "number": ""
+    },
+    {
+     "name": "千路",
+     "kana": "ちじ",
+     "eng": "Chiji",
+     "lat": 36.9179,
+     "lon": 136.8053,
+     "number": ""
+    },
+    {
+     "name": "金丸",
+     "kana": "かねまる",
+     "eng": "Kanemaru",
+     "lat": 36.9349,
+     "lon": 136.8395,
+     "number": ""
+    },
+    {
+     "name": "能登部",
+     "kana": "のとべ",
+     "eng": "Notobe",
+     "lat": 36.9539,
+     "lon": 136.8697,
+     "number": ""
+    },
+    {
+     "name": "良川",
+     "kana": "よしかわ",
+     "eng": "Yoshikawa",
+     "lat": 36.9677,
+     "lon": 136.8829,
+     "number": ""
+    },
+    {
+     "name": "能登二宮",
+     "kana": "のとにのみや",
+     "eng": "Noto-Ninomiya",
+     "lat": 36.9893,
+     "lon": 136.902,
+     "number": ""
+    },
+    {
+     "name": "徳田",
+     "kana": "とくだ",
+     "eng": "Tokuda",
+     "lat": 37.0128,
+     "lon": 136.9338,
+     "number": ""
+    },
+    {
+     "name": "七尾",
+     "kana": "ななお",
+     "eng": "Nanao",
+     "lat": 37.0434,
+     "lon": 136.9618,
+     "number": ""
+    },
+    {
+     "name": "和倉温泉",
+     "kana": "わくらおんせん",
+     "eng": "Wakuraonsen",
+     "lat": 37.075,
+     "lon": 136.933,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 99,
+   "name": "城端線",
+   "kana": "じょうはなせん",
+   "eng": "Johana Line",
+   "color": "#8E7CC3",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "高岡",
+     "kana": "たかおか",
+     "eng": "Takaoka",
+     "lat": 36.742,
+     "lon": 137.0156,
+     "number": ""
+    },
+    {
+     "name": "新高岡",
+     "kana": "しんたかおか",
+     "eng": "Shin-Takaoka",
+     "lat": 36.7298,
+     "lon": 137.0115,
+     "number": ""
+    },
+    {
+     "name": "二塚",
+     "kana": "ふたつか",
+     "eng": "Futatsuka",
+     "lat": 36.7178,
+     "lon": 137.0061,
+     "number": ""
+    },
+    {
+     "name": "林",
+     "kana": "はやし",
+     "eng": "Hayashi",
+     "lat": 36.6942,
+     "lon": 136.9867,
+     "number": ""
+    },
+    {
+     "name": "戸出",
+     "kana": "といで",
+     "eng": "Toide",
+     "lat": 36.6791,
+     "lon": 136.9696,
+     "number": ""
+    },
+    {
+     "name": "油田",
+     "kana": "あぶらでん",
+     "eng": "Aburaden",
+     "lat": 36.6566,
+     "lon": 136.9622,
+     "number": ""
+    },
+    {
+     "name": "砺波",
+     "kana": "となみ",
+     "eng": "Tonami",
+     "lat": 36.644,
+     "lon": 136.96,
+     "number": ""
+    },
+    {
+     "name": "東野尻",
+     "kana": "ひがしのじり",
+     "eng": "Higashi-Nojiri",
+     "lat": 36.6176,
+     "lon": 136.9519,
+     "number": ""
+    },
+    {
+     "name": "高儀",
+     "kana": "たかぎ",
+     "eng": "Takagi",
+     "lat": 36.6034,
+     "lon": 136.9436,
+     "number": ""
+    },
+    {
+     "name": "福野",
+     "kana": "ふくの",
+     "eng": "Fukuno",
+     "lat": 36.5878,
+     "lon": 136.9282,
+     "number": ""
+    },
+    {
+     "name": "東石黒",
+     "kana": "ひがしいしぐろ",
+     "eng": "Higashi-Ishiguro",
+     "lat": 36.5715,
+     "lon": 136.9054,
+     "number": ""
+    },
+    {
+     "name": "福光",
+     "kana": "ふくみつ",
+     "eng": "Fukumitsu",
+     "lat": 36.5568,
+     "lon": 136.8784,
+     "number": ""
+    },
+    {
+     "name": "越中山田",
+     "kana": "えっちゅうやまだ",
+     "eng": "Etchu-Yamada",
+     "lat": 36.5401,
+     "lon": 136.8818,
+     "number": ""
+    },
+    {
+     "name": "城端",
+     "kana": "じょうはな",
+     "eng": "Johana",
+     "lat": 36.5196,
+     "lon": 136.8939,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 100,
+   "name": "氷見線",
+   "kana": "ひみせん",
+   "eng": "Himi Line",
+   "color": "#26A69A",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "高岡",
+     "kana": "たかおか",
+     "eng": "Takaoka",
+     "lat": 36.742,
+     "lon": 137.0156,
+     "number": ""
+    },
+    {
+     "name": "越中中川",
+     "kana": "えっちゅうなかがわ",
+     "eng": "Etchu-Nakagawa",
+     "lat": 36.752,
+     "lon": 137.0185,
+     "number": ""
+    },
+    {
+     "name": "能町",
+     "kana": "のうまち",
+     "eng": "Nomachi",
+     "lat": 36.77,
+     "lon": 137.03,
+     "number": ""
+    },
+    {
+     "name": "伏木",
+     "kana": "ふしき",
+     "eng": "Fushiki",
+     "lat": 36.79,
+     "lon": 137.057,
+     "number": ""
+    },
+    {
+     "name": "越中国分",
+     "kana": "えっちゅうこくぶ",
+     "eng": "Etchu-Kokubu",
+     "lat": 36.8063,
+     "lon": 137.0484,
+     "number": ""
+    },
+    {
+     "name": "雨晴",
+     "kana": "あまはらし",
+     "eng": "Amaharashi",
+     "lat": 36.8196,
+     "lon": 137.0397,
+     "number": ""
+    },
+    {
+     "name": "島尾",
+     "kana": "しまお",
+     "eng": "Shimao",
+     "lat": 36.8418,
+     "lon": 136.9998,
+     "number": ""
+    },
+    {
+     "name": "氷見",
+     "kana": "ひみ",
+     "eng": "Himi",
+     "lat": 36.8555,
+     "lon": 136.9869,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 101,
+   "name": "高山線",
+   "kana": "たかやません",
+   "eng": "Takayama Line",
+   "color": "#C0392B",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "猪谷",
+     "kana": "いのたに",
+     "eng": "Inotani",
+     "lat": 36.4337,
+     "lon": 137.2507,
+     "number": ""
+    },
+    {
+     "name": "楡原",
+     "kana": "にれはら",
+     "eng": "Nirehara",
+     "lat": 36.4892,
+     "lon": 137.24,
+     "number": ""
+    },
+    {
+     "name": "笹津",
+     "kana": "ささづ",
+     "eng": "Sasazu",
+     "lat": 36.5182,
+     "lon": 137.2464,
+     "number": ""
+    },
+    {
+     "name": "東八尾",
+     "kana": "ひがしやつお",
+     "eng": "Higashi-Yatsuo",
+     "lat": 36.5459,
+     "lon": 137.2302,
+     "number": ""
+    },
+    {
+     "name": "越中八尾",
+     "kana": "えっちゅうやつお",
+     "eng": "Etchu-Yatsuo",
+     "lat": 36.58,
+     "lon": 137.1557,
+     "number": ""
+    },
+    {
+     "name": "千里",
+     "kana": "ちさと",
+     "eng": "Chisato",
+     "lat": 36.6074,
+     "lon": 137.1673,
+     "number": ""
+    },
+    {
+     "name": "速星",
+     "kana": "はやほし",
+     "eng": "Hayahoshi",
+     "lat": 36.6312,
+     "lon": 137.1667,
+     "number": ""
+    },
+    {
+     "name": "婦中鵜坂",
+     "kana": "ふちゅううさか",
+     "eng": "Fuchu-Usaka",
+     "lat": 36.6463,
+     "lon": 137.1719,
+     "number": ""
+    },
+    {
+     "name": "西富山",
+     "kana": "にしとやま",
+     "eng": "Nishi-Toyama",
+     "lat": 36.6766,
+     "lon": 137.1928,
+     "number": ""
+    },
+    {
+     "name": "富山",
+     "kana": "とやま",
+     "eng": "Toyama",
+     "lat": 36.7012,
+     "lon": 137.213,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 102,
+   "name": "大糸線",
+   "kana": "おおいとせん",
+   "eng": "Oito Line",
+   "color": "#E67E22",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "南小谷",
+     "kana": "みなみおたり",
+     "eng": "Minami-Otari",
+     "lat": 36.7744,
+     "lon": 137.9002,
+     "number": ""
+    },
+    {
+     "name": "中土",
+     "kana": "なかつち",
+     "eng": "Nakatsuchi",
+     "lat": 36.8053,
+     "lon": 137.88,
+     "number": ""
+    },
+    {
+     "name": "北小谷",
+     "kana": "きたおたり",
+     "eng": "Kita-Otari",
+     "lat": 36.8343,
+     "lon": 137.8771,
+     "number": ""
+    },
+    {
+     "name": "平岩",
+     "kana": "ひらいわ",
+     "eng": "Hiraiwa",
+     "lat": 36.865,
+     "lon": 137.8638,
+     "number": ""
+    },
+    {
+     "name": "小滝",
+     "kana": "こたき",
+     "eng": "Kotaki",
+     "lat": 36.922,
+     "lon": 137.8592,
+     "number": ""
+    },
+    {
+     "name": "根知",
+     "kana": "ねち",
+     "eng": "Nechi",
+     "lat": 36.9604,
+     "lon": 137.8687,
+     "number": ""
+    },
+    {
+     "name": "頸城大野",
+     "kana": "くびきおおの",
+     "eng": "Kubiki-Ono",
+     "lat": 36.9944,
+     "lon": 137.8645,
+     "number": ""
+    },
+    {
+     "name": "姫川",
+     "kana": "ひめかわ",
+     "eng": "Himekawa",
+     "lat": 37.0177,
+     "lon": 137.8597,
+     "number": ""
+    },
+    {
+     "name": "糸魚川",
+     "kana": "いといがわ",
+     "eng": "Itoigawa",
+     "lat": 37.043,
+     "lon": 137.8617,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

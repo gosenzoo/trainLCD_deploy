@@ -4299,7 +4299,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 #### 作成手順
 
-- 路線ごとの駅データ（駅名・かな・英語名・緯度経度・駅ナンバリング）を作成し、作業用スクリプト（リポジトリには含めない）で駅IDを振って `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する
+- 路線ごとの駅データ（駅名・かな・英語名・緯度経度・駅ナンバリング）を `scripts/presetData/sources/*.json` に作成し、`scripts/presetData/build_presets.py` で駅IDを振って `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する（7.33節）
 - 生成後、駅順のつながり（隣の駅との距離が極端に離れていないか）と、同じ駅名の駅に同じ駅IDが振られているかを機械的に確認する
 
 #### 変更ファイル
@@ -4675,3 +4675,28 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 |---|---|
 | `public/csv/presetLines/lineDB.csv` | 路線記号が空の路線の「路線アイコン」列を `I_mono_color` に変更 |
 | `app/components/StationPresetPopup.tsx` | 路線記号が空でも路線アイコンを作成する |
+
+### 7.33 駅プリセットの生成スクリプトと元データ
+
+駅プリセットのCSVは手で編集せず、元データから生成スクリプトで作る。これまで一時フォルダにあった元データとスクリプトをリポジトリに置く。
+
+| パス | 内容 |
+|---|---|
+| `scripts/presetData/sources/*.json` | 路線ごとの元データ（事業者ごとに分割: `jr_east_*.json`・`jr_central_*.json`・`jr_west_*.json`）。各路線は路線ID（`no`）・路線名・かな・英語名・色・路線記号と、駅の並び（駅名・かな・英語名・緯度経度・駅ナンバリング）を持つ |
+| `scripts/presetData/build_presets.py` | 元データを統合して `public/csv/presetLines/` の `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する |
+
+#### 使い方
+
+```bash
+python scripts/presetData/build_presets.py            # public/csv/presetLines/ に上書き
+python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力（確認用）
+```
+
+#### 生成スクリプトの処理
+
+- 路線ID 順に路線を並べ、初めて現れた駅から駅IDを振る（既存の路線ID・駅IDを変えないよう、路線は末尾にのみ追加する）
+- 事業者・路線アイコン・ナンバリングアイコンは路線IDの範囲で決める。路線記号のない路線の路線アイコンは `I_mono_color`
+- 手動の補正（ユーザー指定のナンバリング・色、同名の別駅の区別、作成時に食い違った駅の座標の統一など）はスクリプト内に記述する
+- 次の点を機械的に確認して警告を出す: 同名駅の座標・かな・英語名の食い違い、駅ナンバリングの書式、隣駅との距離（0.2km 未満・12km 超）、大きな遠回り
+- 生成前の CSV と比べ、既存の行が変わっていないか（追加のみか）を報告する
+- 改行コードは OS 標準（Windows では git の改行変換に合わせて CRLF）
