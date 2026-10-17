@@ -1686,7 +1686,7 @@ type PrevStationRef = {
 1. **路線記号アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`iconPresetKey`（路線アイコン列）が両方とも空でない場合、`{ presetType: iconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: `line_{路線ID}` をベースにした一意なキー（衝突時は `line_{路線ID}_2` のように連番を付与）で新規作成する
-   - `symbol`・`iconPresetKey` のいずれかが空の場合は作成しない（`lineIconKey` は空文字のまま）
+   - `iconPresetKey` が空の場合は作成しない（`lineIconKey` は空文字のまま）。`symbol` が空でも `iconPresetKey` があれば作成する（路線記号のない路線は `I_mono_color` で路線カラーの四角になる。7.32節）
 2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey` が全て**完全一致**するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
@@ -4638,7 +4638,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 | フィールド | 値 |
 |---|---|
-| `line.lineIconKey` | 乗換先の路線の路線記号アイコンの `iconDict` キー（1要素の配列）。ルートの路線と同じ規則（4.10節「`lineDict`・`iconDict` への解決」の手順1）で既存の `iconDict` から探し、なければ新規作成する。路線記号または路線アイコンが空の路線は空配列 |
+| `line.lineIconKey` | 乗換先の路線の路線記号アイコンの `iconDict` キー（1要素の配列）。ルートの路線と同じ規則（4.10節「`lineDict`・`iconDict` への解決」の手順1）で既存の `iconDict` から探し、なければ新規作成する。路線アイコンが空の路線は空配列 |
 | `line.name` / `line.kana` / `line.eng` | 乗換先の路線名（日本語・かな・英語） |
 | `station.isDraw` | 常に `false`（手動で追加する場合と同じ） |
 | `station.type` | 乗換先の路線のナンバリングアイコン（`lineDB` の「ナンバリングアイコン」列） |
@@ -4654,3 +4654,24 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | ファイル | 変更内容 |
 |---|---|
 | `app/components/StationPresetPopup.tsx` | 駅抽出時に各駅でルートが使う路線を記録し、乗換路線を生成して `transfers` に設定。路線記号アイコンの解決処理を、乗換路線でも使えるよう分ける |
+
+### 7.32 駅プリセット — 路線記号のない路線のアイコンを路線カラーの四角にする
+
+路線記号（`lineDB` の「路線記号」列）が空の路線は、路線記号アイコンが作られず、路線の表示にアイコンが出なかった。これを、路線カラーで塗った四角のアイコンにする。
+
+#### データの変更（`lineDB.csv`）
+
+- 路線記号が空の路線（現在46路線: 相模線・八高線・東北本線・常磐線・成田線〔3路線〕・総武線・東金線・内房線・外房線・久留里線・上越線・吾妻線・信越線・両毛線・水戸線・日光線・烏山線・水郡線〔2路線〕・鹿島線・東海道本線〔美濃赤坂支線〕・紀勢本線・参宮線・名松線・和田岬線・羽衣線・紀勢線・小浜線・九頭竜線・七尾線・城端線・氷見線・高山線・大糸線・山陽線〔岩国〜下関〕・山陰線〔益田〜幡生・仙崎支線〕・岩徳線・山口線・宇部線・小野田線〔2路線〕・美祢線・博多南線）の「路線アイコン」列を **`I_mono_color`**（路線カラーで塗った四角。文字は描かない）にする
+- 路線記号のある路線の「路線アイコン」列は変えない
+
+#### コードの変更（`StationPresetPopup.tsx`）
+
+- 路線記号アイコンの解決（`resolveIconKey`）で、路線記号が空でも路線アイコンがあれば `iconDict` にアイコンを作る（`{ presetType: "I_mono_color", symbol: "", color: 路線カラー }`）。同じ色の四角は1つの `iconDict` エントリにまとめる（既存の完全一致による再利用と同じ）
+- 路線（`lineDict`）の `lineIconKey` と、乗換路線（`transfers`）の `line.lineIconKey` の両方に適用される
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `public/csv/presetLines/lineDB.csv` | 路線記号が空の路線の「路線アイコン」列を `I_mono_color` に変更 |
+| `app/components/StationPresetPopup.tsx` | 路線記号が空でも路線アイコンを作成する |

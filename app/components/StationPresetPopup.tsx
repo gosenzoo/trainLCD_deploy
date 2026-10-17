@@ -219,11 +219,12 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         const sections: StationSection[] = stagingList.flatMap(route => route.sections)
 
         // プリセット路線の路線記号アイコンを iconDict のキーに解決する（未登録の場合は iconDict に新規追加する）。
-        // 路線記号・路線アイコンのどちらかが空の路線は空文字を返す。乗換路線のアイコンにも使う
+        // 路線アイコンが空の路線は空文字を返す。路線記号が空でも路線アイコンがあれば作成する
+        // （路線記号のない路線は lineDB で I_mono_color〔路線カラーの四角〕が指定されている）。乗換路線のアイコンにも使う
         const resolveIconKey = (presetLine: PresetLine): string => {
             // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
             // presetType には lineDB の「路線アイコン」列（I_*）を使う
-            if (!presetLine.symbol || !presetLine.iconPresetKey) return ''
+            if (!presetLine.iconPresetKey) return ''
             const iconParams: iconParamsType = { presetType: presetLine.iconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
             const allIconsSoFar = { ...setting.iconDict, ...newIcons }
             const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
