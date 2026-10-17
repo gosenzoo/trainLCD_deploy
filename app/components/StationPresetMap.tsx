@@ -364,10 +364,37 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
     // ドラッグ中の情報。downStationId は押した位置にあった駅（クリック判定に使う）
     const dragRef = useRef<{ pointerId: number, startX: number, startY: number, lastX: number, lastY: number, moved: boolean, downStationId: string | null } | null>(null)
     const [isDragging, setIsDragging] = useState(false)
+    // 画面に触れているポインタ（指）の位置。2本指のピンチ操作の判定に使う（3本目以降は追跡しない）
+    const pointersRef = useRef<Map<number, { x: number, y: number }>>(new Map())
+    // ピンチ操作中の情報（直前の指の間隔と中点。中点はコンテナ内の座標）。null ならピンチ操作中ではない
+    const pinchRef = useRef<{ lastDist: number, lastMidX: number, lastMidY: number } | null>(null)
+
+    // 2本の指の間隔と中点（コンテナ内の座標）を求める
+    const getPinchGeometry = () => {
+        const [p1, p2] = [...pointersRef.current.values()]
+        const rect = containerRef.current?.getBoundingClientRect()
+        const left = rect?.left ?? 0, top = rect?.top ?? 0
+        return {
+            dist: Math.hypot(p2.x - p1.x, p2.y - p1.y),
+            midX: (p1.x + p2.x) / 2 - left,
+            midY: (p1.y + p2.y) / 2 - top,
+        }
+    }
 
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-        // 主ボタン（左クリック・タッチ・ペン）のみ扱う
-        if (e.button !== 0 || dragRef.current) return
+        // 主ボタン（左クリック・タッチ・ペン）のみ扱う。3本目以降の指は無視する
+        if (e.button !== 0 || pointersRef.current.size >= 2) return
+        pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+        // ポインタがすでに無効な場合などに例外になるため、失敗しても操作は続ける
+        try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* キャプチャできなくても移動・拡大縮小は可能 */ }
+        if (pointersRef.current.size === 2) {
+            // 2本目の指: ピンチ操作を始める。この操作はクリックとみなさない
+            if (dragRef.current) dragRef.current.moved = true
+            const g = getPinchGeometry()
+            pinchRef.current = { lastDist: g.dist, lastMidX: g.midX, lastMidY: g.midY }
+            setIsDragging(true)
+            return
+        }
         // 駅ノードの上から始めた場合も移動できる。押した駅はクリック判定のために覚えておく
         const stationEl = (e.target as Element).closest('[data-station-id]')
         dragRef.current = {
@@ -377,10 +404,26 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
             moved: false,
             downStationId: stationEl?.getAttribute('data-station-id') ?? null,
         }
-        e.currentTarget.setPointerCapture(e.pointerId)
     }
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!pointersRef.current.has(e.pointerId)) return
+        pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+        const pinch = pinchRef.current
+        if (pinch && pointersRef.current.size === 2) {
+            // ピンチ操作: 指の間隔の変化に比例して拡大縮小し、同時に中点の移動に合わせて路線図を移動する。
+            // 直前の中点の下にあったワールド座標が、新しい中点の位置に来るよう offset を決める
+            const v = viewRef.current
+            const g = getPinchGeometry()
+            if (v && pinch.lastDist > 0) {
+                const newScale = Math.min(MAX_SCALE, Math.max(getMinScale(), v.scale * g.dist / pinch.lastDist))
+                const wx = v.offsetX + pinch.lastMidX / v.scale
+                const wy = v.offsetY + pinch.lastMidY / v.scale
+                applyView({ scale: newScale, offsetX: wx - g.midX / newScale, offsetY: wy - g.midY / newScale })
+            }
+            pinchRef.current = { lastDist: g.dist, lastMidX: g.midX, lastMidY: g.midY }
+            return
+        }
         const d = dragRef.current
         if (!d || d.pointerId !== e.pointerId) return
         if (!d.moved) {
@@ -399,7 +442,29 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         d.lastY = e.clientY
     }
 
+    // 指（ポインタ）が離れたときの共通処理。ピンチ中なら残った指でドラッグ移動を続けられるようにする。
+    // 戻り値: 通常のドラッグ・クリック判定を続けてよいなら true
+    const releasePointer = (pointerId: number): boolean => {
+        if (!pointersRef.current.has(pointerId)) return false
+        pointersRef.current.delete(pointerId)
+        if (pinchRef.current) {
+            pinchRef.current = null
+            const rest = [...pointersRef.current.entries()][0]
+            if (rest) {
+                // 残った指からドラッグを再開する（ピンチ後なのでクリックとはみなさない）
+                const [id, p] = rest
+                dragRef.current = { pointerId: id, startX: p.x, startY: p.y, lastX: p.x, lastY: p.y, moved: true, downStationId: null }
+            } else {
+                dragRef.current = null
+                setIsDragging(false)
+            }
+            return false
+        }
+        return true
+    }
+
     const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!releasePointer(e.pointerId)) return
         const d = dragRef.current
         if (!d || d.pointerId !== e.pointerId) return
         dragRef.current = null
@@ -413,6 +478,7 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
     }
 
     const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!releasePointer(e.pointerId)) return
         if (dragRef.current?.pointerId !== e.pointerId) return
         dragRef.current = null
         setIsDragging(false)

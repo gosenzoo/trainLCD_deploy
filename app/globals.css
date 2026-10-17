@@ -231,6 +231,24 @@ h2 {
   }
 }
 
+/* 縦画面ではセクション選択をメインエリアの上に横1列で並べる。
+   幅が足りない場合は折り返さずに横スクロールさせる（上の max-width 指定より後に書いて上書きする） */
+@media (orientation: portrait) {
+  .editor-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .editor-sidebar {
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .editor-sidebar-item {
+    flex: 1 0 52px;
+  }
+}
+
 /* ============================================
    フォーム要素
    ============================================ */
@@ -684,6 +702,47 @@ tr:hover td {
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* 「路線図から追加」ポップアップの本体（路線選択・駅選択・路線図・追加一覧を横並びにする） */
+.preset-popup-body {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 路線図の領域・追加一覧の領域（横画面では左右に等分） */
+.preset-pane-map {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preset-pane-staging {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 縦画面の路線図表示では、路線図を上・追加一覧を下に 2:1 の高さで並べる */
+@media (orientation: portrait) {
+  .preset-popup-body--map {
+    flex-direction: column;
+  }
+  .preset-popup-body--map .preset-pane-map {
+    flex: 2 1 0;
+    min-height: 0;
+  }
+  .preset-popup-body--map .preset-pane-staging {
+    flex: 1 1 0;
+    min-height: 0;
+  }
 }
 
 /* 縦いっぱいダイアログ内の接続路線リストコンテナは残り領域を埋める（max-height 制約を解除） */

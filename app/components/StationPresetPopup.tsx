@@ -403,7 +403,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 onClick={e => e.stopPropagation()}>
                 {/* タイトル行: 右端に × ボタンを配置 */}
                 <div className="modal-title-row">
-                    <p className="modal-title">駅プリセットから追加</p>
+                    <p className="modal-title">路線図から追加</p>
                     <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
                 </div>
 
@@ -423,8 +423,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     {guidanceText}
                 </div>
 
-                {/* 路線選択・駅選択・追加一覧を左から横並びに配置 */}
-                <div style={{ display: 'flex', gap: '12px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                {/* 路線選択・駅選択・追加一覧を左から横並びに配置。
+                    路線図表示のときは縦画面で「路線図」を上・「追加一覧」を下に並べる（globals.css のメディアクエリ） */}
+                <div className={`preset-popup-body${viewMode === 'map' ? ' preset-popup-body--map' : ''}`}>
                     {viewMode === 'list' ? (<>
                     {/* 路線選択リスト（常に操作可、選択中路線をハイライト） */}
                     <div style={{ flex: '0 0 160px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -494,8 +495,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     </div>
 
                     </>) : (
-                    /* 路線図から選択（仮実装）。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる */
-                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    /* 路線図から選択（仮実装）。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる。
+                       flex の指定は縦画面で上下配置に切り替えるためクラス側に持たせる */
+                    <div className="preset-pane-map">
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線図</div>
                         <div style={{ flex: 1, minHeight: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                             <StationPresetMap
@@ -510,8 +512,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     </div>
                     )}
 
-                    {/* 追加一覧リスト（駅選択の右に同形式で配置） */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {/* 追加一覧リスト（駅選択の右に同形式で配置。縦画面の路線図表示では路線図の下） */}
+                    <div className="preset-pane-staging">
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             追加一覧
                         </div>
