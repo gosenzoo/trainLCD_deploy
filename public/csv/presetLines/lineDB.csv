@@ -1,3 +1,52 @@
 路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン
-0,JR東日本,京浜東北線,けいひんとうほくせん,Keihin-Tohoku Line,#00BFFF,JK,I_JR_east,N_JR_east
-1,JR東日本,山手線,やまのてせん,Yamanote Line,#9ACD32,JY,I_JR_east,N_JR_east
+0,JR東日本,東海道線,とうかいどうせん,Tokaido Line,#F68B1E,JT,I_JR_east,N_JR_east
+1,JR東日本,伊東線,いとうせん,Ito Line,#F68B1E,JT,I_JR_east,N_JR_east
+2,JR東日本,横須賀線,よこすかせん,Yokosuka Line,#1069B4,JO,I_JR_east,N_JR_east
+3,JR東日本,総武線快速,そうぶせんかいそく,Sobu Line (Rapid),#1069B4,JO,I_JR_east,N_JR_east
+4,JR東日本,湘南新宿ライン,しょうなんしんじゅくらいん,Shonan-Shinjuku Line,#E21F26,JS,I_JR_east,N_JR_east
+5,JR東日本,京浜東北線・根岸線,けいひんとうほくせん・ねぎしせん,Keihin-Tohoku Line / Negishi Line,#00B2E5,JK,I_JR_east,N_JR_east
+6,JR東日本,横浜線,よこはません,Yokohama Line,#7FC342,JH,I_JR_east,N_JR_east
+7,JR東日本,相模線,さがみせん,Sagami Line,#009793,,I_JR_east,N_JR_east
+8,JR東日本,南武線,なんぶせん,Nambu Line,#FFD400,JN,I_JR_east,N_JR_east
+9,JR東日本,南武線（浜川崎支線）,なんぶせん（はまかわさきしせん）,Nambu Line (Hamakawasaki Branch),#FFD400,JN,I_JR_east,N_JR_east
+10,JR東日本,鶴見線,つるみせん,Tsurumi Line,#FFD400,JI,I_JR_east,N_JR_east
+11,JR東日本,鶴見線（海芝浦支線）,つるみせん（うみしばうらしせん）,Tsurumi Line (Umi-Shibaura Branch),#FFD400,JI,I_JR_east,N_JR_east
+12,JR東日本,鶴見線（大川支線）,つるみせん（おおかわしせん）,Tsurumi Line (Okawa Branch),#FFD400,JI,I_JR_east,N_JR_east
+13,JR東日本,山手線,やまのてせん,Yamanote Line,#9ACD32,JY,I_JR_east,N_JR_east
+14,JR東日本,中央線快速,ちゅうおうせんかいそく,Chuo Line (Rapid),#F15A22,JC,I_JR_east,N_JR_east
+15,JR東日本,中央線,ちゅうおうせん,Chuo Line,#1D6FB8,CO,I_JR_east,N_JR_east
+16,JR東日本,中央・総武線各駅停車,ちゅうおう・そうぶせんかくえきていしゃ,Chuo-Sobu Line (Local),#FFD400,JB,I_JR_east,N_JR_east
+17,JR東日本,青梅線,おうめせん,Ome Line,#F15A22,JC,I_JR_east,N_JR_east
+18,JR東日本,五日市線,いつかいちせん,Itsukaichi Line,#F15A22,JC,I_JR_east,N_JR_east
+19,JR東日本,八高線,はちこうせん,Hachiko Line,#A8A39D,,I_JR_east,N_JR_east
+20,JR東日本,上野東京ライン,うえのとうきょうらいん,Ueno-Tokyo Line,#F68B1E,JU,I_JR_east,N_JR_east
+21,JR東日本,宇都宮線,うつのみやせん,Utsunomiya Line,#F68B1E,JU,I_JR_east,N_JR_east
+22,JR東日本,東北本線,とうほくほんせん,Tohoku Main Line,#F68B1E,,I_JR_east,N_JR_east
+23,JR東日本,高崎線,たかさきせん,Takasaki Line,#F68B1E,JU,I_JR_east,N_JR_east
+24,JR東日本,埼京線,さいきょうせん,Saikyo Line,#00AC9A,JA,I_JR_east,N_JR_east
+25,JR東日本,川越線,かわごえせん,Kawagoe Line,#00AC9A,JA,I_JR_east,N_JR_east
+26,JR東日本,常磐線快速,じょうばんせんかいそく,Joban Line (Rapid),#00B261,JJ,I_JR_east,N_JR_east
+27,JR東日本,常磐線各駅停車,じょうばんせんかくえきていしゃ,Joban Line (Local),#868686,JL,I_JR_east,N_JR_east
+28,JR東日本,常磐線,じょうばんせん,Joban Line,#0072BC,,I_JR_east,N_JR_east
+29,JR東日本,成田線（我孫子支線）,なりたせん（あびこしせん）,Narita Line (Abiko Branch),#00B261,,I_JR_east,N_JR_east
+30,JR東日本,成田線,なりたせん,Narita Line,#00B261,,I_JR_east,N_JR_east
+31,JR東日本,成田線（空港支線）,なりたせん（くうこうしせん）,Narita Line (Airport Branch),#00B261,,I_JR_east,N_JR_east
+32,JR東日本,総武線,そうぶせん,Sobu Line,#8C8C8C,,I_JR_east,N_JR_east
+33,JR東日本,東金線,とうがねせん,Togane Line,#DB4028,,I_JR_east,N_JR_east
+34,JR東日本,内房線,うちぼうせん,Uchibo Line,#E0A800,,I_JR_east,N_JR_east
+35,JR東日本,外房線,そとぼうせん,Sotobo Line,#009944,,I_JR_east,N_JR_east
+36,JR東日本,久留里線,くるりせん,Kururi Line,#4DB6AC,,I_JR_east,N_JR_east
+37,JR東日本,京葉線,けいようせん,Keiyo Line,#C9242F,JE,I_JR_east,N_JR_east
+38,JR東日本,京葉線（高谷支線）,けいようせん（こうやしせん）,Keiyo Line (Koya Branch),#C9242F,JE,I_JR_east,N_JR_east
+39,JR東日本,京葉線（二俣支線）,けいようせん（ふたまたしせん）,Keiyo Line (Futamata Branch),#C9242F,JE,I_JR_east,N_JR_east
+40,JR東日本,武蔵野線,むさしのせん,Musashino Line,#F15A22,JM,I_JR_east,N_JR_east
+41,JR東日本,上越線,じょうえつせん,Joetsu Line,#EE7B1A,,I_JR_east,N_JR_east
+42,JR東日本,吾妻線,あがつません,Agatsuma Line,#D9A600,,I_JR_east,N_JR_east
+43,JR東日本,信越線,しんえつせん,Shin'etsu Line,#2E8B57,,I_JR_east,N_JR_east
+44,JR東日本,両毛線,りょうもうせん,Ryomo Line,#F08300,,I_JR_east,N_JR_east
+45,JR東日本,水戸線,みとせん,Mito Line,#1E50A2,,I_JR_east,N_JR_east
+46,JR東日本,日光線,にっこうせん,Nikko Line,#A0522D,,I_JR_east,N_JR_east
+47,JR東日本,烏山線,からすやません,Karasuyama Line,#4CAF50,,I_JR_east,N_JR_east
+48,JR東日本,水郡線,すいぐんせん,Suigun Line,#1B9E77,,I_JR_east,N_JR_east
+49,JR東日本,水郡線（常陸太田支線）,すいぐんせん（ひたちおおたしせん）,Suigun Line (Hitachi-Ota Branch),#1B9E77,,I_JR_east,N_JR_east
+50,JR東日本,鹿島線,かしません,Kashima Line,#B5651D,,I_JR_east,N_JR_east
