@@ -34,8 +34,6 @@
   --radius-lg:    12px;
   --shadow:       0 4px 24px rgba(0, 0, 0, 0.5);
   --transition:   150ms ease;
-  /* ヘッダー高さ: sticky ツールバーの top 計算に使用 */
-  --header-height: 65px;
 }
 
 /* ============================================
@@ -105,16 +103,9 @@ h2 {
   margin-right: 12px;
 }
 
-/* ============================================
-   表示ツールバー（ヘッダー直下 sticky）
-   ============================================ */
-.display-toolbar {
-  position: sticky;
-  top: var(--header-height);
-  z-index: 99;
-  background-color: var(--bg-base);
-  padding: 8px 20px;
-  border-bottom: 1px solid var(--border);
+/* タイトルの右に置く「表示」ボタン */
+.app-header-display-btn {
+  margin-left: 16px;
 }
 
 /* ============================================

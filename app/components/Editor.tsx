@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import EditorHead from "./EditorHead"
+import Header from "./Header"
 import OperationForm from './OperationForm'
 import MessageForm from './MessageForm'
 import StationList from "./StationList"
@@ -16,7 +17,7 @@ import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 
 // localStorage から読み込んだ設定の旧形式を正規化（マイグレーション）して返す。
-// 起動時の自動読み込みと「LocalStorageから読み込み」ボタンの両方で使う
+// 起動時の自動読み込みで使う
 const normalizeLoadedSetting = (loaded: any): settingType => {
     // operationList（旧配列形式）→ operationDict（辞書形式）へマイグレーション
     if (loaded.operationList && !loaded.operationDict) {
@@ -135,16 +136,6 @@ const Editor = () => {
     // サイドバーで選択中のセクションID（排他選択、常に1つだけ選択される）
     const [activeSectionId, setActiveSectionId] = useState<string>("station")
 
-    // localStorageから設定を読み込み、旧形式を正規化して state に反映する
-    const loadFromLocalStorage = () => {
-        const lcdStrageItem = localStorage.getItem('lcdStrage');
-        if (!lcdStrageItem) {
-            alert("localStrageにアイテムがありません");
-            return;
-        }
-        setSetting(normalizeLoadedSetting(JSON.parse(lcdStrageItem)));
-    }
-
     // ---- 起動時の自動読み込み・編集のたびの自動保存 ----
     // 起動時の読み込みが終わったら true。それまでは自動保存しない（初期値で保存済みデータを上書きしないため）。
     // 読み込みに失敗した場合は false のままにして、そのセッションでは自動保存しない
@@ -242,17 +233,9 @@ const Editor = () => {
 
     return(
         <div>
-            {/* editor-layout の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
-            <div className="display-toolbar">
-                {/* LcdSimulator画面を別タブで開く */}
-                <button onClick={() => window.open('/LcdSimulator/index.html', '_blank')} className="btn-secondary">LCDシミュレータ</button>
-                {/* Controllerデバッグ画面を別タブで開く */}
-                <button onClick={() => window.open('/Controller/index.html', '_blank')} className="btn-secondary">Controllerデバッグ</button>
-                {/* Drawerデバッグ画面を別タブで開く */}
-                <button onClick={() => window.open('/lcdDisplay/index.html', '_blank')} className="btn-secondary">デバッグ</button>
-                <button onClick={loadFromLocalStorage}>LocalStorageから読み込み</button>
-                <button onClick={openDisplay} className="btn-primary">表示</button>
-            </div>
+            {/* ヘッダー（タイトルの右に「表示」ボタン）。openDisplay が設定の state を使うため Editor 内で描画する。
+                editor-layout の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
+            <Header onDisplay={openDisplay}/>
             <div className="editor-layout">
                 {/* 左端のセクション選択サイドバー（アイコン＋キャプションの縦並び） */}
                 <nav className="editor-sidebar">

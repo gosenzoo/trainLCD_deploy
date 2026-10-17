@@ -528,6 +528,8 @@ graph TD
 
 ### 4.4 表示ツールバー（sticky ツールバー）
 
+> 7.28節で表示ツールバーは廃止し、「表示」ボタンはヘッダー（タイトルの右）へ移した。以下は廃止前の仕様。
+
 `Editor` コンポーネント内に sticky ツールバーを設け、ヘッダー直下に固定表示する。
 
 - `position: sticky; top: [ヘッダー高さ]; z-index: 99` で画面スクロールに追従する
@@ -4336,7 +4338,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 | 項目 | 横画面（従来） | 縦画面 |
 |---|---|---|
-| 配置 | メインエリアの左に縦1列（`.editor-sidebar`） | ヘッダー・表示ツールバーの下、メインエリアの上に**横1列** |
+| 配置 | メインエリアの左に縦1列（`.editor-sidebar`） | ヘッダーの下、メインエリアの上に**横1列** |
 | 各ボタン | アイコンの下にキャプション | 同じ（アイコンの下にキャプション）。7つのボタンで横幅を等分する |
 | はみ出す場合 | — | 横幅が足りないときはボタン列を横スクロールできる（折り返さない） |
 
@@ -4397,6 +4399,8 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 #### 「LocalStorageから読み込み」ボタン
 
+> 7.28節でこのボタンは削除した。以下は削除前の仕様。
+
 - 残す（動作は従来どおり。データがない場合は警告を出す）
 - 自動保存により通常は画面の内容と保存内容が一致するため、主に別タブで保存された内容を取り込むときに使う
 
@@ -4409,3 +4413,31 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | ファイル | 変更内容 |
 |---|---|
 | `app/components/Editor.tsx` | 読み込み処理の共通化、起動時の自動読み込み、自動保存（300ms 遅延・タブが裏に回るときの即時保存） |
+
+### 7.28 ヘッダーの整理（「表示」ボタンの移動・表示ツールバーの廃止）
+
+画面上部の2段（タイトルのヘッダー＋表示ツールバー）を1段にまとめる。
+
+| 要素 | 変更前 | 変更後 |
+|---|---|---|
+| ヘッダー（`.app-header`） | タイトル「LCDシミュレーター」のみ | タイトルの**右**に「表示」ボタン（`btn-primary`）を置く。ヘッダーは従来どおりスクロールに追従する（sticky） |
+| 表示ツールバー（`.display-toolbar`） | 「LCDシミュレータ」「Controllerデバッグ」「デバッグ」「LocalStorageから読み込み」「表示」 | **削除**（「表示」以外の4つのボタンも削除する） |
+
+- 「表示」ボタンの動作（`openDisplay`：設定を `lcdStrage` に保存して表示画面を別タブで開く）は変えない
+- 削除したデバッグ画面（`/LcdSimulator/index.html`・`/Controller/index.html`・`/lcdDisplay/index.html`）は、URL を直接開けば従来どおり使える
+- 「LocalStorageから読み込み」は、起動時の自動読み込み（7.27節）があるため削除する。読み込み処理（`normalizeLoadedSetting`）は起動時の自動読み込みで引き続き使う
+
+#### 実装方針
+
+- `Header` コンポーネントに「表示」ボタンのクリック時に呼ぶ `onDisplay` を props で渡す
+- `openDisplay` と設定の state は `Editor` が持っているため、`Header` は `page.tsx` ではなく `Editor` の中で描画する
+- `.display-toolbar` の CSS と `--header-height` 変数（表示ツールバーの位置決めにのみ使用）を削除する
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/Header.tsx` | タイトルの右に「表示」ボタンを追加（`onDisplay` を受け取る） |
+| `app/components/Editor.tsx` | `Header` を描画し、表示ツールバーと「LocalStorageから読み込み」の処理を削除 |
+| `app/page.tsx` | `Header` の描画を削除（`Editor` 内で描画するため） |
+| `app/globals.css` | `.display-toolbar` と `--header-height` を削除 |
