@@ -30,6 +30,22 @@ export type PresetLineConnect = {
     number: string  // 駅ナンバリング
 }
 
+// 区間オブジェクト: 路線ID・前駅インデックス・次駅インデックス
+// インデックスは lineConnects（同一路線IDで絞り込んだ配列）上の位置（一意）
+// StationPresetPopup・StationPresetMap の両方で使うためここで定義する
+export type StationSection = {
+    lineId: string
+    prevIndex: number
+    nextIndex: number
+}
+
+// 追加一覧の1要素（ルート）。通常は区間1つ、環状線の継ぎ目をまたぐ場合は同じ路線の区間2つ
+export type StagedRoute = {
+    sections: StationSection[]
+    // ルート選択ポップアップで選んだ場合の次駅名（追加一覧の表示に使う）
+    nextStationName?: string
+}
+
 // 乗換エッジ: 別々の駅IDを持つ駅同士が乗り換え可能であることを表す（向きは持たない）。
 // 現状はデータ保持と路線図表示のみに使い、区間選択には使わない
 export type PresetTransfer = {

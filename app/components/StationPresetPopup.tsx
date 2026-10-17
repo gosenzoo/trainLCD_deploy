@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react'
 import "../type"
 import {
     loadLineDB, loadStationDB, loadLineConnectDB, loadTransferDB,
-    PresetLine, PresetStation, PresetLineConnect, PresetTransfer
+    PresetLine, PresetStation, PresetLineConnect, PresetTransfer,
+    StationSection, StagedRoute
 } from '../modules/loadStationPresets'
 import StationPresetMap from './StationPresetMap'
 
@@ -14,14 +15,6 @@ type Props = {
     // エントリ（既存と重複しないもの）を渡す
     onAdd: (result: { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> }) => void
     onClose: () => void
-}
-
-// 区間オブジェクト: 路線ID・前駅インデックス・次駅インデックス
-// インデックスは lineConnects（同一路線IDで絞り込んだ配列）上の位置（一意）
-type StationSection = {
-    lineId: string
-    prevIndex: number
-    nextIndex: number
 }
 
 // 前駅参照: 駅データ・選択時の路線ID・lineConnects 上の位置インデックスをまとめて保持
@@ -124,8 +117,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [selectedLineId, setSelectedLineId] = useState<string | null>(null)
     // 区間の開始駅（前駅）: null = firstStation 状態、値あり = continuing 状態
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
-    // 追加一覧（区間オブジェクトの配列）
-    const [stagingList, setStagingList] = useState<StationSection[]>([])
+    // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
+    const [stagingList, setStagingList] = useState<StagedRoute[]>([])
     // 選択UIの表示切替（list: 従来のリスト選択 / map: 路線図からの選択）
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
     const [loadError, setLoadError] = useState<string | null>(null)
@@ -193,7 +186,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                         prevIndex: prevIdx,
                         nextIndex: index,
                     }
-                    setStagingList(prev => [...prev, section])
+                    // リストUIでは区間1つのルートとして追加する
+                    setStagingList(prev => [...prev, { sections: [section] }])
                 }
             }
             // 選択駅を新しい前駅に更新
@@ -217,6 +211,10 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         let lastKey: string | null = null
         // 直前に result へ追加した駅のプリセット駅ID（路線をまたぐ接続駅の統合判定用）
         let lastStationId: string | null = null
+        // 直前の駅を追加・更新した区間のプリセット路線ID（環状線の継ぎ目の判定用）
+        let lastSectionLineId: string | null = null
+        // 全ルートの区間を順に並べる
+        const sections: StationSection[] = stagingList.flatMap(route => route.sections)
 
         // プリセット路線を lineDict のキーに解決する（未登録の場合は iconDict・lineDict に新規追加する）
         const resolveLineKey = (presetLine: PresetLine): string => {
@@ -253,7 +251,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             return lineKey
         }
 
-        for (const section of stagingList) {
+        for (const section of sections) {
             const connects = lineConnects.filter(c => c.lineId === section.lineId)
             const { prevIndex, nextIndex } = section
             if (prevIndex < 0 || nextIndex < 0 || prevIndex >= connects.length || nextIndex >= connects.length) continue
@@ -284,31 +282,37 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 // lineId は「この駅以降の区間路線ID」なので次の路線で上書きする
                 const prev = result[result.length - 1]
                 if (prev && lastStationId === station.id) {
+                    // 同じ路線の区間どうし（環状線の継ぎ目）は同じ駅を通過するだけなので、統合のみで値は変えない
+                    if (lastSectionLineId === section.lineId) continue
                     prev.numIconNext = toNumIcon(connect.number, lineColor, numIconPresetKey)
                     prev.lineId = resolvedLineKey
+                    lastSectionLineId = section.lineId
                     continue
                 }
                 result.push(toStationType(station, lineColor, connect.number, resolvedLineKey, numIconPresetKey))
                 lastStationId = station.id
+                lastSectionLineId = section.lineId
             }
         }
         return { stations: result, newLines, newIcons }
     }
 
     // 路線図から駅が選ばれたときの処理。
-    // 区間の路線・駅順インデックスは StationPresetMap 側で解決済みのものを受け取る
-    const handleMapSelect = (lineId: string, prevIndex: number, nextIndex: number, station: PresetStation) => {
-        if (prevStation === null) {
+    // ルートの区間（環状線の継ぎ目をまたぐ場合は2区間）は StationPresetMap 側で解決済みのものを受け取る。
+    // 始点駅の選択時は sections が空配列
+    const handleMapSelect = (sections: StationSection[], station: PresetStation, nextStationName?: string) => {
+        if (sections.length === 0) {
             // 始点駅の選択（この時点では区間を作らない）
-            setPrevStation({ station, lineId, index: nextIndex })
+            setPrevStation({ station, lineId: '', index: -1 })
             return
         }
-        setStagingList(prev => [...prev, { lineId, prevIndex, nextIndex }])
+        setStagingList(prev => [...prev, { sections, nextStationName }])
         // 選択駅を新しい始点駅にする
-        setPrevStation({ station, lineId, index: nextIndex })
+        const last = sections[sections.length - 1]
+        setPrevStation({ station, lineId: last.lineId, index: last.nextIndex })
     }
 
-    // 戻るボタン → 末尾の区間を削除し、前駅を巻き戻す
+    // 戻るボタン → 末尾のルートを丸ごと削除し、前駅を巻き戻す
     const handleBack = () => {
         if (stagingList.length === 0) return
         const newList = stagingList.slice(0, -1)
@@ -317,8 +321,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             // 全区間が消えた場合は firstStation 状態に戻す
             setPrevStation(null)
         } else {
-            // 末尾に残った区間の nextIndex の駅を新しい前駅に設定
-            const lastSection = newList[newList.length - 1]
+            // 末尾に残ったルートの最後の区間の nextIndex の駅を新しい前駅に設定
+            const lastRoute = newList[newList.length - 1]
+            const lastSection = lastRoute.sections[lastRoute.sections.length - 1]
             const connects = lineConnects.filter(c => c.lineId === lastSection.lineId)
             const connect = connects[lastSection.nextIndex]
             const station = allStations.find(s => s.id === connect?.stationId)
@@ -334,13 +339,33 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         onClose()
     }
 
-    // 区間の表示ラベルを生成: 「前駅名 → 次駅名（路線名）」
-    const getSectionLabel = (section: StationSection): string => {
-        const connects = lineConnects.filter(c => c.lineId === section.lineId)
-        const prevName = allStations.find(s => s.id === connects[section.prevIndex]?.stationId)?.name ?? `駅${section.prevIndex}`
-        const nextName = allStations.find(s => s.id === connects[section.nextIndex]?.stationId)?.name ?? `駅${section.nextIndex}`
-        const lineName = lines.find(l => l.id === section.lineId)?.name ?? section.lineId
-        return `${prevName} → ${nextName}（${lineName}）`
+    // ルートの表示ラベルを生成: 「前駅名 → 次駅名（路線名）」
+    // 前駅はルートの最初の区間の始点、次駅は最後の区間の終点。
+    // ルート選択ポップアップで選んだルートは「（路線名・次駅：○○）」とする
+    const getRouteLabel = (route: StagedRoute): string => {
+        const first = route.sections[0]
+        const last = route.sections[route.sections.length - 1]
+        const stationNameAt = (section: StationSection, index: number): string => {
+            const connects = lineConnects.filter(c => c.lineId === section.lineId)
+            return allStations.find(s => s.id === connects[index]?.stationId)?.name ?? `駅${index}`
+        }
+        const prevName = stationNameAt(first, first.prevIndex)
+        const nextName = stationNameAt(last, last.nextIndex)
+        const lineName = lines.find(l => l.id === first.lineId)?.name ?? first.lineId
+        const nextHint = route.nextStationName ? `・次駅：${route.nextStationName}` : ''
+        // 中間駅数: ルート上の駅を区間順に並べ（区間の継ぎ目で同じ駅が続く場合は1駅とする）、両端を除いた数
+        const routeStationIds: string[] = []
+        for (const section of route.sections) {
+            const connects = lineConnects.filter(c => c.lineId === section.lineId)
+            const step = section.prevIndex <= section.nextIndex ? 1 : -1
+            for (let i = section.prevIndex; ; i += step) {
+                const sid = connects[i]?.stationId
+                if (sid !== undefined && routeStationIds[routeStationIds.length - 1] !== sid) routeStationIds.push(sid)
+                if (i === section.nextIndex) break
+            }
+        }
+        const midCount = Math.max(routeStationIds.length - 2, 0)
+        return `${prevName} → ${nextName}（${lineName}${nextHint}） 中間駅数：${midCount}`
     }
 
     // 与えられた駅（index = stationsForLine 上の位置）が prevStation と同一かどうか判定
@@ -494,7 +519,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                             flex: 1, overflow: 'auto', border: '1px solid var(--border)',
                             borderRadius: 'var(--radius-md)', background: 'var(--bg-base)',
                         }}>
-                            {stagingList.map((section, i) => (
+                            {stagingList.map((route, i) => (
                                 <div
                                     key={i}
                                     style={{
@@ -503,7 +528,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                                         fontSize: '0.85rem',
                                     }}
                                 >
-                                    {getSectionLabel(section)}
+                                    {getRouteLabel(route)}
                                 </div>
                             ))}
                             {stagingList.length === 0 && (

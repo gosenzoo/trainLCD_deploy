@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer } from '../modules/loadStationPresets'
+import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer, StationSection } from '../modules/loadStationPresets'
 
 type Props = {
     lines: PresetLine[]
@@ -11,8 +11,17 @@ type Props = {
     transfers: PresetTransfer[]
     // 始点駅のID（null のときは全駅がクリック可能）
     startStationId: string | null
-    // 駅クリック時のコールバック。区間の路線と駅順インデックスは本コンポーネントで解決して渡す
-    onSelect: (lineId: string, prevIndex: number, nextIndex: number, station: PresetStation) => void
+    // 駅クリック時のコールバック。ルートの区間（環状線の継ぎ目をまたぐ場合は2区間）は本コンポーネントで解決して渡す。
+    // 始点駅の選択時は sections が空配列。nextStationName はルート選択ポップアップで選んだ場合のみ渡す
+    onSelect: (sections: StationSection[], station: PresetStation, nextStationName?: string) => void
+}
+
+// 始点駅から対象駅までのルート候補
+type RouteCandidate = {
+    lineId: string
+    sections: StationSection[]
+    // ルート上の駅IDの並び（始点駅〜対象駅。区間の継ぎ目の重複は除く）
+    stationIds: string[]
 }
 
 // 全体表示時に画面端へ確保する余白（px）
@@ -427,39 +436,97 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         applyView({ scale: v.scale, offsetX: startPos.x - s.w / 2 / v.scale, offsetY: startPos.y - s.h / 2 / v.scale }, true)
     }
 
-    // 始点駅から対象駅までの区間を一意に決める。
-    // 乗換駅同士では候補路線が複数ありえ、環状線では同一路線内にも候補が複数ありうるため、
-    // 「区間の駅数が最少 → 路線IDが小さい → 始点indexが小さい」の順で選ぶ
-    const resolveSection = (targetId: string): { lineId: string, prevIndex: number, nextIndex: number } | null => {
-        if (startStationId === null) return null
-        let best: { lineId: string, prevIndex: number, nextIndex: number } | null = null
-        const lineIds = [...activeLineIds].sort((a, b) => Number(a) - Number(b))
-        for (const lineId of lineIds) {
+    // 始点駅から対象駅までのルート候補を全て列挙する。
+    // 乗換駅同士では候補路線が複数ありえ、環状線では両方向に回るルートがあるため、同じ路線内でも候補が複数になりうる。
+    // 並び順は「ルートの駅数が少ない → 路線IDが小さい → 始点の位置が小さい」
+    const enumerateRoutes = (targetId: string): RouteCandidate[] => {
+        if (startStationId === null) return []
+        const result: RouteCandidate[] = []
+        const seen = new Set<string>()
+        // 区間の並びからルート上の駅IDの並びを作る（区間の継ぎ目で同じ駅が続く場合は1つにする）
+        const expand = (order: string[], sections: StationSection[]): string[] => {
+            const ids: string[] = []
+            for (const s of sections) {
+                const step = s.prevIndex <= s.nextIndex ? 1 : -1
+                for (let i = s.prevIndex; ; i += step) {
+                    if (ids[ids.length - 1] !== order[i]) ids.push(order[i])
+                    if (i === s.nextIndex) break
+                }
+            }
+            return ids
+        }
+        const add = (lineId: string, order: string[], sections: StationSection[]) => {
+            const stationIds = expand(order, sections)
+            // 同じ路線で通る駅の並びが完全に同じ候補は1つにまとめる
+            const key = `${lineId}::${stationIds.join(',')}`
+            if (seen.has(key)) return
+            seen.add(key)
+            result.push({ lineId, sections, stationIds })
+        }
+        for (const lineId of activeLineIds) {
             const order = orderByLine.get(lineId) ?? []
-            for (let i = 0; i < order.length; i++) {
-                if (order[i] !== startStationId) continue
-                for (let j = 0; j < order.length; j++) {
-                    if (order[j] !== targetId) continue
-                    const span = Math.abs(j - i)
-                    if (span === 0) continue
-                    if (!best || span < Math.abs(best.nextIndex - best.prevIndex)) {
-                        best = { lineId, prevIndex: i, nextIndex: j }
+            const n = order.length
+            // 環状線: 駅順リストの先頭と末尾が同じ駅で、駅数が3以上の路線
+            const isRing = n >= 3 && order[0] === order[n - 1]
+            if (!isRing) {
+                // 始点駅の位置 i と対象駅の位置 j の組ごとに1区間の候補とする
+                for (let i = 0; i < n; i++) {
+                    if (order[i] !== startStationId) continue
+                    for (let j = 0; j < n; j++) {
+                        if (j === i || order[j] !== targetId) continue
+                        add(lineId, order, [{ lineId, prevIndex: i, nextIndex: j }])
                     }
+                }
+                continue
+            }
+            // 環状線: 継ぎ目は末尾の位置 L と先頭の位置 0（同じ駅）。重複を除いた位置 0〜L-1 で考え、
+            // 輪を両方向にたどる2つのルートを候補とする。継ぎ目をまたぐ場合は継ぎ目で分けた2区間にする
+            const L = n - 1
+            for (let ps = 0; ps < L; ps++) {
+                if (order[ps] !== startStationId) continue
+                for (let pt = 0; pt < L; pt++) {
+                    if (pt === ps || order[pt] !== targetId) continue
+                    // 位置が増える向き
+                    if (pt > ps) add(lineId, order, [{ lineId, prevIndex: ps, nextIndex: pt }])
+                    else if (pt === 0) add(lineId, order, [{ lineId, prevIndex: ps, nextIndex: L }])
+                    else add(lineId, order, [{ lineId, prevIndex: ps, nextIndex: L }, { lineId, prevIndex: 0, nextIndex: pt }])
+                    // 位置が減る向き
+                    if (pt < ps) add(lineId, order, [{ lineId, prevIndex: ps, nextIndex: pt }])
+                    else if (ps === 0) add(lineId, order, [{ lineId, prevIndex: L, nextIndex: pt }])
+                    else add(lineId, order, [{ lineId, prevIndex: ps, nextIndex: 0 }, { lineId, prevIndex: L, nextIndex: pt }])
                 }
             }
         }
-        return best
+        return result.sort((a, b) =>
+            a.stationIds.length - b.stationIds.length
+            || Number(a.lineId) - Number(b.lineId)
+            || a.sections[0].prevIndex - b.sections[0].prevIndex)
     }
+
+    // ルート選択ポップアップの状態（対象駅と候補。null なら非表示）
+    const [routeChoice, setRouteChoice] = useState<{ target: PresetStation, routes: RouteCandidate[] } | null>(null)
 
     const handleClick = (station: PresetStation) => {
         if (startStationId === null) {
             // 始点駅の選択（区間はまだ作らない）
-            onSelect('', -1, -1, station)
+            onSelect([], station)
             return
         }
-        const sec = resolveSection(station.id)
-        if (!sec) return
-        onSelect(sec.lineId, sec.prevIndex, sec.nextIndex, station)
+        const routes = enumerateRoutes(station.id)
+        if (routes.length === 0) return
+        // 候補が1つならそのまま追加し、複数ならポップアップでユーザーに選ばせる
+        if (routes.length === 1) {
+            onSelect(routes[0].sections, station)
+            return
+        }
+        setRouteChoice({ target: station, routes })
+    }
+
+    // ルート選択ポップアップで候補が選ばれたとき
+    const handleRouteChosen = (route: RouteCandidate) => {
+        if (!routeChoice) return
+        onSelect(route.sections, routeChoice.target, stationById.get(route.stationIds[1])?.name)
+        setRouteChoice(null)
     }
 
     // ---- 描画 ----
@@ -634,6 +701,59 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={fitAll} disabled={!bounds || !size}>全体表示</button>
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={moveToStart} disabled={!startPos}>始点へ移動</button>
             </div>
+
+            {/* ルート選択ポップアップ。路線図の上に半透明の背景ごと重ね、表示中は路線図を操作できないようにする。
+                背景のクリックは何も追加せずに閉じる */}
+            {routeChoice && (
+                <div
+                    onClick={() => setRouteChoice(null)}
+                    style={{
+                        position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+                    }}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
+                            padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px',
+                            maxWidth: '100%', maxHeight: '100%', overflow: 'auto',
+                        }}
+                    >
+                        <div style={{ fontWeight: 600 }}>
+                            「{stationById.get(startStationId ?? '')?.name ?? ''}」→「{routeChoice.target.name}」のルートを選択
+                        </div>
+                        {/* 候補を「[ナンバリング記号][路線名] 次駅：[始点駅の次の駅]」の形で列挙する */}
+                        {routeChoice.routes.map((route, i) => {
+                            const line = lines.find(l => l.id === route.lineId)
+                            const nextName = stationById.get(route.stationIds[1])?.name ?? ''
+                            return (
+                                <button
+                                    key={i}
+                                    className="btn-secondary"
+                                    onClick={() => handleRouteChosen(route)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', textAlign: 'left' }}
+                                >
+                                    {/* 路線記号は路線カラーの枠で囲んだバッジにする（空なら出さない） */}
+                                    {line?.symbol && (
+                                        <span style={{
+                                            border: `2px solid ${line.color || '#888'}`, borderRadius: '4px',
+                                            padding: '0 4px', fontWeight: 700, fontSize: '0.85em', lineHeight: 1.4,
+                                        }}>{line.symbol}</span>
+                                    )}
+                                    <span>{line?.name ?? route.lineId}</span>
+                                    <span style={{ marginLeft: '8px', color: 'var(--text-muted)' }}>次駅：{nextName}</span>
+                                    {/* 中間駅数: 始点駅と対象駅の間の駅数（両端を除く） */}
+                                    <span style={{ marginLeft: '8px', color: 'var(--text-muted)' }}>中間駅数：{route.stationIds.length - 2}</span>
+                                </button>
+                            )
+                        })}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button className="btn-secondary" onClick={() => setRouteChoice(null)}>キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
