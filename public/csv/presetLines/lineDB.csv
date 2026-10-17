@@ -132,3 +132,18 @@
 130,JR西日本,小野田線（本山支線）,おのだせん（もとやましせん）,Onoda Line (Motoyama Branch),#695FAA,,I_mono_color,N_JR_west
 131,JR西日本,美祢線,みねせん,Mine Line,#D6007F,,I_mono_color,N_JR_west
 132,JR西日本,博多南線,はかたみなみせん,Hakata-Minami Line,#0B318E,,I_mono_color,N_JR_west
+133,東京メトロ,銀座線,ぎんざせん,Ginza Line,#F39700,G,I_tokyo_subway,N_tokyo_subway
+134,東京メトロ,丸ノ内線,まるのうちせん,Marunouchi Line,#E60012,M,I_tokyo_subway,N_tokyo_subway
+135,東京メトロ,丸ノ内線（方南町支線）,まるのうちせん（ほうなんちょうしせん）,Marunouchi Line (Honancho Branch),#E60012,Mb,I_tokyo_subway,N_tokyo_subway
+136,東京メトロ,日比谷線,ひびやせん,Hibiya Line,#9CAEB7,H,I_tokyo_subway,N_tokyo_subway
+137,東京メトロ,東西線,とうざいせん,Tozai Line,#00A7DB,T,I_tokyo_subway,N_tokyo_subway
+138,東京メトロ,千代田線,ちよだせん,Chiyoda Line,#009944,C,I_tokyo_subway,N_tokyo_subway
+139,東京メトロ,千代田線（北綾瀬支線）,ちよだせん（きたあやせしせん）,Chiyoda Line (Kita-Ayase Branch),#009944,C,I_tokyo_subway,N_tokyo_subway
+140,東京メトロ,有楽町線,ゆうらくちょうせん,Yurakucho Line,#D7C447,Y,I_tokyo_subway,N_tokyo_subway
+141,東京メトロ,半蔵門線,はんぞうもんせん,Hanzomon Line,#9B7CB6,Z,I_tokyo_subway,N_tokyo_subway
+142,東京メトロ,南北線,なんぼくせん,Namboku Line,#00ADA9,N,I_tokyo_subway,N_tokyo_subway
+143,東京メトロ,副都心線,ふくとしんせん,Fukutoshin Line,#BB641D,F,I_tokyo_subway,N_tokyo_subway
+144,都営地下鉄,都営浅草線,とえいあさくさせん,Toei Asakusa Line,#E85298,A,I_tokyo_subway,N_tokyo_subway
+145,都営地下鉄,都営三田線,とえいみたせん,Toei Mita Line,#0079C2,I,I_tokyo_subway,N_tokyo_subway
+146,都営地下鉄,都営新宿線,とえいしんじゅくせん,Toei Shinjuku Line,#6CBB5A,S,I_tokyo_subway,N_tokyo_subway
+147,都営地下鉄,都営大江戸線,とえいおおえどせん,Toei Oedo Line,#B6007A,E,I_tokyo_subway,N_tokyo_subway

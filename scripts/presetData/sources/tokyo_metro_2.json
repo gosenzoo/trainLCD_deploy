@@ -1,0 +1,628 @@
+{
+  "lines": [
+    {
+      "no": 140,
+      "name": "有楽町線",
+      "kana": "ゆうらくちょうせん",
+      "eng": "Yurakucho Line",
+      "color": "#D7C447",
+      "symbol": "Y",
+      "stations": [
+        {
+          "name": "和光市",
+          "kana": "わこうし",
+          "eng": "Wakoshi",
+          "lat": 35.788,
+          "lon": 139.6126,
+          "number": "Y 01"
+        },
+        {
+          "name": "地下鉄成増",
+          "kana": "ちかてつなります",
+          "eng": "Chikatetsu-narimasu",
+          "lat": 35.7768,
+          "lon": 139.6313,
+          "number": "Y 02"
+        },
+        {
+          "name": "地下鉄赤塚",
+          "kana": "ちかてつあかつか",
+          "eng": "Chikatetsu-akatsuka",
+          "lat": 35.7697,
+          "lon": 139.644,
+          "number": "Y 03"
+        },
+        {
+          "name": "平和台",
+          "kana": "へいわだい",
+          "eng": "Heiwadai",
+          "lat": 35.7577,
+          "lon": 139.6537,
+          "number": "Y 04"
+        },
+        {
+          "name": "氷川台",
+          "kana": "ひかわだい",
+          "eng": "Hikawadai",
+          "lat": 35.7495,
+          "lon": 139.6655,
+          "number": "Y 05"
+        },
+        {
+          "name": "小竹向原",
+          "kana": "こたけむかいはら",
+          "eng": "Kotake-mukaihara",
+          "lat": 35.7433,
+          "lon": 139.6795,
+          "number": "Y 06"
+        },
+        {
+          "name": "千川",
+          "kana": "せんかわ",
+          "eng": "Senkawa",
+          "lat": 35.738,
+          "lon": 139.6893,
+          "number": "Y 07"
+        },
+        {
+          "name": "要町",
+          "kana": "かなめちょう",
+          "eng": "Kanamecho",
+          "lat": 35.7333,
+          "lon": 139.6988,
+          "number": "Y 08"
+        },
+        {
+          "name": "池袋",
+          "kana": "いけぶくろ",
+          "eng": "Ikebukuro",
+          "lat": 35.73,
+          "lon": 139.711,
+          "number": "Y 09"
+        },
+        {
+          "name": "東池袋",
+          "kana": "ひがしいけぶくろ",
+          "eng": "Higashi-ikebukuro",
+          "lat": 35.7256,
+          "lon": 139.719,
+          "number": "Y 10"
+        },
+        {
+          "name": "護国寺",
+          "kana": "ごこくじ",
+          "eng": "Gokokuji",
+          "lat": 35.7191,
+          "lon": 139.7275,
+          "number": "Y 11"
+        },
+        {
+          "name": "江戸川橋",
+          "kana": "えどがわばし",
+          "eng": "Edogawabashi",
+          "lat": 35.7097,
+          "lon": 139.7337,
+          "number": "Y 12"
+        },
+        {
+          "name": "飯田橋",
+          "kana": "いいだばし",
+          "eng": "Iidabashi",
+          "lat": 35.702,
+          "lon": 139.7448,
+          "number": "Y 13"
+        },
+        {
+          "name": "市ケ谷",
+          "kana": "いちがや",
+          "eng": "Ichigaya",
+          "lat": 35.6918,
+          "lon": 139.7357,
+          "number": "Y 14"
+        },
+        {
+          "name": "麹町",
+          "kana": "こうじまち",
+          "eng": "Kojimachi",
+          "lat": 35.684,
+          "lon": 139.7372,
+          "number": "Y 15"
+        },
+        {
+          "name": "永田町",
+          "kana": "ながたちょう",
+          "eng": "Nagatacho",
+          "lat": 35.6787,
+          "lon": 139.74,
+          "number": "Y 16"
+        },
+        {
+          "name": "桜田門",
+          "kana": "さくらだもん",
+          "eng": "Sakuradamon",
+          "lat": 35.6775,
+          "lon": 139.7514,
+          "number": "Y 17"
+        },
+        {
+          "name": "有楽町",
+          "kana": "ゆうらくちょう",
+          "eng": "Yurakucho",
+          "lat": 35.6752,
+          "lon": 139.7634,
+          "number": "Y 18"
+        },
+        {
+          "name": "銀座一丁目",
+          "kana": "ぎんざいっちょうめ",
+          "eng": "Ginza-itchome",
+          "lat": 35.6744,
+          "lon": 139.7671,
+          "number": "Y 19"
+        },
+        {
+          "name": "新富町",
+          "kana": "しんとみちょう",
+          "eng": "Shintomicho",
+          "lat": 35.6704,
+          "lon": 139.7734,
+          "number": "Y 20"
+        },
+        {
+          "name": "月島",
+          "kana": "つきしま",
+          "eng": "Tsukishima",
+          "lat": 35.6644,
+          "lon": 139.7843,
+          "number": "Y 21"
+        },
+        {
+          "name": "豊洲",
+          "kana": "とよす",
+          "eng": "Toyosu",
+          "lat": 35.655,
+          "lon": 139.7964,
+          "number": "Y 22"
+        },
+        {
+          "name": "辰巳",
+          "kana": "たつみ",
+          "eng": "Tatsumi",
+          "lat": 35.6456,
+          "lon": 139.8104,
+          "number": "Y 23"
+        },
+        {
+          "name": "新木場",
+          "kana": "しんきば",
+          "eng": "Shin-kiba",
+          "lat": 35.6458,
+          "lon": 139.827,
+          "number": "Y 24"
+        }
+      ]
+    },
+    {
+      "no": 141,
+      "name": "半蔵門線",
+      "kana": "はんぞうもんせん",
+      "eng": "Hanzomon Line",
+      "color": "#9B7CB6",
+      "symbol": "Z",
+      "stations": [
+        {
+          "name": "渋谷",
+          "kana": "しぶや",
+          "eng": "Shibuya",
+          "lat": 35.659,
+          "lon": 139.7024,
+          "number": "Z 01"
+        },
+        {
+          "name": "表参道",
+          "kana": "おもてさんどう",
+          "eng": "Omote-sando",
+          "lat": 35.6652,
+          "lon": 139.7123,
+          "number": "Z 02"
+        },
+        {
+          "name": "青山一丁目",
+          "kana": "あおやまいっちょうめ",
+          "eng": "Aoyama-itchome",
+          "lat": 35.6727,
+          "lon": 139.724,
+          "number": "Z 03"
+        },
+        {
+          "name": "永田町",
+          "kana": "ながたちょう",
+          "eng": "Nagatacho",
+          "lat": 35.6787,
+          "lon": 139.74,
+          "number": "Z 04"
+        },
+        {
+          "name": "半蔵門",
+          "kana": "はんぞうもん",
+          "eng": "Hanzomon",
+          "lat": 35.6857,
+          "lon": 139.7415,
+          "number": "Z 05"
+        },
+        {
+          "name": "九段下",
+          "kana": "くだんした",
+          "eng": "Kudanshita",
+          "lat": 35.6954,
+          "lon": 139.7514,
+          "number": "Z 06"
+        },
+        {
+          "name": "神保町",
+          "kana": "じんぼうちょう",
+          "eng": "Jimbocho",
+          "lat": 35.6959,
+          "lon": 139.7577,
+          "number": "Z 07"
+        },
+        {
+          "name": "大手町",
+          "kana": "おおてまち",
+          "eng": "Otemachi",
+          "lat": 35.6865,
+          "lon": 139.766,
+          "number": "Z 08"
+        },
+        {
+          "name": "三越前",
+          "kana": "みつこしまえ",
+          "eng": "Mitsukoshimae",
+          "lat": 35.6872,
+          "lon": 139.7735,
+          "number": "Z 09"
+        },
+        {
+          "name": "水天宮前",
+          "kana": "すいてんぐうまえ",
+          "eng": "Suitengumae",
+          "lat": 35.6826,
+          "lon": 139.7855,
+          "number": "Z 10"
+        },
+        {
+          "name": "清澄白河",
+          "kana": "きよすみしらかわ",
+          "eng": "Kiyosumi-shirakawa",
+          "lat": 35.682,
+          "lon": 139.799,
+          "number": "Z 11"
+        },
+        {
+          "name": "住吉",
+          "kana": "すみよし",
+          "eng": "Sumiyoshi",
+          "lat": 35.689,
+          "lon": 139.8157,
+          "number": "Z 12"
+        },
+        {
+          "name": "錦糸町",
+          "kana": "きんしちょう",
+          "eng": "Kinshicho",
+          "lat": 35.6966,
+          "lon": 139.8145,
+          "number": "Z 13"
+        },
+        {
+          "name": "押上",
+          "kana": "おしあげ",
+          "eng": "Oshiage",
+          "lat": 35.7105,
+          "lon": 139.8133,
+          "number": "Z 14"
+        }
+      ]
+    },
+    {
+      "no": 142,
+      "name": "南北線",
+      "kana": "なんぼくせん",
+      "eng": "Namboku Line",
+      "color": "#00ADA9",
+      "symbol": "N",
+      "stations": [
+        {
+          "name": "目黒",
+          "kana": "めぐろ",
+          "eng": "Meguro",
+          "lat": 35.634,
+          "lon": 139.7158,
+          "number": "N 01"
+        },
+        {
+          "name": "白金台",
+          "kana": "しろかねだい",
+          "eng": "Shirokanedai",
+          "lat": 35.6378,
+          "lon": 139.7262,
+          "number": "N 02"
+        },
+        {
+          "name": "白金高輪",
+          "kana": "しろかねたかなわ",
+          "eng": "Shirokane-takanawa",
+          "lat": 35.6427,
+          "lon": 139.734,
+          "number": "N 03"
+        },
+        {
+          "name": "麻布十番",
+          "kana": "あざぶじゅうばん",
+          "eng": "Azabu-juban",
+          "lat": 35.6549,
+          "lon": 139.737,
+          "number": "N 04"
+        },
+        {
+          "name": "六本木一丁目",
+          "kana": "ろっぽんぎいっちょうめ",
+          "eng": "Roppongi-itchome",
+          "lat": 35.6658,
+          "lon": 139.7395,
+          "number": "N 05"
+        },
+        {
+          "name": "溜池山王",
+          "kana": "ためいけさんのう",
+          "eng": "Tameike-sanno",
+          "lat": 35.6737,
+          "lon": 139.7414,
+          "number": "N 06"
+        },
+        {
+          "name": "永田町",
+          "kana": "ながたちょう",
+          "eng": "Nagatacho",
+          "lat": 35.6787,
+          "lon": 139.74,
+          "number": "N 07"
+        },
+        {
+          "name": "四ツ谷",
+          "kana": "よつや",
+          "eng": "Yotsuya",
+          "lat": 35.686,
+          "lon": 139.7302,
+          "number": "N 08"
+        },
+        {
+          "name": "市ケ谷",
+          "kana": "いちがや",
+          "eng": "Ichigaya",
+          "lat": 35.6918,
+          "lon": 139.7357,
+          "number": "N 09"
+        },
+        {
+          "name": "飯田橋",
+          "kana": "いいだばし",
+          "eng": "Iidabashi",
+          "lat": 35.702,
+          "lon": 139.7448,
+          "number": "N 10"
+        },
+        {
+          "name": "後楽園",
+          "kana": "こうらくえん",
+          "eng": "Korakuen",
+          "lat": 35.7078,
+          "lon": 139.7517,
+          "number": "N 11"
+        },
+        {
+          "name": "東大前",
+          "kana": "とうだいまえ",
+          "eng": "Todaimae",
+          "lat": 35.7174,
+          "lon": 139.7579,
+          "number": "N 12"
+        },
+        {
+          "name": "本駒込",
+          "kana": "ほんこまごめ",
+          "eng": "Hon-komagome",
+          "lat": 35.7244,
+          "lon": 139.7535,
+          "number": "N 13"
+        },
+        {
+          "name": "駒込",
+          "kana": "こまごめ",
+          "eng": "Komagome",
+          "lat": 35.7365,
+          "lon": 139.747,
+          "number": "N 14"
+        },
+        {
+          "name": "西ケ原",
+          "kana": "にしがはら",
+          "eng": "Nishigahara",
+          "lat": 35.7462,
+          "lon": 139.742,
+          "number": "N 15"
+        },
+        {
+          "name": "王子",
+          "kana": "おうじ",
+          "eng": "Oji",
+          "lat": 35.7533,
+          "lon": 139.738,
+          "number": "N 16"
+        },
+        {
+          "name": "王子神谷",
+          "kana": "おうじかみや",
+          "eng": "Oji-kamiya",
+          "lat": 35.7652,
+          "lon": 139.736,
+          "number": "N 17"
+        },
+        {
+          "name": "志茂",
+          "kana": "しも",
+          "eng": "Shimo",
+          "lat": 35.7775,
+          "lon": 139.7322,
+          "number": "N 18"
+        },
+        {
+          "name": "赤羽岩淵",
+          "kana": "あかばねいわぶち",
+          "eng": "Akabane-iwabuchi",
+          "lat": 35.7835,
+          "lon": 139.7222,
+          "number": "N 19"
+        }
+      ]
+    },
+    {
+      "no": 143,
+      "name": "副都心線",
+      "kana": "ふくとしんせん",
+      "eng": "Fukutoshin Line",
+      "color": "#BB641D",
+      "symbol": "F",
+      "stations": [
+        {
+          "name": "和光市",
+          "kana": "わこうし",
+          "eng": "Wakoshi",
+          "lat": 35.788,
+          "lon": 139.6126,
+          "number": "F 01"
+        },
+        {
+          "name": "地下鉄成増",
+          "kana": "ちかてつなります",
+          "eng": "Chikatetsu-narimasu",
+          "lat": 35.7768,
+          "lon": 139.6313,
+          "number": "F 02"
+        },
+        {
+          "name": "地下鉄赤塚",
+          "kana": "ちかてつあかつか",
+          "eng": "Chikatetsu-akatsuka",
+          "lat": 35.7697,
+          "lon": 139.644,
+          "number": "F 03"
+        },
+        {
+          "name": "平和台",
+          "kana": "へいわだい",
+          "eng": "Heiwadai",
+          "lat": 35.7577,
+          "lon": 139.6537,
+          "number": "F 04"
+        },
+        {
+          "name": "氷川台",
+          "kana": "ひかわだい",
+          "eng": "Hikawadai",
+          "lat": 35.7495,
+          "lon": 139.6655,
+          "number": "F 05"
+        },
+        {
+          "name": "小竹向原",
+          "kana": "こたけむかいはら",
+          "eng": "Kotake-mukaihara",
+          "lat": 35.7433,
+          "lon": 139.6795,
+          "number": "F 06"
+        },
+        {
+          "name": "千川",
+          "kana": "せんかわ",
+          "eng": "Senkawa",
+          "lat": 35.738,
+          "lon": 139.6893,
+          "number": "F 07"
+        },
+        {
+          "name": "要町",
+          "kana": "かなめちょう",
+          "eng": "Kanamecho",
+          "lat": 35.7333,
+          "lon": 139.6988,
+          "number": "F 08"
+        },
+        {
+          "name": "池袋",
+          "kana": "いけぶくろ",
+          "eng": "Ikebukuro",
+          "lat": 35.73,
+          "lon": 139.711,
+          "number": "F 09"
+        },
+        {
+          "name": "雑司が谷",
+          "kana": "ぞうしがや",
+          "eng": "Zoshigaya",
+          "lat": 35.7207,
+          "lon": 139.7149,
+          "number": "F 10"
+        },
+        {
+          "name": "西早稲田",
+          "kana": "にしわせだ",
+          "eng": "Nishi-waseda",
+          "lat": 35.7076,
+          "lon": 139.7088,
+          "number": "F 11"
+        },
+        {
+          "name": "東新宿",
+          "kana": "ひがししんじゅく",
+          "eng": "Higashi-shinjuku",
+          "lat": 35.6978,
+          "lon": 139.7075,
+          "number": "F 12"
+        },
+        {
+          "name": "新宿三丁目",
+          "kana": "しんじゅくさんちょうめ",
+          "eng": "Shinjuku-sanchome",
+          "lat": 35.6907,
+          "lon": 139.7058,
+          "number": "F 13"
+        },
+        {
+          "name": "北参道",
+          "kana": "きたさんどう",
+          "eng": "Kita-sando",
+          "lat": 35.6781,
+          "lon": 139.7053,
+          "number": "F 14"
+        },
+        {
+          "name": "明治神宮前",
+          "kana": "めいじじんぐうまえ",
+          "eng": "Meiji-jingumae",
+          "lat": 35.6685,
+          "lon": 139.7055,
+          "number": "F 15"
+        },
+        {
+          "name": "渋谷",
+          "kana": "しぶや",
+          "eng": "Shibuya",
+          "lat": 35.659,
+          "lon": 139.7024,
+          "number": "F 16"
+        }
+      ]
+    }
+  ]
+}

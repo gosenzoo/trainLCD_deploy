@@ -12,6 +12,8 @@ COMPANIES = [
     (range(0, 51), 'JR東日本', 'I_JR_east', 'N_JR_east'),
     (range(51, 64), 'JR東海', 'I_mono_color', 'N_JR_central'),
     (range(64, 133), 'JR西日本', 'I_JR_west', 'N_JR_west'),
+    (range(133, 144), '東京メトロ', 'I_tokyo_subway', 'N_tokyo_subway'),
+    (range(144, 148), '都営地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),
 ]
 def company(no):
     for rg, op, icon, num in COMPANIES:
@@ -117,9 +119,39 @@ SHARED_ALIAS = {}
 for group in load_groups('shared_stations.json'):
     for k in group[1:]: SHARED_ALIAS[k] = group[0]
 
+def base_key(l, s):
+    # 共同使用駅の読み替え前の識別キー: 「事業者:駅名」（同一事業者内の同名の別駅は区別用の名前）
+    return f"{company(l['no'])[0]}:{DISTINCT.get((l['no'], s['name']), s['name'])}"
+
+# 近接する同名駅（事業者が違い、駅名が同じで、互いに 1km 以内）も共同使用駅として自動的にまとめる（7.35節・7.37節）。
+# 先に登録された駅（路線ID の小さい路線の駅）を代表にするため、既存の駅ID は変わらない
+SAME_NAME_MERGE_KM = 1.0
+def _normalize(name):
+    return name.replace('ヶ', 'ケ')
+_first = {}   # 読み替え前のキー → (駅名, 座標, 事業者)（路線ID 順で最初に現れた値）
+for l in lines:
+    for s in l['stations']:
+        k = base_key(l, s)
+        if k not in _first: _first[k] = (s['name'], s, company(l['no'])[0])
+_by_name = {}
+for k, (name, pos, op) in _first.items():
+    _by_name.setdefault(_normalize(name), []).append(k)
+far_same_name = []   # まとめなかった同名駅（1km 超・3km 以内）の報告用
+for name, keys in _by_name.items():
+    for i, k in enumerate(keys):
+        if k in SHARED_ALIAS: continue
+        for rep in keys[:i]:
+            rep_root = SHARED_ALIAS.get(rep, rep)
+            if _first[rep][2] == _first[k][2]: continue   # 同じ事業者の同名駅は DISTINCT で扱う
+            d = dist_km(_first[rep][1], _first[k][1])
+            if d <= SAME_NAME_MERGE_KM:
+                SHARED_ALIAS[k] = rep_root
+                break
+            if d <= 3: far_same_name.append((rep, k, round(d, 2)))
+
 def skey(l, s):
-    # 駅の識別キー: 「事業者:駅名」（同一事業者内の同名の別駅は区別用の名前）。共同使用駅は代表の駅のキー
-    key = f"{company(l['no'])[0]}:{DISTINCT.get((l['no'], s['name']), s['name'])}"
+    # 駅の識別キー: 「事業者:駅名」。共同使用駅（設定ファイル・近接する同名駅）は代表の駅のキー
+    key = base_key(l, s)
     return SHARED_ALIAS.get(key, key)
 
 # 同じ駅なのに路線（作成グループ）ごとに座標が数km ずれている場合は、
@@ -173,7 +205,8 @@ for l in lines:
 # wikidata/stations.json（fetch_wikidata.py で取得。CC0）から、駅名・事業者・今の座標との距離で1件を選んで座標を差し替える
 WIKIDATA_PATH = os.path.join(HERE, 'wikidata', 'stations.json')
 # このデータの事業者名 → Wikidata の事業者の日本語名
-OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道'}
+OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道',
+                    '東京メトロ': '東京地下鉄', '都営地下鉄': '東京都交通局'}
 # 選んだ候補が今の座標からこれ以上離れていれば、同名の別駅との取り違えとみなして差し替えない（km）。
 # 事業者が一致した候補は取り違えの可能性が低いため、許容範囲を広げる
 WIKIDATA_MAX_SHIFT_KM = 10
@@ -253,12 +286,13 @@ for l in lines:
     sym = l.get('symbol', '')
     for s in sts:
         n = s.get('number', '')
-        if n and not re.fullmatch(r'[A-Z]{1,2} \d{2}', n):
+        if n and not re.fullmatch(r'[A-Z][A-Za-z]? \d{2}', n):
             warnings.append(f'ナンバリング形式: {l["name"]} {s["name"]} {n!r}')
         if n and sym and not n.startswith(sym + ' '):
             warnings.append(f'記号不一致: {l["name"]} {s["name"]} {n} (symbol={sym})')
     names = [s['name'] for s in sts]
-    ring = len(names) > 2 and names[0] == names[-1]
+    # 環状線（先頭と末尾が同じ駅）と6の字の路線（末尾の駅が途中にも現れる）は、末尾の駅の重複を除いて調べる
+    ring = len(names) > 2 and names[-1] in names[:-1]
     body = names[:-1] if ring else names
     for nm in {x for x in body if body.count(x) > 1}:
         warnings.append(f'路線内で駅が重複: {l["name"]} {nm}')
@@ -302,7 +336,9 @@ def shortest_path_order(pts):
 
 transfer_edges = []
 for group in load_groups('transfer_groups.json'):
-    keys = [SHARED_ALIAS.get(k, k) for k in group]
+    # 共同使用駅の読み替え後に重複を除く（同じ駅にまとまった駅どうしはエッジを作らない）
+    keys = list(dict.fromkeys(SHARED_ALIAS.get(k, k) for k in group))
+    if len(keys) < 2: continue
     unknown = [k for k in keys if k not in stations]
     if unknown:
         warnings.append(f'乗換グループに存在しない駅: {unknown}')
@@ -338,6 +374,8 @@ write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)
 print(f'路線 {len(lines)} / 駅 {len(order)} / 路線接続 {sum(len(l["stations"]) for l in lines)}')
 for l in lines: print(f'  {l["no"]:2d} {l["name"]}: {len(l["stations"])}駅 {l["stations"][0]["name"]}→{l["stations"][-1]["name"]}')
 if wikidata_report: print(wikidata_report)
+print(f'近接する同名駅として自動でまとめた駅: {sum(1 for k in SHARED_ALIAS if k not in {x for g in load_groups("shared_stations.json") for x in g})} 件')
+if far_same_name: print(f'1km より離れていてまとめなかった同名駅（3km 以内）: {far_same_name}')
 print(f'警告 {len(warnings)} 件')
 for w in warnings: print('  ' + w)
 
