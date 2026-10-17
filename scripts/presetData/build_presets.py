@@ -169,7 +169,85 @@ for l in lines:
             if st['eng'] != s['eng']:
                 warnings.append(f'同名駅の英語名不一致: {s["name"]} {st["eng"]} / {s["eng"]} ({l["name"]})')
 
-# 路線ごとのチェック: ナンバリング形式・隣駅との距離・駅の重複
+# ---- Wikidata による座標の差し替え（7.36節） ----
+# wikidata/stations.json（fetch_wikidata.py で取得。CC0）から、駅名・事業者・今の座標との距離で1件を選んで座標を差し替える
+WIKIDATA_PATH = os.path.join(HERE, 'wikidata', 'stations.json')
+# このデータの事業者名 → Wikidata の事業者の日本語名
+OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道'}
+# 選んだ候補が今の座標からこれ以上離れていれば、同名の別駅との取り違えとみなして差し替えない（km）。
+# 事業者が一致した候補は取り違えの可能性が低いため、許容範囲を広げる
+WIKIDATA_MAX_SHIFT_KM = 10
+WIKIDATA_MAX_SHIFT_SAME_OPERATOR_KM = 30
+def match_name(name):
+    # 照合用の駅名: 表記の揺れ（ヶ/ケ、驒/騨）をそろえる
+    return name.replace('ヶ', 'ケ').replace('驒', '騨')
+def local_detour(pa, pb, pc):
+    # 前後の駅を直接結ぶ距離に対する、途中の駅を経由する距離の比（大きいほど遠回り）
+    ac = dist_km(pa, pc)
+    return (dist_km(pa, pb) + dist_km(pb, pc)) / ac if ac > 0.5 else 1.0
+wikidata_report = None
+if os.path.exists(WIKIDATA_PATH):
+    wd_all = [w for w in json.load(open(WIKIDATA_PATH, encoding='utf-8'))['stations'] if not w['closed']]
+    # 別の名前の駅とまったく同じ座標になっている項目は、座標の誤り（コピーなど）の可能性が高いため使わない
+    names_at = {}
+    for w in wd_all: names_at.setdefault((w['lat'], w['lon']), set()).add(match_name(w['name']))
+    wd_by_name, suspicious = {}, []
+    for w in wd_all:
+        if len(names_at[(w['lat'], w['lon'])]) > 1:
+            suspicious.append(w['label'])
+            continue
+        wd_by_name.setdefault(match_name(w['name']), []).append(w)
+    # 駅の識別キー → その駅を通る路線の事業者（Wikidata の名前）
+    key_operators = {}
+    for l in lines:
+        for s in l['stations']:
+            op = company(l['no'])[0]
+            key_operators.setdefault(skey(l, s), set()).add(OPERATOR_WD_NAME.get(op, op))
+    original = {key: (st['lat'], st['lon']) for key, st in stations.items()}
+    shifted, not_found, too_far = {}, [], []
+    for key, st in stations.items():
+        cands = wd_by_name.get(match_name(st['name']), [])
+        if not cands:
+            not_found.append(key)
+            continue
+        # 事業者が一致する候補があればそれに絞り、今の座標に最も近いものを選ぶ
+        same_op = [w for w in cands if set(w['operators']) & key_operators[key]]
+        best = min(same_op or cands, key=lambda w: dist_km(st, w))
+        d = dist_km(st, best)
+        if d >= (WIKIDATA_MAX_SHIFT_SAME_OPERATOR_KM if same_op else WIKIDATA_MAX_SHIFT_KM):
+            too_far.append((key, round(d, 1)))
+            continue
+        st['lat'], st['lon'] = best['lat'], best['lon']
+        shifted[key] = d
+    # 差し替えた結果、前後の駅との間で大きな遠回りになる駅は、差し替えを取り消して元の座標に戻す
+    neighbors = {}
+    for l in lines:
+        ks = [skey(l, s) for s in l['stations']]
+        for i in range(1, len(ks) - 1):
+            neighbors.setdefault(ks[i], []).append((ks[i - 1], ks[i + 1]))
+    reverted = []
+    for key in list(shifted):
+        st = stations[key]
+        orig = dict(lat=original[key][0], lon=original[key][1])
+        for ka, kc in neighbors.get(key, []):
+            pa, pc = stations[ka], stations[kc]
+            if local_detour(pa, st, pc) > 1.8 and local_detour(pa, orig, pc) <= 1.8:
+                st['lat'], st['lon'] = orig['lat'], orig['lon']
+                reverted.append(key)
+                del shifted[key]
+                break
+    ds = sorted(shifted.values())
+    wikidata_report = (
+        f'Wikidata の座標で差し替え: {len(ds)} / {len(stations)} 駅'
+        + (f'（移動量 中央値 {ds[len(ds) // 2]:.2f}km・最大 {ds[-1]:.1f}km）' if ds else '')
+        + f'\n  見つからない駅 {len(not_found)} 件: {not_found}'
+        + f'\n  離れすぎていて差し替えなかった駅 {len(too_far)} 件: {too_far}'
+        + f'\n  差し替えると遠回りになるため元に戻した駅 {len(reverted)} 件: {reverted}'
+        + f'\n  座標が別の駅と重複していて使わなかった Wikidata の項目 {len(suspicious)} 件'
+    )
+
+# 路線ごとのチェック: ナンバリング形式・隣駅との距離・駅の重複。
+# 距離は最終的な座標（Wikidata で差し替えた後の値）で調べる
 for l in lines:
     sts = l['stations']
     sym = l.get('symbol', '')
@@ -184,15 +262,16 @@ for l in lines:
     body = names[:-1] if ring else names
     for nm in {x for x in body if body.count(x) > 1}:
         warnings.append(f'路線内で駅が重複: {l["name"]} {nm}')
-    for a, b in zip(sts, sts[1:]):
-        d = dist_km(a, b)
+    pos = [stations[skey(l, s)] for s in sts]  # 最終的な座標
+    for (a, b), (pa, pb) in zip(zip(sts, sts[1:]), zip(pos, pos[1:])):
+        d = dist_km(pa, pb)
         if d > 12 or d < 0.2:
             warnings.append(f'隣駅距離 {d:.1f}km: {l["name"]} {a["name"]}→{b["name"]}')
     # 折り返し（ジグザグ）の検出: 前後の駅を直接結ぶより大きく遠回りしている駅は座標の誤りの可能性が高い
-    for a, b, c in zip(sts, sts[1:], sts[2:]):
-        ac = dist_km(a, c)
-        if ac > 0.5 and dist_km(a, b) + dist_km(b, c) > 1.8 * ac:
-            warnings.append(f'遠回り {dist_km(a, b) + dist_km(b, c):.1f}km/{ac:.1f}km: {l["name"]} {a["name"]}→{b["name"]}→{c["name"]}')
+    for (a, b, c), (pa, pb, pc) in zip(zip(sts, sts[1:], sts[2:]), zip(pos, pos[1:], pos[2:])):
+        ac = dist_km(pa, pc)
+        if ac > 0.5 and dist_km(pa, pb) + dist_km(pb, pc) > 1.8 * ac:
+            warnings.append(f'遠回り {dist_km(pa, pb) + dist_km(pb, pc):.1f}km/{ac:.1f}km: {l["name"]} {a["name"]}→{b["name"]}→{c["name"]}')
 
 # ---- 乗換エッジ（7.35節） ----
 # 乗換グループごとに、グループ内の全駅を距離の合計が最短になる1本の道（パス）でつなぐ。ループは作らない
@@ -258,6 +337,7 @@ write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)
 
 print(f'路線 {len(lines)} / 駅 {len(order)} / 路線接続 {sum(len(l["stations"]) for l in lines)}')
 for l in lines: print(f'  {l["no"]:2d} {l["name"]}: {len(l["stations"])}駅 {l["stations"][0]["name"]}→{l["stations"][-1]["name"]}')
+if wikidata_report: print(wikidata_report)
 print(f'警告 {len(warnings)} 件')
 for w in warnings: print('  ' + w)
 
@@ -269,4 +349,10 @@ for name in CSV_NAMES:
         continue
     new = read_lines(name)
     changed = [i for i, (a, b) in enumerate(zip(old, new)) if a != b]
+    if name == 'stationDB.csv':
+        # 駅は座標（緯度・経度）の変更と、それ以外（駅ID・駅名など）の変更を分けて報告する
+        other = [i for i in changed if old[i].split(',')[:4] != new[i].split(',')[:4]]
+        print(f'{name}: 既存 {len(old)} 行 / 新 {len(new)} 行 / 座標の変更 {len(changed) - len(other)} 件 / 座標以外の変更 {len(other)} 件'
+              + (f' 例: {old[other[0]]} -> {new[other[0]]}' if other else ''))
+        continue
     print(f'{name}: 既存 {len(old)} 行 / 新 {len(new)} 行 / 既存行の変更 {len(changed)} 件' + (f' 例: {old[changed[0]]} -> {new[changed[0]]}' if changed else ''))
