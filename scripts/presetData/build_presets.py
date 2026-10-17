@@ -10,7 +10,7 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'publ
 # 路線番号の範囲ごとの事業者・路線アイコン・ナンバリングアイコン
 COMPANIES = [
     (range(0, 51), 'JR東日本', 'I_JR_east', 'N_JR_east'),
-    (range(51, 64), 'JR東海', 'I_mono_color', 'N_JR_central'),
+    (range(51, 64), 'JR東海', 'I_JR_central', 'N_JR_central'),
     (range(64, 133), 'JR西日本', 'I_JR_west', 'N_JR_west'),
     # 東京メトロ（133〜143）と都営地下鉄（144〜147）は同一事業者「東京地下鉄」として扱う（7.37節）
     (range(133, 148), '東京地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),

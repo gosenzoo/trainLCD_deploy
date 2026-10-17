@@ -1694,7 +1694,7 @@ type PrevStationRef = {
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: `line_{路線ID}` をベースにした一意なキー（衝突時は `line_{路線ID}_2` のように連番を付与）で新規作成する
    - `iconPresetKey` が空の場合は作成しない（`lineIconKey` は空文字のまま）。`symbol` が空でも `iconPresetKey` があれば作成する（路線記号のない路線は `I_mono_color` で路線カラーの四角になる。7.32節）
-2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey` が全て**完全一致**するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey`・`lineIconKey`（手順1で解決した路線記号アイコンのキー）の**全ての項目**が完全一致するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
 3. 区間内の各駅の `lineId` に、解決した `lineDict` のキーを設定する（区間内の全ての駅に同じキーを設定する。路線が変わる接続駅は前項「路線をまたぐ駅の扱い」に従って1行に統合し、`lineId` は次の路線のキーで上書きする）
@@ -4459,7 +4459,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 |---|---|
 | 収録範囲 | JR東海の在来線の全線・全駅（県境で打ち切らない）。新幹線（東海道新幹線）は含めない。旅客駅のない区間（新垂井線）と、JR東海が列車を運行しない城北線は含めない |
 | 事業者 | `JR東海` |
-| 路線アイコン | `I_mono_color`（JR東海用の路線アイコンのプリセットがないため） |
+| 路線アイコン | `I_JR_central`（7.40節で `I_mono_color` から差し替え。路線記号のない路線は `I_mono_color`） |
 | ナンバリングアイコン | `N_JR_central` |
 | 路線記号・駅ナンバリング | JR東海の駅ナンバリング（CA〜CJ。CH は欠番）。ナンバリングはTOICAエリアを中心とした一部の駅のみのため、番号のない駅は空欄。ナンバリングが導入されていない路線（紀勢本線・参宮線・名松線・美濃赤坂線）は記号も空欄 |
 | 路線名 | JR東海の正式な線名を使い、「本線」は省略しない（例: 東海道本線、関西本線）。JR東日本の「東海道線」「中央線」と区別できる |
@@ -4703,7 +4703,7 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 
 - 路線ID 順に路線を並べ、初めて現れた駅から駅IDを振る（既存の路線ID・駅IDを変えないよう、路線は末尾にのみ追加する）
 - 事業者・路線アイコン・ナンバリングアイコンは路線IDの範囲で決める。路線記号のない路線の路線アイコンは `I_mono_color`
-- 事業者ごとのプリセットがない場合の代用: 路線アイコンは `I_mono_color`（路線カラーの四角）、ナンバリングアイコンは `N_JR_east`。例: JR東海は路線アイコンのプリセットがないため `I_mono_color`、ナンバリングアイコンは専用の `N_JR_central` を使う。事業者ごとのプリセットができたら差し替える
+- 事業者ごとのプリセットがない場合の代用: 路線アイコンは `I_mono_color`（路線カラーの四角）、ナンバリングアイコンは `N_JR_east`。例: JR東海は路線アイコン `I_JR_central`・ナンバリングアイコン `N_JR_central`（7.40節）。事業者ごとのプリセットができたら差し替える
 - 手動の補正（ユーザー指定のナンバリング・色、同名の別駅の区別、作成時に食い違った駅の座標の統一など）はスクリプト内に記述する
 - 次の点を機械的に確認して警告を出す: 同名駅の座標・かな・英語名の食い違い、駅ナンバリングの書式、隣駅との距離（0.2km 未満・12km 超）、大きな遠回り
 - 生成前の CSV と比べ、既存の行が変わっていないか（追加のみか）を報告する
@@ -5004,3 +5004,30 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 | `app/initSettingObject.tsx` | `0_metadata` の初期値 |
 | `app/components/Editor.tsx` | 設定データの `0_metadata.version` を常に現在のバージョンにそろえる |
 | `app/layout.tsx`・`app/page.tsx` | ページタイトル・フッターのアプリ名 |
+
+### 7.40 JR東海の路線アイコンのプリセット（`I_JR_central`）
+
+JR東海用の路線アイコンのプリセット `I_JR_central` を追加し、JR東海の路線の路線アイコンを `I_mono_color` から差し替える。
+
+- プリセットの SVG を `assets/iconPresets/`（エディタ用。`node scripts/generateIconPresetTexts.js` で `src/generated/iconPresetTexts.ts` に変換）と `public/iconPresets/`（表示画面用）の両方に置く。参考画像 `JRC_I_original.png` も同様
+- アイコン選択の一覧（`app/modules/presetIndex.ts` の `iconIndexes`）に「JR東海」（`I_JR_central`）を追加する
+- 駅プリセットの生成スクリプトで、JR東海（路線ID 51〜63）の路線アイコンを `I_JR_central` にする。路線記号のない路線（美濃赤坂支線・紀勢本線・参宮線・名松線）は従来どおり `I_mono_color`
+
+#### 既存の路線の流用条件の変更
+
+「路線図から追加」で路線（`lineDict`）を登録するとき、既存の路線を流用するのは、**全ての項目**（`name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey`・`lineIconKey`）が一致する場合だけにする（4.10節「`lineDict`・`iconDict` への解決」の手順2）。
+
+- 従来は `lineIconKey` を比べていなかったため、プリセットのアイコンを差し替える前に登録した路線（例: アイコンが色の四角の「東海道本線」）が流用され、新しいアイコンが使われなかった
+- 変更後は、アイコンが違えば別の路線として新しく登録する（同じ名前の路線が路線登録に2つ並ぶことがある）
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `assets/iconPresets/I_JR_central.svg`・`JRC_I_original.png` | 新規（`public/iconPresets/` から複製） |
+| `public/iconPresets/I_JR_central.svg`・`JRC_I_original.png` | 新規（作成いただいたもの） |
+| `src/generated/iconPresetTexts.ts` | 再生成 |
+| `app/modules/presetIndex.ts` | `iconIndexes` に JR東海を追加 |
+| `scripts/presetData/build_presets.py` | JR東海の路線アイコンを `I_JR_central` に |
+| `public/csv/presetLines/lineDB.csv` | JR東海の路線アイコン列を更新 |
+| `app/components/StationPresetPopup.tsx` | 既存の路線の流用を、全ての項目（`lineIconKey` を含む）が一致する場合に限る |

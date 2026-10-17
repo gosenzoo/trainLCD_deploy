@@ -1,0 +1,5 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <rect id="lineColor" x="0" y="0" width="225" height="225" fill="#ff0000"/>
+    <rect id="symbolArea" x="15" y="58" width="195" height="112" fill="#e1e1e1" data-style='{"fontFamily": "Overused Grotesk", "fontWeight": "600", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang='en' />
+    <!-- <image href="./JRC_I_original.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>

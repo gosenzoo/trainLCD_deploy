@@ -50,16 +50,16 @@
 48,JR東日本,水郡線,すいぐんせん,Suigun Line,#1B9E77,,I_mono_color,N_JR_east
 49,JR東日本,水郡線（常陸太田支線）,すいぐんせん（ひたちおおたしせん）,Suigun Line (Hitachi-Ota Branch),#1B9E77,,I_mono_color,N_JR_east
 50,JR東日本,鹿島線,かしません,Kashima Line,#B5651D,,I_mono_color,N_JR_east
-51,JR東海,東海道本線,とうかいどうほんせん,Tokaido Main Line,#FF7322,CA,I_mono_color,N_JR_central
+51,JR東海,東海道本線,とうかいどうほんせん,Tokaido Main Line,#FF7322,CA,I_JR_central,N_JR_central
 52,JR東海,東海道本線（美濃赤坂支線）,とうかいどうほんせん（みのあかさかしせん）,Tokaido Main Line (Mino-Akasaka Branch),#FF7322,,I_mono_color,N_JR_central
-53,JR東海,御殿場線,ごてんばせん,Gotemba Line,#3F743A,CB,I_mono_color,N_JR_central
-54,JR東海,身延線,みのぶせん,Minobu Line,#61379D,CC,I_mono_color,N_JR_central
-55,JR東海,飯田線,いいだせん,Iida Line,#65ABDC,CD,I_mono_color,N_JR_central
-56,JR東海,武豊線,たけとよせん,Taketoyo Line,#89522B,CE,I_mono_color,N_JR_central
-57,JR東海,中央本線,ちゅうおうほんせん,Chuo Main Line,#28709B,CF,I_mono_color,N_JR_central
-58,JR東海,関西本線,かんさいほんせん,Kansai Main Line,#36BE90,CJ,I_mono_color,N_JR_central
-59,JR東海,高山本線,たかやまほんせん,Takayama Main Line,#A61E12,CG,I_mono_color,N_JR_central
-60,JR東海,太多線,たいたせん,Taita Line,#CABA4C,CI,I_mono_color,N_JR_central
+53,JR東海,御殿場線,ごてんばせん,Gotemba Line,#3F743A,CB,I_JR_central,N_JR_central
+54,JR東海,身延線,みのぶせん,Minobu Line,#61379D,CC,I_JR_central,N_JR_central
+55,JR東海,飯田線,いいだせん,Iida Line,#65ABDC,CD,I_JR_central,N_JR_central
+56,JR東海,武豊線,たけとよせん,Taketoyo Line,#89522B,CE,I_JR_central,N_JR_central
+57,JR東海,中央本線,ちゅうおうほんせん,Chuo Main Line,#28709B,CF,I_JR_central,N_JR_central
+58,JR東海,関西本線,かんさいほんせん,Kansai Main Line,#36BE90,CJ,I_JR_central,N_JR_central
+59,JR東海,高山本線,たかやまほんせん,Takayama Main Line,#A61E12,CG,I_JR_central,N_JR_central
+60,JR東海,太多線,たいたせん,Taita Line,#CABA4C,CI,I_JR_central,N_JR_central
 61,JR東海,紀勢本線,きせいほんせん,Kisei Main Line,#1E7FC8,,I_mono_color,N_JR_central
 62,JR東海,参宮線,さんぐうせん,Sangu Line,#8E44AD,,I_mono_color,N_JR_central
 63,JR東海,名松線,めいしょうせん,Meisho Line,#6B8E23,,I_mono_color,N_JR_central

@@ -92,12 +92,14 @@ const generateUniqueIconKey = (iconDict: settingType['iconDict'], base: string):
     return `${base}_${i}`
 }
 
-// lineDict内に name・kana・eng・color・symbol・numIconPresetKey が完全一致するエントリがあればそのキーを返す
-const findMatchingLineKey = (lineDict: settingType['lineDict'], line: PresetLine): string | undefined => {
+// lineDict内に name・kana・eng・color・symbol・numIconPresetKey・lineIconKey が完全一致するエントリがあればそのキーを返す
+// 路線アイコン（lineIconKey）も含めた全ての項目が一致する場合だけ流用する（7.40節。アイコンが違えば別の路線として新しく登録する）
+const findMatchingLineKey = (lineDict: settingType['lineDict'], line: PresetLine, lineIconKey: string): string | undefined => {
     return Object.keys(lineDict).find(key => {
         const l = lineDict[key]
         return l.name === line.name && l.kana === line.kana && l.eng === line.eng &&
-            l.color === line.color && l.symbol === line.symbol && l.numIconPresetKey === line.numIconPresetKey
+            l.color === line.color && l.symbol === line.symbol && l.numIconPresetKey === line.numIconPresetKey &&
+            l.lineIconKey === lineIconKey
     })
 }
 
@@ -178,7 +180,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
             // 路線本体の解決: 既存lineDict → 今回新規作成分の順に完全一致するものを探す
             const allLinesSoFar = { ...setting.lineDict, ...newLines }
-            let lineKey = findMatchingLineKey(allLinesSoFar, presetLine)
+            let lineKey = findMatchingLineKey(allLinesSoFar, presetLine, lineIconKey)
             if (!lineKey) {
                 lineKey = generateNextLineKey(Object.keys(allLinesSoFar))
                 newLines[lineKey] = {
