@@ -12,8 +12,8 @@ COMPANIES = [
     (range(0, 51), 'JR東日本', 'I_JR_east', 'N_JR_east'),
     (range(51, 64), 'JR東海', 'I_mono_color', 'N_JR_central'),
     (range(64, 133), 'JR西日本', 'I_JR_west', 'N_JR_west'),
-    (range(133, 144), '東京メトロ', 'I_tokyo_subway', 'N_tokyo_subway'),
-    (range(144, 148), '都営地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),
+    # 東京メトロ（133〜143）と都営地下鉄（144〜147）は同一事業者「東京地下鉄」として扱う（7.37節）
+    (range(133, 148), '東京地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),
 ]
 def company(no):
     for rg, op, icon, num in COMPANIES:
@@ -205,8 +205,9 @@ for l in lines:
 # wikidata/stations.json（fetch_wikidata.py で取得。CC0）から、駅名・事業者・今の座標との距離で1件を選んで座標を差し替える
 WIKIDATA_PATH = os.path.join(HERE, 'wikidata', 'stations.json')
 # このデータの事業者名 → Wikidata の事業者の日本語名
+# （1つの事業者が Wikidata 上の複数の事業者にあたる場合は配列で書く）
 OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道',
-                    '東京メトロ': '東京地下鉄', '都営地下鉄': '東京都交通局'}
+                    '東京地下鉄': ['東京地下鉄', '東京都交通局']}
 # 選んだ候補が今の座標からこれ以上離れていれば、同名の別駅との取り違えとみなして差し替えない（km）。
 # 事業者が一致した候補は取り違えの可能性が低いため、許容範囲を広げる
 WIKIDATA_MAX_SHIFT_KM = 10
@@ -235,7 +236,8 @@ if os.path.exists(WIKIDATA_PATH):
     for l in lines:
         for s in l['stations']:
             op = company(l['no'])[0]
-            key_operators.setdefault(skey(l, s), set()).add(OPERATOR_WD_NAME.get(op, op))
+            wd_names = OPERATOR_WD_NAME.get(op, op)
+            key_operators.setdefault(skey(l, s), set()).update(wd_names if isinstance(wd_names, list) else [wd_names])
     original = {key: (st['lat'], st['lon']) for key, st in stations.items()}
     shifted, not_found, too_far = {}, [], []
     for key, st in stations.items():
