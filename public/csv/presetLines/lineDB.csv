@@ -63,3 +63,72 @@
 61,JR東海,紀勢本線,きせいほんせん,Kisei Main Line,#1E7FC8,,I_mono_color,N_JR_central
 62,JR東海,参宮線,さんぐうせん,Sangu Line,#8E44AD,,I_mono_color,N_JR_central
 63,JR東海,名松線,めいしょうせん,Meisho Line,#6B8E23,,I_mono_color,N_JR_central
+64,JR西日本,北陸線,ほくりくせん,Hokuriku Line,#0072BC,A,I_JR_west,N_JR_west
+65,JR西日本,琵琶湖線,びわこせん,Biwako Line,#0072BC,A,I_JR_west,N_JR_west
+66,JR西日本,JR京都線,JRきょうとせん,JR Kyoto Line,#0072BC,A,I_JR_west,N_JR_west
+67,JR西日本,JR神戸線,JRこうべせん,JR Kobe Line,#0072BC,A,I_JR_west,N_JR_west
+68,JR西日本,山陽線,さんようせん,Sanyo Line,#0072BC,A,I_JR_west,N_JR_west
+69,JR西日本,和田岬線,わだみさきせん,Wadamisaki Line,#4FA3D9,,I_JR_west,N_JR_west
+70,JR西日本,赤穂線,あこうせん,Ako Line,#0072BC,A,I_JR_west,N_JR_west
+71,JR西日本,湖西線,こせいせん,Kosei Line,#00ACD1,B,I_JR_west,N_JR_west
+72,JR西日本,草津線,くさつせん,Kusatsu Line,#5A9934,C,I_JR_west,N_JR_west
+73,JR西日本,奈良線,ならせん,Nara Line,#AA731C,D,I_JR_west,N_JR_west
+74,JR西日本,嵯峨野線,さがのせん,Sagano Line,#878DDC,E,I_JR_west,N_JR_west
+75,JR西日本,山陰線,さんいんせん,San'in Line,#878DDC,E,I_JR_west,N_JR_west
+76,JR西日本,おおさか東線,おおさかひがしせん,Osaka Higashi Line,#347293,F,I_JR_west,N_JR_west
+77,JR西日本,JR宝塚線,JRたからづかせん,JR Takarazuka Line,#FFBA00,G,I_JR_west,N_JR_west
+78,JR西日本,福知山線,ふくちやません,Fukuchiyama Line,#FFBA00,G,I_JR_west,N_JR_west
+79,JR西日本,JR東西線,JRとうざいせん,JR Tozai Line,#FF1493,H,I_JR_west,N_JR_west
+80,JR西日本,学研都市線,がっけんとしせん,Gakkentoshi Line,#FF1493,H,I_JR_west,N_JR_west
+81,JR西日本,加古川線,かこがわせん,Kakogawa Line,#00BAA5,I,I_JR_west,N_JR_west
+82,JR西日本,播但線,ばんたんせん,Bantan Line,#A52F5D,J,I_JR_west,N_JR_west
+83,JR西日本,姫新線,きしんせん,Kishin Line,#FF593E,K,I_JR_west,N_JR_west
+84,JR西日本,舞鶴線,まいづるせん,Maizuru Line,#FF8E1F,L,I_JR_west,N_JR_west
+85,JR西日本,大阪環状線,おおさかかんじょうせん,Osaka Loop Line,#E80000,O,I_JR_west,N_JR_west
+86,JR西日本,JRゆめ咲線,JRゆめさきせん,JR Yumesaki Line,#0A318E,P,I_JR_west,N_JR_west
+87,JR西日本,大和路線,やまとじせん,Yamatoji Line,#00B178,Q,I_JR_west,N_JR_west
+88,JR西日本,関西線,かんさいせん,Kansai Line,#5726B7,V,I_JR_west,N_JR_west
+89,JR西日本,阪和線,はんわせん,Hanwa Line,#FF8E1F,R,I_JR_west,N_JR_west
+90,JR西日本,羽衣線,はごろもせん,Hagoromo Line,#F5A65B,,I_JR_west,N_JR_west
+91,JR西日本,関西空港線,かんさいくうこうせん,Kansai Airport Line,#0072BC,S,I_JR_west,N_JR_west
+92,JR西日本,和歌山線,わかやません,Wakayama Line,#F79FBA,T,I_JR_west,N_JR_west
+93,JR西日本,万葉まほろば線,まんようまほろばせん,Man-yo Mahoroba Line,#B31C31,U,I_JR_west,N_JR_west
+94,JR西日本,きのくに線,きのくにせん,Kinokuni Line,#00A6B4,W,I_JR_west,N_JR_west
+95,JR西日本,紀勢線,きせいせん,Kisei Line,#4A90A4,,I_JR_west,N_JR_west
+96,JR西日本,小浜線,おばません,Obama Line,#4CAF50,,I_JR_west,N_JR_west
+97,JR西日本,九頭竜線,くずりゅうせん,Kuzuryu Line,#1E88E5,,I_JR_west,N_JR_west
+98,JR西日本,七尾線,ななおせん,Nanao Line,#902C40,,I_JR_west,N_JR_west
+99,JR西日本,城端線,じょうはなせん,Johana Line,#8E7CC3,,I_JR_west,N_JR_west
+100,JR西日本,氷見線,ひみせん,Himi Line,#26A69A,,I_JR_west,N_JR_west
+101,JR西日本,高山線,たかやません,Takayama Line,#C0392B,,I_JR_west,N_JR_west
+102,JR西日本,大糸線,おおいとせん,Oito Line,#E67E22,,I_JR_west,N_JR_west
+103,JR西日本,山陽線,さんようせん,Sanyo Line,#B0D136,S,I_JR_west,N_JR_west
+104,JR西日本,山陽線,さんようせん,Sanyo Line,#F69036,W,I_JR_west,N_JR_west
+105,JR西日本,山陽線,さんようせん,Sanyo Line,#00AEEF,X,I_JR_west,N_JR_west
+106,JR西日本,赤穂線,あこうせん,Ako Line,#F16369,N,I_JR_west,N_JR_west
+107,JR西日本,津山線,つやません,Tsuyama Line,#FDBD18,T,I_JR_west,N_JR_west
+108,JR西日本,桃太郎線,ももたろうせん,Momotaro Line,#F6A4B4,U,I_JR_west,N_JR_west
+109,JR西日本,伯備線,はくびせん,Hakubi Line,#35934A,V,I_JR_west,N_JR_west
+110,JR西日本,瀬戸大橋線,せとおおはしせん,Seto-Ohashi Line,#0072BC,M,I_JR_west,N_JR_west
+111,JR西日本,宇野みなと線,うのみなとせん,Uno Minato Line,#7ACCCD,L,I_JR_west,N_JR_west
+112,JR西日本,福塩線,ふくえんせん,Fukuen Line,#49479E,Z,I_JR_west,N_JR_west
+113,JR西日本,山陰線,さんいんせん,San'in Line,#B2D33E,A,I_JR_west,N_JR_west
+114,JR西日本,山陰線,さんいんせん,San'in Line,#F26122,D,I_JR_west,N_JR_west
+115,JR西日本,因美線,いんびせん,Imbi Line,#BA7C32,B,I_JR_west,N_JR_west
+116,JR西日本,境線,さかいせん,Sakai Line,#0066B3,C,I_JR_west,N_JR_west
+117,JR西日本,木次線,きすきせん,Kisuki Line,#FFC20E,E,I_JR_west,N_JR_west
+118,JR西日本,山陽線,さんようせん,Sanyo Line,#61B24C,G,I_JR_west,N_JR_west
+119,JR西日本,山陽線,さんようせん,Sanyo Line,#EC3932,R,I_JR_west,N_JR_west
+120,JR西日本,呉線,くれせん,Kure Line,#EE8F17,Y,I_JR_west,N_JR_west
+121,JR西日本,可部線,かべせん,Kabe Line,#09C0B0,B,I_JR_west,N_JR_west
+122,JR西日本,芸備線,げいびせん,Geibi Line,#8F7DB9,P,I_JR_west,N_JR_west
+123,JR西日本,山陽線,さんようせん,Sanyo Line,#0072BC,,I_JR_west,N_JR_west
+124,JR西日本,山陰線,さんいんせん,San'in Line,#7E733D,,I_JR_west,N_JR_west
+125,JR西日本,山陰線（仙崎支線）,さんいんせん（せんざきしせん）,San'in Line (Senzaki Branch),#7E733D,,I_JR_west,N_JR_west
+126,JR西日本,岩徳線,がんとくせん,Gantoku Line,#00A663,,I_JR_west,N_JR_west
+127,JR西日本,山口線,やまぐちせん,Yamaguchi Line,#F37052,,I_JR_west,N_JR_west
+128,JR西日本,宇部線,うべせん,Ube Line,#B02857,,I_JR_west,N_JR_west
+129,JR西日本,小野田線,おのだせん,Onoda Line,#695FAA,,I_JR_west,N_JR_west
+130,JR西日本,小野田線（本山支線）,おのだせん（もとやましせん）,Onoda Line (Motoyama Branch),#695FAA,,I_JR_west,N_JR_west
+131,JR西日本,美祢線,みねせん,Mine Line,#D6007F,,I_JR_west,N_JR_west
+132,JR西日本,博多南線,はかたみなみせん,Hakata-Minami Line,#0B318E,,I_JR_west,N_JR_west
