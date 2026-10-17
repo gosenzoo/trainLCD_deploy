@@ -101,26 +101,16 @@ const generateNextLineKey = (existingKeys: string[]): string => {
     return String(nums.length > 0 ? Math.max(...nums) + 1 : 0)
 }
 
-// 駅・路線の選択ハイライトに使うスタイル
-const highlightStyle = {
-    background: 'var(--accent-dim)',
-    color: 'var(--accent-hover)',
-    fontWeight: 700,
-} as const
-
 const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [lines, setLines] = useState<PresetLine[]>([])
     const [allStations, setAllStations] = useState<PresetStation[]>([])
     const [lineConnects, setLineConnects] = useState<PresetLineConnect[]>([])
     // 乗換エッジ（路線図の描画にのみ使う。区間選択には使わない）
     const [transfers, setTransfers] = useState<PresetTransfer[]>([])
-    const [selectedLineId, setSelectedLineId] = useState<string | null>(null)
     // 区間の開始駅（前駅）: null = firstStation 状態、値あり = continuing 状態
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
     // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
     const [stagingList, setStagingList] = useState<StagedRoute[]>([])
-    // 選択UIの表示切替（list: 従来のリスト選択 / map: 路線図からの選択）。開いたときは路線図を表示する
-    const [viewMode, setViewMode] = useState<'list' | 'map'>('map')
     const [loadError, setLoadError] = useState<string | null>(null)
 
     // マウント時に CSV を読み込む
@@ -135,67 +125,6 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             })
             .catch(() => setLoadError('CSVファイルの読み込みに失敗しました'))
     }, [])
-
-    // 路線選択リストの絞り込み:
-    // firstStation (prevStation === null): lineDB の全路線を表示
-    // continuing (prevStation !== null): lineConnectDB で prevStation.station.id が含まれる路線のみ表示
-    const filteredLines = (() => {
-        if (prevStation === null) return lines
-        const connectedLineIds = new Set(
-            lineConnects
-                .filter(c => c.stationId === prevStation.station.id)
-                .map(c => c.lineId)
-        )
-        return lines.filter(line => connectedLineIds.has(line.id))
-    })()
-
-    // 選択中路線の lineConnects エントリ（インデックスを保持するため配列ごと使う）
-    const lineConnectsForLine = selectedLineId
-        ? lineConnects.filter(c => c.lineId === selectedLineId)
-        : []
-
-    // 選択中路線の駅リスト（lineConnects の順序に従い stationDB を引く）
-    const stationsForLine: PresetStation[] = lineConnectsForLine
-        .map(c => allStations.find(s => s.id === c.stationId))
-        .filter((s): s is PresetStation => s !== undefined)
-
-    // 路線クリック → selectedLineId を更新
-    const handleLineClick = (lineId: string) => {
-        setSelectedLineId(lineId)
-    }
-
-    // 駅クリック（index は stationsForLine / lineConnectsForLine 上の位置）
-    const handleStationClick = (station: PresetStation, index: number) => {
-        if (prevStation === null) {
-            // firstStation: クリックした駅を前駅に設定（→ continuing 状態へ）
-            setPrevStation({ station, lineId: selectedLineId!, index })
-        } else {
-            // continuing: 前駅→選択駅の区間を生成して追加一覧へ追加
-            if (selectedLineId !== null) {
-                // 前駅が現在の路線と同じ場合はそのインデックスを使用、
-                // 乗り換えで路線が変わった場合は駅IDで一致する最初のインデックスを探す
-                let prevIdx: number
-                if (prevStation.lineId === selectedLineId) {
-                    prevIdx = prevStation.index
-                } else {
-                    prevIdx = lineConnectsForLine.findIndex(c => c.stationId === prevStation.station.id)
-                }
-                if (prevIdx !== -1) {
-                    const section: StationSection = {
-                        lineId: selectedLineId,
-                        prevIndex: prevIdx,
-                        nextIndex: index,
-                    }
-                    // リストUIでは区間1つのルートとして追加する
-                    setStagingList(prev => [...prev, { sections: [section] }])
-                }
-            }
-            // 選択駅を新しい前駅に更新
-            setPrevStation({ station, lineId: selectedLineId!, index })
-        }
-        // 駅選択後は路線・駅の選択をリセット
-        setSelectedLineId(null)
-    }
 
     // 各区間から駅を展開し、連続区間の接続駅の重複を除去して stationType[] に変換する。
     // 同時に、各区間の路線（PresetLine）を lineDict・iconDict のキーに解決する。
@@ -459,7 +388,6 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             const station = allStations.find(s => s.id === connect?.stationId)
             setPrevStation(station ? { station, lineId: lastSection.lineId, index: lastSection.nextIndex } : null)
         }
-        setSelectedLineId(null)
     }
 
     // 追加ボタン → 区間から駅を展開して onAdd を呼ぶ
@@ -498,30 +426,10 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         return `${prevName} → ${nextName}（${lineName}${nextHint}） 中間駅数：${midCount}`
     }
 
-    // 与えられた駅（index = stationsForLine 上の位置）が prevStation と同一かどうか判定
-    // 同路線: 駅ID + インデックス両方一致（環状線で終端選択を許可するため）
-    // 異路線: 駅IDのみ一致で判定（乗り換え後も同一駅をブロック）
-    const isPrevStation = (station: PresetStation, index: number): boolean => {
-        if (prevStation === null) return false
-        if (selectedLineId === prevStation.lineId) {
-            return station.id === prevStation.station.id && index === prevStation.index
-        }
-        return station.id === prevStation.station.id
-    }
-
-    // ガイダンステキストを状態に応じて生成
+    // ガイダンステキストを状態に応じて生成（路線図は駅を直接クリックするため、路線選択の案内は出さない）
     const getGuidanceText = (): string => {
-        // 路線図は駅を直接クリックするため、路線選択の案内は出さない
-        if (viewMode === 'map') {
-            if (prevStation === null) return '路線図から開始駅を選択してください'
-            return `「${prevStation.station.name}」からハイライトされた駅を選択してください`
-        }
-        if (prevStation === null) {
-            if (selectedLineId === null) return '開始駅の路線を選択してください'
-            return '開始駅を選択してください'
-        }
-        if (selectedLineId === null) return `「${prevStation.station.name}」から続く路線を選択してください`
-        return `「${prevStation.station.name}」の次の駅を選択してください`
+        if (prevStation === null) return '路線図から開始駅を選択してください'
+        return `「${prevStation.station.name}」からハイライトされた駅を選択してください`
     }
 
     const guidanceText = getGuidanceText()
@@ -529,19 +437,12 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     return (
         // 枠外クリックで閉じる
         <div className="modal-backdrop" onClick={onClose}>
-            <div className="modal-dialog modal-dialog--tall" style={{ width: viewMode === 'map' ? 'min(1100px, 95vw)' : 'min(700px, 90vw)' }}
+            <div className="modal-dialog modal-dialog--tall" style={{ width: 'min(1100px, 95vw)' }}
                 onClick={e => e.stopPropagation()}>
                 {/* タイトル行: 右端に × ボタンを配置 */}
                 <div className="modal-title-row">
                     <p className="modal-title">路線図から追加</p>
                     <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
-                </div>
-
-                {/* 選択方法の切り替え（路線図からの選択を主とし、リスト選択は補助として残す）。
-                    追加一覧・始点駅の状態は共通なので、途中で切り替えても続きから操作できる */}
-                <div className="btn-group" style={{ marginBottom: 0 }}>
-                    <button className={viewMode === 'map' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('map')}>路線図から選択</button>
-                    <button className={viewMode === 'list' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('list')}>リストから選択</button>
                 </div>
 
                 {loadError && (
@@ -553,80 +454,10 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     {guidanceText}
                 </div>
 
-                {/* 路線選択・駅選択・追加一覧を左から横並びに配置。
-                    路線図表示のときは縦画面で「路線図」を上・「追加一覧」を下に並べる（globals.css のメディアクエリ） */}
-                <div className={`preset-popup-body${viewMode === 'map' ? ' preset-popup-body--map' : ''}`}>
-                    {viewMode === 'list' ? (<>
-                    {/* 路線選択リスト（常に操作可、選択中路線をハイライト） */}
-                    <div style={{ flex: '0 0 160px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線選択</div>
-                        <div style={{
-                            flex: 1, overflow: 'auto', border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-md)', background: 'var(--bg-base)',
-                        }}>
-                            {filteredLines.map(line => (
-                                <div
-                                    key={line.id}
-                                    onClick={() => handleLineClick(line.id)}
-                                    style={{
-                                        padding: '6px 10px',
-                                        cursor: 'pointer',
-                                        borderBottom: '1px solid var(--border)',
-                                        ...(selectedLineId === line.id ? highlightStyle : {}),
-                                    }}
-                                >{line.name}</div>
-                            ))}
-                            {lines.length === 0 && !loadError && (
-                                <div style={{ padding: '10px', color: 'var(--text-muted)' }}>読み込み中...</div>
-                            )}
-                            {lines.length > 0 && filteredLines.length === 0 && (
-                                <div style={{ padding: '10px', color: 'var(--text-muted)' }}>接続路線なし</div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* 駅選択リスト（同路線+同インデックスの前駅はグレーアウト・選択不可） */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            駅選択
-                        </div>
-                        <div style={{
-                            flex: 1, overflow: 'auto', border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-md)', background: 'var(--bg-base)',
-                        }}>
-                            {stationsForLine.map((station, i) => {
-                                const isDisabled = isPrevStation(station, i)
-                                return (
-                                    <div
-                                        key={i}
-                                        onClick={isDisabled ? undefined : () => handleStationClick(station, i)}
-                                        style={{
-                                            padding: '6px 10px',
-                                            cursor: isDisabled ? 'default' : 'pointer',
-                                            borderBottom: '1px solid var(--border)',
-                                            display: 'flex',
-                                            gap: '8px',
-                                            alignItems: 'center',
-                                            ...(isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : {}),
-                                        }}
-                                        className="station-preset-row"
-                                    >
-                                        <span>{station.name}</span>
-                                    </div>
-                                )
-                            })}
-                            {!selectedLineId && (
-                                <div style={{ padding: '10px', color: 'var(--text-muted)' }}>路線を選択してください</div>
-                            )}
-                            {selectedLineId && stationsForLine.length === 0 && (
-                                <div style={{ padding: '10px', color: 'var(--text-muted)' }}>駅データがありません</div>
-                            )}
-                        </div>
-                    </div>
-
-                    </>) : (
-                    /* 路線図から選択（仮実装）。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる。
-                       flex の指定は縦画面で上下配置に切り替えるためクラス側に持たせる */
+                {/* 路線図と追加一覧を横並びに配置（縦画面では「路線図」を上・「追加一覧」を下に並べる。globals.css のメディアクエリ） */}
+                <div className="preset-popup-body preset-popup-body--map">
+                    {/* 路線図から選択。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる。
+                       flex の指定は縦画面で上下配置に切り替えるためクラス側に持たせる */}
                     <div className="preset-pane-map">
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線図</div>
                         <div style={{ flex: 1, minHeight: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
@@ -640,9 +471,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                             />
                         </div>
                     </div>
-                    )}
 
-                    {/* 追加一覧リスト（駅選択の右に同形式で配置。縦画面の路線図表示では路線図の下） */}
+                    {/* 追加一覧リスト（路線図の右。縦画面では路線図の下） */}
                     <div className="preset-pane-staging">
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             追加一覧
