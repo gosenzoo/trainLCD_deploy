@@ -3,7 +3,7 @@
 # 使い方: python scripts/presetData/build_presets.py [出力ディレクトリ]
 #   出力ディレクトリを省略すると public/csv/presetLines/ に上書きする。
 #   生成前に既存のCSVを読み込み、既存行が変わっていないか（追加のみか）を最後に報告する。
-import json, glob, math, os, re, sys
+import itertools, json, glob, math, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'public', 'csv', 'presetLines')
@@ -29,7 +29,8 @@ def dist_km(a, b):
 lines = []
 for f in sorted(glob.glob(os.path.join(HERE, 'sources', '*.json'))):
     with open(f, encoding='utf-8') as fp:
-        lines += json.load(fp)['lines']
+        # 路線データ以外の設定ファイル（共同使用駅・乗換グループ）は読み飛ばす
+        lines += json.load(fp).get('lines', [])
 lines.sort(key=lambda l: l['no'])
 
 # ---- 手動の補正（ユーザー指定・グループ間の不一致の解消） ----
@@ -85,8 +86,11 @@ if missing: warnings.append(f'欠けている路線番号: {missing}')
 dups = sorted({n for n in nos if nos.count(n) > 1})
 if dups: warnings.append(f'重複した路線番号: {dups}')
 
-# 同名でも別の駅（離れた場所にある別の駅）の区別: (路線名, 駅名) → 駅の識別キー
-# 同名でも別の駅（離れた場所にある別の駅）の区別: (路線番号, 駅名) → 駅の識別キー
+# ---- 駅の区別（7.35節） ----
+# 駅は「事業者:駅名」で区別する（事業者が違えば駅名が同じでも別の駅）。
+# 同じ事業者で同名の別の駅は DISTINCT で区別し、共同使用駅は shared_stations.json で同じ駅にまとめる。
+# 同名でも別の駅（同じ事業者内の、離れた場所にある別の駅）の区別: (路線番号, 駅名) → 駅名に付ける区別用の名前
+# （事業者が違う同名の駅は自動的に別の駅になるが、既存の指定は残しておく）
 DISTINCT = {
     (58, '富田'): '富田@三重',            # 関西本線（両毛線の富田とは別）
     (67, '大久保'): '大久保@兵庫',        # JR神戸線（中央・総武線各駅停車の大久保とは別）
@@ -104,8 +108,19 @@ DISTINCT = {
     (123, '下松'): '下松@山口',           # 山陽線（阪和線の下松とは別）
     (123, '戸田'): '戸田@山口',           # 山陽線（埼京線の戸田とは別）
 }
+def load_groups(filename):
+    path = os.path.join(HERE, 'sources', filename)
+    return json.load(open(path, encoding='utf-8'))['groups'] if os.path.exists(path) else []
+
+# 共同使用駅: 各グループの「事業者:駅名」を、グループ先頭の駅の識別キーに読み替える
+SHARED_ALIAS = {}
+for group in load_groups('shared_stations.json'):
+    for k in group[1:]: SHARED_ALIAS[k] = group[0]
+
 def skey(l, s):
-    return DISTINCT.get((l['no'], s['name']), s['name'])
+    # 駅の識別キー: 「事業者:駅名」（同一事業者内の同名の別駅は区別用の名前）。共同使用駅は代表の駅のキー
+    key = f"{company(l['no'])[0]}:{DISTINCT.get((l['no'], s['name']), s['name'])}"
+    return SHARED_ALIAS.get(key, key)
 
 # 同じ駅なのに路線（作成グループ）ごとに座標が数km ずれている場合は、
 # 前後の駅とのつながりが最も自然になる（隣駅までの距離の合計が最小になる）候補に揃える
@@ -179,9 +194,49 @@ for l in lines:
         if ac > 0.5 and dist_km(a, b) + dist_km(b, c) > 1.8 * ac:
             warnings.append(f'遠回り {dist_km(a, b) + dist_km(b, c):.1f}km/{ac:.1f}km: {l["name"]} {a["name"]}→{b["name"]}→{c["name"]}')
 
+# ---- 乗換エッジ（7.35節） ----
+# 乗換グループごとに、グループ内の全駅を距離の合計が最短になる1本の道（パス）でつなぐ。ループは作らない
+def shortest_path_order(pts):
+    n = len(pts)
+    if n <= 2: return list(range(n))
+    D = [[dist_km(pts[i], pts[j]) for j in range(n)] for i in range(n)]
+    length = lambda o: sum(D[o[i]][o[i + 1]] for i in range(n - 1))
+    if n <= 8:
+        # 駅数が少なければ全通りを調べる（向きが逆なだけの順番は同じ道なので片方だけ調べる）
+        best = min((p for p in itertools.permutations(range(n)) if p[0] < p[-1]), key=length)
+        return list(best)
+    # 駅数が多い場合: 各駅を始点に近い駅から順につなぎ、2-opt（区間の反転）で改善した中で最短のもの
+    best = None
+    for start in range(n):
+        o, rest = [start], set(range(n)) - {start}
+        while rest:
+            nxt = min(rest, key=lambda j: D[o[-1]][j]); o.append(nxt); rest.remove(nxt)
+        improved = True
+        while improved:
+            improved = False
+            for i in range(n - 1):
+                for j in range(i + 2, n + 1):
+                    cand = o[:i + 1] + o[i + 1:j][::-1] + o[j:]
+                    if length(cand) < length(o) - 1e-9: o, improved = cand, True
+        if best is None or length(o) < length(best): best = o
+    return best
+
+transfer_edges = []
+for group in load_groups('transfer_groups.json'):
+    keys = [SHARED_ALIAS.get(k, k) for k in group]
+    unknown = [k for k in keys if k not in stations]
+    if unknown:
+        warnings.append(f'乗換グループに存在しない駅: {unknown}')
+        continue
+    pts = [stations[k] for k in keys]
+    o = shortest_path_order(pts)
+    for a, b in zip(o, o[1:]):
+        ia, ib = stations[keys[a]]['id'], stations[keys[b]]['id']
+        transfer_edges.append((min(ia, ib), max(ia, ib)))
+
 os.makedirs(OUT, exist_ok=True)
 # 既存データとの比較用に、上書き前のCSVを読み込んでおく
-CSV_NAMES = ('stationDB.csv', 'lineDB.csv', 'lineConnectDB.csv')
+CSV_NAMES = ('stationDB.csv', 'lineDB.csv', 'lineConnectDB.csv', 'transferDB.csv')
 def read_lines(name):
     path = os.path.join(OUT, name)
     return open(path, encoding='utf-8').read().splitlines() if os.path.exists(path) else None
@@ -199,6 +254,7 @@ write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英�
       [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2]) for l in lines])
 write('lineConnectDB.csv', '路線ID,駅ID,駅ナンバリング',
       [(l['no'], stations[skey(l, s)]['id'], s.get('number', '')) for l in lines for s in l['stations']])
+write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)
 
 print(f'路線 {len(lines)} / 駅 {len(order)} / 路線接続 {sum(len(l["stations"]) for l in lines)}')
 for l in lines: print(f'  {l["no"]:2d} {l["name"]}: {len(l["stations"])}駅 {l["stations"][0]["name"]}→{l["stations"][-1]["name"]}')

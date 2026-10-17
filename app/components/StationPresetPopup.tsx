@@ -288,10 +288,22 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         for (const lineId of linesAtStation(usage.stationId)) {
             if (!usage.lines.has(lineId)) candidates.push({ lineId, stationId: usage.stationId, towardId: null })
         }
-        // 乗換エッジでつながった駅を通る路線（ルートで使っていないもの）
-        for (const t of transfers) {
-            const other = t.stationId1 === usage.stationId ? t.stationId2 : t.stationId2 === usage.stationId ? t.stationId1 : null
-            if (other === null) continue
+        // 乗換エッジでつながった駅を通る路線（ルートで使っていないもの）。
+        // 乗換グループの駅は1本道でつながっているため、エッジを端までたどってグループ内の全駅を対象にする（7.35節）
+        const connected: string[] = []
+        const visited = new Set<string>([usage.stationId])
+        const queue = [usage.stationId]
+        while (queue.length > 0) {
+            const cur = queue.shift()!
+            for (const t of transfers) {
+                const next = t.stationId1 === cur ? t.stationId2 : t.stationId2 === cur ? t.stationId1 : null
+                if (next === null || visited.has(next)) continue
+                visited.add(next)
+                connected.push(next)
+                queue.push(next)
+            }
+        }
+        for (const other of connected) {
             for (const lineId of linesAtStation(other)) {
                 if (usage.lines.has(lineId) || candidates.some(c => c.lineId === lineId && c.towardId === null)) continue
                 candidates.push({ lineId, stationId: other, towardId: null })
