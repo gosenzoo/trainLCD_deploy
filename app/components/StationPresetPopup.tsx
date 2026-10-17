@@ -203,6 +203,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     // エントリがあればそれを再利用し、同じ路線が複数区間・複数駅にまたがっても1つのエントリにまとめる。
     const extractStationsFromSections = (): { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> } => {
         const result: stationType[] = []
+        // result の各行で、ルートが使っている路線と行き来する隣駅（乗換路線の生成に使う。result と同じ並び）
+        const rowUsages: RowUsage[] = []
         const newLines: Record<string, lineType> = {}
         const newIcons: Record<string, iconParamsType> = {}
         // プリセット路線ID → 解決済み lineDict キーのキャッシュ（同じプリセット路線の再解決を避ける）
@@ -216,25 +218,27 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         // 全ルートの区間を順に並べる
         const sections: StationSection[] = stagingList.flatMap(route => route.sections)
 
+        // プリセット路線の路線記号アイコンを iconDict のキーに解決する（未登録の場合は iconDict に新規追加する）。
+        // 路線記号・路線アイコンのどちらかが空の路線は空文字を返す。乗換路線のアイコンにも使う
+        const resolveIconKey = (presetLine: PresetLine): string => {
+            // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
+            // presetType には lineDB の「路線アイコン」列（I_*）を使う
+            if (!presetLine.symbol || !presetLine.iconPresetKey) return ''
+            const iconParams: iconParamsType = { presetType: presetLine.iconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
+            const allIconsSoFar = { ...setting.iconDict, ...newIcons }
+            const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
+            if (existingIconKey) return existingIconKey
+            const newKey = generateUniqueIconKey(allIconsSoFar, `line_${presetLine.id}`)
+            newIcons[newKey] = iconParams
+            return newKey
+        }
+
         // プリセット路線を lineDict のキーに解決する（未登録の場合は iconDict・lineDict に新規追加する）
         const resolveLineKey = (presetLine: PresetLine): string => {
             const cached = resolvedKeyByPresetLineId[presetLine.id]
             if (cached !== undefined) return cached
 
-            // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
-            // presetType には lineDB の「路線アイコン」列（I_*）を使う
-            let lineIconKey = ''
-            if (presetLine.symbol && presetLine.iconPresetKey) {
-                const iconParams: iconParamsType = { presetType: presetLine.iconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
-                const allIconsSoFar = { ...setting.iconDict, ...newIcons }
-                const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
-                if (existingIconKey) {
-                    lineIconKey = existingIconKey
-                } else {
-                    lineIconKey = generateUniqueIconKey(allIconsSoFar, `line_${presetLine.id}`)
-                    newIcons[lineIconKey] = iconParams
-                }
-            }
+            const lineIconKey = resolveIconKey(presetLine)
 
             // 路線本体の解決: 既存lineDict → 今回新規作成分の順に完全一致するものを探す
             const allLinesSoFar = { ...setting.lineDict, ...newLines }
@@ -269,11 +273,20 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 for (let i = prevIndex; i >= nextIndex; i--) indices.push(i)
             }
 
-            for (const idx of indices) {
+            for (let k = 0; k < indices.length; k++) {
+                const idx = indices[k]
                 const connect = connects[idx]
+                // この区間でこの駅の前後に行き来する駅（同じ路線上の隣の駅）。乗換路線の「○○方面」の判定に使う
+                const usedNeighbors = [indices[k - 1], indices[k + 1]]
+                    .filter((n): n is number => n !== undefined)
+                    .map(n => connects[n].stationId)
                 // 連続区間の接続駅（重複）をスキップ: 路線ID+インデックスをキーにする
                 const key = `${section.lineId}::${idx}`
-                if (key === lastKey) continue
+                if (key === lastKey) {
+                    // 重複した駅でも、次の区間で行き来する方向は直前の行に記録する
+                    if (rowUsages.length > 0) recordUsage(rowUsages[rowUsages.length - 1], section.lineId, usedNeighbors)
+                    continue
+                }
                 lastKey = key
                 const station = allStations.find(s => s.id === connect.stationId)
                 if (!station) continue
@@ -282,6 +295,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 // lineId は「この駅以降の区間路線ID」なので次の路線で上書きする
                 const prev = result[result.length - 1]
                 if (prev && lastStationId === station.id) {
+                    recordUsage(rowUsages[rowUsages.length - 1], section.lineId, usedNeighbors)
                     // 同じ路線の区間どうし（環状線の継ぎ目）は同じ駅を通過するだけなので、統合のみで値は変えない
                     if (lastSectionLineId === section.lineId) continue
                     prev.numIconNext = toNumIcon(connect.number, lineColor, numIconPresetKey)
@@ -290,11 +304,126 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     continue
                 }
                 result.push(toStationType(station, lineColor, connect.number, resolvedLineKey, numIconPresetKey))
+                const usage = { stationId: station.id, lines: new Map<string, Set<string>>() }
+                recordUsage(usage, section.lineId, usedNeighbors)
+                rowUsages.push(usage)
                 lastStationId = station.id
                 lastSectionLineId = section.lineId
             }
         }
+
+        // 各駅に乗換路線を設定する（7.31節）
+        result.forEach((row, i) => { row.transfers = buildTransfers(rowUsages[i], resolveIconKey) })
         return { stations: result, newLines, newIcons }
+    }
+
+    // 駅ごとの「ルートが使っている路線」の記録: 路線ID → その路線でこの駅から行き来する隣の駅IDの集合。
+    // Map の挿入順＝到着する区間の路線、出発する区間の路線の順（乗換路線の並び順の「自社」の判定に使う）
+    type RowUsage = { stationId: string, lines: Map<string, Set<string>> }
+    const recordUsage = (usage: RowUsage, lineId: string, neighbors: string[]) => {
+        if (!usage.lines.has(lineId)) usage.lines.set(lineId, new Set())
+        neighbors.forEach(n => usage.lines.get(lineId)!.add(n))
+    }
+
+    // 1駅分の乗換路線を生成する（7.31節）。
+    // - その駅（と乗換エッジでつながった駅）を通る路線のうち、この駅でルートが使っていない路線
+    // - ルートが使っている路線の、この駅からルートが進まない方向（「○○線（××方面）」）
+    // 並び順: 自社（この駅でルートが使う路線の事業者）→ 他社（lineDB に初めて現れる順）、同じ事業者内は路線IDの順
+    const buildTransfers = (usage: RowUsage, resolveIconKey: (line: PresetLine) => string): transferItemType[] => {
+        const lineIndexById = new Map(lines.map((l, i) => [l.id, i]))
+        const lineById = new Map(lines.map(l => [l.id, l]))
+        const stationById = new Map(allStations.map(s => [s.id, s]))
+        // 事業者の並び順（lineDB に初めて現れる順）
+        const operatorOrder: string[] = []
+        for (const l of lines) if (!operatorOrder.includes(l.operator)) operatorOrder.push(l.operator)
+        // 自社: この駅でルートが使っている路線の事業者（到着・出発の順）
+        const ownOperators: string[] = []
+        for (const lineId of usage.lines.keys()) {
+            const op = lineById.get(lineId)?.operator
+            if (op !== undefined && !ownOperators.includes(op)) ownOperators.push(op)
+        }
+        const operatorRank = (op: string) => {
+            const own = ownOperators.indexOf(op)
+            return own !== -1 ? own : ownOperators.length + operatorOrder.indexOf(op)
+        }
+        // 駅を通る路線ID（路線の登録順）
+        const linesAtStation = (stationId: string): string[] => {
+            const ids = new Set(lineConnects.filter(c => c.stationId === stationId).map(c => c.lineId))
+            return lines.filter(l => ids.has(l.id)).map(l => l.id)
+        }
+
+        // 候補: 路線ID・ナンバリングを引く駅ID・方面の隣駅ID（方面でない場合は null）
+        const candidates: { lineId: string, stationId: string, towardId: string | null }[] = []
+        // その駅を通る、ルートで使っていない路線
+        for (const lineId of linesAtStation(usage.stationId)) {
+            if (!usage.lines.has(lineId)) candidates.push({ lineId, stationId: usage.stationId, towardId: null })
+        }
+        // 乗換エッジでつながった駅を通る路線（ルートで使っていないもの）
+        for (const t of transfers) {
+            const other = t.stationId1 === usage.stationId ? t.stationId2 : t.stationId2 === usage.stationId ? t.stationId1 : null
+            if (other === null) continue
+            for (const lineId of linesAtStation(other)) {
+                if (usage.lines.has(lineId) || candidates.some(c => c.lineId === lineId && c.towardId === null)) continue
+                candidates.push({ lineId, stationId: other, towardId: null })
+            }
+        }
+        // ルートで使っている路線の、ルートが進まない方向（その路線上でこの駅の隣にある駅ごと）
+        for (const [lineId, used] of usage.lines) {
+            const order = lineConnects.filter(c => c.lineId === lineId).map(c => c.stationId)
+            const neighbors: string[] = []
+            order.forEach((sid, i) => {
+                if (sid !== usage.stationId) return
+                for (const n of [order[i - 1], order[i + 1]]) {
+                    if (n !== undefined && n !== usage.stationId && !neighbors.includes(n)) neighbors.push(n)
+                }
+            })
+            for (const n of neighbors) {
+                if (!used.has(n)) candidates.push({ lineId, stationId: usage.stationId, towardId: n })
+            }
+        }
+
+        // 並び替え（同順位の方面は、隣駅を見つけた順のまま）
+        const sorted = candidates
+            .map((c, i) => ({ c, i }))
+            .sort((a, b) => {
+                const la = lineById.get(a.c.lineId), lb = lineById.get(b.c.lineId)
+                return operatorRank(la?.operator ?? '') - operatorRank(lb?.operator ?? '')
+                    || (lineIndexById.get(a.c.lineId) ?? 0) - (lineIndexById.get(b.c.lineId) ?? 0)
+                    || a.i - b.i
+            })
+            .map(x => x.c)
+
+        return sorted.flatMap(c => {
+            const line = lineById.get(c.lineId)
+            const st = stationById.get(c.stationId)
+            if (!line || !st) return []
+            // 乗換先の路線での、この駅のナンバリング（"JY 01" → 記号 "JY"・番号 "01"）
+            const numberStr = lineConnects.find(x => x.lineId === c.lineId && x.stationId === c.stationId && x.number !== '')?.number ?? ''
+            const spaceIdx = numberStr.indexOf(' ')
+            const symbol = spaceIdx !== -1 ? numberStr.slice(0, spaceIdx) : ''
+            const number = spaceIdx !== -1 ? numberStr.slice(spaceIdx + 1) : numberStr
+            // 方面の場合は「路線名（隣駅名方面）」とする
+            const toward = c.towardId !== null ? stationById.get(c.towardId) : undefined
+            const iconKey = resolveIconKey(line)
+            const item: transferItemType = {
+                line: {
+                    lineIconKey: iconKey ? [iconKey] : [],
+                    name: toward ? `${line.name}（${toward.name}方面）` : line.name,
+                    kana: toward ? `${line.kana}（${toward.kana}ほうめん）` : line.kana,
+                    eng: toward ? `${line.eng} (for ${toward.eng})` : line.eng,
+                },
+                station: {
+                    isDraw: false,
+                    type: line.numIconPresetKey,
+                    symbol,
+                    color: line.color,
+                    number,
+                    name: st.name,
+                    eng: st.eng,
+                },
+            }
+            return [item]
+        })
     }
 
     // 路線図から駅が選ばれたときの処理。
