@@ -14,6 +14,8 @@ COMPANIES = [
     (range(64, 133), 'JR西日本', 'I_JR_west', 'N_JR_west'),
     # 東京メトロ（133〜143）と都営地下鉄（144〜147）は同一事業者「東京地下鉄」として扱う（7.37節）
     (range(133, 148), '東京地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),
+    # 根岸線（7.38節で京浜東北線から分割し末尾に追加）
+    (range(148, 149), 'JR東日本', 'I_JR_east', 'N_JR_east'),
 ]
 def company(no):
     for rg, op, icon, num in COMPANIES:
@@ -200,6 +202,25 @@ for l in lines:
                 warnings.append(f'同名駅のかな不一致: {s["name"]} {st["kana"]} / {s["kana"]} ({l["name"]})')
             if st['eng'] != s['eng']:
                 warnings.append(f'同名駅の英語名不一致: {s["name"]} {st["eng"]} / {s["eng"]} ({l["name"]})')
+
+# ---- 駅ID の固定（7.38節） ----
+# 駅の識別キー → 駅ID の対応表（station_ids.json）にある駅はその駅ID を使い、
+# 新しい駅には既存の最大の駅ID の次から順に振って対応表に追加する（路線の分割・並べ替えで駅ID が変わらないようにする）
+STATION_IDS_PATH = os.path.join(HERE, 'station_ids.json')
+station_ids = json.load(open(STATION_IDS_PATH, encoding='utf-8'))['ids'] if os.path.exists(STATION_IDS_PATH) else {}
+next_id = max(station_ids.values(), default=-1) + 1
+new_station_keys = []
+for key in order:
+    if key not in station_ids:
+        station_ids[key] = next_id
+        next_id += 1
+        new_station_keys.append(key)
+    stations[key]['id'] = station_ids[key]
+# 出力は駅ID の順（どの路線からも使われなくなった駅は出力しないが、対応表には残して駅ID を再利用しない）
+order.sort(key=lambda k: stations[k]['id'])
+with open(STATION_IDS_PATH, 'w', encoding='utf-8') as fp:
+    json.dump({'_comment': '駅の識別キー（共同使用駅の読み替え後の「事業者:駅名」）→ 駅ID。生成スクリプトが自動で追記する。手で編集しない',
+               'ids': dict(sorted(station_ids.items(), key=lambda kv: kv[1]))}, fp, ensure_ascii=False, indent=1)
 
 # ---- Wikidata による座標の差し替え（7.36節） ----
 # wikidata/stations.json（fetch_wikidata.py で取得。CC0）から、駅名・事業者・今の座標との距離で1件を選んで座標を差し替える

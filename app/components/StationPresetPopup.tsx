@@ -34,6 +34,12 @@ const toNumIcon = (numberStr: string, lineColor: string, presetKey: string): sta
     return { symbol, number, presetKey, color: lineColor, manualSymbol: symbol, manualPresetKey: presetKey, manualColor: lineColor, colorMode: "manual" }
 }
 
+// 2つのナンバリングの構成パラメータが全て一致するかどうか（境界駅で2つ目を設定するかの判定に使う）
+const isSameNumIcon = (a: stationNumIconType, b: stationNumIconType): boolean =>
+    a.symbol === b.symbol && a.number === b.number && a.presetKey === b.presetKey && a.color === b.color &&
+    a.manualSymbol === b.manualSymbol && a.manualPresetKey === b.manualPresetKey && a.manualColor === b.manualColor &&
+    a.colorMode === b.colorMode
+
 // 空の2つ目のナンバリング（路線をまたぐ駅でのみ値が入る）。
 // 後から手動で入力する場合に備え、プリセットキーは所属路線のものを入れておく
 const emptyNumIconNext = (presetKey: string): stationNumIconType =>
@@ -228,7 +234,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     recordUsage(rowUsages[rowUsages.length - 1], section.lineId, usedNeighbors)
                     // 同じ路線の区間どうし（環状線の継ぎ目）は同じ駅を通過するだけなので、統合のみで値は変えない
                     if (lastSectionLineId === section.lineId) continue
-                    prev.numIconNext = toNumIcon(connect.number, lineColor, numIconPresetKey)
+                    // 次の路線のナンバリングが1つ目と全ての値で同じ場合（例: 京浜東北線→根岸線の横浜 JK 12）は2つ目を設定しない
+                    const nextNumIcon = toNumIcon(connect.number, lineColor, numIconPresetKey)
+                    if (!isSameNumIcon(prev.numIcon, nextNumIcon)) prev.numIconNext = nextNumIcon
                     prev.lineId = resolvedLineKey
                     lastSectionLineId = section.lineId
                     continue

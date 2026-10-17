@@ -4,7 +4,7 @@
 2,JR東日本,横須賀線,よこすかせん,Yokosuka Line,#1069B4,JO,I_JR_east,N_JR_east
 3,JR東日本,総武線快速,そうぶせんかいそく,Sobu Line (Rapid),#1069B4,JO,I_JR_east,N_JR_east
 4,JR東日本,湘南新宿ライン,しょうなんしんじゅくらいん,Shonan-Shinjuku Line,#E21F26,JS,I_JR_east,N_JR_east
-5,JR東日本,京浜東北線・根岸線,けいひんとうほくせん・ねぎしせん,Keihin-Tohoku Line / Negishi Line,#00B2E5,JK,I_JR_east,N_JR_east
+5,JR東日本,京浜東北線,けいひんとうほくせん,Keihin-Tohoku Line,#00B2E5,JK,I_JR_east,N_JR_east
 6,JR東日本,横浜線,よこはません,Yokohama Line,#7FC342,JH,I_JR_east,N_JR_east
 7,JR東日本,相模線,さがみせん,Sagami Line,#009793,,I_mono_color,N_JR_east
 8,JR東日本,南武線,なんぶせん,Nambu Line,#FFD400,JN,I_JR_east,N_JR_east
@@ -147,3 +147,4 @@
 145,東京地下鉄,都営三田線,とえいみたせん,Toei Mita Line,#0079C2,I,I_tokyo_subway,N_tokyo_subway
 146,東京地下鉄,都営新宿線,とえいしんじゅくせん,Toei Shinjuku Line,#6CBB5A,S,I_tokyo_subway,N_tokyo_subway
 147,東京地下鉄,都営大江戸線,とえいおおえどせん,Toei Oedo Line,#B6007A,E,I_tokyo_subway,N_tokyo_subway
+148,JR東日本,根岸線,ねぎしせん,Negishi Line,#00B2E5,JK,I_JR_east,N_JR_east

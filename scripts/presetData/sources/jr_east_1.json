@@ -652,9 +652,9 @@
   },
   {
    "no": 5,
-   "name": "京浜東北線・根岸線",
-   "kana": "けいひんとうほくせん・ねぎしせん",
-   "eng": "Keihin-Tohoku Line / Negishi Line",
+   "name": "京浜東北線",
+   "kana": "けいひんとうほくせん",
+   "eng": "Keihin-Tohoku Line",
    "color": "#00B2E5",
    "symbol": "JK",
    "stations": [
@@ -945,94 +945,6 @@
      "lat": 35.4657,
      "lon": 139.6223,
      "number": "JK 12"
-    },
-    {
-     "name": "桜木町",
-     "kana": "さくらぎちょう",
-     "eng": "Sakuragicho",
-     "lat": 35.451,
-     "lon": 139.6311,
-     "number": "JK 11"
-    },
-    {
-     "name": "関内",
-     "kana": "かんない",
-     "eng": "Kannai",
-     "lat": 35.444,
-     "lon": 139.6359,
-     "number": "JK 10"
-    },
-    {
-     "name": "石川町",
-     "kana": "いしかわちょう",
-     "eng": "Ishikawacho",
-     "lat": 35.439,
-     "lon": 139.643,
-     "number": "JK 09"
-    },
-    {
-     "name": "山手",
-     "kana": "やまて",
-     "eng": "Yamate",
-     "lat": 35.4212,
-     "lon": 139.6475,
-     "number": "JK 08"
-    },
-    {
-     "name": "根岸",
-     "kana": "ねぎし",
-     "eng": "Negishi",
-     "lat": 35.4093,
-     "lon": 139.6328,
-     "number": "JK 07"
-    },
-    {
-     "name": "磯子",
-     "kana": "いそご",
-     "eng": "Isogo",
-     "lat": 35.3949,
-     "lon": 139.6187,
-     "number": "JK 06"
-    },
-    {
-     "name": "新杉田",
-     "kana": "しんすぎた",
-     "eng": "Shin-Sugita",
-     "lat": 35.3796,
-     "lon": 139.6197,
-     "number": "JK 05"
-    },
-    {
-     "name": "洋光台",
-     "kana": "ようこうだい",
-     "eng": "Yokodai",
-     "lat": 35.3758,
-     "lon": 139.5913,
-     "number": "JK 04"
-    },
-    {
-     "name": "港南台",
-     "kana": "こうなんだい",
-     "eng": "Konandai",
-     "lat": 35.3768,
-     "lon": 139.5745,
-     "number": "JK 03"
-    },
-    {
-     "name": "本郷台",
-     "kana": "ほんごうだい",
-     "eng": "Hongodai",
-     "lat": 35.37,
-     "lon": 139.5491,
-     "number": "JK 02"
-    },
-    {
-     "name": "大船",
-     "kana": "おおふな",
-     "eng": "Ofuna",
-     "lat": 35.354,
-     "lon": 139.5313,
-     "number": "JK 01"
     }
    ]
   },
@@ -1357,6 +1269,112 @@
      "lat": 35.5945,
      "lon": 139.345,
      "number": ""
+    }
+   ]
+  },
+  {
+   "no": 148,
+   "name": "根岸線",
+   "kana": "ねぎしせん",
+   "eng": "Negishi Line",
+   "color": "#00B2E5",
+   "symbol": "JK",
+   "stations": [
+    {
+     "name": "横浜",
+     "kana": "よこはま",
+     "eng": "Yokohama",
+     "lat": 35.4657,
+     "lon": 139.6223,
+     "number": "JK 12"
+    },
+    {
+     "name": "桜木町",
+     "kana": "さくらぎちょう",
+     "eng": "Sakuragicho",
+     "lat": 35.451,
+     "lon": 139.6311,
+     "number": "JK 11"
+    },
+    {
+     "name": "関内",
+     "kana": "かんない",
+     "eng": "Kannai",
+     "lat": 35.444,
+     "lon": 139.6359,
+     "number": "JK 10"
+    },
+    {
+     "name": "石川町",
+     "kana": "いしかわちょう",
+     "eng": "Ishikawacho",
+     "lat": 35.439,
+     "lon": 139.643,
+     "number": "JK 09"
+    },
+    {
+     "name": "山手",
+     "kana": "やまて",
+     "eng": "Yamate",
+     "lat": 35.4212,
+     "lon": 139.6475,
+     "number": "JK 08"
+    },
+    {
+     "name": "根岸",
+     "kana": "ねぎし",
+     "eng": "Negishi",
+     "lat": 35.4093,
+     "lon": 139.6328,
+     "number": "JK 07"
+    },
+    {
+     "name": "磯子",
+     "kana": "いそご",
+     "eng": "Isogo",
+     "lat": 35.3949,
+     "lon": 139.6187,
+     "number": "JK 06"
+    },
+    {
+     "name": "新杉田",
+     "kana": "しんすぎた",
+     "eng": "Shin-Sugita",
+     "lat": 35.3796,
+     "lon": 139.6197,
+     "number": "JK 05"
+    },
+    {
+     "name": "洋光台",
+     "kana": "ようこうだい",
+     "eng": "Yokodai",
+     "lat": 35.3758,
+     "lon": 139.5913,
+     "number": "JK 04"
+    },
+    {
+     "name": "港南台",
+     "kana": "こうなんだい",
+     "eng": "Konandai",
+     "lat": 35.3768,
+     "lon": 139.5745,
+     "number": "JK 03"
+    },
+    {
+     "name": "本郷台",
+     "kana": "ほんごうだい",
+     "eng": "Hongodai",
+     "lat": 35.37,
+     "lon": 139.5491,
+     "number": "JK 02"
+    },
+    {
+     "name": "大船",
+     "kana": "おおふな",
+     "eng": "Ofuna",
+     "lat": 35.354,
+     "lon": 139.5313,
+     "number": "JK 01"
     }
    ]
   }
