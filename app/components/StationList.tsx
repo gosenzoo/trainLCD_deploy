@@ -439,9 +439,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     return (
         <div>
-            {/* 駅プリセットから追加ボタン（最上段） */}
+            {/* 路線図から追加ボタン（最上段）。駅プリセットのポップアップを開く */}
             <div style={{ marginBottom: '8px' }}>
-                <button onClick={() => setIsPresetPopupOpen(true)}>駅プリセットから追加</button>
+                <button onClick={() => setIsPresetPopupOpen(true)}>路線図から追加</button>
             </div>
 
             {/* 駅プリセットポップアップ */}

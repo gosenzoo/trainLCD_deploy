@@ -119,8 +119,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
     // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
     const [stagingList, setStagingList] = useState<StagedRoute[]>([])
-    // 選択UIの表示切替（list: 従来のリスト選択 / map: 路線図からの選択）
-    const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+    // 選択UIの表示切替（list: 従来のリスト選択 / map: 路線図からの選択）。開いたときは路線図を表示する
+    const [viewMode, setViewMode] = useState<'list' | 'map'>('map')
     const [loadError, setLoadError] = useState<string | null>(null)
 
     // マウント時に CSV を読み込む
@@ -407,11 +407,11 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
                 </div>
 
-                {/* 選択方法の切り替え（仮実装のため従来のリスト選択も残す）。
+                {/* 選択方法の切り替え（路線図からの選択を主とし、リスト選択は補助として残す）。
                     追加一覧・始点駅の状態は共通なので、途中で切り替えても続きから操作できる */}
                 <div className="btn-group" style={{ marginBottom: 0 }}>
-                    <button className={viewMode === 'list' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('list')}>リストから選択</button>
                     <button className={viewMode === 'map' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('map')}>路線図から選択</button>
+                    <button className={viewMode === 'list' ? 'btn-primary' : 'btn-secondary'} onClick={() => setViewMode('list')}>リストから選択</button>
                 </div>
 
                 {loadError && (

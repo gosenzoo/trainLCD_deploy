@@ -1549,7 +1549,7 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 
 #### ボタン配置
 
-`StationList` の最上段（`GenericItemList` より上）に「駅プリセットから追加」ボタンを配置する。クリックで `StationPresetPopup` が開く。
+`StationList` の最上段（`GenericItemList` より上）に「路線図から追加」ボタンを配置する。クリックで `StationPresetPopup` が開く（7.25節で「駅プリセットから追加」から名称変更）。
 
 #### `StationPresetPopup` コンポーネント
 
@@ -4308,3 +4308,22 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | `public/csv/presetLines/lineDB.csv` | 全面的に作り直し |
 | `public/csv/presetLines/lineConnectDB.csv` | 全面的に作り直し |
 
+### 7.25 駅プリセット — 路線図表示をデフォルトにする
+
+駅プリセットのポップアップは路線図からの選択を主とし、リストからの選択を補助とする。
+
+| 項目 | 変更前 | 変更後 |
+|---|---|---|
+| `StationList` のボタン名 | 駅プリセットから追加 | **路線図から追加** |
+| ポップアップを開いたときの表示 | リストから選択 | **路線図から選択** |
+| 切り替えボタンの並び | 「リストから選択」「路線図から選択」 | **「路線図から選択」「リストから選択」** |
+
+- ポップアップのタイトル（「駅プリセットから追加」）は変更しない
+- 表示の切り替えはポップアップを開くたびに路線図に戻る（前回の選択は記憶しない）
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/StationList.tsx` | ボタン名を変更 |
+| `app/components/StationPresetPopup.tsx` | `viewMode` の初期値を `'map'` に変更、切り替えボタンの順序を入れ替え |
