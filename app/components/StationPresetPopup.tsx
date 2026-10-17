@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import "../type"
 import {
-    loadLineDB, loadStationDB, loadLineConnectDB,
-    PresetLine, PresetStation, PresetLineConnect
+    loadLineDB, loadStationDB, loadLineConnectDB, loadTransferDB,
+    PresetLine, PresetStation, PresetLineConnect, PresetTransfer
 } from '../modules/loadStationPresets'
 import StationPresetMap from './StationPresetMap'
 
@@ -33,26 +33,29 @@ type PrevStationRef = {
 
 // lineConnectDB の駅ナンバリング（例: "TY 01"）をスペースで分割し、ナンバリングアイコン情報を組み立てる。
 // プリセット取り込みは値を確定させて書き込むため colorMode は常に manual にする
-const toNumIcon = (numberStr: string, lineColor: string): stationNumIconType => {
+// presetKey: 所属路線の lineDB「ナンバリングアイコン」列の値（N_*）
+const toNumIcon = (numberStr: string, lineColor: string, presetKey: string): stationNumIconType => {
     const spaceIdx = numberStr.indexOf(' ')
     const symbol = spaceIdx !== -1 ? numberStr.slice(0, spaceIdx) : ''
     const number = spaceIdx !== -1 ? numberStr.slice(spaceIdx + 1) : numberStr
-    return { symbol, number, presetKey: "N_tokyu", color: lineColor, manualSymbol: symbol, manualPresetKey: "N_tokyu", manualColor: lineColor, colorMode: "manual" }
+    return { symbol, number, presetKey, color: lineColor, manualSymbol: symbol, manualPresetKey: presetKey, manualColor: lineColor, colorMode: "manual" }
 }
 
-// 空の2つ目のナンバリング（路線をまたぐ駅でのみ値が入る）
-const emptyNumIconNext = (): stationNumIconType =>
-    ({ symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" })
+// 空の2つ目のナンバリング（路線をまたぐ駅でのみ値が入る）。
+// 後から手動で入力する場合に備え、プリセットキーは所属路線のものを入れておく
+const emptyNumIconNext = (presetKey: string): stationNumIconType =>
+    ({ symbol: "", number: "", presetKey, color: "", manualSymbol: "", manualPresetKey: presetKey, manualColor: "", colorMode: "manual" })
 
 // プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
 // lineId: この駅以降の区間路線ID（resolveLineKey で解決した lineDict のキー）
-const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string): stationType => {
+// numIconPresetKey: 所属路線のナンバリングアイコンのプリセットキー
+const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string, numIconPresetKey: string): stationType => {
     return {
     name: station.name,
     kana: station.kana,
     eng: station.eng,
-    numIcon: toNumIcon(numberStr, lineColor),
-    numIconNext: emptyNumIconNext(),
+    numIcon: toNumIcon(numberStr, lineColor, numIconPresetKey),
+    numIconNext: emptyNumIconNext(numIconPresetKey),
     lineNumberType: "0",
     transfers: [],
     isPass: false,
@@ -116,6 +119,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [lines, setLines] = useState<PresetLine[]>([])
     const [allStations, setAllStations] = useState<PresetStation[]>([])
     const [lineConnects, setLineConnects] = useState<PresetLineConnect[]>([])
+    // 乗換エッジ（路線図の描画にのみ使う。区間選択には使わない）
+    const [transfers, setTransfers] = useState<PresetTransfer[]>([])
     const [selectedLineId, setSelectedLineId] = useState<string | null>(null)
     // 区間の開始駅（前駅）: null = firstStation 状態、値あり = continuing 状態
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
@@ -127,11 +132,13 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
     // マウント時に CSV を読み込む
     useEffect(() => {
-        Promise.all([loadLineDB(), loadStationDB(), loadLineConnectDB()])
-            .then(([lineData, stationData, connectData]) => {
+        // transferDB は読み込めなくても空配列を返すため、読み込みエラーの原因にはならない
+        Promise.all([loadLineDB(), loadStationDB(), loadLineConnectDB(), loadTransferDB()])
+            .then(([lineData, stationData, connectData, transferData]) => {
                 setLines(lineData)
                 setAllStations(stationData)
                 setLineConnects(connectData)
+                setTransfers(transferData)
             })
             .catch(() => setLoadError('CSVファイルの読み込みに失敗しました'))
     }, [])
@@ -217,9 +224,10 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             if (cached !== undefined) return cached
 
             // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
+            // presetType には lineDB の「路線アイコン」列（I_*）を使う
             let lineIconKey = ''
-            if (presetLine.symbol && presetLine.numIconPresetKey) {
-                const iconParams: iconParamsType = { presetType: presetLine.numIconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
+            if (presetLine.symbol && presetLine.iconPresetKey) {
+                const iconParams: iconParamsType = { presetType: presetLine.iconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
                 const allIconsSoFar = { ...setting.iconDict, ...newIcons }
                 const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
                 if (existingIconKey) {
@@ -252,6 +260,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
             const presetLine = lines.find(l => l.id === section.lineId)
             const lineColor = presetLine?.color ?? ''
+            const numIconPresetKey = presetLine?.numIconPresetKey ?? ''
             const resolvedLineKey = presetLine ? resolveLineKey(presetLine) : ''
 
             // 前駅→次駅の方向（昇順 or 降順）にインデックスを列挙
@@ -275,11 +284,11 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 // lineId は「この駅以降の区間路線ID」なので次の路線で上書きする
                 const prev = result[result.length - 1]
                 if (prev && lastStationId === station.id) {
-                    prev.numIconNext = toNumIcon(connect.number, lineColor)
+                    prev.numIconNext = toNumIcon(connect.number, lineColor, numIconPresetKey)
                     prev.lineId = resolvedLineKey
                     continue
                 }
-                result.push(toStationType(station, lineColor, connect.number, resolvedLineKey))
+                result.push(toStationType(station, lineColor, connect.number, resolvedLineKey, numIconPresetKey))
                 lastStationId = station.id
             }
         }
@@ -468,6 +477,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                                 lines={lines}
                                 allStations={allStations}
                                 lineConnects={lineConnects}
+                                transfers={transfers}
                                 startStationId={prevStation?.station.id ?? null}
                                 onSelect={handleMapSelect}
                             />

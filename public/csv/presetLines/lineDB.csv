@@ -1,3 +1,3 @@
-路線ID,路線名,路線名かな,路線名英語,路線カラー, 路線記号, アイコン, 
-0,京浜東北線,けいひんとうほくせん,Keihin-Tohoku Line,#00BFFF, JK, I_tokyu
-1,山手線,やまのてせん,Yamanote Line,#9ACD32, JY, I_tokyu
+路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン
+0,JR東日本,京浜東北線,けいひんとうほくせん,Keihin-Tohoku Line,#00BFFF,JK,I_JR_east,N_JR_east
+1,JR東日本,山手線,やまのてせん,Yamanote Line,#9ACD32,JY,I_JR_east,N_JR_east

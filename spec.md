@@ -1490,17 +1490,60 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 
 | ファイル | 列構成 |
 |----------|--------|
-| `public/csv/presetLines/stationDB.csv` | 駅ID, 駅名, 駅名かな, 駅名英語 |
-| `public/csv/presetLines/lineDB.csv` | 路線ID, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, アイコン（ナンバリングプリセット名） |
+| `public/csv/presetLines/stationDB.csv` | 駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度 |
+| `public/csv/presetLines/lineDB.csv` | 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン |
 | `public/csv/presetLines/lineConnectDB.csv` | 路線ID, 駅ID, 駅ナンバリング |
+| `public/csv/presetLines/transferDB.csv` | 駅ID1, 駅ID2 |
 
 - **駅ID**: 全駅にわたって一意な識別子
 - **路線ID**: 全路線にわたって一意な識別子
 - **lineConnectDB.csv**: 同一路線IDの行を上から順に抽出したとき、その順番がその路線上の駅のつながりを表す。駅の所属路線を求める際もこのファイルから導出する
+- **transferDB.csv**: 別々の駅IDを持つ駅同士が乗り換え可能であることを表す（「乗換」エッジ）。下記「駅のグラフ構造」参照
+
+**lineDB.csv の各列**:
+
+| 列 | 内容 | 例 |
+|---|---|---|
+| 事業者 | 路線を運営する事業者名。路線選択UIの分類に使う | `JR東日本`、`東急電鉄` |
+| 路線記号 | 路線のナンバリング記号 | `JK` |
+| 路線アイコン | 路線記号アイコンのプリセットキー（`I_*`）。`iconDict` の `presetType` に使う | `I_JR_east` |
+| ナンバリングアイコン | 駅ナンバリングのプリセットキー（`N_*`）。`lineDict.numIconPresetKey` と各駅の `numIcon.presetKey`・`numIconNext.presetKey` に使う | `N_JR_east` |
+
+> 従来の `アイコン` 列は `I_*` が入っているのに `lineDict.numIconPresetKey`（本来 `N_*`）へ書き込まれ、駅のナンバリングは `N_tokyu` 固定になっていた。これを `路線アイコン`・`ナンバリングアイコン` の2列に分けて解消する。
+
+#### 駅のグラフ構造
+
+プリセットデータは、駅をノード、駅同士の関係をエッジとするグラフとして扱う。エッジは2種類ある。
+
+| エッジ | 定義元 | 意味 | 区間選択での扱い |
+|---|---|---|---|
+| 路線 | `lineConnectDB.csv` | 同一路線上で隣り合う駅を結ぶ。列車で移動できる | 区間として選択できる |
+| 乗換 | `transferDB.csv` | 別々の駅IDを持つ駅同士を結ぶ。徒歩などで乗り換えできる | **使わない**（データ保持と路線図表示のみ） |
 
 #### 駅IDの定義
 
 **駅ID** は stationDB.csv で全駅にわたって一意に定められた識別子。路線をまたいで同一駅を参照できる。
+
+- **同じ駅（1つの駅ID）**: 駅名が同じで、駅施設を共有する駅。同一事業者の複数路線が乗り入れる駅、複数事業者の共同使用駅、直通運転の境界駅を含む
+  - 例: JR東日本の新宿駅（山手線・中央線快速・埼京線などが同じ駅ID）
+- **別の駅（別々の駅IDを「乗換」でつなぐ）**: 駅施設が別の駅、または事業者によって駅名・かな・英語名が異なる駅
+  - 例: JR新宿 ⇔ 京王新宿、JR浜松町 ⇔ 都営大門
+- 1つの駅IDは駅名・かな・英語名を1組しか持てない。事業者によって表記が異なる駅は、別々の駅IDにして「乗換」でつなぐ
+- 最終的な判断はデータ作成者に委ねる
+
+#### データ作成ルール
+
+全国の路線データを登録する前提で、以下のルールに従ってCSVを作成する。
+
+| 項目 | ルール |
+|---|---|
+| ID の形式 | 駅ID・路線IDともに0以上の整数とする（路線図の区間決定で数値として比較するため）。一度割り当てたIDは変更しない |
+| CSV の値 | 値にカンマ（`,`）・ダブルクォート（`"`）・改行を含めない（パーサーは単純な `,` 区切りで引用符に対応しない）。前後の空白は読み込み時に除去される |
+| 分岐線 | `lineConnectDB` は路線を1本の線（駅の並び）として表すため、分岐する路線は**支線ごとに別の路線ID**とする。分岐駅は本線・支線の両方に同じ駅IDで含める（例: 丸ノ内線の方南町支線は「丸ノ内線（分岐線）」として中野坂上〜方南町を登録する） |
+| 環状線 | 起点駅を末尾にもう一度並べて輪を閉じる（例: 山手線は 大崎 → … → 大崎） |
+| 6の字の路線 | 合流する駅を2回並べる（例: 大江戸線は 光が丘 → … → 都庁前 → 新宿西口 → … → 新宿 → 都庁前） |
+| 駅ナンバリング | `記号 番号` の形式（スペース区切り）。ナンバリングのない路線は空欄 |
+| transferDB | 1組の乗換を1行で表す（向きを持たない。`A,B` と `B,A` の両方は書かない）。同じ駅IDどうしは書かない |
 
 #### ボタン配置
 
@@ -1571,15 +1614,15 @@ type PrevStationRef = {
 | 駅をクリック（`firstStation`） | → `continuing` | クリックした駅を `prevStation` に設定。`selectedLineId` をリセット |
 | 駅をクリック（`continuing`） | 変化なし（`continuing` 維持） | 前駅→選択駅の区間を追加一覧に追加、選択駅を `prevStation` に更新。`selectedLineId` をリセット |
 | 駅をクリック（`prevStation` と同一駅） | — | クリック不可・グレーアウト表示 |
-| 「戻る」ボタン（`stagingList` が空のとき無効） | — | 末尾の区間を削除。残った区間がある場合は末尾区間の `nextStationId` の駅を `prevStation` に設定、ない場合は `prevStation` を `null` に戻す。`selectedLineId` もリセット |
+| 「戻る」ボタン（`stagingList` が空のとき無効） | — | 末尾の区間を削除。残った区間がある場合は末尾区間の `nextIndex` の位置にある駅を `prevStation` に設定、ない場合は `prevStation` を `null` に戻す。`selectedLineId` もリセット |
 | 「追加」ボタン | — | 追加一覧の全区間に含まれる駅を順番に `stationType` に変換して `onAdd` へ渡し、ポップアップを閉じる |
 
 **「追加」ボタン押下時の駅抽出ロジック**:
 
 追加一覧の各 `StationSection` から駅を以下の手順で展開し、`stationType[]` として `onAdd` に渡す。
 
-1. 各区間 `{ lineId, prevStationId, nextStationId }` について、lineConnectDB から同一 `lineId` の行を上から順に抽出し、駅IDの順序リストを得る
-2. 順序リスト中の `prevStationId` と `nextStationId` のインデックスを求め、その間（両端含む）の駅IDを列挙する（`prevStationId` が後にある場合は逆順）
+1. 各区間 `{ lineId, prevIndex, nextIndex }` について、lineConnectDB から同一 `lineId` の行を上から順に抽出し、駅IDの順序リストを得る
+2. 順序リスト中の `prevIndex` から `nextIndex` まで（両端含む）の駅IDを列挙する（`prevIndex > nextIndex` の場合は逆順）。駅IDではなく位置で指定するため、環状線のように同じ駅が2回現れる路線でも区間が一意に決まる
 3. 区間をまたいで同じ駅IDが重複する場合は除去する（連続区間の接続駅が重複しないよう処理）
 4. 列挙した駅IDで stationDB を引いて `toStationType` に変換する
 
@@ -1625,6 +1668,7 @@ type PrevStationRef = {
 | `eng` | 駅名英語（stationDB） |
 | `numIcon.symbol` / `numIcon.number` | 駅ナンバリング（lineConnectDB）をスペースで分割 |
 | `numIcon.color` / `numIcon.manualColor` | 路線カラー（lineDB から所属路線で引く） |
+| `numIcon.presetKey` / `numIcon.manualPresetKey` | ナンバリングアイコン（lineDB から所属路線で引く。`numIconNext` も同様に次の路線から引く） |
 | `lineId` | 下記「lineDict・iconDict への解決」で解決した `lineDict` のキー |
 | `operationId` | `"0"` 固定（全駅に0番目の運用を設定する） |
 | その他フィールド | 暫定デフォルト値 |
@@ -1635,10 +1679,10 @@ type PrevStationRef = {
 
 各区間の路線（`PresetLine`）は、以下の手順で `lineDict`・`iconDict` のキーに解決する。同じプリセット路線が複数区間・複数駅にまたがって使われる場合（同一路線上を複数回クリックして区間を追加した場合や、別の「駅プリセットから追加」操作で同じ路線を再度使った場合）は、1つの `lineDict` エントリにまとめる（重複登録しない）。
 
-1. **路線記号アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`numIconPresetKey` が両方とも空でない場合、`{ presetType: numIconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+1. **路線記号アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`iconPresetKey`（路線アイコン列）が両方とも空でない場合、`{ presetType: iconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: `line_{路線ID}` をベースにした一意なキー（衝突時は `line_{路線ID}_2` のように連番を付与）で新規作成する
-   - `symbol`・`numIconPresetKey` のいずれかが空の場合は作成しない（`lineIconKey` は空文字のまま）
+   - `symbol`・`iconPresetKey` のいずれかが空の場合は作成しない（`lineIconKey` は空文字のまま）
 2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey` が全て**完全一致**するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
@@ -1653,6 +1697,7 @@ type PrevStationRef = {
 | `lines` | `PresetLine[]` | 全路線リスト（lineDB.csv） |
 | `allStations` | `PresetStation[]` | 全駅リスト（stationDB.csv） |
 | `lineConnects` | `PresetLineConnect[]` | 全路線接続データ（lineConnectDB.csv） |
+| `transfers` | `PresetTransfer[]` | 全乗換データ（transferDB.csv）。路線図の乗換エッジ描画にのみ使う |
 | `selectedLineId` | `string \| null` | 路線選択リストで選択中の路線ID |
 | `prevStation` | `PrevStationRef \| null` | 区間の開始駅（前駅）。`null` なら `firstStation` 状態、値があれば `continuing` 状態 |
 | `stagingList` | `StationSection[]` | 追加一覧（区間オブジェクトの配列） |
@@ -1681,7 +1726,7 @@ sequenceDiagram
     Display-->>User: LCD画面アニメーション
 ```
 
-### 4.11 UI コンポーネント規約
+### 4.12 UI コンポーネント規約
 
 #### トグルスイッチ (`ToggleSwitch`)
 
@@ -3850,6 +3895,7 @@ H = kx·w·|sinθ| + ky·h·|cosθ|
 - 緯度経度を画面座標へ変換する（経度→x、緯度→y。緯度は北が上になるよう符号を反転し、全駅の範囲が収まるよう等方スケールで正規化する）
 - 駅は**駅IDごとに1つのノード**として描画する。複数路線が通る駅（乗換駅）も1ノードとし、そこから各路線が伸びる形になる
 - 路線は `lineConnectDB` の駅順に従って駅ノード間を結ぶ折れ線とし、`lineDB` の路線カラーで描画する
+- 乗換エッジ（`transferDB`）は駅ノード間を結ぶグレーの点線で描画する（路線より下、駅ノードより下のレイヤー）。表示のみでクリックできず、ハイライト・区間選択には影響しない（7.20節参照）
 
 #### 選択操作
 
@@ -3882,3 +3928,65 @@ H = kx·w·|sinθ| + ky·h·|cosθ|
 | `app/modules/loadStationPresets.ts` | `PresetStation` に `lat`・`lon` を追加しパース |
 | `app/components/StationPresetMap.tsx` | 新規。路線図の描画・ハイライト・クリック処理 |
 | `app/components/StationPresetPopup.tsx` | リスト／路線図のタブ切り替えを追加 |
+
+### 7.20 駅プリセット — 全国データ対応のためのデータ構造整理
+
+日本全国の路線（駅 約9,000・路線 約600規模）を登録する前提で、CSVのデータ構造とデータ作成ルールを整理する。詳細は 4.10節「CSVファイル」「駅のグラフ構造」「駅IDの定義」「データ作成ルール」を参照。本節では変更点をまとめる。
+
+#### 変更点
+
+1. **乗換エッジの追加**: `transferDB.csv`（駅ID1, 駅ID2）を新設する。別々の駅IDを持つ駅同士が乗り換え可能であることを表す。今回は**データ保持と路線図表示のみ**に使い、区間選択（リスト・路線図とも）や `stationType` への変換には使わない
+2. **同一駅の定義**: 駅施設を共有する駅は1つの駅ID、駅施設が別の駅や表記が異なる駅は別々の駅IDにして乗換エッジでつなぐ
+3. **lineDB.csv の列変更**: `事業者` 列を追加し、`アイコン` 列を `路線アイコン`（`I_*`）と `ナンバリングアイコン`（`N_*`）の2列に分ける
+   - 変更後の列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン
+   - `事業者` は今回は読み込んで保持するのみ（路線選択UIでの分類は別途対応）
+4. **ナンバリングプリセットの固定値を廃止**: 駅の `numIcon`・`numIconNext` の `presetKey`/`manualPresetKey` を `N_tokyu` 固定から、所属路線の `ナンバリングアイコン` 列の値に変更する。`lineDict.numIconPresetKey` にも同列の値を設定する
+5. **データ作成ルールの明文化**: ID の形式、CSV に使えない文字、分岐線・環状線・6の字の路線の表し方、transferDB の書き方を定める
+
+#### 型定義の変更（`app/modules/loadStationPresets.ts`）
+
+```typescript
+export type PresetLine = {
+    id: string
+    operator: string          // 事業者（追加）
+    name: string
+    kana: string
+    eng: string
+    color: string
+    symbol: string
+    iconPresetKey: string     // 路線アイコンのプリセットキー I_*（追加）
+    numIconPresetKey: string  // ナンバリングアイコンのプリセットキー N_*（参照する列を変更）
+}
+
+// 乗換エッジ（追加）: 別々の駅IDを持つ駅同士の乗換。向きは持たない
+export type PresetTransfer = {
+    stationId1: string
+    stationId2: string
+}
+```
+
+- `loadTransferDB()` を追加する。`transferDB.csv` が存在しない（fetch が失敗する）場合は空配列として扱い、ポップアップ全体の読み込みエラーにはしない
+
+#### 既存データの移行
+
+- `lineDB.csv`: 新しい列構成に書き換える（京浜東北線・山手線: 事業者 `JR東日本`、路線アイコン `I_JR_east`、ナンバリングアイコン `N_JR_east`）
+- `transferDB.csv`: ヘッダー行のみで新規作成する（既存データの京浜東北線・山手線は同じ駅IDを共有しているため、乗換エッジは不要）
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `public/csv/presetLines/lineDB.csv` | 列構成を変更し既存データを移行 |
+| `public/csv/presetLines/transferDB.csv` | 新規（ヘッダーのみ） |
+| `app/modules/loadStationPresets.ts` | `PresetLine` の列変更、`PresetTransfer` と `loadTransferDB()` を追加 |
+| `app/components/StationPresetPopup.tsx` | `transfers` の読み込み、`numIcon` のプリセットキーを路線から設定、`iconDict` の `presetType` を `iconPresetKey` に変更 |
+| `app/components/StationPresetMap.tsx` | 乗換エッジを点線で描画 |
+
+#### 今回の対象外（今後の検討事項）
+
+全国データ規模での速度・操作性の改善は別途仕様化する。
+
+- 駅・路線の検索を `Map` による索引にする、CSV の読み込み結果をキャッシュする
+- 駅名のインクリメンタル検索、事業者 → 路線の2階層の路線選択
+- 路線図のズーム・パン、画面内のみの描画、ズームに応じた駅名表示（または Canvas・地図ライブラリへの移行）
+- 乗換エッジを使った乗換案内（`transfers`）の自動設定

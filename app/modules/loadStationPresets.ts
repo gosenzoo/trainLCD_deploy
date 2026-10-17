@@ -13,12 +13,14 @@ export type PresetStation = {
 
 export type PresetLine = {
     id: string
+    operator: string      // 事業者（路線選択UIの分類用。現状は保持のみ）
     name: string
     kana: string
     eng: string
     color: string         // 路線カラー（HEX）
     symbol: string        // 路線記号
-    numIconPresetKey: string  // ナンバリングアイコンのプリセット名
+    iconPresetKey: string     // 路線アイコンのプリセット名（I_*）。iconDict の presetType に使う
+    numIconPresetKey: string  // ナンバリングアイコンのプリセット名（N_*）
 }
 
 // 路線接続データ: 同一路線IDの行を上から順に並べると路線上の駅順序になる
@@ -26,6 +28,13 @@ export type PresetLineConnect = {
     lineId: string
     stationId: string
     number: string  // 駅ナンバリング
+}
+
+// 乗換エッジ: 別々の駅IDを持つ駅同士が乗り換え可能であることを表す（向きは持たない）。
+// 現状はデータ保持と路線図表示のみに使い、区間選択には使わない
+export type PresetTransfer = {
+    stationId1: string
+    stationId2: string
 }
 
 // stationDB.csv を fetch してパースし、全駅リストを返す
@@ -65,14 +74,17 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
         .filter(line => line.trim() !== '')
         .map(line => {
             const cols = line.split(',')
+            // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン
             return {
                 id: cols[0]?.trim() ?? '',
-                name: cols[1]?.trim() ?? '',
-                kana: cols[2]?.trim() ?? '',
-                eng: cols[3]?.trim() ?? '',
-                color: cols[4]?.trim() ?? '',
-                symbol: cols[5]?.trim() ?? '',
-                numIconPresetKey: cols[6]?.trim() ?? '',
+                operator: cols[1]?.trim() ?? '',
+                name: cols[2]?.trim() ?? '',
+                kana: cols[3]?.trim() ?? '',
+                eng: cols[4]?.trim() ?? '',
+                color: cols[5]?.trim() ?? '',
+                symbol: cols[6]?.trim() ?? '',
+                iconPresetKey: cols[7]?.trim() ?? '',
+                numIconPresetKey: cols[8]?.trim() ?? '',
             }
         })
         .filter(l => l.id !== '')
@@ -95,4 +107,29 @@ export const loadLineConnectDB = async (): Promise<PresetLineConnect[]> => {
             }
         })
         .filter(c => c.lineId !== '' && c.stationId !== '')
+}
+
+// transferDB.csv を fetch してパースし、乗換エッジリストを返す。
+// 乗換データは任意のため、ファイルが無い・読み込めない場合は空配列として扱う
+export const loadTransferDB = async (): Promise<PresetTransfer[]> => {
+    try {
+        const res = await fetch('/csv/presetLines/transferDB.csv')
+        if (!res.ok) return []
+        const text = await res.text()
+        return text
+            .split('\n')
+            .slice(1)  // ヘッダー行をスキップ
+            .filter(line => line.trim() !== '')
+            .map(line => {
+                const cols = line.split(',')
+                return {
+                    stationId1: cols[0]?.trim() ?? '',
+                    stationId2: cols[1]?.trim() ?? '',
+                }
+            })
+            // 空欄や同じ駅IDどうしの行は無効として除く
+            .filter(t => t.stationId1 !== '' && t.stationId2 !== '' && t.stationId1 !== t.stationId2)
+    } catch {
+        return []
+    }
 }

@@ -1,12 +1,14 @@
 "use client"
 
 import React, { useMemo } from 'react'
-import { PresetLine, PresetStation, PresetLineConnect } from '../modules/loadStationPresets'
+import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer } from '../modules/loadStationPresets'
 
 type Props = {
     lines: PresetLine[]
     allStations: PresetStation[]
     lineConnects: PresetLineConnect[]
+    // 乗換エッジ（表示のみ。ハイライト・区間選択には影響しない）
+    transfers: PresetTransfer[]
     // 始点駅のID（null のときは全駅がクリック可能）
     startStationId: string | null
     // 駅クリック時のコールバック。区間の路線と駅順インデックスは本コンポーネントで解決して渡す
@@ -24,7 +26,7 @@ const NODE_R = 7
 // 路線図の配置座標（緯度経度 → viewBox 座標）
 type Pos = { x: number, y: number }
 
-const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, startStationId, onSelect }) => {
+const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect }) => {
     // 路線ID → その路線の駅ID順（lineConnectDB の並び順がそのまま駅順になる）
     const orderByLine = useMemo(() => {
         const map = new Map<string, string[]>()
@@ -120,6 +122,23 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, s
     return (
         <div style={{ overflow: 'auto', width: '100%', height: '100%', background: 'var(--bg-base)' }}>
             <svg viewBox={`0 0 ${viewW} ${viewH}`} width={viewW} height={viewH} style={{ display: 'block' }}>
+                {/* 乗換エッジ（別々の駅IDを持つ駅同士）。路線・駅ノードより下にグレーの点線で描画し、クリックは受け付けない */}
+                {transfers.map((t, i) => {
+                    const p1 = posById.get(t.stationId1)
+                    const p2 = posById.get(t.stationId2)
+                    if (!p1 || !p2) return null
+                    return (
+                        <line
+                            key={`transfer-${i}`}
+                            x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+                            stroke="var(--text-muted)"
+                            strokeWidth={2}
+                            strokeDasharray="4 4"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    )
+                })}
+
                 {/* 路線（駅順に駅ノードを結ぶ折れ線）。ハイライト対象外はグレーで描画する */}
                 {lines.map(line => {
                     const order = orderByLine.get(line.id) ?? []
