@@ -195,6 +195,9 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <input type="color" onChange={(e) => formUpdated(e, 'trainTypeBackColor')} value={operation.trainTypeBackColor || '#000000'} />
             </div>
             </fieldset>
+            {/* 列車路線記号～列車ラインの描画を「列車」欄にまとめる（7.52節） */}
+            <fieldset>
+            <legend>列車</legend>
             <div className="form-row">
                 <label>列車路線記号</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'lineLogo')} value={operation.lineLogo} />
@@ -254,6 +257,14 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             <div className="form-row">
                 <label>列車にラインを描画するか</label>
                 <ToggleSwitch checked={operation.isDrawLine} onChange={(v) => toggleUpdated(v, 'isDrawLine')} />
+            </div>
+            </fieldset>
+            {/* 画面レイアウトの表示タイプ（7.52節）。運用ごとに設定する */}
+            <div className="form-row">
+                <label>表示タイプ</label>
+                <select onChange={(e) => formUpdated(e, 'displayType')} value={operation.displayType || 'tokyu'}>
+                    <option value="tokyu">東急</option>
+                </select>
             </div>
             </>)}
             </div>{/* /tab-form-body */}

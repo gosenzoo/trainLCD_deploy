@@ -60,6 +60,12 @@
 
         const DRAWER_BASE = './Drawer';
 
+        // 対応している表示タイプ（Drawer/pageInput/[表示タイプ]/ にレイアウトのファイルがあるもの。7.52節）。
+        // これ以外・未設定の表示タイプは東急として扱う
+        const SUPPORTED_DISPLAY_TYPES = ['tokyu'];
+        const DEFAULT_DISPLAY_TYPE = 'tokyu';
+        const toDisplayType = (type) => SUPPORTED_DISPLAY_TYPES.includes(type) ? type : DEFAULT_DISPLAY_TYPE;
+
         // settingsにdispConfigがない場合（旧Editor出力）に使用するデフォルト値
         const DEFAULT_PAGE_DISP_LIST = {
             '0': [ // 始発停車
@@ -160,14 +166,24 @@
             return presets;
         }
 
-        async function loadBodySVGs(pageNameList) {
+        // 表示タイプのボディ（ページ設定に入っているページ名すべて）を読み込む
+        async function loadBodySVGs(displayType, pageNameList) {
             const map = new Map();
             await Promise.all(pageNameList.map(async filename => {
                 try {
-                    map.set(filename, await fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/body/${filename}`));
+                    map.set(filename, await fetchSVG(`${DRAWER_BASE}/pageInput/${displayType}/body/${filename}`));
                 } catch (e) {}
             }));
             return map;
+        }
+
+        // 表示タイプのレイアウト（ヘッダーとボディ）を読み込む（7.52節）
+        async function loadLayout(displayType, pageNameList) {
+            const [headerSVG, bodySVGMap] = await Promise.all([
+                fetchSVG(`${DRAWER_BASE}/pageInput/${displayType}/header/headerSVG.svg`),
+                loadBodySVGs(displayType, pageNameList),
+            ]);
+            return { headerSVG, bodySVGMap };
         }
 
         // SVGサイズをウィンドウに合わせる
@@ -225,13 +241,27 @@
                     .map(v => v.presetType)
             )];
 
+            // 全運用の表示タイプを重複なしで集める（7.52節）。運用がなければ東急
+            const operations = Object.values(settings.operationDict ?? {});
+            const displayTypes = [...new Set(operations.map(op => toDisplayType(op.displayType)))];
+            if (displayTypes.length === 0) displayTypes.push(DEFAULT_DISPLAY_TYPE);
+
             // Drawerリソースを並列フェッチ（iconList.jsonはデバッグ用のため使用しない）
-            const [numIconPresets, iconPresets, headerSVG, bodySVGMap] = await Promise.all([
+            const [numIconPresets, iconPresets, layoutList] = await Promise.all([
                 loadIconPresets(numIconPresetKeys),
                 loadIconPresets(iconPresetKeys),  // IconDrawer用プリセットSVGも同じパスからフェッチ
-                fetchSVG(`${DRAWER_BASE}/pageInput/tokyu/header/headerSVG.svg`),
-                loadBodySVGs(pageNameList),
+                Promise.all(displayTypes.map(type => loadLayout(type, pageNameList))),
             ]);
+            // 表示タイプをキーにしたレイアウトの辞書。運用ごとの切り替え描画で使う予定
+            const layoutResources = {};
+            displayTypes.forEach((type, i) => { layoutResources[type] = layoutList[i]; });
+
+            // 描画に使うレイアウト: 駅一覧の最初の駅の運用の表示タイプ（運用がなければ東急）。
+            // 運用ごとの切り替え描画は未対応のため、表示中はこのレイアウトのまま
+            const firstOperation = settings.operationDict?.[settings.stationList[0]?.operationId];
+            const activeDisplayType = toDisplayType(firstOperation?.displayType);
+            // 読み込んでいない表示タイプになった場合は、読み込んだ最初のレイアウトを使う
+            const { headerSVG, bodySVGMap } = layoutResources[activeDisplayType] ?? layoutList[0];
 
             // LcdAnimatorをグローバルシングルトンとして初期化
             window.lcdAnimator = new LcdAnimator();

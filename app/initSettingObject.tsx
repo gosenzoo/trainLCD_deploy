@@ -26,7 +26,7 @@ const initOperationObject: operationType = {
     lineColor: "",
     carNumber: "",
     leftOrRight: 'right',
-    isDispTime: true,
+    isDispTime: false,  // 所要時間表示は初期値オフ（7.51節）
     isDispLineName: true,
     carNumberList: "1*,2,3,4,5,6,7,8",
     headOffset: "170",
@@ -34,6 +34,7 @@ const initOperationObject: operationType = {
     isDrawStopText: false,
     isDrawLine: false,
     carLineColor: "#FFFFFF",
+    displayType: "tokyu",  // 表示タイプ（7.52節）
 }
 
 const initStationObject: stationType = {

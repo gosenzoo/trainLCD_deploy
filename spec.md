@@ -224,7 +224,7 @@ classDiagram
 | `carNumber` | string | 現在の号車番号 |
 | `carNumberList` | string | 全号車リスト（カンマ区切り。`*`付きが現在号車） |
 | `leftOrRight` | `'left'\|'right'` | 表示の進行方向 |
-| `isDispTime` | boolean | 所要時間表示 ON/OFF |
+| `isDispTime` | boolean | 所要時間表示 ON/OFF。初期値 `false`（7.51節） |
 | `isDispLineName` | boolean | 路線名表示 ON/OFF |
 | `isDrawStopText` | boolean | 次停車駅テキスト表示 ON/OFF |
 | `isDrawLine` | boolean | 号車ライン描画 ON/OFF |
@@ -502,13 +502,13 @@ graph TD
 
 | `activeSectionId` | 表示名 | アイコン | 内容コンポーネント |
 |---|---|---|---|
-| `file` | ファイル操作 | `IconFileOps`（フォルダ） | `EditorHead` |
-| `station` | 駅設定 | `IconStation`（電車正面） | `StationList` |
-| `operation` | 運用設定 | `IconOperation`（旗） | `OperationForm` |
-| `message` | メッセージ設定 | `IconMessage`（吹き出し） | `MessageForm` |
-| `line` | 路線登録 | `IconLineReg`（駅2つを結ぶ線） | `LineList` |
-| `icon` | アイコン登録 | `IconShapes`（円と三角形） | `IconList` |
-| `dispConfig` | 表示設定 | `IconDisplay`（モニター） | `DispConfig` |
+| `file` | ファイル | `IconFileOps`（フォルダ） | `EditorHead` |
+| `station` | 駅 | `IconStation`（電車正面） | `StationList` |
+| `operation` | 運用 | `IconOperation`（旗） | `OperationForm` |
+| `message` | メッセージ | `IconMessage`（吹き出し） | `MessageForm` |
+| `dispConfig` | ページ・言語 | `IconDisplay`（モニター） | `DispConfig` |
+| `icon` | アイコン | `IconShapes`（円と三角形） | `IconList` |
+| `line` | 路線 | `IconLineReg`（駅2つを結ぶ線） | `LineList` |
 
 アイコンは `app/components/SvgIcons.tsx` に既存の矢印・プラス・ゴミ箱アイコンと同じ方式（`viewBox="0 0 16 16"`、`fill="currentColor"`、塗りのみでくり抜きなし）で追加する。
 
@@ -1015,7 +1015,7 @@ type GenericItemListProps<T> = {
 | `defaultLine` | 詳細路線図表示 | 乗換案内（日英テキスト）・登録路線情報を反映ボタン |
 | `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
 | `platform` | ホーム案内表示 | ホーム乗換案内行ごと表示数・スロット分割数・列車左端スロット・ホーム向側列車の路線ID・向側列車両数・向側列車左端スロット |
-| `map` | マップ | 既存の MapComponent（現在開発中） |
+| `map` | 座標設定 | Google マップで駅の座標を設定する（7.51節） |
 
 #### ナンバリング連番入力
 
@@ -3212,8 +3212,8 @@ public/lcdDisplay/
 | 値 | ファイル | 対象車両 |
 |---|---|---|
 | `tokyu` | `public/display.html` | 東急スタイル |
-| `JW-225` | `public/Display_JW-225.html` | JR西日本 225系 |
-| `JE-E131` | （未実装） | JR東日本 E131系 |
+
+表示タイプは運用ごとの設定（`operation.displayType`。7.52節）。225系（`Display_JW-225.html`）・E131系（未実装）は選択肢から外した（ファイルは残す）。
 
 ### 表示SVGファイル構成と読み込み処理
 
@@ -5608,3 +5608,99 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 |---|---|
 | `app/components/LineInfoBalloon.tsx` | 路線記号・ナンバリングフォーマットの欄 |
 | `app/components/StationList.tsx` | 吹き出しに `iconDict` を渡す |
+
+### 7.51 所要時間表示の初期値、路線図から追加する駅の座標、駅設定の「座標設定」タブ
+
+#### 1. 所要時間表示の初期値
+
+運用の「所要時間表示」（`isDispTime`）の初期値を `false` にする。新しく作る運用（`initOperationObject`）と、表示側で運用が未設定の区間に使う既定値（`applyOperationFallbacks`）の両方を変える。保存済みの運用の値は変えない。
+
+#### 2. 路線図から追加する駅の座標
+
+「路線図から追加」で追加する駅の `coordinate` に、駅プリセット（`stationDB.csv`）の緯度・経度を入れる（`[lat, lon]`）。プリセットの座標がない駅は従来どおり `[null, null]`。
+
+#### 3. 駅設定の「座標設定」タブ
+
+駅設定のタブ「マップ」を「座標設定」に改め、Google マップで駅の座標を設定できるようにする（`MapComponent` を作り直す）。
+
+| 項目 | 内容 |
+|---|---|
+| 対象の駅 | 駅一覧で最後に選んだ駅（`selectedIndexes` の末尾） |
+| ピン | 対象の駅の `coordinate` の位置に常に1本置く。座標が不正（緯度・経度の片方でも `null`・数値でない、範囲外）ならピンは出さない |
+| クリック | 地図をクリックすると、その位置を対象の駅の `coordinate` に設定する。ピンはクリックした位置に移る |
+| 地図の中心 | 対象の駅を切り替えたとき、座標が正しければその位置に移る（ズームは駅が分かる程度、15）。座標がなければ地図の位置は変えない。最初は東京駅付近。クリックで座標を設定したときは地図を動かさない |
+| 地図の下 | 対象の駅名と現在の緯度・経度（未設定なら「未設定」） |
+| 駅を選んでいないとき | 地図をグレーアウトしてクリックを受け付けない |
+| 読み込み | 読み込み中は「地図を読み込み中」、失敗したら「地図を読み込めませんでした」 |
+
+APIキーはソースに書かず、環境変数 `GOOGLE_MAPS_API_KEY`（`.env.local`、本番はホスティングの環境変数）から読む。Next.js はそのままでは `NEXT_PUBLIC_` で始まる変数しかブラウザ側に渡さないため、`next.config.mjs` の `env` で `GOOGLE_MAPS_API_KEY` を渡す（ビルド時に埋め込まれるので、値を変えたら再ビルドが必要）。キーが設定されていなければ地図を読み込まず「Google Maps の APIキーが設定されていません」と出す。
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/initSettingObject.tsx`・`public/Controller/src/utility/utils.js` | `isDispTime` の初期値 |
+| `app/components/StationPresetPopup.tsx` | 追加する駅に座標を入れる |
+| `app/components/MapComponent.tsx` | 座標設定の地図に作り直す |
+| `app/components/StationList.tsx` | タブ名を「座標設定」にし、`MapComponent` を表示する |
+| `next.config.mjs` | `env` で `GOOGLE_MAPS_API_KEY` をブラウザ側に渡す |
+
+### 7.52 エディタの大項目の整理と、表示タイプを運用ごとの設定にする
+
+#### 大項目の名前
+
+| 旧 | 新 |
+|---|---|
+| ファイル操作（`file`） | ファイル |
+| 駅設定（`station`） | 駅 |
+| 運用設定（`operation`） | 運用 |
+| メッセージ設定（`message`） | メッセージ |
+| 表示設定（`dispConfig`） | ページ・言語 |
+| アイコン登録（`icon`） | アイコン |
+| 路線登録（`line`） | 路線 |
+
+並び順は上の表のとおり（「ページ・言語」を「メッセージ」の次に移し、「アイコン」を「路線」の前にする）。
+
+#### 「表示設定」ポップアップ
+
+ヘッダーの「表示」ボタンの左に「表示設定」ボタンを置き、押すと「表示設定」ポップアップ（`DisplaySettingPopup`）を開く。
+
+- 内容: 「環状運転」（`info.isLoop`）・「座標による駅移動」（`info.isMoveByCoord`）のトグルスイッチ。「ファイル」から移す
+- 見た目・閉じ方は既存のポップアップ（`.modal-backdrop`・`.modal-dialog`）と同じ。右上の「×」、下の「閉じる」、背景のクリックで閉じる
+- 変更はその場で設定に反映する（決定ボタンはない）
+
+#### 「ファイル」
+
+- 「設定名」を「設定をダウンロード」「設定を初期化」の行のすぐ下に移す
+- 「全体設定」の見出しと「表示タイプ」は削除する（環状運転・座標による駅移動はポップアップへ、表示タイプは運用設定へ）
+
+#### 運用設定
+
+- 「列車路線記号」～「列車にラインを描画するか」を「列車」欄（`fieldset`）でくくる
+- 最下部（「列車」欄の下）に「表示タイプ」（`operation.displayType`）のセレクトを置く。選択肢は「東急」（`tokyu`）のみ
+
+#### データ
+
+- `operationType` に `displayType: string` を追加する。初期値 `"tokyu"`
+- これまで表示タイプはエディタ上の状態で、設定データに保存していなかった。既存データ（ファイル読み込み・localStorage からの自動読み込み）で `displayType` がない運用は `"tokyu"` にする
+- エディタの `displayType` 状態は廃止する。「表示」ボタンは常に `display.html` を開く
+
+#### LCD表示（`display.html`）
+
+これから画面レイアウトを運用ごとに変えられるようにするため、まず読み込みを運用ごとにする。描画は従来どおり1つのレイアウトで行い、運用ごとの切り替え描画は次の作業とする。
+
+- 表示前に、全運用の `displayType` を重複なしで集め、表示タイプごとにレイアウトのファイル（ヘッダー `pageInput/[表示タイプ]/header/headerSVG.svg`、ボディ `pageInput/[表示タイプ]/body/[ページ名]`。ページ名はページ設定（`dispConfig.pageDispList`）に入っているものすべてで、`overLineSVG.svg`・`doorAnim.svg`・`transfers.svg` なども含む）を読み込んで、表示タイプをキーにした辞書（`layoutResources`）に持つ
+- `displayType` がない・空、または対応していない表示タイプ（`pageInput` にフォルダがない）は `tokyu` として扱う
+- 描画に使うレイアウトは、駅一覧の最初の駅の運用（`stationList[0].operationId`）の表示タイプ。運用がなければ `tokyu`
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/type.ts`・`app/initSettingObject.tsx` | `operationType.displayType` |
+| `app/components/Editor.tsx` | 大項目の名前、`displayType` 状態の廃止、「表示設定」ポップアップ、読み込み時の補完 |
+| `app/components/Header.tsx` | 「表示設定」ボタン |
+| `app/components/DisplaySettingPopup.tsx` | 新規。「表示設定」ポップアップ |
+| `app/components/EditorHead.tsx` | 設定名の移動、全体設定・表示タイプの削除、読み込み時の補完 |
+| `app/components/OperationForm.tsx` | 「列車」欄、表示タイプ |
+| `public/display.html` | 表示タイプごとのレイアウトの読み込み |

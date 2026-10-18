@@ -73,7 +73,7 @@ function getOperationForSection(operationList, sectionInd) {
  * @returns {object} フォールバック適用済みのoperation
  */
 function applyOperationFallbacks(operation, lastStopStation) {
-    // operationが未設定の場合はデフォルト値で生成
+    // operationが未設定の場合はデフォルト値で生成（所要時間表示は初期値オフ。7.51節）
     if (!operation) {
         operation = {
             destination: "", destinationKana: "", destinationEng: "",
@@ -81,7 +81,7 @@ function applyOperationFallbacks(operation, lastStopStation) {
             direction: "", trainType: "", trainTypeEng: "",
             trainTypeSub: "", trainTypeSubEng: "", trainTypeColor: "",
             lineLogo: "", lineColor: "", carNumber: "",
-            leftOrRight: "right", isDispTime: true, isDispLineName: true,
+            leftOrRight: "right", isDispTime: false, isDispLineName: true,
             carNumberList: "1*,2,3,4,5,6,7,8", headOffset: "170", backOffset: "170",
             isDrawStopText: false, isDrawLine: false, carLineColor: "#FFFFFF",
             startStationInd: "0"

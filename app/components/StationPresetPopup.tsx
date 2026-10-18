@@ -97,7 +97,8 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     sectionTime: "0",
     lineId,
     operationId: "0",  // プリセットから追加する全駅に0番目の運用を設定する
-    coordinate: [null, null],
+    // 駅プリセットの緯度・経度を入れる（7.51節）。座標がない駅は null のまま
+    coordinate: [station.lat, station.lon],
     transferText: "",
     transferTextEng: "",
     doorSide: "left",

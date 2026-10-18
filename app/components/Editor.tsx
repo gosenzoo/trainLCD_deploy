@@ -9,6 +9,7 @@ import StationList from "./StationList"
 import LineList from "./LineList"
 import IconList from './IconList'
 import DispConfig from './DispConfig'
+import DisplaySettingPopup from './DisplaySettingPopup'
 import { IconFileOps, IconStation, IconOperation, IconMessage, IconLineReg, IconShapes, IconDisplay } from './SvgIcons'
 import "../type"
 import initSettingObject from '../initSettingObject'
@@ -35,6 +36,8 @@ const normalizeLoadedSetting = (loaded: any): settingType => {
     // isAutoDestination がない旧データは、行先が空ならオン・入力済みならオフにする（7.49節）
     Object.values(loaded.operationDict).forEach((op: any) => {
         if (op.isAutoDestination === undefined) op.isAutoDestination = !op.destination
+        // 表示タイプがない旧データは東急にする（7.52節）
+        if (!op.displayType) op.displayType = 'tokyu'
     })
     if (!loaded.dispConfig) {
         loaded.dispConfig = structuredClone(initSettingObject.dispConfig);
@@ -135,8 +138,8 @@ const Editor = () => {
 
     const [presetIconDict, setPresetIconDict] = useState<Record<string, string>>(loadIconPresetTexts());
 
-    // 表示タイプ状態を Editor で管理し、sticky ツールバーの「表示」ボタンから参照する
-    const [displayType, setDisplayType] = useState<string>("tokyu")
+    // 「表示設定」ポップアップの開閉（7.52節）
+    const [isDisplaySettingOpen, setIsDisplaySettingOpen] = useState<boolean>(false)
 
     // サイドバーで選択中のセクションID（排他選択、常に1つだけ選択される）
     const [activeSectionId, setActiveSectionId] = useState<string>("station")
@@ -210,17 +213,10 @@ const Editor = () => {
         // flushSave は ref 経由で最新値を参照するため、登録は1回でよい
     }, [])
 
-    // 選択中の表示タイプに対応する LCD 画面を別タブで開く
+    // LCD 画面を別タブで開く。表示タイプは運用ごとの設定になったため、常に display.html を開く（7.52節）
     const openDisplay = () => {
-        if (displayType === "JW-225") {
-            localStorage.setItem('lcdStrage', JSON.stringify(setting))
-            window.open('./Display_JW-225.html')
-        }
-        if (displayType === "tokyu") {
-            localStorage.setItem('lcdStrage', JSON.stringify(setting))
-            window.open('./display.html', '_blank', 'noopener')
-        }
-        if (displayType === "JE-E131") { console.log("ないです") }
+        localStorage.setItem('lcdStrage', JSON.stringify(setting))
+        window.open('./display.html', '_blank', 'noopener')
     }
 
     console.log(createNumIconFromPreset(presetIconDict, "I_JR_west", "A", "", "#000000"))
@@ -230,16 +226,16 @@ const Editor = () => {
     // サイドバーに表示するセクション一覧。id・表示名・アイコン・内容コンポーネントをここで一元管理する
     const sections: { id: string, title: string, icon: React.FC, element: React.ReactNode }[] = [
         {
-            id: "file", title: "ファイル操作", icon: IconFileOps,
-            element: <EditorHead setting={setting} setSetting={setSetting}
-                displayType={displayType} setDisplayType={setDisplayType}/>,
+            id: "file", title: "ファイル", icon: IconFileOps,
+            element: <EditorHead setting={setting} setSetting={setSetting}/>,
         },
-        { id: "station", title: "駅設定", icon: IconStation, element: <StationList setting={setting} setSetting={setSetting}/> },
-        { id: "operation", title: "運用設定", icon: IconOperation, element: <OperationForm setting={setting} setSetting={setSetting}/> },
-        { id: "message", title: "メッセージ設定", icon: IconMessage, element: <MessageForm setting={setting} setSetting={setSetting}/> },
-        { id: "line", title: "路線登録", icon: IconLineReg, element: <LineList setting={setting} setSetting={setSetting}/> },
-        { id: "icon", title: "アイコン登録", icon: IconShapes, element: <IconList setting={setting} setSetting={setSetting}/> },
-        { id: "dispConfig", title: "表示設定", icon: IconDisplay, element: <DispConfig setting={setting} setSetting={setSetting}/> },
+        { id: "station", title: "駅", icon: IconStation, element: <StationList setting={setting} setSetting={setSetting}/> },
+        { id: "operation", title: "運用", icon: IconOperation, element: <OperationForm setting={setting} setSetting={setSetting}/> },
+        { id: "message", title: "メッセージ", icon: IconMessage, element: <MessageForm setting={setting} setSetting={setSetting}/> },
+        // ページ・言語はメッセージの次に置く（7.52節）
+        { id: "dispConfig", title: "ページ・言語", icon: IconDisplay, element: <DispConfig setting={setting} setSetting={setSetting}/> },
+        { id: "icon", title: "アイコン", icon: IconShapes, element: <IconList setting={setting} setSetting={setSetting}/> },
+        { id: "line", title: "路線", icon: IconLineReg, element: <LineList setting={setting} setSetting={setSetting}/> },
     ]
     const activeSection = sections.find(s => s.id === activeSectionId) ?? sections[0]
 
@@ -247,7 +243,11 @@ const Editor = () => {
         <div>
             {/* ヘッダー（タイトルの右に「表示」ボタン）。openDisplay が設定の state を使うため Editor 内で描画する。
                 editor-layout の外に置くことで overflow-x:hidden の影響を受けず sticky が機能する */}
-            <Header onDisplay={openDisplay}/>
+            <Header onDisplay={openDisplay} onDisplaySetting={() => setIsDisplaySettingOpen(true)}/>
+            {/* 「表示設定」ポップアップ（環状運転・座標による駅移動） */}
+            {isDisplaySettingOpen && (
+                <DisplaySettingPopup setting={setting} setSetting={setSetting} onClose={() => setIsDisplaySettingOpen(false)}/>
+            )}
             <div className="editor-layout">
                 {/* 左端のセクション選択サイドバー（アイコン＋キャプションの縦並び） */}
                 <nav className="editor-sidebar">

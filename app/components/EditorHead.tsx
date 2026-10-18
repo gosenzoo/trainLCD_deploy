@@ -2,14 +2,10 @@ import React from "react"
 import { useRouter } from 'next/navigation'
 import "../type"
 import initSettingObject from "../initSettingObject"
-import ToggleSwitch from './ToggleSwitch'
 
 type editorHeadType = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>,
-    // 表示タイプ状態は Editor で管理し、props で受け取る
-    displayType: string,
-    setDisplayType: React.Dispatch<React.SetStateAction<string>>,
 }
 
 function mergeProperties<T extends object, U extends object>(A: T, B: U): T & U {
@@ -22,7 +18,7 @@ function mergeProperties<T extends object, U extends object>(A: T, B: U): T & U 
   return A as T & U;
 }
 
-const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType, setDisplayType}) => {
+const EditorHead: React.FC<editorHeadType> = ({setting, setSetting}) => {
     const router = useRouter()
     let readData: settingType;
 
@@ -51,6 +47,8 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                             // isAutoDestination がない旧データは、行先が空ならオン・入力済みならオフにする（7.49節）。
                             // mergeProperties で初期値（オン）が入る前に決める
                             if (op.isAutoDestination === undefined) op.isAutoDestination = !op.destination
+                            // 表示タイプがない旧データは東急にする（7.52節）
+                            if (!op.displayType) op.displayType = 'tokyu'
                             mergeProperties(op, initSettingObject.operation)
                         });
                         readData.stationList.forEach(station => {
@@ -177,10 +175,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
             downloadLink.click();
         }
     }
-    const displayTypeSelectChanged = (e: any) => {
-        setDisplayType(e.target.value)
-    }
-
     const formUpdated = (e:any, field: infoMembers) => {
         if(!setting){
             return
@@ -198,14 +192,6 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
         setSetting(_setting)
     }
 
-    // トグルスイッチ用ハンドラ（boolean 値を直接受け取る）
-    const toggleUpdated = (checked: boolean, field: infoMembers) => {
-        if(!setting || !setting.info){ return }
-        const _setting: settingType = structuredClone(setting)
-        _setting.info[field] = checked as never
-        setSetting(_setting)
-    }
-
     return(
         <div>
             <div className="btn-group">
@@ -216,6 +202,11 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                     }
                     return;
                 }} className="btn-danger">設定を初期化</button>
+            </div>
+            {/* 設定名は「設定をダウンロード」の下に置く（7.52節） */}
+            <div className="form-row">
+                <label>設定名</label>
+                <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
             </div>
             <div className="form-row">
                 <label>設定ファイル入力</label>
@@ -247,28 +238,7 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                     setSetting(readData);
                 }} className="btn-primary">すべて読み込み</button>
             </div>
-
-            <h2>全体設定</h2>
-            <div className="form-row">
-                <label>設定名</label>
-                <input type="text" onChange={(e) => {formUpdated(e, 'settingName')}} value={setting.info.settingName}></input>
-            </div>
-            <div className="form-row">
-                <label>環状運転</label>
-                <ToggleSwitch checked={setting.info.isLoop} onChange={(v) => toggleUpdated(v, 'isLoop')} />
-            </div>
-            <div className="form-row">
-                <label>座標による駅移動</label>
-                <ToggleSwitch checked={setting.info.isMoveByCoord} onChange={(v) => toggleUpdated(v, 'isMoveByCoord')} />
-            </div>
-            <div className="form-row">
-                <label>表示タイプ</label>
-                <select onChange={displayTypeSelectChanged} value={displayType}>
-                    <option value="tokyu">東急</option>
-                    <option value="JW-225">JR西日本 225系</option>
-                    <option value="JE-E131">JR東日本 E131系</option>
-                </select>
-            </div>
+            {/* 環状運転・座標による駅移動は「表示設定」ポップアップへ、表示タイプは運用設定へ移した（7.52節） */}
         </div>
     )
 }

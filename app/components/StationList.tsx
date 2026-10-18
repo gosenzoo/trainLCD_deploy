@@ -430,8 +430,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             case 'platform':
                 return <StationParamSetter setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} activeSection={activeTab} />
             case 'map':
-                //return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
-                return <div style={{padding: '20px', border: '1px solid #ccc', marginTop: '10px'}}>マップコンポーネントは現在開発中です。</div>
+                // 座標設定: Google マップのクリックで、最後に選んだ駅の座標を設定する（7.51節）
+                return <MapComponent setting={setting} setSetting={setSetting} selectedIndexes={selectedIndexes} />
             default:
                 return null
         }
@@ -545,7 +545,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 <button onClick={() => setActiveTab('defaultLine')} className={`tab-btn${activeTab === 'defaultLine' ? ' active' : ''}`}>詳細路線図表示</button>
                 <button onClick={() => setActiveTab('transfersDisp')} className={`tab-btn${activeTab === 'transfersDisp' ? ' active' : ''}`}>乗換一覧表示</button>
                 <button onClick={() => setActiveTab('platform')} className={`tab-btn${activeTab === 'platform' ? ' active' : ''}`}>ホーム案内表示</button>
-                <button onClick={() => setActiveTab('map')} className={`tab-btn${activeTab === 'map' ? ' active' : ''}`}>マップ</button>
+                <button onClick={() => setActiveTab('map')} className={`tab-btn${activeTab === 'map' ? ' active' : ''}`}>座標設定</button>
             </div>
             {renderContent()}
         </div>

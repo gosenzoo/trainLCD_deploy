@@ -104,6 +104,8 @@ type operationType = {
     isDrawStopText: boolean,
     isDrawLine: boolean,
     carLineColor: string,
+    // 画面レイアウトの表示タイプ（7.52節。例: "tokyu"）。運用ごとに設定する
+    displayType: string,
 }
 
 // 駅ナンバリングアイコン情報（symbol/number/presetKey/color をひとまとめにする）
@@ -176,4 +178,4 @@ type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' 
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
 type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
-    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'isAutoDestination'
+    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'isAutoDestination' | 'displayType'
