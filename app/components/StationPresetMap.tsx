@@ -14,6 +14,8 @@ type Props = {
     // 駅クリック時のコールバック。ルートの区間（環状線の継ぎ目をまたぐ場合は2区間）は本コンポーネントで解決して渡す。
     // 始点駅の選択時は sections が空配列。nextStationName はルート選択ポップアップで選んだ場合のみ渡す
     onSelect: (sections: StationSection[], station: PresetStation, nextStationName?: string) => void
+    // 操作ボタンの右に並べて表示する内容（操作ガイダンス・読み込みエラーなど。7.42節）
+    toolbarExtra?: React.ReactNode
 }
 
 // 始点駅から対象駅までのルート候補
@@ -112,7 +114,7 @@ const offsetPolylinePoints = (pts: Pos[], edges: { nx: number, ny: number, off: 
     return out.join(' ')
 }
 
-const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect }) => {
+const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect, toolbarExtra }) => {
     // 路線ID → その路線の駅ID順（lineConnectDB の並び順がそのまま駅順になる）
     const orderByLine = useMemo(() => {
         const map = new Map<string, string[]>()
@@ -729,7 +731,7 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         )
     }
 
-    // 拡大縮小・表示位置ボタンのスタイル（路線図の右上に重ねて表示する）
+    // 拡大縮小・表示位置ボタンのスタイル（路線図の左上に重ねて表示する。7.42節）
     const ctrlBtnStyle: React.CSSProperties = { minWidth: '32px', padding: '4px 8px' }
 
     return (
@@ -756,16 +758,21 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 )}
             </div>
 
+            {/* 操作ボタンと、その右に並べる内容（ガイダンスなど）。左上に重ね、幅が足りなければ折り返す。
+                ボタン以外の部分はドラッグを妨げないよう pointer-events を無効にする（globals.css の .preset-map-toolbar） */}
+            <div className="preset-map-toolbar">
             {/* 操作ボタン。押してもドラッグが始まらないよう pointerdown を止める */}
             <div
                 className="btn-group"
                 onPointerDown={e => e.stopPropagation()}
-                style={{ position: 'absolute', top: '8px', right: '8px', margin: 0 }}
+                style={{ margin: 0, pointerEvents: 'auto' }}
             >
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={() => zoomAtCenter(BUTTON_ZOOM_STEP)} title="拡大">＋</button>
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={() => zoomAtCenter(1 / BUTTON_ZOOM_STEP)} title="縮小">−</button>
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={fitAll} disabled={!bounds || !size}>全体表示</button>
                 <button className="btn-secondary" style={ctrlBtnStyle} onClick={moveToStart} disabled={!startPos}>始点へ移動</button>
+            </div>
+            {toolbarExtra}
             </div>
 
             {/* ルート選択ポップアップ。路線図の上に半透明の背景ごと重ね、表示中は路線図を操作できないようにする。
@@ -774,7 +781,8 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 <div
                     onClick={() => setRouteChoice(null)}
                     style={{
-                        position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)',
+                        // 追加一覧ウィンドウ（z-index: 10）より上に重ねる（7.42節）
+                        position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)', zIndex: 20,
                         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
                     }}
                 >

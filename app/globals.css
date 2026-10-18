@@ -704,44 +704,158 @@ tr:hover td {
   flex-direction: column;
 }
 
-/* 「路線図から追加」ポップアップの本体（路線選択・駅選択・路線図・追加一覧を横並びにする） */
-.preset-popup-body {
+/* ============================================
+   「路線図から追加」画面（7.42節）
+   ============================================ */
+/* エディタの上に重ねる全画面。ヘッダーと本体（路線図）を縦に並べる */
+.preset-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+
+/* 画面ヘッダー（.app-header の見た目を使い、sticky は解除する） */
+.preset-screen-header {
+  position: static;
+  flex-shrink: 0;
+}
+
+/* ヘッダーのタイトルは折り返さない */
+.preset-screen-header h1,
+.preset-screen-header button {
+  white-space: nowrap;
+}
+
+/* ヘッダーの「路線図から追加」 */
+.preset-screen-title {
+  margin-left: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* 本体: 路線図を全体に表示し、追加一覧ウィンドウを重ねる基準 */
+.preset-screen-body {
+  position: relative;
   flex: 1;
   min-height: 0;
+}
+
+/* 路線図の左上に重ねる操作ボタンとガイダンス。幅が足りなければ折り返す。
+   ボタン以外はドラッグを妨げないよう pointer-events を無効にする */
+.preset-map-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  pointer-events: none;
+}
+
+/* ガイダンス・読み込みエラー（路線図の上でも読めるよう背景を付ける） */
+.preset-map-guidance {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  opacity: 0.9;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 追加一覧ウィンドウ（横画面: 右寄せで、画面ヘッダーを除いた高さいっぱい。
+   画面ヘッダー・右端・下端との間を 8px あけ、開いた状態は上側の角2つだけを丸める） */
+.preset-staging-window {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  width: min(360px, 40vw);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  box-shadow: var(--shadow);
 }
 
-/* 路線図の領域・追加一覧の領域（横画面では左右に等分） */
-.preset-pane-map {
-  flex: 1;
-  min-width: 0;
+/* 閉じた状態はヘッダーだけを残し、4つの角すべてを丸める（横画面ではヘッダーは右上のまま） */
+.preset-staging-window.is-closed {
+  bottom: auto;
+  border-radius: 8px;
+}
+
+/* 横画面では、操作ボタンとガイダンスが追加一覧ウィンドウの下に隠れないようにする */
+.preset-map-toolbar {
+  right: calc(min(360px, 40vw) + 16px);
+}
+
+/* ウィンドウのヘッダー（ボタン以外のクリックで開閉） */
+.preset-staging-header {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
 }
 
-.preset-pane-staging {
+.preset-staging-title {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  font-weight: 600;
 }
 
-/* 縦画面の路線図表示では、路線図を上・追加一覧を下に 2:1 の高さで並べる */
+/* ルートの一覧（ウィンドウの残りの高さでスクロール） */
+.preset-staging-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
+}
+
+/* 縦画面: 追加一覧ウィンドウを下寄せ・幅いっぱい・高さは画面の 1/3。閉じるとヘッダーが最下部に残る */
 @media (orientation: portrait) {
-  .preset-popup-body--map {
-    flex-direction: column;
+  .preset-staging-window {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 33.333vh;
+    border: none;
+    border-top: 1px solid var(--border);
   }
-  .preset-popup-body--map .preset-pane-map {
-    flex: 2 1 0;
-    min-height: 0;
+  .preset-staging-window.is-closed {
+    height: auto;
+    bottom: 0;
   }
-  .preset-popup-body--map .preset-pane-staging {
-    flex: 1 1 0;
-    min-height: 0;
+  .preset-map-toolbar {
+    right: 8px;
+  }
+  /* 幅の狭い縦画面ではヘッダーを詰めて1行に収める */
+  .preset-screen-header {
+    padding: 10px 12px;
+  }
+  .preset-screen-header h1 {
+    font-size: 1.15rem;
+  }
+  .preset-screen-header::before {
+    margin-right: 8px;
+  }
+  .preset-screen-title {
+    margin-left: 6px;
+    font-size: 0.85rem;
   }
 }
 

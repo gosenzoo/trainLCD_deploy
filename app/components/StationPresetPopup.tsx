@@ -120,6 +120,15 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
     const [stagingList, setStagingList] = useState<StagedRoute[]>([])
     const [loadError, setLoadError] = useState<string | null>(null)
+    // 追加一覧ウィンドウの開閉（7.42節）。画面を開くたびに「開いた状態」から始める
+    const [isStagingOpen, setIsStagingOpen] = useState<boolean>(true)
+
+    // 全画面表示の間は、後ろのエディタのページがスクロールしないようにする（閉じたら元に戻す）
+    useEffect(() => {
+        const prevOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+        return () => { document.body.style.overflow = prevOverflow }
+    }, [])
 
     // マウント時に CSV を読み込む
     useEffect(() => {
@@ -393,7 +402,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         setPrevStation({ station, lineId: last.lineId, index: last.nextIndex })
     }
 
-    // 戻るボタン → 末尾のルートを丸ごと削除し、前駅を巻き戻す
+    // 「1つ戻る」ボタン → 末尾のルートを丸ごと削除し、前駅を巻き戻す
     const handleBack = () => {
         if (stagingList.length === 0) return
         const newList = stagingList.slice(0, -1)
@@ -457,52 +466,47 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const guidanceText = getGuidanceText()
 
     return (
-        // 枠外クリックで閉じる
-        <div className="modal-backdrop" onClick={onClose}>
-            <div className="modal-dialog modal-dialog--tall" style={{ width: 'min(1100px, 95vw)' }}
-                onClick={e => e.stopPropagation()}>
-                {/* タイトル行: 右端に × ボタンを配置 */}
-                <div className="modal-title-row">
-                    <p className="modal-title">路線図から追加</p>
-                    <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
-                </div>
+        // 全画面の「路線図から追加」画面（7.42節）。エディタの上に重ねて表示し、URL は変えない
+        <div className="preset-screen">
+            {/* 画面ヘッダー: 左にタイトル、右端に「追加せず閉じる」（確認なしで追加一覧を破棄して閉じる） */}
+            <div className="app-header preset-screen-header">
+                <h1>ポケットLCD</h1>
+                <span className="preset-screen-title">路線図から追加</span>
+                <button onClick={onClose} className="btn-secondary app-header-display-btn">追加せず閉じる</button>
+            </div>
 
-                {loadError && (
-                    <p style={{ color: 'var(--danger)', margin: 0 }}>{loadError}</p>
-                )}
+            {/* 路線図（ヘッダーより下の全体）と、その上に重ねる追加一覧ウィンドウ */}
+            <div className="preset-screen-body">
+                {/* 駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる。
+                   操作ボタンの右に操作ガイダンスと読み込みエラーを表示する */}
+                <StationPresetMap
+                    lines={lines}
+                    allStations={allStations}
+                    lineConnects={lineConnects}
+                    transfers={transfers}
+                    startStationId={prevStation?.station.id ?? null}
+                    onSelect={handleMapSelect}
+                    toolbarExtra={
+                        <div className="preset-map-guidance">
+                            <span>{guidanceText}</span>
+                            {loadError && <span style={{ color: 'var(--danger)' }}>{loadError}</span>}
+                        </div>
+                    }
+                />
 
-                {/* 操作ガイダンステキスト（常に表示） */}
-                <div style={{ fontSize: '0.9rem', color: 'var(--accent)', fontWeight: 600, padding: '4px 0' }}>
-                    {guidanceText}
-                </div>
-
-                {/* 路線図と追加一覧を横並びに配置（縦画面では「路線図」を上・「追加一覧」を下に並べる。globals.css のメディアクエリ） */}
-                <div className="preset-popup-body preset-popup-body--map">
-                    {/* 路線図から選択。駅ノードは駅IDごとに1つで、乗換駅からは複数路線が伸びる。
-                       flex の指定は縦画面で上下配置に切り替えるためクラス側に持たせる */}
-                    <div className="preset-pane-map">
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>路線図</div>
-                        <div style={{ flex: 1, minHeight: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                            <StationPresetMap
-                                lines={lines}
-                                allStations={allStations}
-                                lineConnects={lineConnects}
-                                transfers={transfers}
-                                startStationId={prevStation?.station.id ?? null}
-                                onSelect={handleMapSelect}
-                            />
+                {/* 追加一覧ウィンドウ（横画面は右寄せ・縦画面は下寄せ。globals.css のメディアクエリ）。
+                   ヘッダーのボタン以外の部分をクリックすると開閉する。閉じるとヘッダーだけが残る */}
+                <div className={`preset-staging-window${isStagingOpen ? '' : ' is-closed'}`}>
+                    <div className="preset-staging-header" onClick={() => setIsStagingOpen(open => !open)}>
+                        <span className="preset-staging-title">{isStagingOpen ? '▼' : '▲'} 追加一覧</span>
+                        {/* ボタンのクリックでは開閉しない */}
+                        <div className="btn-group" style={{ margin: 0 }} onClick={e => e.stopPropagation()}>
+                            <button onClick={handleBack} className="btn-secondary" disabled={stagingList.length === 0}>1つ戻る</button>
+                            <button onClick={handleAdd} className="btn-primary" disabled={stagingList.length === 0}>追加</button>
                         </div>
                     </div>
-
-                    {/* 追加一覧リスト（路線図の右。縦画面では路線図の下） */}
-                    <div className="preset-pane-staging">
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            追加一覧
-                        </div>
-                        <div style={{
-                            flex: 1, overflow: 'auto', border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-md)', background: 'var(--bg-base)',
-                        }}>
+                    {isStagingOpen && (
+                        <div className="preset-staging-list">
                             {stagingList.map((route, i) => (
                                 <div
                                     key={i}
@@ -521,13 +525,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                                 </div>
                             )}
                         </div>
-                    </div>
-                </div>
-
-                {/* フッター */}
-                <div className="modal-footer">
-                    <button onClick={handleBack} className="btn-secondary" disabled={stagingList.length === 0}>戻る</button>
-                    <button onClick={handleAdd} className="btn-primary" disabled={stagingList.length === 0}>追加</button>
+                    )}
                 </div>
             </div>
         </div>
