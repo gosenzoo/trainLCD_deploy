@@ -155,6 +155,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
     const [stagingList, setStagingList] = useState<StagedRoute[]>([])
     const [loadError, setLoadError] = useState<string | null>(null)
+    // CSV の読み込み中かどうか（読み込み中は「路線図をロード中」を表示する。7.44節）
+    const [isLoading, setIsLoading] = useState<boolean>(true)
     // 追加一覧ウィンドウの開閉（7.42節）。画面を開くたびに「開いた状態」から始める
     const [isStagingOpen, setIsStagingOpen] = useState<boolean>(true)
     // 路線図に表示する事業者種別（7.43節）。画面を開くたびに全種別を表示した状態から始める
@@ -188,6 +190,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 setTransfers(transferData)
             })
             .catch(() => setLoadError('CSVファイルの読み込みに失敗しました'))
+            // 成功・失敗のどちらでも読み込み中の表示を消す
+            .finally(() => setIsLoading(false))
     }, [])
 
     // 各区間から駅を展開し、連続区間の接続駅の重複を除去して stationType[] に変換する。
@@ -449,23 +453,24 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         setPrevStation({ station, lineId: last.lineId, index: last.nextIndex })
     }
 
-    // 「1つ戻る」ボタン → 末尾のルートを丸ごと削除し、前駅を巻き戻す
+    // 「1つ戻る」ボタン（7.44節）。始点駅が選ばれているときだけ有効
+    // - 追加一覧が空（始点駅だけ選択済み）: 始点駅の選択を解除する
+    // - 追加一覧にルートがある: 末尾のルートを削除し、始点駅をそのルートの始点の駅に戻す
+    //   （ルートが1つなら、最初に選んだ始点駅が選ばれた状態になる）
     const handleBack = () => {
-        if (stagingList.length === 0) return
-        const newList = stagingList.slice(0, -1)
-        setStagingList(newList)
-        if (newList.length === 0) {
-            // 全区間が消えた場合は firstStation 状態に戻す
+        if (prevStation === null) return
+        if (stagingList.length === 0) {
             setPrevStation(null)
-        } else {
-            // 末尾に残ったルートの最後の区間の nextIndex の駅を新しい前駅に設定
-            const lastRoute = newList[newList.length - 1]
-            const lastSection = lastRoute.sections[lastRoute.sections.length - 1]
-            const connects = lineConnects.filter(c => c.lineId === lastSection.lineId)
-            const connect = connects[lastSection.nextIndex]
-            const station = allStations.find(s => s.id === connect?.stationId)
-            setPrevStation(station ? { station, lineId: lastSection.lineId, index: lastSection.nextIndex } : null)
+            return
         }
+        const removed = stagingList[stagingList.length - 1]
+        setStagingList(stagingList.slice(0, -1))
+        // 削除したルートの最初の区間の prevIndex の駅を新しい始点駅に設定
+        const firstSection = removed.sections[0]
+        const connects = lineConnects.filter(c => c.lineId === firstSection.lineId)
+        const connect = connects[firstSection.prevIndex]
+        const station = allStations.find(s => s.id === connect?.stationId)
+        setPrevStation(station ? { station, lineId: firstSection.lineId, index: firstSection.prevIndex } : null)
     }
 
     // 追加ボタン → 区間から駅を展開して onAdd を呼ぶ
@@ -564,6 +569,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     }
                 />
 
+                {/* 読み込み中の表示（路線図の領域の中央。進捗バーは出さない。7.44節） */}
+                {isLoading && <div className="preset-map-loading">路線図をロード中</div>}
+
                 {/* 追加一覧ウィンドウ（横画面は右寄せ・縦画面は下寄せ。globals.css のメディアクエリ）。
                    ヘッダーのボタン以外の部分をクリックすると開閉する。閉じるとヘッダーだけが残る */}
                 <div className={`preset-staging-window${isStagingOpen ? '' : ' is-closed'}`}>
@@ -571,8 +579,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                         <span className="preset-staging-title">{isStagingOpen ? '▼' : '▲'} 追加一覧</span>
                         {/* ボタンのクリックでは開閉しない */}
                         <div className="btn-group" style={{ margin: 0 }} onClick={e => e.stopPropagation()}>
-                            <button onClick={handleBack} className="btn-secondary" disabled={stagingList.length === 0}>1つ戻る</button>
-                            <button onClick={handleAdd} className="btn-primary" disabled={stagingList.length === 0}>追加</button>
+                            <button onClick={handleBack} className="btn-secondary" disabled={prevStation === null}>1つ戻る</button>
+                            <button onClick={handleAdd} className="btn-primary" disabled={stagingList.length === 0}>この区間を追加</button>
                         </div>
                     </div>
                     {isStagingOpen && (
