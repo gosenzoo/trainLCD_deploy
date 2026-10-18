@@ -21,6 +21,18 @@ export type PresetLine = {
     symbol: string        // 路線記号
     iconPresetKey: string     // 路線アイコンのプリセット名（I_*）。iconDict の presetType に使う
     numIconPresetKey: string  // ナンバリングアイコンのプリセット名（N_*）
+    operatorType: PresetOperatorType  // 事業者種別（路線図の表示切り替えに使う。7.43節）
+}
+
+// 路線の事業者種別（7.43節）。路線図の表示切り替えボタンの並び順もこの順
+export const PRESET_OPERATOR_TYPES = ['新幹線', 'JR在来線', '私鉄'] as const
+export type PresetOperatorType = typeof PRESET_OPERATOR_TYPES[number]
+
+// lineDB.csv の「事業者種別」列の値を種別に変換する。
+// 列が空・未知の値のときは、事業者名が JR で始まれば JR在来線、それ以外は私鉄とする（生成スクリプトと同じ規則）
+const toOperatorType = (value: string, operator: string): PresetOperatorType => {
+    if ((PRESET_OPERATOR_TYPES as readonly string[]).includes(value)) return value as PresetOperatorType
+    return operator.startsWith('JR') ? 'JR在来線' : '私鉄'
 }
 
 // 路線接続データ: 同一路線IDの行を上から順に並べると路線上の駅順序になる
@@ -90,7 +102,8 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
         .filter(line => line.trim() !== '')
         .map(line => {
             const cols = line.split(',')
-            // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン
+            // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン, 事業者種別
+            const operator = cols[1]?.trim() ?? ''
             return {
                 id: cols[0]?.trim() ?? '',
                 operator: cols[1]?.trim() ?? '',
@@ -101,6 +114,7 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
                 symbol: cols[6]?.trim() ?? '',
                 iconPresetKey: cols[7]?.trim() ?? '',
                 numIconPresetKey: cols[8]?.trim() ?? '',
+                operatorType: toOperatorType(cols[9]?.trim() ?? '', operator),
             }
         })
         .filter(l => l.id !== '')

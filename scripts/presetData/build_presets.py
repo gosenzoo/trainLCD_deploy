@@ -23,6 +23,14 @@ def company(no):
     raise KeyError(no)
 ALL_NOS = [n for rg, *_ in COMPANIES for n in rg]
 
+# 路線の事業者種別（新幹線・JR在来線・私鉄。7.43節）。
+# 元データの路線に "operatorType" があればその値、なければ事業者名が JR で始まれば JR在来線、それ以外は私鉄
+OPERATOR_TYPES = ('新幹線', 'JR在来線', '私鉄')
+def operator_type(l):
+    t = l.get('operatorType') or ('JR在来線' if company(l['no'])[0].startswith('JR') else '私鉄')
+    if t not in OPERATOR_TYPES: raise ValueError(f'路線 {l["no"]} の operatorType が不正: {t}')
+    return t
+
 def dist_km(a, b):
     # 簡易な距離（km）。駅間距離のチェック用
     lat = math.radians((a['lat'] + b['lat']) / 2)
@@ -387,9 +395,9 @@ def write(name, header, rows):
 
 write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度',
       [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}') for n in order])
-write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン',
+write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別',
       # 路線記号のない路線は、路線アイコンを路線カラーの四角（I_mono_color）にする（7.32節）
-      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2]) for l in lines])
+      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l)) for l in lines])
 write('lineConnectDB.csv', '路線ID,駅ID,駅ナンバリング',
       [(l['no'], stations[skey(l, s)]['id'], s.get('number', '')) for l in lines for s in l['stations']])
 write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)

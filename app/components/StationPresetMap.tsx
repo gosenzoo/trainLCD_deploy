@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer, StationSection } from '../modules/loadStationPresets'
+import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer, StationSection, PresetOperatorType } from '../modules/loadStationPresets'
 
 type Props = {
     lines: PresetLine[]
@@ -16,6 +16,8 @@ type Props = {
     onSelect: (sections: StationSection[], station: PresetStation, nextStationName?: string) => void
     // 操作ボタンの右に並べて表示する内容（操作ガイダンス・読み込みエラーなど。7.42節）
     toolbarExtra?: React.ReactNode
+    // 表示中の事業者種別（7.43節）。含まれない種別の路線は線を描かず、ハイライト・ルート候補からも外す
+    visibleOperatorTypes: ReadonlySet<PresetOperatorType>
 }
 
 // 始点駅から対象駅までのルート候補
@@ -114,7 +116,7 @@ const offsetPolylinePoints = (pts: Pos[], edges: { nx: number, ny: number, off: 
     return out.join(' ')
 }
 
-const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect, toolbarExtra }) => {
+const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, transfers, startStationId, onSelect, toolbarExtra, visibleOperatorTypes }) => {
     // 路線ID → その路線の駅ID順（lineConnectDB の並び順がそのまま駅順になる）
     const orderByLine = useMemo(() => {
         const map = new Map<string, string[]>()
@@ -240,15 +242,31 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         return { linePaths: paths, nodeShapes: shapes }
     }, [lines, orderByLine, worldById])
 
-    // 始点駅を通る路線のID集合（始点未選択なら全路線）
+    // 表示中の路線のID集合（事業者種別で絞り込む。7.43節）。
+    // 配置・形（平行線のずらし量・ノード形状・全体表示の範囲）は全路線で計算済みのものを使い、ここでは描画と選択だけを絞る
+    const visibleLineIds = useMemo(
+        () => new Set(lines.filter(l => visibleOperatorTypes.has(l.operatorType)).map(l => l.id)),
+        [lines, visibleOperatorTypes])
+
+    // 表示する駅のID集合: 表示中の路線が1本でも通る駅。始点駅は線がすべて非表示でも常に表示する
+    const visibleStationIds = useMemo(() => {
+        const set = new Set<string>()
+        for (const lineId of visibleLineIds) {
+            for (const sid of orderByLine.get(lineId) ?? []) set.add(sid)
+        }
+        if (startStationId !== null) set.add(startStationId)
+        return set
+    }, [visibleLineIds, orderByLine, startStationId])
+
+    // 始点駅を通る路線のうち表示中のもののID集合（始点未選択なら表示中の全路線）
     const activeLineIds = useMemo(() => {
-        if (startStationId === null) return new Set(lines.map(l => l.id))
+        if (startStationId === null) return visibleLineIds
         const set = new Set<string>()
         for (const [lineId, order] of orderByLine) {
-            if (order.includes(startStationId)) set.add(lineId)
+            if (visibleLineIds.has(lineId) && order.includes(startStationId)) set.add(lineId)
         }
         return set
-    }, [startStationId, orderByLine, lines])
+    }, [startStationId, orderByLine, visibleLineIds])
 
     // クリック可能な駅ID集合（＝ハイライト中の路線上の全駅）
     const selectableIds = useMemo(() => {
@@ -618,6 +636,8 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         const visibleStations: { station: PresetStation, p: Pos }[] = []
         if (showNodes) {
             for (const station of allStations) {
+                // 通る路線がすべて非表示の駅は描かない（7.43節）
+                if (!visibleStationIds.has(station.id)) continue
                 const w = worldById.get(station.id)
                 if (!w) continue
                 const p = toScreen(w)
@@ -632,6 +652,8 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
             <>
                 {/* 乗換エッジ（別々の駅IDを持つ駅同士）。路線・駅ノードより下にグレーの点線で描画し、クリックは受け付けない */}
                 {showNodes && transfers.map((t, i) => {
+                    // 両端の駅がどちらも表示されているときだけ描く（7.43節）
+                    if (!visibleStationIds.has(t.stationId1) || !visibleStationIds.has(t.stationId2)) return null
                     const w1 = worldById.get(t.stationId1)
                     const w2 = worldById.get(t.stationId2)
                     if (!w1 || !w2) return null
@@ -653,6 +675,8 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
                 {/* 路線（駅順に駅ノードを結ぶ折れ線）。ハイライト対象外はグレーで描画する */}
                 {/* 並走区間では路線ごとに横へずらした平行線になる */}
                 {linePaths.map(({ line, pts, edges, bounds: lb }) => {
+                    // 非表示の事業者種別の路線は描かない（ずらし量は全路線で計算したままなので、残りの線の位置は変わらない）
+                    if (!visibleLineIds.has(line.id)) return null
                     // 路線の範囲が表示範囲と重ならなければ描画しない
                     if (lb.maxX < visMinX || lb.minX > visMaxX || lb.maxY < visMinY || lb.minY > visMaxY) return null
                     const isActive = activeLineIds.has(line.id)
@@ -775,14 +799,13 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
             {toolbarExtra}
             </div>
 
-            {/* ルート選択ポップアップ。路線図の上に半透明の背景ごと重ね、表示中は路線図を操作できないようにする。
-                背景のクリックは何も追加せずに閉じる */}
+            {/* ルート選択ポップアップ。画面ヘッダーを含む画面全体に半透明の背景を重ね、表示中はポップアップの外を操作できないようにする。
+                背景のクリックでは閉じない（閉じるのは候補の選択か「キャンセル」のみ。7.43節） */}
             {routeChoice && (
                 <div
-                    onClick={() => setRouteChoice(null)}
                     style={{
-                        // 追加一覧ウィンドウ（z-index: 10）より上に重ねる（7.42節）
-                        position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)', zIndex: 20,
+                        // 画面全体（fixed）に広げ、追加一覧ウィンドウ（z-index: 10）より上に重ねる（7.42節・7.43節）
+                        position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.5)', zIndex: 20,
                         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
                     }}
                 >

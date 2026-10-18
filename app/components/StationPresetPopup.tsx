@@ -5,7 +5,7 @@ import "../type"
 import {
     loadLineDB, loadStationDB, loadLineConnectDB, loadTransferDB,
     PresetLine, PresetStation, PresetLineConnect, PresetTransfer,
-    StationSection, StagedRoute
+    StationSection, StagedRoute, PRESET_OPERATOR_TYPES, PresetOperatorType
 } from '../modules/loadStationPresets'
 import StationPresetMap from './StationPresetMap'
 
@@ -15,6 +15,41 @@ type Props = {
     // エントリ（既存と重複しないもの）を渡す
     onAdd: (result: { stations: stationType[], newLines: Record<string, lineType>, newIcons: Record<string, iconParamsType> }) => void
     onClose: () => void
+}
+
+// 事業者種別の切替ボタンのアイコン（7.43節）。車両の正面を簡略化した線画（24×24、色は文字色に従う）
+const OPERATOR_TYPE_ICONS: Record<PresetOperatorType, React.ReactNode> = {
+    // 新幹線: 丸みのある先頭形状と流線形の窓
+    '新幹線': (
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 2.5c-4.2 0-7 3.4-7 8.5v5.5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11c0-5.1-2.8-8.5-7-8.5z" />
+            <path d="M7.5 10.5c.3-2.6 2.1-4.5 4.5-4.5s4.2 1.9 4.5 4.5z" />
+            <circle cx="8.5" cy="15" r="0.9" />
+            <circle cx="15.5" cy="15" r="0.9" />
+            <path d="M8 21.5l1.5-3M16 21.5l-1.5-3" />
+        </svg>
+    ),
+    // JR在来線: 角ばった車体と横長の窓
+    'JR在来線': (
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+            <rect x="5" y="2.5" width="14" height="16" rx="2" />
+            <rect x="7.5" y="5.5" width="9" height="5" rx="0.5" />
+            <circle cx="8.5" cy="15" r="0.9" />
+            <circle cx="15.5" cy="15" r="0.9" />
+            <path d="M8 21.5l1.5-3M16 21.5l-1.5-3" />
+        </svg>
+    ),
+    // 私鉄: 丸みのある車体と2枚の窓
+    '私鉄': (
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+            <rect x="5" y="2.5" width="14" height="16" rx="4" />
+            <rect x="7.5" y="5.5" width="4" height="5" rx="0.5" />
+            <rect x="12.5" y="5.5" width="4" height="5" rx="0.5" />
+            <circle cx="8.5" cy="15" r="0.9" />
+            <circle cx="15.5" cy="15" r="0.9" />
+            <path d="M8 21.5l1.5-3M16 21.5l-1.5-3" />
+        </svg>
+    ),
 }
 
 // 前駅参照: 駅データ・選択時の路線ID・lineConnects 上の位置インデックスをまとめて保持
@@ -122,6 +157,18 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [loadError, setLoadError] = useState<string | null>(null)
     // 追加一覧ウィンドウの開閉（7.42節）。画面を開くたびに「開いた状態」から始める
     const [isStagingOpen, setIsStagingOpen] = useState<boolean>(true)
+    // 路線図に表示する事業者種別（7.43節）。画面を開くたびに全種別を表示した状態から始める
+    const [visibleOperatorTypes, setVisibleOperatorTypes] = useState<ReadonlySet<PresetOperatorType>>(() => new Set(PRESET_OPERATOR_TYPES))
+
+    // 事業者種別の表示・非表示を切り替える
+    const toggleOperatorType = (type: PresetOperatorType) => {
+        setVisibleOperatorTypes(prev => {
+            const next = new Set(prev)
+            if (next.has(type)) next.delete(type)
+            else next.add(type)
+            return next
+        })
+    }
 
     // 全画面表示の間は、後ろのエディタのページがスクロールしないようにする（閉じたら元に戻す）
     useEffect(() => {
@@ -472,7 +519,29 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             <div className="app-header preset-screen-header">
                 <h1>ポケットLCD</h1>
                 <span className="preset-screen-title">路線図から追加</span>
-                <button onClick={onClose} className="btn-secondary app-header-display-btn">追加せず閉じる</button>
+                {/* 事業者種別の切替ボタン（アイコン＋名前の正方形）。表示中の種別はハイライトする（7.43節） */}
+                <div className="preset-type-toggles">
+                    {PRESET_OPERATOR_TYPES.map(type => {
+                        const isVisible = visibleOperatorTypes.has(type)
+                        return (
+                            <button
+                                key={type}
+                                className={`preset-type-toggle${isVisible ? ' is-on' : ''}`}
+                                onClick={() => toggleOperatorType(type)}
+                                aria-pressed={isVisible}
+                                title={`${type}を${isVisible ? '非表示' : '表示'}にする`}
+                            >
+                                {OPERATOR_TYPE_ICONS[type]}
+                                <span>{type}</span>
+                            </button>
+                        )
+                    })}
+                </div>
+                {/* 縦画面では表記を「閉じる」に縮める（globals.css） */}
+                <button onClick={onClose} className="btn-secondary app-header-display-btn">
+                    <span className="preset-close-label-long">追加せず閉じる</span>
+                    <span className="preset-close-label-short">閉じる</span>
+                </button>
             </div>
 
             {/* 路線図（ヘッダーより下の全体）と、その上に重ねる追加一覧ウィンドウ */}
@@ -486,6 +555,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     transfers={transfers}
                     startStationId={prevStation?.station.id ?? null}
                     onSelect={handleMapSelect}
+                    visibleOperatorTypes={visibleOperatorTypes}
                     toolbarExtra={
                         <div className="preset-map-guidance">
                             <span>{guidanceText}</span>

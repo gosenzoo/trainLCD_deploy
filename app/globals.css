@@ -717,9 +717,11 @@ tr:hover td {
   background: var(--bg-base);
 }
 
-/* 画面ヘッダー（.app-header の見た目を使い、sticky は解除する） */
+/* 画面ヘッダー（.app-header の見た目を使い、sticky は解除する）。
+   flex の子要素では static でも z-index が効くため auto に戻し、ルート選択ポップアップの背景より下にする（7.43節） */
 .preset-screen-header {
   position: static;
+  z-index: auto;
   flex-shrink: 0;
 }
 
@@ -734,6 +736,46 @@ tr:hover td {
   margin-left: 10px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* 事業者種別の切替ボタン（7.43節）。アイコンの下に名前を置いた正方形 */
+.preset-type-toggles {
+  display: flex;
+  gap: 6px;
+  margin-left: 16px;
+}
+
+.preset-type-toggle {
+  width: 56px;
+  height: 56px;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--text-muted);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+/* 表示中の種別はハイライトする */
+.preset-type-toggle.is-on {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* 「追加せず閉じる」ボタンの表記（縦画面では短い表記に切り替える） */
+.preset-close-label-short {
+  display: none;
 }
 
 /* 本体: 路線図を全体に表示し、追加一覧ウィンドウを重ねる基準 */
@@ -845,17 +887,44 @@ tr:hover td {
   }
   /* 幅の狭い縦画面ではヘッダーを詰めて1行に収める */
   .preset-screen-header {
-    padding: 10px 12px;
+    padding: 8px 8px;
   }
   .preset-screen-header h1 {
-    font-size: 1.15rem;
+    font-size: 0.95rem;
+    letter-spacing: 0;
   }
   .preset-screen-header::before {
-    margin-right: 8px;
+    margin-right: 6px;
   }
   .preset-screen-title {
+    margin-left: 4px;
+    font-size: 0.72rem;
+  }
+  .preset-screen-header .app-header-display-btn {
+    padding: 6px 8px;
+    flex-shrink: 0;
+  }
+  /* 切替ボタンを小さくし、「追加せず閉じる」を「閉じる」に縮めて1行に収める */
+  .preset-type-toggles {
+    gap: 3px;
     margin-left: 6px;
-    font-size: 0.85rem;
+  }
+  .preset-type-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 1px;
+    gap: 0;
+    font-size: 0.55rem;
+  }
+  .preset-type-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+  .preset-close-label-long {
+    display: none;
+  }
+  .preset-close-label-short {
+    display: inline;
   }
 }
 
