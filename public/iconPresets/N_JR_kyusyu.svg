@@ -1,0 +1,8 @@
+<svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <rect id="outline" x="0" y="0" rx="18" ry="18" width="225" height="225" stroke-width="5" stroke="#ffffff" />
+    <rect id="lineColor" x="0" y="0" rx="18" ry="18" width="225" height="225" fill="#ff0000" />
+    <rect id="back" x="12" y="79" rx="5" ry="5" width="201" height="134" fill="#ffffff" />
+    <rect id="symbolArea" x="30" y="8" width="165" height="64" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(255, 255, 255)"}' lang="en" />
+    <rect id="numberArea" x="20" y="88" width="185" height="116" fill="#99999950" data-style='{"fontFamily": "sans-serif", "fontWeight": "bold", "textAnchor": "middle", "fill": "rgb(0, 0, 0)"}' lang="en" />
+    <!-- <image href="./O_N_JR_kyusyu.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>

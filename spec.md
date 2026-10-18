@@ -1861,19 +1861,24 @@ classDiagram
 
 | キー | 名称 | 用途 |
 |---|---|---|
-| `I_tokyu` | 東急 | 路線アイコン |
 | `I_JR_east` | JR東日本 | 路線アイコン |
-| `I_tokyo_subway` | 東京地下鉄 | 路線アイコン |
 | `I_JR_west` | JR西日本 | 路線アイコン |
+| `I_JR_central` | JR東海 | 路線アイコン |
+| `I_tokyo_subway` | 東京地下鉄 | 路線アイコン |
+| `I_tokyu` | 東急 | 路線アイコン |
 | `I_mono_color` | 単色 | 路線アイコン |
 | `I_train_normal1` | 地上路線汎用１ | 路線アイコン |
 | `I_train_normal2` | 地上路線汎用２ | 路線アイコン |
 | `I_train_subway1` | 地下路線汎用 | 路線アイコン |
-| `N_tokyu` | 東急 | ナンバリング |
 | `N_JR_east` | JR東日本 | ナンバリング |
-| `N_tokyo_subway` | 東京地下鉄 | ナンバリング |
 | `N_JR_west` | JR西日本 | ナンバリング |
 | `N_JR_central` | JR東海 | ナンバリング |
+| `N_JR_hokkaido` | JR北海道 | ナンバリング |
+| `N_JR_shikoku` | JR四国 | ナンバリング |
+| `N_JR_kyusyu` | JR九州 | ナンバリング |
+| `N_sapporo` | 札幌駅 | ナンバリング（記号欄なし・枠の色は黒で固定。路線カラーは反映しない） |
+| `N_tokyo_subway` | 東京地下鉄 | ナンバリング |
+| `N_tokyu` | 東急 | ナンバリング |
 
 ### SVG プリセットの構造
 
@@ -5031,3 +5036,25 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `scripts/presetData/build_presets.py` | JR東海の路線アイコンを `I_JR_central` に |
 | `public/csv/presetLines/lineDB.csv` | JR東海の路線アイコン列を更新 |
 | `app/components/StationPresetPopup.tsx` | 既存の路線の流用を、全ての項目（`lineIconKey` を含む）が一致する場合に限る |
+
+### 7.41 JR北海道・JR四国・JR九州・札幌駅のナンバリングのプリセット
+
+ナンバリングのプリセット `N_JR_hokkaido`（JR北海道）・`N_JR_shikoku`（JR四国）・`N_JR_kyusyu`（JR九州）・`N_sapporo`（札幌駅）を追加する。
+
+- プリセットの SVG を `public/iconPresets/`（表示画面用。作成いただいたもの）から `assets/iconPresets/`（エディタ用）に複製し、`node scripts/generateIconPresetTexts.js` で `src/generated/iconPresetTexts.ts` を再生成する
+- ナンバリング選択の一覧（`app/modules/presetIndex.ts` の `numberIndexes`）に「JR北海道」「JR四国」「JR九州」「札幌駅」を追加する
+- 選択の一覧の並び順を事業者順にそろえる（プリセット種別一覧の表の順）
+  - ナンバリング（`numberIndexes`）: JR東日本、JR西日本、JR東海、JR北海道、JR四国、JR九州、札幌駅、東京地下鉄、東急
+  - 路線アイコン（`iconIndexes`）: 上の順のうちプリセットがあるもの（JR東日本、JR西日本、JR東海、東京地下鉄、東急）、続けて単色、地上路線汎用１、地上路線汎用２、地下路線汎用
+- `N_sapporo` は記号欄（`symbolArea`）がなく番号だけを描く。枠の色は黒で固定（`lineColor` の要素がない）なので、路線カラーは反映されない
+- 参考画像は `public/iconPresets/` で `O_〜.png` の名前に変わったため、`assets/iconPresets/` も同じにそろえる（旧名の `〜-original.png`・`JRC_I_original.png` を `O_〜.png` に置き換える）
+- 駅プリセット（路線図）のデータは変えない。これらの事業者の路線を追加するときに使う
+
+#### 変更ファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `assets/iconPresets/N_JR_hokkaido.svg`・`N_JR_shikoku.svg`・`N_JR_kyusyu.svg`・`N_sapporo.svg` | 新規（`public/iconPresets/` から複製） |
+| `assets/iconPresets/O_〜.png` | 参考画像を `public/iconPresets/` と同じ名前にそろえる |
+| `src/generated/iconPresetTexts.ts` | 再生成 |
+| `app/modules/presetIndex.ts` | `numberIndexes` に4つを追加、`iconIndexes`・`numberIndexes` を事業者順に並べ替え |
