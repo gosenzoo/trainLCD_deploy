@@ -48,6 +48,9 @@ const EditorHead: React.FC<editorHeadType> = ({setting, setSetting, displayType,
                             readData.operationDict = { "0": structuredClone(initSettingObject.operation) }
                         }
                         Object.values(readData.operationDict).forEach((op: any) => {
+                            // isAutoDestination がない旧データは、行先が空ならオン・入力済みならオフにする（7.49節）。
+                            // mergeProperties で初期値（オン）が入る前に決める
+                            if (op.isAutoDestination === undefined) op.isAutoDestination = !op.destination
                             mergeProperties(op, initSettingObject.operation)
                         });
                         readData.stationList.forEach(station => {

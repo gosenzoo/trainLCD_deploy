@@ -4,11 +4,14 @@ import React, { useEffect, useRef } from 'react'
 import "../type"
 import { loadIconPresetTexts } from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
+import { resolveDestination } from '../modules/resolveDestination'
 
 type OperationInfoBalloonProps = {
     // 表示する運用のID（operationDictのキー）と運用データ
     operationId: string
     operation: operationType
+    // 実際に表示される行先（7.49節）を求めるための駅一覧
+    stationList: stationType[]
     // 吹き出しの表示位置（クリックされた位置を基準にする）
     x: number
     y: number
@@ -33,7 +36,7 @@ const parseStationNumber = (numberStr: string): { symbol: string, number: string
 
 // 運用セルクリック時に運用情報（行先・種別・経由等・号車・行先番号）を表示する吹き出し。
 // 表示位置・閉じる操作・デザインは LineInfoBalloon と共通にする。
-const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId, operation, x, y, onClose }) => {
+const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId, operation, stationList, x, y, onClose }) => {
     const balloonRef = useRef<HTMLDivElement>(null)
     const presetIconDict = loadIconPresetTexts()
 
@@ -48,8 +51,11 @@ const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId
         return () => document.removeEventListener('mousedown', handleMouseDown)
     }, [onClose])
 
-    const { symbol, number } = parseStationNumber(operation.destinationNum)
-    const destNumHtml = createNumIconFromPreset(presetIconDict, operation.destinationNumIconKey, symbol, number, operation.destinationColor)?.outerHTML
+    // 行先は実際に表示されるもの（「行先を自動で設定する」がオンなら末尾停車駅の値）を出す（7.49節）
+    const isAuto = operation.isAutoDestination !== false
+    const dest = resolveDestination(operation, stationList)
+    const { symbol, number } = parseStationNumber(dest.destinationNum)
+    const destNumHtml = createNumIconFromPreset(presetIconDict, dest.destinationNumIconKey, symbol, number, dest.destinationColor)?.outerHTML
 
     return (
         <div
@@ -59,21 +65,22 @@ const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId
             onClick={e => e.stopPropagation()}
         >
             <button className="line-info-balloon-close" onClick={onClose} title="閉じる">×</button>
+            {/* 1行目: 「運用[id]」と、行先自動がオンなら同じ行にハイライトした札を並べる */}
             <div className="line-info-balloon-row">
-                <span className="line-info-balloon-label">運用ID</span>
-                <span>{operationId}</span>
+                <span>運用{operationId}</span>
+                {isAuto && <span className="operation-auto-dest-badge">行先自動</span>}
             </div>
             <div className="line-info-balloon-row">
                 <span className="line-info-balloon-label">行先</span>
-                <span>{operation.destination}</span>
+                <span>{dest.destination}</span>
             </div>
             <div className="line-info-balloon-row">
                 <span className="line-info-balloon-label">行先かな</span>
-                <span>{operation.destinationKana}</span>
+                <span>{dest.destinationKana}</span>
             </div>
             <div className="line-info-balloon-row">
                 <span className="line-info-balloon-label">行先英語</span>
-                <span>{operation.destinationEng}</span>
+                <span>{dest.destinationEng}</span>
             </div>
             <div className="line-info-balloon-row">
                 <span className="line-info-balloon-label">種別</span>

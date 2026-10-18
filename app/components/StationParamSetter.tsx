@@ -10,6 +10,7 @@ import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
 import LineAddPopup from './LineAddPopup'
+import { getOperationLabel } from '../modules/resolveDestination'
 import { IconArrowUp, IconArrowDown, IconTrash, IconPlus } from './SvgIcons'
 
 type stationParamsSetterProps = {
@@ -609,15 +610,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <option value="">（なし）</option>
                     {Object.entries(setting.operationDict ?? {})
                         .sort((a, b) => Number(a[0]) - Number(b[0]))
-                        .map(([key, op]) => {
-                            const parts: string[] = [key + ':']
-                            if (op.trainType) parts.push(op.trainType)
-                            if (op.direction) parts.push(op.direction)
-                            parts.push((op.destination || '行先未設定') + '行')
-                            return (
-                                <option key={key} value={key}>{parts.join(' ')}</option>
-                            )
-                        })
+                        .map(([key, op]) => (
+                            // 運用タブと同じラベル「運用[id]: [行先自動][種別] [行先]行」（7.49節）
+                            <option key={key} value={key}>{getOperationLabel(key, op, setting.stationList ?? [])}</option>
+                        ))
                     }
                 </select>
                 <br></br>

@@ -992,6 +992,17 @@ tr:hover td {
   white-space: nowrap;
 }
 
+/* 運用情報の吹き出しの「行先自動」の札（7.49節）。「行先を自動で設定する」がオンの運用だけに出す */
+.operation-auto-dest-badge {
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
 /* タイトル行（× ボタンと横並びにするためのラッパー） */
 .modal-title-row {
   display: flex;

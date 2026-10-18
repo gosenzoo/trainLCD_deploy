@@ -86,22 +86,42 @@ function applyOperationFallbacks(operation, lastStopStation) {
             isDrawStopText: false, isDrawLine: false, carLineColor: "#FFFFFF",
             startStationInd: "0"
         };
+        // 運用が未設定の区間は「行先を自動で設定する」がオンと同じ扱いにする（7.49節）
+        operation.isAutoDestination = true;
+    } else {
+        // 元の運用（operationDict のエントリ）を書き換えないよう複製してから上書きする
+        operation = { ...operation };
     }
+    // isAutoDestination がない旧データはオンとみなす
+    const isAuto = operation.isAutoDestination !== false;
 
-    // 行先パラメータが空の場合は末尾停車駅の値で補完
+    // 「行先を自動で設定する」がオンなら行先の6項目を末尾停車駅の値で上書きし、オフなら運用の値をそのまま使う（7.49節）
+    // ナンバリングは駅の numIcon サブオブジェクトから取る（終点に着く側の路線なので numIconNext ではなく numIcon）
+    const lastNumIcon = lastStopStation?.numIcon || {};
+    const lastStopValues = {
+        name: lastStopStation?.name,
+        kana: lastStopStation?.kana,
+        eng:  lastStopStation?.eng,
+        // parseStationNumber で記号と番号に戻せるよう「記号 番号」の形にする（記号が空なら番号のみ）
+        number: lastNumIcon.number
+            ? (lastNumIcon.symbol ? `${lastNumIcon.symbol} ${lastNumIcon.number}` : lastNumIcon.number)
+            : "",
+        color:     lastNumIcon.color,
+        presetKey: lastNumIcon.presetKey,
+    };
     const destFallbackMap = [
         ["destination",           "name"],
         ["destinationKana",       "kana"],
         ["destinationEng",        "eng"],
         ["destinationNum",        "number"],
-        ["destinationColor",      "lineColor"],
-        ["destinationNumIconKey", "numIconPresetKey"],
+        ["destinationColor",      "color"],
+        ["destinationNumIconKey", "presetKey"],
     ];
-    destFallbackMap.forEach(([opField, stationField]) => {
-        if (!operation[opField] && lastStopStation?.[stationField]) {
-            operation[opField] = lastStopStation[stationField];
-        }
-    });
+    if (isAuto) {
+        destFallbackMap.forEach(([opField, valueKey]) => {
+            operation[opField] = lastStopValues[valueKey] || "";
+        });
+    }
 
     // その他パラメータが空の場合は固定デフォルト値で補完
     const fixedFallbackMap = [

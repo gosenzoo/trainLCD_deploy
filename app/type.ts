@@ -83,6 +83,8 @@ type operationType = {
     destinationNum: string,
     destinationColor: string,
     destinationNumIconKey: string,
+    // 行先を自動で設定する（7.49節）。true なら行先の6項目は使わず末尾停車駅の値で表示する
+    isAutoDestination: boolean,
     direction: string,
     trainType: string,
     trainTypeEng: string,
@@ -174,4 +176,4 @@ type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' 
 type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
 
 type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
-    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor'
+    'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'isAutoDestination'

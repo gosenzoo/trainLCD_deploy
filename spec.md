@@ -212,7 +212,8 @@ classDiagram
 | `destination` / `destinationKana` / `destinationEng` | string | 行先（日本語・かな・英語） |
 | `destinationNum` | string | 行先ナンバリング記号（例: `JT-01`） |
 | `destinationColor` | string | 行先表示の文字色（HEX） |
-| `destinationNumIconKey` | string | 行先ナンバリングのアイコンキー |
+| `destinationNumIconKey` | string | 行先ナンバリングのアイコンキー。初期値 `N_JR_east`（7.49節） |
+| `isAutoDestination` | boolean | 行先を自動で設定する（7.49節）。`true` なら行先関連の6項目を使わず、末尾停車駅の値で表示する（`direction` は対象外）。初期値 `true` |
 | `direction` | string | 経由・方面表示 |
 | `trainType` / `trainTypeEng` | string | 列車種別（例: 急行 / Express） |
 | `trainTypeSub` / `trainTypeSubEng` | string | 種別補足テキスト |
@@ -852,7 +853,7 @@ type GenericItemListProps<T> = {
 | ラベル | 次区間運用 |
 | UI | `<select>` |
 | 先頭選択肢 | `""` / `"(なし)"` — `station.operationId` に空文字を設定する |
-| その後の選択肢 | `operationDict` の各エントリを `"[id]: [trainType] [direction] [destination]行"` 形式で表示 |
+| その後の選択肢 | `operationDict` の各エントリを運用タブのラベル（4.9節「タブラベルの生成ロジック」）と同じ形式で表示（7.49節） |
 | 値 | 選択された `operationDict` のキー文字列（`station.operationId` に格納） |
 
 ---
@@ -1245,7 +1246,7 @@ export function moveDictItemsDown<T>(
 
 **路線セルクリック時の吹き出し表示**: `onClick`（4.5節参照）で、クリックされたセルの `station.lineId` に対応する `lineDict` の情報を吹き出し（`LineInfoBalloon` コンポーネント）で表示する。
 
-- 表示内容: 路線名（`line.name`）・路線名かな（`line.kana`）・路線名英語（`line.eng`）・路線記号の画像（`line.numIconPresetKey` の `createNumIconFromPreset` に `line.symbol`・`line.color` を渡して生成したSVG）
+- 表示内容: 路線名（`line.name`）・路線名かな（`line.kana`）・路線名英語（`line.eng`）・路線記号・ナンバリングフォーマット（7.50節）
 - `lineId` が未設定、または `lineDict` に該当エントリが存在しない場合は吹き出しを表示しない
 - 吹き出しはクリックされた位置（`event.clientX` / `event.clientY`）を基準に `position: fixed` で表示する
 - 閉じる操作: 吹き出し右上の「×」ボタンをクリック、または吹き出し外側をクリック（`mousedown` を `document` で監視し、吹き出し自身の要素に含まれないクリックで閉じる）
@@ -1279,10 +1280,10 @@ export function moveDictItemsDown<T>(
 
 | 項目 | 参照するフィールド |
 |---|---|
-| 運用ID | `station.operationId`（`operationDict` のキー） |
-| 行先 | `operation.destination` |
-| 行先かな | `operation.destinationKana` |
-| 行先英語 | `operation.destinationEng` |
+| 運用ID | 1行目に `運用[station.operationId]` と表示する。`operation.isAutoDestination` が `true` なら、同じ行に `行先自動` の札をハイライトして並べる（7.49節） |
+| 行先 | 実際に表示される行先（7.49節。オンなら末尾停車駅の `name`、オフなら `operation.destination`）。行先かな・行先英語・行先番号も同様 |
+| 行先かな | 同上（`kana` / `operation.destinationKana`） |
+| 行先英語 | 同上（`eng` / `operation.destinationEng`） |
 | 種別 | `operation.trainType` |
 | 種別英語 | `operation.trainTypeEng` |
 | 経由等 | `operation.direction` |
@@ -1433,7 +1434,7 @@ export function moveDictItemsDown<T>(
 ```
 [ 運用を追加 ] [ 表示中を削除 ]
 ┌────────────────────┬────────────────────┬──────────┐
-│ 0: 急行 渋谷経由 元町行 │ 1: 各停 元町行       │  ...  │  ← タブ行
+│ 運用0: 急行 元町行  │ 運用1: (行先自動)各停 渋谷行 │  ...  │  ← タブ行
 └────────────────────┴────────────────────┴──────────┘
   選択中の運用IDに対応するフォーム内容
 ```
@@ -1444,16 +1445,18 @@ export function moveDictItemsDown<T>(
 
 #### タブラベルの生成ロジック
 
-タブに表示するテキスト: **「[id]: [trainType] [direction] [destination]行」**
+タブに表示するテキスト: **「運用[id]: [行先自動][trainType] [destination]行」**（7.49節で変更。経由等は入れない）
 
 | フィールド | 内容 |
 |---|---|
 | `id` | `operationDict` のキー |
-| `trainType` | `operation.trainType`（空の場合は省略） |
-| `direction` | `operation.direction`（空の場合は省略） |
-| `destination` | `operation.destination`（空の場合は `"行先未設定"`） |
+| 行先自動 | 「行先を自動で設定する」がオンなら `(行先自動)`、オフなら省略。後ろに空白を入れない |
+| `trainType` | `operation.trainType`（空の場合は省略。後ろの空白も入れない） |
+| `destination` | 実際に表示される行先（7.49節。オンなら末尾停車駅名、オフなら `operation.destination`）。空の場合は `"行先未設定"` |
 
-例: `"0: 急行 渋谷経由 元町・中華街行"` / `"1: 各停 元町・中華街行"`
+例: `"運用0: 急行 元町・中華街行"` / `"運用1: (行先自動)各停 渋谷行"` / `"運用2: (行先自動)渋谷行"`（種別が空）
+
+次区間運用の選択肢（`StationParamSetter`）も同じ形式で表示する。
 
 #### 運用追加・削除
 
@@ -1768,7 +1771,7 @@ type ToggleSwitchProps = {
 | コンポーネント | フィールド |
 |---|---|
 | `EditorHead` | `isLoop`、`isMoveByCoord` |
-| `OperationForm` | `isDispTime`、`isDispLineName`、`isDrawStopText`、`isDrawLine` |
+| `OperationForm` | `isAutoDestination`、`isDispTime`、`isDispLineName`、`isDrawStopText`、`isDrawLine` |
 
 **トグルボタン** — `btn-toggle` / `btn-toggle--active` クラス (`app/globals.css`):
 - 通常状態: 通常ボタンと同じ見た目
@@ -3291,16 +3294,18 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 
 #### ② 行先パラメータが空の場合（① の後に必ず実施）
 
-`nowOperation` の行先関連フィールドが空文字・`null`・`undefined` の場合、末尾停車駅の対応する値で上書きする。
+`nowOperation` の行先関連フィールドを、末尾停車駅の対応する値で上書きする。上書きする条件は 7.49節のとおり（`isAutoDestination` が `true` なら値の有無にかかわらず上書き、`false` なら上書きしない）。下表の固定値の項目は従来どおり、空文字・`null`・`undefined` の場合に補完する。
 
 | operation フィールド | 参照元（末尾停車駅） |
 |---|---|
 | `destination` | `.name` |
 | `destinationKana` | `.kana` |
 | `destinationEng` | `.eng` |
-| `destinationNum` | `.number` |
-| `destinationColor` | `.lineColor` |
-| `destinationNumIconKey` | `.numIconPresetKey` |
+| `destinationNum` | `.numIcon.number` が空でなければ `.numIcon.symbol` と半角スペースで連結した文字列（例: `"JY 01"`。記号が空なら番号のみ）。`parseStationNumber` で記号と番号に戻せる形にする |
+| `destinationColor` | `.numIcon.color` |
+| `destinationNumIconKey` | `.numIcon.presetKey` |
+
+※ ナンバリングの3項目は、駅データが `numIcon` サブオブジェクトに移ったあとも旧フィールド（`.number`・`.lineColor`・`.numIconPresetKey`）を参照していて補完されていなかったため、参照先を `numIcon` に改めた。路線をまたぐ駅でも、終点に着く側の路線である `numIcon`（`numIconNext` ではない）を使う。
 | `carNumber` | `"1"`（固定） |
 | `trainType` | `"普通"`（固定） |
 | `trainTypeEng` | `"Local"`（固定） |
@@ -5521,3 +5526,85 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `scripts/presetData/sources/transfer_groups.json` | 名前の違う乗換駅の乗換エッジを追加 |
 | `scripts/presetData/build_presets.py` | 事業者（`COMPANIES`）に新幹線の路線ID を追加。新幹線の路線は隣駅距離の「離れすぎ」を調べない |
 | `public/csv/presetLines/*.csv` | 再生成 |
+
+### 7.49 運用設定 — 「行先を自動で設定する」
+
+運用設定の「行先」欄に、行先を駅一覧から自動で決めるかどうかのトグルスイッチを追加する。
+
+#### 画面
+
+「行先」欄の最上段に「行先を自動で設定する」（`ToggleSwitch`）を置く。
+
+| 状態 | 行先欄の他の項目 | 表示に使う値 |
+|---|---|---|
+| オン（初期値） | グレーアウトして編集不可（`.form-disabled`）。入力済みの値は消さずに残す | 末尾停車駅（下記）の値 |
+| オフ | グレーアウトを解除 | 行先欄に入力した値 |
+
+グレーアウトするのは、行き先・行き先かな・行き先(英語)・行き先ナンバリング・行き先色・行先ナンバリング記号の6項目。経由等はオン・オフにかかわらず入力でき、表示にも使う。「すべての運用に適用」がオンのときは、他のトグルと同じく全運用に反映する。
+
+#### 表示（`applyOperationFallbacks`）
+
+末尾停車駅は従来どおり、駅一覧を末尾から見て最初の停車駅（`isPass` が `false`）。なければ最後の駅。
+
+| 項目 | オン | オフ |
+|---|---|---|
+| `destination`・`destinationKana`・`destinationEng` | 末尾停車駅の `name`・`kana`・`eng` | 運用の値（空なら空のまま） |
+| `destinationNum`・`destinationColor`・`destinationNumIconKey` | 末尾停車駅の `numIcon` から作る（変換規則は 7章「行先パラメータが空の場合」の表） | 運用の値（空なら空のまま） |
+| `direction`（経由等） | 運用の値 | 運用の値 |
+
+- 運用が未設定（駅の `operationId` が空、または存在しない運用）の場合は、オンと同じ扱いにする。
+- `isAutoDestination` が `undefined` のとき（下記マイグレーション前のデータ）は `true` とみなす。
+
+#### タブラベル
+
+運用タブのラベルと次区間運用の選択肢は「運用[id]: [行先自動][trainType] [destination]行」の形式にする（詳細は 4.9節「タブラベルの生成ロジック」）。オンなら `(行先自動)` を付け、行先に末尾停車駅名を使う。
+
+#### エディタ上の行先の表示
+
+エディタで行先を表示する箇所は、すべて「実際に表示される行先」（表示側の `applyOperationFallbacks` と同じ結果）を出す。求め方は `app/modules/resolveDestination.ts` にまとめ、表示側と同じ規則（オンなら末尾停車駅の値、オフなら運用の値）にする。
+
+| 箇所 | オン | オフ |
+|---|---|---|
+| 運用タブのラベル（`OperationForm`） | `運用0: (行先自動)急行 渋谷行` | `運用0: 急行 元町・中華街行` |
+| 次区間運用の選択肢（`StationParamSetter`） | 同上 | 同上 |
+| 運用情報の吹き出し（`OperationInfoBalloon`） | 1行目に `運用0` と並べて `行先自動` の札をハイライト（`--accent` の背景・白文字の小さな札）して出す。行先・行先かな・行先英語・行先番号は末尾停車駅の値 | 1行目は `運用0` のみ。値は運用のもの |
+
+末尾停車駅がない（駅一覧が空）場合の行先は空文字とし、ラベルは従来どおり「行先未設定」を使う。
+
+#### 初期値とマイグレーション
+
+- 新しい運用（`initOperationObject`）は `isAutoDestination: true`、`destinationNumIconKey: "N_JR_east"`。
+- 既存データ（ファイル読み込み・localStorage からの自動読み込み）で `isAutoDestination` がない運用は、`destination` が空なら `true`、入力済みなら `false` にする。入力済みの行先がそのまま表示されるようにするため。
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/type.ts` | `operationType` に `isAutoDestination` を追加 |
+| `app/initSettingObject.tsx` | `isAutoDestination: true`、`destinationNumIconKey: "N_JR_east"` |
+| `app/modules/resolveDestination.ts` | 新規。実際に表示される行先を求める |
+| `app/components/OperationForm.tsx` | トグルの追加、グレーアウト、タブラベル |
+| `app/components/StationParamSetter.tsx` | 次区間運用の選択肢のラベル |
+| `app/components/OperationInfoBalloon.tsx`・`StationList.tsx` | 吹き出しに「行先自動」の札と実際の行先を出す（駅一覧を渡す） |
+| `app/globals.css` | 「行先自動」の札のハイライト |
+| `app/components/Editor.tsx`・`EditorHead.tsx` | 読み込み時のマイグレーション |
+| `public/Controller/src/utility/utils.js` | `applyOperationFallbacks` をオン/オフで切り替える |
+
+### 7.50 路線情報の吹き出し — 路線記号とナンバリングフォーマット
+
+駅一覧の「路線」列をクリックしたときの吹き出し（`LineInfoBalloon`）で、「路線記号」欄にナンバリングの画像が出ていたのを改め、路線記号（路線アイコン）を出す。ナンバリングの画像は新しい「ナンバリングフォーマット」欄に移す。
+
+| 欄 | 表示内容 |
+|---|---|
+| 路線記号 | その路線の路線アイコンと、その右隣に `[プリセット名]`（例: `[JR東日本]`）。`line.lineIconKey` で `iconDict` を引き、路線設定の一覧（`LineList` の「路線記号」列）と同じ方法で描く（画像ならその画像、プリセットなら `createNumIconFromPreset` に `presetType`・`symbol`・`color` を渡して生成したSVG）。プリセット名は `iconIndexes` の `name`、画像なら `[画像]` |
+| ナンバリングフォーマット | これまで「路線記号」欄に出していた画像（`line.numIconPresetKey` の `createNumIconFromPreset` に `line.symbol`・`line.color` を渡して生成したSVG）と、その右隣に `[プリセット名]`（例: `[JR東日本]`）。プリセット名は `numberIndexes` の `name` |
+
+- プリセットのキーが一覧（`iconIndexes`・`numberIndexes`）にない場合はアイコンを描けないため、アイコンの代わりに `キー:[キー](未登録)` の文字（例: `キー:N_foo(未登録)`）を出す。
+- 路線アイコンが未設定（`lineIconKey` が空、または `iconDict` にない）、ナンバリングのキーが空の場合は空欄にする。
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/LineInfoBalloon.tsx` | 路線記号・ナンバリングフォーマットの欄 |
+| `app/components/StationList.tsx` | 吹き出しに `iconDict` を渡す |

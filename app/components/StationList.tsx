@@ -468,6 +468,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             {lineInfoBalloon && (
                 <LineInfoBalloon
                     line={lineInfoBalloon.line}
+                    iconDict={setting.iconDict}
                     x={lineInfoBalloon.x}
                     y={lineInfoBalloon.y}
                     onClose={() => setLineInfoBalloon(null)}
@@ -479,6 +480,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 <OperationInfoBalloon
                     operationId={operationInfoBalloon.operationId}
                     operation={operationInfoBalloon.operation}
+                    stationList={setting.stationList}
                     x={operationInfoBalloon.x}
                     y={operationInfoBalloon.y}
                     onClose={() => setOperationInfoBalloon(null)}

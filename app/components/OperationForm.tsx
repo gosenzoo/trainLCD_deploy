@@ -5,19 +5,11 @@ import "../type"
 import initObjects from "../initSettingObject"
 import { numberIndexes } from "../modules/presetIndex"
 import ToggleSwitch from './ToggleSwitch'
+import { getOperationLabel } from "../modules/resolveDestination"
 
 type operationFormType = {
     setting: settingType,
     setSetting: React.Dispatch<React.SetStateAction<settingType>>
-}
-
-// operationDictのエントリからタブラベルを生成する: "[id]: [trainType] [direction] [destination]行"
-const getTabLabel = (id: string, operation: operationType): string => {
-    const parts: string[] = [id + ':']
-    if (operation.trainType) parts.push(operation.trainType)
-    if (operation.direction) parts.push(operation.direction)
-    parts.push((operation.destination || '行先未設定') + '行')
-    return parts.join(' ')
 }
 
 const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
@@ -104,7 +96,8 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                         onClick={() => setSelectedKey(key)}
                         className={`tab-btn${key === effectiveKey ? ' active' : ''}`}
                     >
-                        {getTabLabel(key, dict[key])}
+                        {/* タブラベル「運用[id]: [行先自動][種別] [行先]行」（7.49節） */}
+                        {getOperationLabel(key, dict[key], setting.stationList ?? [])}
                     </button>
                 ))}
             </div>
@@ -135,6 +128,12 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             </fieldset>
             <fieldset>
             <legend>行先</legend>
+            {/* オンのときは末尾停車駅を行先にし、下の6項目をグレーアウトする（7.49節）。経由等は対象外 */}
+            <div className="form-row">
+                <label>行先を自動で設定する</label>
+                <ToggleSwitch checked={operation.isAutoDestination} onChange={(v) => toggleUpdated(v, 'isAutoDestination')} />
+            </div>
+            <div className={operation.isAutoDestination ? 'form-disabled' : ''}>
             <div className="form-row">
                 <label>行き先</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'destination')} value={operation.destination} />
@@ -163,6 +162,7 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                     ))}
                 </select>
             </div>
+            </div>{/* /行先の自動設定でグレーアウトする範囲 */}
             <div className="form-row">
                 <label>経由等</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'direction')} value={operation.direction} />

@@ -32,6 +32,10 @@ const normalizeLoadedSetting = (loaded: any): settingType => {
     if (!loaded.operationDict || Object.keys(loaded.operationDict).length === 0) {
         loaded.operationDict = structuredClone(initSettingObject.setting.operationDict)
     }
+    // isAutoDestination がない旧データは、行先が空ならオン・入力済みならオフにする（7.49節）
+    Object.values(loaded.operationDict).forEach((op: any) => {
+        if (op.isAutoDestination === undefined) op.isAutoDestination = !op.destination
+    })
     if (!loaded.dispConfig) {
         loaded.dispConfig = structuredClone(initSettingObject.dispConfig);
     }
