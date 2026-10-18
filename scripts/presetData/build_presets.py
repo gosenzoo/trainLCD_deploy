@@ -22,6 +22,14 @@ COMPANIES = [
     # JR東日本の関東以外の路線・JR北海道（7.47節）。JR東日本は路線記号のない路線が I_mono_color になる（lineDB の出力時）
     (range(190, 226), 'JR東日本', 'I_JR_east', 'N_JR_east'),
     (range(226, 245), 'JR北海道', 'I_mono_color', 'N_JR_hokkaido'),
+    # 新幹線（7.48節）。路線ごとに運営会社が違う。路線アイコンはすべて路線カラーの四角
+    (range(245, 246), 'JR東海', 'I_mono_color', 'N_JR_central'),     # 東海道新幹線
+    (range(246, 247), 'JR西日本', 'I_mono_color', 'N_JR_west'),      # 山陽新幹線
+    (range(247, 249), 'JR九州', 'I_mono_color', 'N_JR_kyusyu'),      # 九州新幹線・西九州新幹線
+    (range(249, 253), 'JR東日本', 'I_mono_color', 'N_JR_east'),      # 東北・上越（ガーラ湯沢支線を含む）・北陸（東京〜上越妙高）
+    (range(253, 254), 'JR西日本', 'I_mono_color', 'N_JR_west'),      # 北陸新幹線（上越妙高〜敦賀）
+    (range(254, 256), 'JR東日本', 'I_mono_color', 'N_JR_east'),      # 山形新幹線・秋田新幹線
+    (range(256, 257), 'JR北海道', 'I_mono_color', 'N_JR_hokkaido'),  # 北海道新幹線
 ]
 
 # 駅ごとのナンバリングアイコン（7.47節）: 駅の識別キー → プリセット名。stationDB.csv の「ナンバリングアイコン」列に出力し、
@@ -358,7 +366,8 @@ for l in lines:
     pos = [stations[skey(l, s)] for s in sts]  # 最終的な座標
     for (a, b), (pa, pb) in zip(zip(sts, sts[1:]), zip(pos, pos[1:])):
         d = dist_km(pa, pb)
-        if d > 12 or d < 0.2:
+        # 新幹線は駅間が長いのが普通のため、離れすぎのチェックはしない（近すぎるチェックのみ。7.48節）
+        if (d > 12 and operator_type(l) != '新幹線') or d < 0.2:
             warnings.append(f'隣駅距離 {d:.1f}km: {l["name"]} {a["name"]}→{b["name"]}')
     # 折り返し（ジグザグ）の検出: 前後の駅を直接結ぶより大きく遠回りしている駅は座標の誤りの可能性が高い
     for (a, b, c), (pa, pb, pc) in zip(zip(sts, sts[1:], sts[2:]), zip(pos, pos[1:], pos[2:])):

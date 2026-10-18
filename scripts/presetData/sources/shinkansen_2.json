@@ -1,0 +1,769 @@
+{
+ "lines": [
+  {
+   "no": 249,
+   "name": "東北新幹線",
+   "kana": "とうほくしんかんせん",
+   "eng": "Tohoku Shinkansen",
+   "color": "#41934C",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "上野",
+     "kana": "うえの",
+     "eng": "Ueno",
+     "lat": 35.7134,
+     "lon": 139.7767,
+     "number": ""
+    },
+    {
+     "name": "大宮",
+     "kana": "おおみや",
+     "eng": "Omiya",
+     "lat": 35.9064,
+     "lon": 139.6239,
+     "number": ""
+    },
+    {
+     "name": "小山",
+     "kana": "おやま",
+     "eng": "Oyama",
+     "lat": 36.3136,
+     "lon": 139.8065,
+     "number": ""
+    },
+    {
+     "name": "宇都宮",
+     "kana": "うつのみや",
+     "eng": "Utsunomiya",
+     "lat": 36.5586,
+     "lon": 139.8983,
+     "number": ""
+    },
+    {
+     "name": "那須塩原",
+     "kana": "なすしおばら",
+     "eng": "Nasushiobara",
+     "lat": 36.9317,
+     "lon": 140.0207,
+     "number": ""
+    },
+    {
+     "name": "新白河",
+     "kana": "しんしらかわ",
+     "eng": "Shin-Shirakawa",
+     "lat": 37.1232,
+     "lon": 140.1888,
+     "number": ""
+    },
+    {
+     "name": "郡山",
+     "kana": "こおりやま",
+     "eng": "Koriyama",
+     "lat": 37.3978,
+     "lon": 140.3883,
+     "number": ""
+    },
+    {
+     "name": "福島",
+     "kana": "ふくしま",
+     "eng": "Fukushima",
+     "lat": 37.7544,
+     "lon": 140.4586,
+     "number": ""
+    },
+    {
+     "name": "白石蔵王",
+     "kana": "しろいしざおう",
+     "eng": "Shiroishi-Zao",
+     "lat": 37.9955,
+     "lon": 140.6331,
+     "number": ""
+    },
+    {
+     "name": "仙台",
+     "kana": "せんだい",
+     "eng": "Sendai",
+     "lat": 38.2603,
+     "lon": 140.8819,
+     "number": ""
+    },
+    {
+     "name": "古川",
+     "kana": "ふるかわ",
+     "eng": "Furukawa",
+     "lat": 38.5706,
+     "lon": 140.9677,
+     "number": ""
+    },
+    {
+     "name": "くりこま高原",
+     "kana": "くりこまこうげん",
+     "eng": "Kurikoma-Kogen",
+     "lat": 38.7491,
+     "lon": 141.0718,
+     "number": ""
+    },
+    {
+     "name": "一ノ関",
+     "kana": "いちのせき",
+     "eng": "Ichinoseki",
+     "lat": 38.9261,
+     "lon": 141.1392,
+     "number": ""
+    },
+    {
+     "name": "水沢江刺",
+     "kana": "みずさわえさし",
+     "eng": "Mizusawa-Esashi",
+     "lat": 39.1453,
+     "lon": 141.1887,
+     "number": ""
+    },
+    {
+     "name": "北上",
+     "kana": "きたかみ",
+     "eng": "Kitakami",
+     "lat": 39.2822,
+     "lon": 141.1223,
+     "number": ""
+    },
+    {
+     "name": "新花巻",
+     "kana": "しんはなまき",
+     "eng": "Shin-Hanamaki",
+     "lat": 39.4073,
+     "lon": 141.174,
+     "number": ""
+    },
+    {
+     "name": "盛岡",
+     "kana": "もりおか",
+     "eng": "Morioka",
+     "lat": 39.7014,
+     "lon": 141.1364,
+     "number": ""
+    },
+    {
+     "name": "いわて沼宮内",
+     "kana": "いわてぬまくない",
+     "eng": "Iwate-Numakunai",
+     "lat": 39.9608,
+     "lon": 141.2177,
+     "number": ""
+    },
+    {
+     "name": "二戸",
+     "kana": "にのへ",
+     "eng": "Ninohe",
+     "lat": 40.2599,
+     "lon": 141.2856,
+     "number": ""
+    },
+    {
+     "name": "八戸",
+     "kana": "はちのへ",
+     "eng": "Hachinohe",
+     "lat": 40.5094,
+     "lon": 141.4307,
+     "number": ""
+    },
+    {
+     "name": "七戸十和田",
+     "kana": "しちのへとわだ",
+     "eng": "Shichinohe-Towada",
+     "lat": 40.7199,
+     "lon": 141.154,
+     "number": ""
+    },
+    {
+     "name": "新青森",
+     "kana": "しんあおもり",
+     "eng": "Shin-Aomori",
+     "lat": 40.8275,
+     "lon": 140.6935,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 250,
+   "name": "上越新幹線",
+   "kana": "じょうえつしんかんせん",
+   "eng": "Joetsu Shinkansen",
+   "color": "#F58D79",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "上野",
+     "kana": "うえの",
+     "eng": "Ueno",
+     "lat": 35.7134,
+     "lon": 139.7767,
+     "number": ""
+    },
+    {
+     "name": "大宮",
+     "kana": "おおみや",
+     "eng": "Omiya",
+     "lat": 35.9064,
+     "lon": 139.6239,
+     "number": ""
+    },
+    {
+     "name": "熊谷",
+     "kana": "くまがや",
+     "eng": "Kumagaya",
+     "lat": 36.1397,
+     "lon": 139.39,
+     "number": ""
+    },
+    {
+     "name": "本庄早稲田",
+     "kana": "ほんじょうわせだ",
+     "eng": "Honjo-Waseda",
+     "lat": 36.2188,
+     "lon": 139.1795,
+     "number": ""
+    },
+    {
+     "name": "高崎",
+     "kana": "たかさき",
+     "eng": "Takasaki",
+     "lat": 36.3225,
+     "lon": 139.0128,
+     "number": ""
+    },
+    {
+     "name": "上毛高原",
+     "kana": "じょうもうこうげん",
+     "eng": "Jomo-Kogen",
+     "lat": 36.6932,
+     "lon": 138.9776,
+     "number": ""
+    },
+    {
+     "name": "越後湯沢",
+     "kana": "えちごゆざわ",
+     "eng": "Echigo-Yuzawa",
+     "lat": 36.9361,
+     "lon": 138.8099,
+     "number": ""
+    },
+    {
+     "name": "浦佐",
+     "kana": "うらさ",
+     "eng": "Urasa",
+     "lat": 37.1672,
+     "lon": 138.923,
+     "number": ""
+    },
+    {
+     "name": "長岡",
+     "kana": "ながおか",
+     "eng": "Nagaoka",
+     "lat": 37.4473,
+     "lon": 138.8542,
+     "number": ""
+    },
+    {
+     "name": "燕三条",
+     "kana": "つばめさんじょう",
+     "eng": "Tsubame-Sanjo",
+     "lat": 37.6477,
+     "lon": 138.939,
+     "number": ""
+    },
+    {
+     "name": "新潟",
+     "kana": "にいがた",
+     "eng": "Niigata",
+     "lat": 37.912,
+     "lon": 139.0619,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 251,
+   "name": "上越新幹線（ガーラ湯沢支線）",
+   "kana": "じょうえつしんかんせん（がーらゆざわしせん）",
+   "eng": "Joetsu Shinkansen (Gala-Yuzawa Branch)",
+   "color": "#F58D79",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "越後湯沢",
+     "kana": "えちごゆざわ",
+     "eng": "Echigo-Yuzawa",
+     "lat": 36.9361,
+     "lon": 138.8099,
+     "number": ""
+    },
+    {
+     "name": "ガーラ湯沢",
+     "kana": "がーらゆざわ",
+     "eng": "Gala-Yuzawa",
+     "lat": 36.9509,
+     "lon": 138.7995,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 252,
+   "name": "北陸新幹線",
+   "kana": "ほくりくしんかんせん",
+   "eng": "Hokuriku Shinkansen",
+   "color": "#6A3D98",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "上野",
+     "kana": "うえの",
+     "eng": "Ueno",
+     "lat": 35.7134,
+     "lon": 139.7767,
+     "number": ""
+    },
+    {
+     "name": "大宮",
+     "kana": "おおみや",
+     "eng": "Omiya",
+     "lat": 35.9064,
+     "lon": 139.6239,
+     "number": ""
+    },
+    {
+     "name": "熊谷",
+     "kana": "くまがや",
+     "eng": "Kumagaya",
+     "lat": 36.1397,
+     "lon": 139.39,
+     "number": ""
+    },
+    {
+     "name": "本庄早稲田",
+     "kana": "ほんじょうわせだ",
+     "eng": "Honjo-Waseda",
+     "lat": 36.2188,
+     "lon": 139.1795,
+     "number": ""
+    },
+    {
+     "name": "高崎",
+     "kana": "たかさき",
+     "eng": "Takasaki",
+     "lat": 36.3225,
+     "lon": 139.0128,
+     "number": ""
+    },
+    {
+     "name": "安中榛名",
+     "kana": "あんなかはるな",
+     "eng": "Annaka-Haruna",
+     "lat": 36.3624,
+     "lon": 138.8496,
+     "number": ""
+    },
+    {
+     "name": "軽井沢",
+     "kana": "かるいざわ",
+     "eng": "Karuizawa",
+     "lat": 36.3426,
+     "lon": 138.6352,
+     "number": ""
+    },
+    {
+     "name": "佐久平",
+     "kana": "さくだいら",
+     "eng": "Sakudaira",
+     "lat": 36.278,
+     "lon": 138.4642,
+     "number": ""
+    },
+    {
+     "name": "上田",
+     "kana": "うえだ",
+     "eng": "Ueda",
+     "lat": 36.3966,
+     "lon": 138.2497,
+     "number": ""
+    },
+    {
+     "name": "長野",
+     "kana": "ながの",
+     "eng": "Nagano",
+     "lat": 36.6431,
+     "lon": 138.1881,
+     "number": ""
+    },
+    {
+     "name": "飯山",
+     "kana": "いいやま",
+     "eng": "Iiyama",
+     "lat": 36.8452,
+     "lon": 138.3589,
+     "number": ""
+    },
+    {
+     "name": "上越妙高",
+     "kana": "じょうえつみょうこう",
+     "eng": "Joetsumyoko",
+     "lat": 37.0813,
+     "lon": 138.2485,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 254,
+   "name": "山形新幹線",
+   "kana": "やまがたしんかんせん",
+   "eng": "Yamagata Shinkansen",
+   "color": "#F36221",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "上野",
+     "kana": "うえの",
+     "eng": "Ueno",
+     "lat": 35.7134,
+     "lon": 139.7767,
+     "number": ""
+    },
+    {
+     "name": "大宮",
+     "kana": "おおみや",
+     "eng": "Omiya",
+     "lat": 35.9064,
+     "lon": 139.6239,
+     "number": ""
+    },
+    {
+     "name": "宇都宮",
+     "kana": "うつのみや",
+     "eng": "Utsunomiya",
+     "lat": 36.5586,
+     "lon": 139.8983,
+     "number": ""
+    },
+    {
+     "name": "郡山",
+     "kana": "こおりやま",
+     "eng": "Koriyama",
+     "lat": 37.3978,
+     "lon": 140.3883,
+     "number": ""
+    },
+    {
+     "name": "福島",
+     "kana": "ふくしま",
+     "eng": "Fukushima",
+     "lat": 37.7544,
+     "lon": 140.4586,
+     "number": ""
+    },
+    {
+     "name": "米沢",
+     "kana": "よねざわ",
+     "eng": "Yonezawa",
+     "lat": 37.9096,
+     "lon": 140.1282,
+     "number": ""
+    },
+    {
+     "name": "高畠",
+     "kana": "たかはた",
+     "eng": "Takahata",
+     "lat": 37.9924,
+     "lon": 140.1527,
+     "number": ""
+    },
+    {
+     "name": "赤湯",
+     "kana": "あかゆ",
+     "eng": "Akayu",
+     "lat": 38.0472,
+     "lon": 140.1491,
+     "number": ""
+    },
+    {
+     "name": "かみのやま温泉",
+     "kana": "かみのやまおんせん",
+     "eng": "Kaminoyama-Onsen",
+     "lat": 38.1522,
+     "lon": 140.2787,
+     "number": ""
+    },
+    {
+     "name": "山形",
+     "kana": "やまがた",
+     "eng": "Yamagata",
+     "lat": 38.2487,
+     "lon": 140.3275,
+     "number": ""
+    },
+    {
+     "name": "天童",
+     "kana": "てんどう",
+     "eng": "Tendo",
+     "lat": 38.36,
+     "lon": 140.3695,
+     "number": ""
+    },
+    {
+     "name": "さくらんぼ東根",
+     "kana": "さくらんぼひがしね",
+     "eng": "Sakurambo-Higashine",
+     "lat": 38.4286,
+     "lon": 140.3809,
+     "number": ""
+    },
+    {
+     "name": "村山",
+     "kana": "むらやま",
+     "eng": "Murayama",
+     "lat": 38.4771,
+     "lon": 140.3863,
+     "number": ""
+    },
+    {
+     "name": "大石田",
+     "kana": "おおいしだ",
+     "eng": "Oishida",
+     "lat": 38.5957,
+     "lon": 140.3753,
+     "number": ""
+    },
+    {
+     "name": "新庄",
+     "kana": "しんじょう",
+     "eng": "Shinjo",
+     "lat": 38.7627,
+     "lon": 140.3061,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 255,
+   "name": "秋田新幹線",
+   "kana": "あきたしんかんせん",
+   "eng": "Akita Shinkansen",
+   "color": "#ED4399",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "上野",
+     "kana": "うえの",
+     "eng": "Ueno",
+     "lat": 35.7134,
+     "lon": 139.7767,
+     "number": ""
+    },
+    {
+     "name": "大宮",
+     "kana": "おおみや",
+     "eng": "Omiya",
+     "lat": 35.9064,
+     "lon": 139.6239,
+     "number": ""
+    },
+    {
+     "name": "仙台",
+     "kana": "せんだい",
+     "eng": "Sendai",
+     "lat": 38.2603,
+     "lon": 140.8819,
+     "number": ""
+    },
+    {
+     "name": "古川",
+     "kana": "ふるかわ",
+     "eng": "Furukawa",
+     "lat": 38.5706,
+     "lon": 140.9677,
+     "number": ""
+    },
+    {
+     "name": "くりこま高原",
+     "kana": "くりこまこうげん",
+     "eng": "Kurikoma-Kogen",
+     "lat": 38.7491,
+     "lon": 141.0718,
+     "number": ""
+    },
+    {
+     "name": "一ノ関",
+     "kana": "いちのせき",
+     "eng": "Ichinoseki",
+     "lat": 38.9261,
+     "lon": 141.1392,
+     "number": ""
+    },
+    {
+     "name": "水沢江刺",
+     "kana": "みずさわえさし",
+     "eng": "Mizusawa-Esashi",
+     "lat": 39.1453,
+     "lon": 141.1887,
+     "number": ""
+    },
+    {
+     "name": "北上",
+     "kana": "きたかみ",
+     "eng": "Kitakami",
+     "lat": 39.2822,
+     "lon": 141.1223,
+     "number": ""
+    },
+    {
+     "name": "新花巻",
+     "kana": "しんはなまき",
+     "eng": "Shin-Hanamaki",
+     "lat": 39.4073,
+     "lon": 141.174,
+     "number": ""
+    },
+    {
+     "name": "盛岡",
+     "kana": "もりおか",
+     "eng": "Morioka",
+     "lat": 39.7014,
+     "lon": 141.1364,
+     "number": ""
+    },
+    {
+     "name": "雫石",
+     "kana": "しずくいし",
+     "eng": "Shizukuishi",
+     "lat": 39.6894,
+     "lon": 140.9749,
+     "number": ""
+    },
+    {
+     "name": "田沢湖",
+     "kana": "たざわこ",
+     "eng": "Tazawako",
+     "lat": 39.7003,
+     "lon": 140.7224,
+     "number": ""
+    },
+    {
+     "name": "角館",
+     "kana": "かくのだて",
+     "eng": "Kakunodate",
+     "lat": 39.5917,
+     "lon": 140.571,
+     "number": ""
+    },
+    {
+     "name": "大曲",
+     "kana": "おおまがり",
+     "eng": "Omagari",
+     "lat": 39.4654,
+     "lon": 140.4796,
+     "number": ""
+    },
+    {
+     "name": "秋田",
+     "kana": "あきた",
+     "eng": "Akita",
+     "lat": 39.7168,
+     "lon": 140.1297,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 256,
+   "name": "北海道新幹線",
+   "kana": "ほっかいどうしんかんせん",
+   "eng": "Hokkaido Shinkansen",
+   "color": "#9ACD32",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "新青森",
+     "kana": "しんあおもり",
+     "eng": "Shin-Aomori",
+     "lat": 40.8275,
+     "lon": 140.6935,
+     "number": ""
+    },
+    {
+     "name": "奥津軽いまべつ",
+     "kana": "おくつがるいまべつ",
+     "eng": "Okutsugaru-Imabetsu",
+     "lat": 41.1451,
+     "lon": 140.5154,
+     "number": ""
+    },
+    {
+     "name": "木古内",
+     "kana": "きこない",
+     "eng": "Kikonai",
+     "lat": 41.6777,
+     "lon": 140.4341,
+     "number": ""
+    },
+    {
+     "name": "新函館北斗",
+     "kana": "しんはこだてほくと",
+     "eng": "Shin-Hakodate-Hokuto",
+     "lat": 41.9047,
+     "lon": 140.6484,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

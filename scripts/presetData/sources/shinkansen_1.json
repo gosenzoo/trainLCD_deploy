@@ -1,0 +1,579 @@
+{
+ "lines": [
+  {
+   "no": 245,
+   "name": "東海道新幹線",
+   "kana": "とうかいどうしんかんせん",
+   "eng": "Tokaido Shinkansen",
+   "color": "#0072BA",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "東京",
+     "kana": "とうきょう",
+     "eng": "Tokyo",
+     "lat": 35.6808,
+     "lon": 139.7669,
+     "number": ""
+    },
+    {
+     "name": "品川",
+     "kana": "しながわ",
+     "eng": "Shinagawa",
+     "lat": 35.6286,
+     "lon": 139.7392,
+     "number": ""
+    },
+    {
+     "name": "新横浜",
+     "kana": "しんよこはま",
+     "eng": "Shin-Yokohama",
+     "lat": 35.5075,
+     "lon": 139.6175,
+     "number": ""
+    },
+    {
+     "name": "小田原",
+     "kana": "おだわら",
+     "eng": "Odawara",
+     "lat": 35.2564,
+     "lon": 139.155,
+     "number": ""
+    },
+    {
+     "name": "熱海",
+     "kana": "あたみ",
+     "eng": "Atami",
+     "lat": 35.1033,
+     "lon": 139.0778,
+     "number": ""
+    },
+    {
+     "name": "三島",
+     "kana": "みしま",
+     "eng": "Mishima",
+     "lat": 35.1272,
+     "lon": 138.9106,
+     "number": ""
+    },
+    {
+     "name": "新富士",
+     "kana": "しんふじ",
+     "eng": "Shin-Fuji",
+     "lat": 35.142,
+     "lon": 138.6634,
+     "number": ""
+    },
+    {
+     "name": "静岡",
+     "kana": "しずおか",
+     "eng": "Shizuoka",
+     "lat": 34.9717,
+     "lon": 138.3889,
+     "number": ""
+    },
+    {
+     "name": "掛川",
+     "kana": "かけがわ",
+     "eng": "Kakegawa",
+     "lat": 34.7697,
+     "lon": 138.015,
+     "number": ""
+    },
+    {
+     "name": "浜松",
+     "kana": "はままつ",
+     "eng": "Hamamatsu",
+     "lat": 34.7036,
+     "lon": 137.7344,
+     "number": ""
+    },
+    {
+     "name": "豊橋",
+     "kana": "とよはし",
+     "eng": "Toyohashi",
+     "lat": 34.7628,
+     "lon": 137.3817,
+     "number": ""
+    },
+    {
+     "name": "三河安城",
+     "kana": "みかわあんじょう",
+     "eng": "Mikawa-Anjo",
+     "lat": 34.969,
+     "lon": 137.0607,
+     "number": ""
+    },
+    {
+     "name": "名古屋",
+     "kana": "なごや",
+     "eng": "Nagoya",
+     "lat": 35.1708,
+     "lon": 136.8816,
+     "number": ""
+    },
+    {
+     "name": "岐阜羽島",
+     "kana": "ぎふはしま",
+     "eng": "Gifu-Hashima",
+     "lat": 35.3158,
+     "lon": 136.6856,
+     "number": ""
+    },
+    {
+     "name": "米原",
+     "kana": "まいばら",
+     "eng": "Maibara",
+     "lat": 35.3142,
+     "lon": 136.2905,
+     "number": ""
+    },
+    {
+     "name": "京都",
+     "kana": "きょうと",
+     "eng": "Kyoto",
+     "lat": 34.9856,
+     "lon": 135.7586,
+     "number": ""
+    },
+    {
+     "name": "新大阪",
+     "kana": "しんおおさか",
+     "eng": "Shin-Osaka",
+     "lat": 34.7334,
+     "lon": 135.5002,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 246,
+   "name": "山陽新幹線",
+   "kana": "さんようしんかんせん",
+   "eng": "Sanyo Shinkansen",
+   "color": "#0072BA",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "新大阪",
+     "kana": "しんおおさか",
+     "eng": "Shin-Osaka",
+     "lat": 34.7334,
+     "lon": 135.5002,
+     "number": ""
+    },
+    {
+     "name": "新神戸",
+     "kana": "しんこうべ",
+     "eng": "Shin-Kobe",
+     "lat": 34.7067,
+     "lon": 135.1962,
+     "number": ""
+    },
+    {
+     "name": "西明石",
+     "kana": "にしあかし",
+     "eng": "Nishi-Akashi",
+     "lat": 34.6669,
+     "lon": 134.9605,
+     "number": ""
+    },
+    {
+     "name": "姫路",
+     "kana": "ひめじ",
+     "eng": "Himeji",
+     "lat": 34.8276,
+     "lon": 134.6909,
+     "number": ""
+    },
+    {
+     "name": "相生",
+     "kana": "あいおい",
+     "eng": "Aioi",
+     "lat": 34.8181,
+     "lon": 134.4739,
+     "number": ""
+    },
+    {
+     "name": "岡山",
+     "kana": "おかやま",
+     "eng": "Okayama",
+     "lat": 34.6664,
+     "lon": 133.9186,
+     "number": ""
+    },
+    {
+     "name": "新倉敷",
+     "kana": "しんくらしき",
+     "eng": "Shin-Kurashiki",
+     "lat": 34.565,
+     "lon": 133.6787,
+     "number": ""
+    },
+    {
+     "name": "福山",
+     "kana": "ふくやま",
+     "eng": "Fukuyama",
+     "lat": 34.489,
+     "lon": 133.361,
+     "number": ""
+    },
+    {
+     "name": "新尾道",
+     "kana": "しんおのみち",
+     "eng": "Shin-Onomichi",
+     "lat": 34.4301,
+     "lon": 133.1903,
+     "number": ""
+    },
+    {
+     "name": "三原",
+     "kana": "みはら",
+     "eng": "Mihara",
+     "lat": 34.4006,
+     "lon": 133.0826,
+     "number": ""
+    },
+    {
+     "name": "東広島",
+     "kana": "ひがしひろしま",
+     "eng": "Higashi-Hiroshima",
+     "lat": 34.3894,
+     "lon": 132.7598,
+     "number": ""
+    },
+    {
+     "name": "広島",
+     "kana": "ひろしま",
+     "eng": "Hiroshima",
+     "lat": 34.3983,
+     "lon": 132.4758,
+     "number": ""
+    },
+    {
+     "name": "新岩国",
+     "kana": "しんいわくに",
+     "eng": "Shin-Iwakuni",
+     "lat": 34.165,
+     "lon": 132.1498,
+     "number": ""
+    },
+    {
+     "name": "徳山",
+     "kana": "とくやま",
+     "eng": "Tokuyama",
+     "lat": 34.0514,
+     "lon": 131.802,
+     "number": ""
+    },
+    {
+     "name": "新山口",
+     "kana": "しんやまぐち",
+     "eng": "Shin-Yamaguchi",
+     "lat": 34.0931,
+     "lon": 131.3972,
+     "number": ""
+    },
+    {
+     "name": "厚狭",
+     "kana": "あさ",
+     "eng": "Asa",
+     "lat": 34.0533,
+     "lon": 131.1598,
+     "number": ""
+    },
+    {
+     "name": "新下関",
+     "kana": "しんしものせき",
+     "eng": "Shin-Shimonoseki",
+     "lat": 34.0057,
+     "lon": 130.9488,
+     "number": ""
+    },
+    {
+     "name": "小倉",
+     "kana": "こくら",
+     "eng": "Kokura",
+     "lat": 33.8869,
+     "lon": 130.8832,
+     "number": ""
+    },
+    {
+     "name": "博多",
+     "kana": "はかた",
+     "eng": "Hakata",
+     "lat": 33.5898,
+     "lon": 130.4207,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 247,
+   "name": "九州新幹線",
+   "kana": "きゅうしゅうしんかんせん",
+   "eng": "Kyushu Shinkansen",
+   "color": "#E60012",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "博多",
+     "kana": "はかた",
+     "eng": "Hakata",
+     "lat": 33.5898,
+     "lon": 130.4207,
+     "number": ""
+    },
+    {
+     "name": "新鳥栖",
+     "kana": "しんとす",
+     "eng": "Shin-Tosu",
+     "lat": 33.3915,
+     "lon": 130.4943,
+     "number": ""
+    },
+    {
+     "name": "久留米",
+     "kana": "くるめ",
+     "eng": "Kurume",
+     "lat": 33.3199,
+     "lon": 130.5014,
+     "number": ""
+    },
+    {
+     "name": "筑後船小屋",
+     "kana": "ちくごふなごや",
+     "eng": "Chikugo-Funagoya",
+     "lat": 33.1779,
+     "lon": 130.4924,
+     "number": ""
+    },
+    {
+     "name": "新大牟田",
+     "kana": "しんおおむた",
+     "eng": "Shin-Omuta",
+     "lat": 33.0713,
+     "lon": 130.4888,
+     "number": ""
+    },
+    {
+     "name": "新玉名",
+     "kana": "しんたまな",
+     "eng": "Shin-Tamana",
+     "lat": 32.9425,
+     "lon": 130.5736,
+     "number": ""
+    },
+    {
+     "name": "熊本",
+     "kana": "くまもと",
+     "eng": "Kumamoto",
+     "lat": 32.7893,
+     "lon": 130.6887,
+     "number": ""
+    },
+    {
+     "name": "新八代",
+     "kana": "しんやつしろ",
+     "eng": "Shin-Yatsushiro",
+     "lat": 32.5186,
+     "lon": 130.6347,
+     "number": ""
+    },
+    {
+     "name": "新水俣",
+     "kana": "しんみなまた",
+     "eng": "Shin-Minamata",
+     "lat": 32.211,
+     "lon": 130.4293,
+     "number": ""
+    },
+    {
+     "name": "出水",
+     "kana": "いずみ",
+     "eng": "Izumi",
+     "lat": 32.0896,
+     "lon": 130.3584,
+     "number": ""
+    },
+    {
+     "name": "川内",
+     "kana": "せんだい",
+     "eng": "Sendai",
+     "lat": 31.8137,
+     "lon": 130.3123,
+     "number": ""
+    },
+    {
+     "name": "鹿児島中央",
+     "kana": "かごしまちゅうおう",
+     "eng": "Kagoshima-Chuo",
+     "lat": 31.5837,
+     "lon": 130.5417,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 248,
+   "name": "西九州新幹線",
+   "kana": "にしきゅうしゅうしんかんせん",
+   "eng": "Nishi-Kyushu Shinkansen",
+   "color": "#E60012",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "武雄温泉",
+     "kana": "たけおおんせん",
+     "eng": "Takeo-Onsen",
+     "lat": 33.1967,
+     "lon": 130.0235,
+     "number": ""
+    },
+    {
+     "name": "嬉野温泉",
+     "kana": "うれしのおんせん",
+     "eng": "Ureshino-Onsen",
+     "lat": 33.1066,
+     "lon": 129.999,
+     "number": ""
+    },
+    {
+     "name": "新大村",
+     "kana": "しんおおむら",
+     "eng": "Shin-Omura",
+     "lat": 32.9328,
+     "lon": 129.9571,
+     "number": ""
+    },
+    {
+     "name": "諫早",
+     "kana": "いさはや",
+     "eng": "Isahaya",
+     "lat": 32.8518,
+     "lon": 130.0415,
+     "number": ""
+    },
+    {
+     "name": "長崎",
+     "kana": "ながさき",
+     "eng": "Nagasaki",
+     "lat": 32.7527,
+     "lon": 129.8691,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 253,
+   "name": "北陸新幹線",
+   "kana": "ほくりくしんかんせん",
+   "eng": "Hokuriku Shinkansen",
+   "color": "#0072BA",
+   "symbol": "",
+   "operatorType": "新幹線",
+   "stations": [
+    {
+     "name": "上越妙高",
+     "kana": "じょうえつみょうこう",
+     "eng": "Joetsumyoko",
+     "lat": 37.0813,
+     "lon": 138.2485,
+     "number": ""
+    },
+    {
+     "name": "糸魚川",
+     "kana": "いといがわ",
+     "eng": "Itoigawa",
+     "lat": 37.0439,
+     "lon": 137.8625,
+     "number": ""
+    },
+    {
+     "name": "黒部宇奈月温泉",
+     "kana": "くろべうなづきおんせん",
+     "eng": "Kurobe-Unazukionsen",
+     "lat": 36.874,
+     "lon": 137.4811,
+     "number": ""
+    },
+    {
+     "name": "富山",
+     "kana": "とやま",
+     "eng": "Toyama",
+     "lat": 36.7012,
+     "lon": 137.213,
+     "number": ""
+    },
+    {
+     "name": "新高岡",
+     "kana": "しんたかおか",
+     "eng": "Shin-Takaoka",
+     "lat": 36.7271,
+     "lon": 137.0106,
+     "number": ""
+    },
+    {
+     "name": "金沢",
+     "kana": "かなざわ",
+     "eng": "Kanazawa",
+     "lat": 36.5783,
+     "lon": 136.6478,
+     "number": ""
+    },
+    {
+     "name": "小松",
+     "kana": "こまつ",
+     "eng": "Komatsu",
+     "lat": 36.4022,
+     "lon": 136.4532,
+     "number": ""
+    },
+    {
+     "name": "加賀温泉",
+     "kana": "かがおんせん",
+     "eng": "Kagaonsen",
+     "lat": 36.3202,
+     "lon": 136.3508,
+     "number": ""
+    },
+    {
+     "name": "芦原温泉",
+     "kana": "あわらおんせん",
+     "eng": "Awaraonsen",
+     "lat": 36.2152,
+     "lon": 136.2355,
+     "number": ""
+    },
+    {
+     "name": "福井",
+     "kana": "ふくい",
+     "eng": "Fukui",
+     "lat": 36.062,
+     "lon": 136.2234,
+     "number": ""
+    },
+    {
+     "name": "越前たけふ",
+     "kana": "えちぜんたけふ",
+     "eng": "Echizen-Takefu",
+     "lat": 35.8957,
+     "lon": 136.1989,
+     "number": ""
+    },
+    {
+     "name": "敦賀",
+     "kana": "つるが",
+     "eng": "Tsuruga",
+     "lat": 35.6452,
+     "lon": 136.076,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

@@ -244,3 +244,15 @@
 242,JR北海道,釧網本線,せんもうほんせん,Senmo Line,#EF59A1,B,I_mono_color,N_JR_hokkaido,JR在来線
 243,JR北海道,学園都市線,がくえんとしせん,Gakuentoshi Line,#00A54F,G,I_mono_color,N_JR_hokkaido,JR在来線
 244,JR北海道,日高本線,ひだかほんせん,Hidaka Line,#00A73C,,I_mono_color,N_JR_hokkaido,JR在来線
+245,JR東海,東海道新幹線,とうかいどうしんかんせん,Tokaido Shinkansen,#0072BA,,I_mono_color,N_JR_central,新幹線
+246,JR西日本,山陽新幹線,さんようしんかんせん,Sanyo Shinkansen,#0072BA,,I_mono_color,N_JR_west,新幹線
+247,JR九州,九州新幹線,きゅうしゅうしんかんせん,Kyushu Shinkansen,#E60012,,I_mono_color,N_JR_kyusyu,新幹線
+248,JR九州,西九州新幹線,にしきゅうしゅうしんかんせん,Nishi-Kyushu Shinkansen,#E60012,,I_mono_color,N_JR_kyusyu,新幹線
+249,JR東日本,東北新幹線,とうほくしんかんせん,Tohoku Shinkansen,#41934C,,I_mono_color,N_JR_east,新幹線
+250,JR東日本,上越新幹線,じょうえつしんかんせん,Joetsu Shinkansen,#F58D79,,I_mono_color,N_JR_east,新幹線
+251,JR東日本,上越新幹線（ガーラ湯沢支線）,じょうえつしんかんせん（がーらゆざわしせん）,Joetsu Shinkansen (Gala-Yuzawa Branch),#F58D79,,I_mono_color,N_JR_east,新幹線
+252,JR東日本,北陸新幹線,ほくりくしんかんせん,Hokuriku Shinkansen,#6A3D98,,I_mono_color,N_JR_east,新幹線
+253,JR西日本,北陸新幹線,ほくりくしんかんせん,Hokuriku Shinkansen,#0072BA,,I_mono_color,N_JR_west,新幹線
+254,JR東日本,山形新幹線,やまがたしんかんせん,Yamagata Shinkansen,#F36221,,I_mono_color,N_JR_east,新幹線
+255,JR東日本,秋田新幹線,あきたしんかんせん,Akita Shinkansen,#ED4399,,I_mono_color,N_JR_east,新幹線
+256,JR北海道,北海道新幹線,ほっかいどうしんかんせん,Hokkaido Shinkansen,#9ACD32,,I_mono_color,N_JR_hokkaido,新幹線
