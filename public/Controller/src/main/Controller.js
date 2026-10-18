@@ -114,6 +114,43 @@ class Controller {
     }
 
     /**
+     * 状態（stateInd）を直接指定して移動し、drawParamsを返す（7.53節。自動(座標)で駅を飛ばすときに使う）
+     * @param {number} stateInd - 駅インデックス×3 + posState（0:つぎは / 1:まもなく / 2:ただいま・通過）
+     * @returns {object} drawParams
+     */
+    jumpToState(stateInd) {
+        this._progressController.stateInd = stateInd;
+        this._updatePageState();
+        this._langController.langReset();
+        return this.getDrawParams();
+    }
+
+    /**
+     * 自動の画面送りが参照する現在の進行状態を返す（7.53節）
+     * @returns {{ stateInd: number, stationInd: number, posState: number, runState: number, isTerminal: boolean, pageState: number }}
+     */
+    getProgressState() {
+        const pc = this._progressController;
+        return {
+            stateInd:   pc.stateInd,
+            stationInd: pc.currentStationInd,
+            posState:   pc.posState,
+            runState:   pc.runState,
+            isTerminal: pc.isTerminal,
+            pageState:  pc._computePageState(),
+        };
+    }
+
+    /**
+     * 指定した pageState のページ一覧を1周する長さ（ミリ秒）を、現在の表示条件で求める（7.53節）
+     * @param {number} pageState
+     * @returns {number}
+     */
+    getCycleTime(pageState) {
+        return this._pageController.getCycleTime(pageState, this._getConditionData());
+    }
+
+    /**
      * ページを一つ進め、言語をリセットしてdrawParamsを返す
      * @returns {object} drawParams
      */

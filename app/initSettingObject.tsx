@@ -4,7 +4,8 @@ import { APP_VERSION } from "./version"
 const initInfoObject: infoType = {
     settingName: "",
     isLoop: false,
-    isMoveByCoord: false,
+    pageAdvanceMode: 'manual',  // 画面送りは初期値「手動」（7.53節）
+    allowManualControl: true,   // 手動操作を許可（7.53節）
 }
 
 const initOperationObject: operationType = {
@@ -47,7 +48,8 @@ const initStationObject: stationType = {
     lineNumberType: "0",
     transfers: [],
     isPass: false,
-    sectionTime: "0",
+    sectionTime: "60",  // 走行時間（秒）の初期値（7.53節）
+    stopTime: "20",     // 停車時間（秒）の初期値（7.53節）
     lineId: "",
     operationId: "",
     coordinate: [null, null],

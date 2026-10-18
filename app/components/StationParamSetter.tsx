@@ -623,9 +623,15 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     <option value={'left'}>左</option>
                 </select>
                 <br></br>
-                <label>次区間所要時間(分)</label>
+                <label>次駅までの走行時間(秒)</label>
                 <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
                     value={targetStation?.sectionTime ?? ''}
+                ></input>
+                <br></br>
+                {/* 停車時間（秒）。自動(時間)の画面送りと所要時間の表示に使う（7.53節） */}
+                <label>停車時間(秒)</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'stopTime')}
+                    value={targetStation?.stopTime ?? ''}
                 ></input>
                 <br></br>
                 <label>上部ナンバリング表示形式</label>

@@ -51,6 +51,16 @@ class LcdSimulator {
         this._controller.onLongStop = (drawParams) => {
             this._render(drawParams);
         };
+
+        // 画面送り（7.53節）。自動(時間)・自動(座標)のときだけ自動送りを使う（手動は従来どおり）
+        this._onGeoError = null;
+        const mode = settings.info?.pageAdvanceMode;
+        this._autoAdvance = (mode === 'time' || mode === 'coord')
+            ? new AutoAdvanceController(this._controller, settings.stationList, mode, {
+                onMove:     (drawParams) => this._render(drawParams),
+                onGeoError: (message) => { if (this._onGeoError) this._onGeoError(message); },
+            })
+            : null;
     }
 
     // ============================================================
@@ -60,6 +70,8 @@ class LcdSimulator {
     /** 現在のdrawParamsで初期描画する */
     start() {
         this._render(this._controller.getDrawParams());
+        // 自動の画面送りを始める
+        if (this._autoAdvance) this._autoAdvance.start();
     }
 
     /**
@@ -68,6 +80,8 @@ class LcdSimulator {
      */
     moveState(step) {
         this._render(this._controller.moveState(step));
+        // 手動操作した先の状態から自動送りをやり直す
+        if (this._autoAdvance) this._autoAdvance.onManualMove();
     }
 
     /**
@@ -76,6 +90,8 @@ class LcdSimulator {
      */
     moveStation(step) {
         this._render(this._controller.moveStation(step));
+        // 手動操作した先の状態から自動送りをやり直す
+        if (this._autoAdvance) this._autoAdvance.onManualMove();
     }
 
     /** ページを一つ進めて再描画する */
@@ -115,6 +131,15 @@ class LcdSimulator {
      */
     set onRender(callback) {
         this._onRender = callback;
+    }
+
+    /**
+     * 自動(座標)で位置情報が使えないときに呼ばれるコールバックを登録する（7.53節）
+     * コールバックの引数: (message)
+     * @param {Function} callback
+     */
+    set onGeoError(callback) {
+        this._onGeoError = callback;
     }
 
     // ============================================================

@@ -141,6 +141,22 @@ class PageController {
         return true;
     }
 
+    /**
+     * 指定した pageState のページ一覧を「1周」する長さ（ミリ秒）を返す（7.53節。自動の画面送りで使う）。
+     * 表示条件を満たすページの dispTime の合計。infoMessage はサブページ数分を数える
+     * @param {number} pageState
+     * @param {object} conditionData
+     * @returns {number}
+     */
+    getCycleTime(pageState, conditionData) {
+        const list = this.pageDispList[String(pageState)] ?? [];
+        return list.reduce((sum, page) => {
+            if (!this._isPageValid(page, conditionData)) return sum;
+            const count = page.pageName === 'infoMessage.svg' ? Math.max(1, conditionData?.infoMsgTotalPage ?? 1) : 1;
+            return sum + (Number(page.dispTime) || 0) * count;
+        }, 0);
+    }
+
     /** pageOutput を返す */
     getParams() {
         return {

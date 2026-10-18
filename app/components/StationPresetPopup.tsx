@@ -94,7 +94,8 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     lineNumberType: "0",
     transfers: [],
     isPass: false,
-    sectionTime: "0",
+    sectionTime: "60",  // 走行時間・停車時間（秒）の初期値（7.53節）
+    stopTime: "20",
     lineId,
     operationId: "0",  // プリセットから追加する全駅に0番目の運用を設定する
     // 駅プリセットの緯度・経度を入れる（7.51節）。座標がない駅は null のまま

@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import "../type"
 import StationParamSetter from './StationParamSetter'
 import MapComponent from './MapComponent'
+import { calcRunSeconds, secondsToMinutes } from '../modules/calcRunTime'
 import GenericItemList, { ColumnDef, ColumnGroup } from './GenericItemList'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
@@ -145,7 +146,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             // 2つ目のナンバリングは路線をまたぐ駅でのみ使うため、前駅から引き継がず常に空で追加する
             numIconNext: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" },
             lineNumberType: "0", transfers: [],
-            isPass: false, sectionTime: "0", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
+            isPass: false, sectionTime: "60", stopTime: "20", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
             headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
             otherCarNum: "0", otherLeftSlotInd: "0", transferListTransfers: ""
@@ -243,16 +244,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         setSetting(_setting)
     }
 
-    // 始点駅（先頭駅）からindex駅の直前の駅までのsectionTimeを積算する
-    // 途中にsectionTimeが数値変換できない駅があれば計算不能として "-" を返す
+    // 始点駅（先頭駅）からindex駅までの所要時間（分）。走行時間と間の停車駅の停車時間を合計する（7.53節）
+    // 途中に数値でない走行時間・停車時間があれば計算不能として "-" を返す
     const calcCumulativeTime = (stationList: stationType[], index: number): string => {
-        let sum = 0
-        for (let i = 0; i < index; i++) {
-            const t = Number(stationList[i].sectionTime)
-            if (stationList[i].sectionTime === "" || isNaN(t)) return "-"
-            sum += t
-        }
-        return String(sum)
+        const seconds = calcRunSeconds(stationList, 0, index)
+        return seconds === null ? "-" : String(secondsToMinutes(seconds))
     }
 
     // 駅一覧テーブルのカラム定義
@@ -405,8 +401,15 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             cell: (station) => station.doorSide === 'left' ? '左' : '右',
         },
         {
-            header: <>次駅までの<br/>所要時間</>,
-            cell: (station) => station.sectionTime,
+            // 走行時間・停車時間を「時間」の見出しでまとめ、まとめて折りたたみ可能にする（7.53節。初期状態は閉じる）
+            groupHeader: '時間',
+            collapsible: true,
+            defaultCollapsed: true,
+            columns: [
+                // 見出しは改行せず1行で表示する（列の幅は見出しが収まるまで広がる）
+                { header: '次区間走行時間(秒)', cell: (station) => station.sectionTime },
+                { header: '停車時間(秒)', cell: (station) => station.stopTime ?? '' },
+            ],
         },
         {
             // 「緯度」「経度」を1つの見出しの下にまとめ、まとめて折りたたみ可能にする（駅名多言語と同じ構造）。

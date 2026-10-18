@@ -22,12 +22,15 @@
 
 <body onmousedown="return false">
     <svg id="display" xmlns="http://www.w3.org/2000/svg"></svg>
+    <!-- 自動(座標)で位置情報が使えないときの表示（7.53節）。普段は隠しておく -->
+    <div id="geoError" style="display:none; position:fixed; top:4px; left:6px; font-size:12px; color:#fff; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; pointer-events:none;"></div>
 
     <!-- Controllerスクリプト -->
     <script src="./Controller/src/utility/utils.js"></script>
     <script src="./Controller/src/obj/PageController.js"></script>
     <script src="./Controller/src/obj/LangController.js"></script>
     <script src="./Controller/src/obj/ProgressController.js"></script>
+    <script src="./Controller/src/obj/AutoAdvanceController.js"></script>
     <script src="./Controller/src/main/Controller.js"></script>
 
     <!-- Drawerスクリプト -->
@@ -109,6 +112,8 @@
 
         const displaySVG = document.getElementById('display');
         let sim  = null;
+        // キーボード・タッチの操作を受け付けるか（7.53節）。画面送りが自動で「手動操作を許可」がオフのときだけ false
+        let isManualControlAllowed = true;
         let width, height;
 
         // ============================================================
@@ -118,7 +123,7 @@
         // キーボード操作（PC）
         // P: ページ送り / ArrowLeft・ArrowRight: 状態移動 / A・D: 駅移動
         function keyDown(e) {
-            if (!sim) return;
+            if (!sim || !isManualControlAllowed) return;
             if      (e.key === 'p' || e.key === 'P') { sim.pageRotate();     }
             else if (e.key === 'ArrowLeft')           { sim.moveState(-1);   }
             else if (e.key === 'ArrowRight')          { sim.moveState(1);    }
@@ -131,7 +136,7 @@
         // 右1/4: 上半分→駅+1, 下半分→状態+1
         // 中央1/2 かつ 下1/3: ページ送り
         function windowTouched(e) {
-            if (!sim) return;
+            if (!sim || !isManualControlAllowed) return;
             const touch = e.changedTouches[0];
             const w = window.innerWidth;
             const h = window.innerHeight;
@@ -212,6 +217,8 @@
                 alert('settings が見つかりません。エディタで設定を保存してください。');
                 return;
             }
+            // 環状運転は準備中のため、常にオフとして扱う（7.53節）
+            if (settings.info) settings.info.isLoop = false;
 
             // dispConfigがない旧形式のsettingsにはデフォルト値を使用
             const pageDispList = settings.dispConfig?.pageDispList ?? DEFAULT_PAGE_DISP_LIST;
@@ -219,7 +226,10 @@
                 ? { langIdList: settings.dispConfig.langIdList }
                 : DEFAULT_LANG_PARAMS;
             // PAGE_PARAMS: pageDispList と isPageAuto を渡す（Controller が pageState ごとに参照）
-            const isPageAuto   = settings.dispConfig?.isPageAuto ?? true;
+            // 画面送りが自動（7.53節）のときは、「1周」の終わりを決めるため「ページ自動切換え」がオフでもページを回す
+            const pageAdvanceMode = settings.info?.pageAdvanceMode ?? 'manual';
+            isManualControlAllowed = pageAdvanceMode === 'manual' || (settings.info?.allowManualControl ?? true);
+            const isPageAuto   = (settings.dispConfig?.isPageAuto ?? true) || pageAdvanceMode !== 'manual';
             const PAGE_PARAMS  = { pageDispList, isPageAuto };
             // SVGロード用に全状態から一意のページ名を収集する
             const pageNameList = [...new Set(Object.values(pageDispList).flat().map(e => e.pageName))];
@@ -280,6 +290,12 @@
             // アイコン辞書は settings.iconDict を使用する（iconList.json はデバッグ用のため使用しない）
             const drawerResources = { iconList: settings.iconDict || {}, numIconPresets, iconPresets, headerSVG, bodySVGMap };
             sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, displaySVG, drawerResources);
+            // 自動(座標)で位置情報が使えないときは、画面左上に小さく表示する（7.53節）
+            sim.onGeoError = (message) => {
+                const el = document.getElementById('geoError');
+                el.textContent = message;
+                el.style.display = 'block';
+            };
 
             // カスタムフォントが全て読み込まれてから描画を開始する。
             // フォント未読み込みのまま描画すると Canvas の measureText がフォールバックフォントで

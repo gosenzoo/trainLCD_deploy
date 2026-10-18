@@ -788,19 +788,26 @@ class ProgressController {
         // 現在位置より前（または現在地）の駅は時間なし
         for (let i = 0; i <= nowInd; i++) { timeList.push(-1); }
 
-        // 現在位置から各表示駅への累積時間を計算
+        // 現在位置から各表示駅への累積時間を計算（7.53節）。
+        // 走行時間（sectionTime）と、間にある停車駅の停車時間（stopTime）を秒で合計し、分に直して記録する。
+        // 通過駅の停車時間、出発する駅と行き先の駅の停車時間は含めない
         let buf = 0;
-        let listInd = dispStationList[nowInd]._id;
+        const startInd = dispStationList[nowInd]._id;
+        let listInd = startInd;
         let dispInd = nowInd;
 
         while (dispInd < stationFrameNum - 1 && listInd < this.stationList.length - 1) {
-            // sectionTimeが空(NaN)の場合はNaNを伝播させ、累積時間を未確定扱いにする
+            // 間にある停車駅の停車時間（出発する駅は除く）
+            if (listInd !== startInd && !this.stationList[listInd].isPass) {
+                buf += parseInt(this.stationList[listInd].stopTime);
+            }
+            // sectionTime・stopTimeが空(NaN)の場合はNaNを伝播させ、累積時間を未確定扱いにする
             buf += parseInt(this.stationList[listInd].sectionTime);
             listInd++;
 
-            // 全体リストのlistIndが次の表示駅の_idに達したら時間を記録
+            // 全体リストのlistIndが次の表示駅の_idに達したら時間（分。60で割って四捨五入）を記録
             if (dispStationList[dispInd + 1]._id === listInd) {
-                timeList.push(Number.isNaN(buf) ? -1 : buf);
+                timeList.push(Number.isNaN(buf) ? -1 : Math.round(buf / 60));
                 dispInd++;
             }
         }

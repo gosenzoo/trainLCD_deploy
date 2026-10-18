@@ -73,7 +73,10 @@ type settingType = {
 type infoType = {
     settingName: string,///////////////////////////
     isLoop: boolean,///////////////////////////
-    isMoveByCoord: boolean,//////////////////////////
+    // 画面送り（7.53節）。手動・自動(時間)・自動(座標)。旧 isMoveByCoord を置き換える
+    pageAdvanceMode: 'manual' | 'time' | 'coord',
+    // 手動操作を許可（7.53節）。自動の画面送りのときにキーボード・タッチの操作を受け付けるか
+    allowManualControl: boolean,
 }
 
 type operationType = {
@@ -136,7 +139,8 @@ type stationType = {
     lineNumberType: string,
     transfers: transferItemType[],
     isPass: boolean,
-    sectionTime: string,
+    sectionTime: string,  // 次駅までの走行時間（秒。7.53節）
+    stopTime: string,     // 停車時間（秒。7.53節）
     lineId: string,
     operationId: string,
     coordinate: [number | null, number | null],
@@ -170,12 +174,12 @@ type iconParamsType = {
     symbol: string
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'stopTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
     'otherCarNum' | 'otherLeftSlotInd' | 'transferListTransfers'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' | 'numIconPresetKey'
 
-type infoMembers = 'settingName' | 'isLoop' | 'isMoveByCoord'
+type infoMembers = 'settingName' | 'isLoop' | 'pageAdvanceMode' | 'allowManualControl'
 
 type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
     'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'isAutoDestination' | 'displayType'

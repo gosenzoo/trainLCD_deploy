@@ -1386,3 +1386,30 @@ button.tab-btn.active.tab-btn--unused {
     font-size: 16px;
   }
 }
+
+/* ============================================
+   3つ以上から1つを選ぶ切り替えスイッチ（「表示設定」の画面送り。7.53節）
+   ============================================ */
+.segmented-switch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+button.segmented-switch-item {
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid var(--border);
+  padding: 6px 12px;
+}
+
+button.segmented-switch-item:last-child {
+  border-right: none;
+}
+
+/* 選んでいる項目をハイライトする */
+button.segmented-switch-item.segmented-switch-item--active {
+  background: var(--accent);
+  color: #fff;
+}
