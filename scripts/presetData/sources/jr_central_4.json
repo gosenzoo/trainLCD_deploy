@@ -4,7 +4,7 @@
    "no": 58,
    "name": "関西本線",
    "kana": "かんさいほんせん",
-   "eng": "Kansai Main Line",
+   "eng": "Kansai Line",
    "color": "#3DBC87",
    "symbol": "CJ",
    "stations": [
@@ -158,7 +158,7 @@
    "no": 61,
    "name": "紀勢本線",
    "kana": "きせいほんせん",
-   "eng": "Kisei Main Line",
+   "eng": "Kisei Line",
    "color": "#1E7FC8",
    "symbol": "",
    "stations": [

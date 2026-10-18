@@ -4,7 +4,7 @@
    "no": 57,
    "name": "中央本線",
    "kana": "ちゅうおうほんせん",
-   "eng": "Chuo Main Line",
+   "eng": "Chuo Line",
    "color": "#28709B",
    "symbol": "CF",
    "stations": [
@@ -334,7 +334,7 @@
    "no": 59,
    "name": "高山本線",
    "kana": "たかやまほんせん",
-   "eng": "Takayama Main Line",
+   "eng": "Takayama Line",
    "color": "#A61E12",
    "symbol": "CG",
    "stations": [

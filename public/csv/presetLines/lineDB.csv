@@ -21,7 +21,7 @@
 19,JR東日本,八高線,はちこうせん,Hachiko Line,#A8A39D,,I_mono_color,N_JR_east,JR在来線
 20,JR東日本,上野東京ライン,うえのとうきょうらいん,Ueno-Tokyo Line,#F68B1E,JU,I_JR_east,N_JR_east,JR在来線
 21,JR東日本,宇都宮線,うつのみやせん,Utsunomiya Line,#F68B1E,JU,I_JR_east,N_JR_east,JR在来線
-22,JR東日本,東北本線,とうほくほんせん,Tohoku Main Line,#F68B1E,,I_mono_color,N_JR_east,JR在来線
+22,JR東日本,東北本線,とうほくほんせん,Tohoku Line,#F68B1E,,I_mono_color,N_JR_east,JR在来線
 23,JR東日本,高崎線,たかさきせん,Takasaki Line,#F68B1E,JU,I_JR_east,N_JR_east,JR在来線
 24,JR東日本,埼京線,さいきょうせん,Saikyo Line,#00AC9A,JA,I_JR_east,N_JR_east,JR在来線
 25,JR東日本,川越線,かわごえせん,Kawagoe Line,#00AC9A,JA,I_JR_east,N_JR_east,JR在来線
@@ -50,17 +50,17 @@
 48,JR東日本,水郡線,すいぐんせん,Suigun Line,#1B9E77,,I_mono_color,N_JR_east,JR在来線
 49,JR東日本,水郡線（常陸太田支線）,すいぐんせん（ひたちおおたしせん）,Suigun Line (Hitachi-Ota Branch),#1B9E77,,I_mono_color,N_JR_east,JR在来線
 50,JR東日本,鹿島線,かしません,Kashima Line,#B5651D,,I_mono_color,N_JR_east,JR在来線
-51,JR東海,東海道本線,とうかいどうほんせん,Tokaido Main Line,#FF7322,CA,I_JR_central,N_JR_central,JR在来線
-52,JR東海,東海道本線（美濃赤坂支線）,とうかいどうほんせん（みのあかさかしせん）,Tokaido Main Line (Mino-Akasaka Branch),#FF7322,,I_mono_color,N_JR_central,JR在来線
+51,JR東海,東海道本線,とうかいどうほんせん,Tokaido Line,#FF7322,CA,I_JR_central,N_JR_central,JR在来線
+52,JR東海,東海道本線（美濃赤坂支線）,とうかいどうほんせん（みのあかさかしせん）,Tokaido Line (Mino-Akasaka Branch),#FF7322,,I_mono_color,N_JR_central,JR在来線
 53,JR東海,御殿場線,ごてんばせん,Gotemba Line,#3F743A,CB,I_JR_central,N_JR_central,JR在来線
 54,JR東海,身延線,みのぶせん,Minobu Line,#61379D,CC,I_JR_central,N_JR_central,JR在来線
 55,JR東海,飯田線,いいだせん,Iida Line,#65ABDC,CD,I_JR_central,N_JR_central,JR在来線
 56,JR東海,武豊線,たけとよせん,Taketoyo Line,#89522B,CE,I_JR_central,N_JR_central,JR在来線
-57,JR東海,中央本線,ちゅうおうほんせん,Chuo Main Line,#28709B,CF,I_JR_central,N_JR_central,JR在来線
-58,JR東海,関西本線,かんさいほんせん,Kansai Main Line,#36BE90,CJ,I_JR_central,N_JR_central,JR在来線
-59,JR東海,高山本線,たかやまほんせん,Takayama Main Line,#A61E12,CG,I_JR_central,N_JR_central,JR在来線
+57,JR東海,中央本線,ちゅうおうほんせん,Chuo Line,#28709B,CF,I_JR_central,N_JR_central,JR在来線
+58,JR東海,関西本線,かんさいほんせん,Kansai Line,#36BE90,CJ,I_JR_central,N_JR_central,JR在来線
+59,JR東海,高山本線,たかやまほんせん,Takayama Line,#A61E12,CG,I_JR_central,N_JR_central,JR在来線
 60,JR東海,太多線,たいたせん,Taita Line,#CABA4C,CI,I_JR_central,N_JR_central,JR在来線
-61,JR東海,紀勢本線,きせいほんせん,Kisei Main Line,#1E7FC8,,I_mono_color,N_JR_central,JR在来線
+61,JR東海,紀勢本線,きせいほんせん,Kisei Line,#1E7FC8,,I_mono_color,N_JR_central,JR在来線
 62,JR東海,参宮線,さんぐうせん,Sangu Line,#8E44AD,,I_mono_color,N_JR_central,JR在来線
 63,JR東海,名松線,めいしょうせん,Meisho Line,#6B8E23,,I_mono_color,N_JR_central,JR在来線
 64,JR西日本,北陸線,ほくりくせん,Hokuriku Line,#0072BC,A,I_JR_west,N_JR_west,JR在来線
@@ -148,3 +148,44 @@
 146,東京地下鉄,都営新宿線,とえいしんじゅくせん,Toei Shinjuku Line,#6CBB5A,S,I_tokyo_subway,N_tokyo_subway,私鉄
 147,東京地下鉄,都営大江戸線,とえいおおえどせん,Toei Oedo Line,#B6007A,E,I_tokyo_subway,N_tokyo_subway,私鉄
 148,JR東日本,根岸線,ねぎしせん,Negishi Line,#00B2E5,JK,I_JR_east,N_JR_east,JR在来線
+149,JR九州,鹿児島本線,かごしまほんせん,Kagoshima Line,#EE3D49,JA,I_mono_color,N_JR_kyusyu,JR在来線
+150,JR九州,鹿児島本線,かごしまほんせん,Kagoshima Line,#EE3D49,JB,I_mono_color,N_JR_kyusyu,JR在来線
+151,JR九州,鹿児島本線,かごしまほんせん,Kagoshima Line,#EE3D49,,I_mono_color,N_JR_kyusyu,JR在来線
+152,JR九州,鹿児島本線,かごしまほんせん,Kagoshima Line,#EE3D49,,I_mono_color,N_JR_kyusyu,JR在来線
+153,JR九州,山陽本線,さんようほんせん,Sanyo Line,#EE3D49,JA,I_mono_color,N_JR_kyusyu,JR在来線
+154,JR九州,福北ゆたか線,ふくほくゆたかせん,Fukuhoku Yutaka Line,#FAAF18,JC,I_mono_color,N_JR_kyusyu,JR在来線
+155,JR九州,若松線,わかまつせん,Wakamatsu Line,#0095D9,JE,I_mono_color,N_JR_kyusyu,JR在来線
+156,JR九州,原田線,はらだせん,Harada Line,#36B558,JG,I_mono_color,N_JR_kyusyu,JR在来線
+157,JR九州,香椎線,かしいせん,Kashii Line,#0095D9,JD,I_mono_color,N_JR_kyusyu,JR在来線
+158,JR九州,日豊本線,にっぽうほんせん,Nippo Line,#0095D9,JF,I_mono_color,N_JR_kyusyu,JR在来線
+159,JR九州,日豊本線,にっぽうほんせん,Nippo Line,#0095D9,,I_mono_color,N_JR_kyusyu,JR在来線
+160,JR九州,宮崎空港線,みやざきくうこうせん,Miyazaki Airport Line,#36B558,,I_mono_color,N_JR_kyusyu,JR在来線
+161,JR九州,日南線,にちなんせん,Nichinan Line,#FAAF18,,I_mono_color,N_JR_kyusyu,JR在来線
+162,JR九州,吉都線,きっとせん,Kitto Line,#36B558,,I_mono_color,N_JR_kyusyu,JR在来線
+163,JR九州,肥薩線,ひさつせん,Hisatsu Line,#8F3E97,,I_mono_color,N_JR_kyusyu,JR在来線
+164,JR九州,指宿枕崎線,いぶすきまくらざきせん,Ibusuki Makurazaki Line,#FAAF18,,I_mono_color,N_JR_kyusyu,JR在来線
+165,JR九州,三角線,みすみせん,Misumi Line,#0095D9,,I_mono_color,N_JR_kyusyu,JR在来線
+166,JR九州,豊肥本線,ほうひほんせん,Hohi Line,#B96F30,,I_mono_color,N_JR_kyusyu,JR在来線
+167,JR九州,久大本線,きゅうだいほんせん,Kyudai Line,#36B558,,I_mono_color,N_JR_kyusyu,JR在来線
+168,JR九州,長崎本線,ながさきほんせん,Nagasaki Line,#FAAF18,JH,I_mono_color,N_JR_kyusyu,JR在来線
+169,JR九州,長崎本線,ながさきほんせん,Nagasaki Line,#FAAF18,,I_mono_color,N_JR_kyusyu,JR在来線
+170,JR九州,長崎本線（長与支線）,ながさきほんせん（ながよしせん）,Nagasaki Line (Nagayo Branch),#FAAF18,,I_mono_color,N_JR_kyusyu,JR在来線
+171,JR九州,佐世保線,させぼせん,Sasebo Line,#36B558,,I_mono_color,N_JR_kyusyu,JR在来線
+172,JR九州,大村線,おおむらせん,Omura Line,#0095D9,,I_mono_color,N_JR_kyusyu,JR在来線
+173,JR九州,唐津線,からつせん,Karatsu Line,#0095D9,,I_mono_color,N_JR_kyusyu,JR在来線
+174,JR九州,筑肥線,ちくひせん,Chikuhi Line,#8F3E97,JK,I_mono_color,N_JR_kyusyu,JR在来線
+175,JR九州,筑肥線,ちくひせん,Chikuhi Line,#8F3E97,,I_mono_color,N_JR_kyusyu,JR在来線
+176,JR九州,日田彦山線,ひたひこさんせん,Hitahikosan Line,#B96F30,JI,I_mono_color,N_JR_kyusyu,JR在来線
+177,JR九州,日田彦山線,ひたひこさんせん,Hitahikosan Line,#B96F30,,I_mono_color,N_JR_kyusyu,JR在来線
+178,JR九州,後藤寺線,ごとうじせん,Gotoji Line,#8F3E97,JJ,I_mono_color,N_JR_kyusyu,JR在来線
+179,JR四国,予讃線,よさんせん,Yosan Line,#FBAF18,Y,I_mono_color,N_JR_shikoku,JR在来線
+180,JR四国,予讃線,よさんせん,Yosan Line,#FBAF18,U,I_mono_color,N_JR_shikoku,JR在来線
+181,JR四国,予讃線,よさんせん,Yosan Line,#98A9D6,S,I_mono_color,N_JR_shikoku,JR在来線
+182,JR四国,土讃線,どさんせん,Dosan Line,#E25885,D,I_mono_color,N_JR_shikoku,JR在来線
+183,JR四国,土讃線,どさんせん,Dosan Line,#E25885,K,I_mono_color,N_JR_shikoku,JR在来線
+184,JR四国,予土線,よどせん,Yodo Line,#009257,G,I_mono_color,N_JR_shikoku,JR在来線
+185,JR四国,高徳線,こうとくせん,Kotoku Line,#8AC53E,T,I_mono_color,N_JR_shikoku,JR在来線
+186,JR四国,鳴門線,なるとせん,Naruto Line,#8C2C5F,N,I_mono_color,N_JR_shikoku,JR在来線
+187,JR四国,徳島線,とくしません,Tokushima Line,#2A6482,B,I_mono_color,N_JR_shikoku,JR在来線
+188,JR四国,牟岐線,むぎせん,Mugi Line,#00B5AD,M,I_mono_color,N_JR_shikoku,JR在来線
+189,JR四国,瀬戸大橋線,せとおおはしせん,Seto-Ohashi Line,#0072BC,,I_mono_color,N_JR_shikoku,JR在来線

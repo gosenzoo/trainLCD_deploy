@@ -16,6 +16,9 @@ COMPANIES = [
     (range(133, 148), '東京地下鉄', 'I_tokyo_subway', 'N_tokyo_subway'),
     # 根岸線（7.38節で京浜東北線から分割し末尾に追加）
     (range(148, 149), 'JR東日本', 'I_JR_east', 'N_JR_east'),
+    # JR九州・JR四国（7.45節）。路線アイコンは事業者のプリセットがないため路線カラーの四角
+    (range(149, 179), 'JR九州', 'I_mono_color', 'N_JR_kyusyu'),
+    (range(179, 190), 'JR四国', 'I_mono_color', 'N_JR_shikoku'),
 ]
 def company(no):
     for rg, op, icon, num in COMPANIES:
@@ -236,10 +239,15 @@ WIKIDATA_PATH = os.path.join(HERE, 'wikidata', 'stations.json')
 # このデータの事業者名 → Wikidata の事業者の日本語名
 # （1つの事業者が Wikidata 上の複数の事業者にあたる場合は配列で書く）
 OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道',
+                    'JR九州': '九州旅客鉄道', 'JR四国': '四国旅客鉄道',
                     '東京地下鉄': ['東京地下鉄', '東京都交通局']}
 # 選んだ候補が今の座標からこれ以上離れていれば、同名の別駅との取り違えとみなして差し替えない（km）。
 # 事業者が一致した候補は取り違えの可能性が低いため、許容範囲を広げる
 WIKIDATA_MAX_SHIFT_KM = 10
+# 座標が誤っていると確認した Wikidata の項目（QID）。使わずに元データの座標を残す
+WIKIDATA_EXCLUDE = {
+    'Q5359644',  # 大野城駅（JR九州）: 隣の春日駅とほぼ同じ座標になっている（7.45節）
+}
 WIKIDATA_MAX_SHIFT_SAME_OPERATOR_KM = 30
 def match_name(name):
     # 照合用の駅名: 表記の揺れ（ヶ/ケ、驒/騨）をそろえる
@@ -256,6 +264,10 @@ if os.path.exists(WIKIDATA_PATH):
     for w in wd_all: names_at.setdefault((w['lat'], w['lon']), set()).add(match_name(w['name']))
     wd_by_name, suspicious = {}, []
     for w in wd_all:
+        # 座標が誤っていると確認した項目も使わない（WIKIDATA_EXCLUDE）
+        if w['qid'] in WIKIDATA_EXCLUDE:
+            suspicious.append(w['label'])
+            continue
         if len(names_at[(w['lat'], w['lon'])]) > 1:
             suspicious.append(w['label'])
             continue

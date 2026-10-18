@@ -4,7 +4,7 @@
    "no": 51,
    "name": "東海道本線",
    "kana": "とうかいどうほんせん",
-   "eng": "Tokaido Main Line",
+   "eng": "Tokaido Line",
    "color": "#F08300",
    "symbol": "CA",
    "stations": [
@@ -686,7 +686,7 @@
    "no": 52,
    "name": "東海道本線（美濃赤坂支線）",
    "kana": "とうかいどうほんせん（みのあかさかしせん）",
-   "eng": "Tokaido Main Line (Mino-Akasaka Branch)",
+   "eng": "Tokaido Line (Mino-Akasaka Branch)",
    "color": "#F08300",
    "symbol": "",
    "stations": [

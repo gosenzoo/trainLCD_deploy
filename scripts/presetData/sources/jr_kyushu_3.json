@@ -1,0 +1,1098 @@
+{
+ "lines": [
+  {
+   "no": 159,
+   "name": "日豊本線",
+   "kana": "にっぽうほんせん",
+   "eng": "Nippo Line",
+   "color": "#0095D9",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "行橋",
+     "kana": "ゆくはし",
+     "eng": "Yukuhashi",
+     "lat": 33.7286,
+     "lon": 130.9833,
+     "number": ""
+    },
+    {
+     "name": "南行橋",
+     "kana": "みなみゆくはし",
+     "eng": "Minami-Yukuhashi",
+     "lat": 33.717,
+     "lon": 130.993,
+     "number": ""
+    },
+    {
+     "name": "新田原",
+     "kana": "しんでんばる",
+     "eng": "Shindenbaru",
+     "lat": 33.696,
+     "lon": 131.023,
+     "number": ""
+    },
+    {
+     "name": "築城",
+     "kana": "ついき",
+     "eng": "Tsuiki",
+     "lat": 33.677,
+     "lon": 131.045,
+     "number": ""
+    },
+    {
+     "name": "椎田",
+     "kana": "しいだ",
+     "eng": "Shiida",
+     "lat": 33.658,
+     "lon": 131.07,
+     "number": ""
+    },
+    {
+     "name": "豊前松江",
+     "kana": "ぶぜんしょうえ",
+     "eng": "Buzen-Shoe",
+     "lat": 33.629,
+     "lon": 131.108,
+     "number": ""
+    },
+    {
+     "name": "宇島",
+     "kana": "うのしま",
+     "eng": "Unoshima",
+     "lat": 33.617,
+     "lon": 131.138,
+     "number": ""
+    },
+    {
+     "name": "三毛門",
+     "kana": "みけかど",
+     "eng": "Mikekado",
+     "lat": 33.603,
+     "lon": 131.16,
+     "number": ""
+    },
+    {
+     "name": "吉富",
+     "kana": "よしとみ",
+     "eng": "Yoshitomi",
+     "lat": 33.6,
+     "lon": 131.175,
+     "number": ""
+    },
+    {
+     "name": "中津",
+     "kana": "なかつ",
+     "eng": "Nakatsu",
+     "lat": 33.597,
+     "lon": 131.188,
+     "number": ""
+    },
+    {
+     "name": "東中津",
+     "kana": "ひがしなかつ",
+     "eng": "Higashi-Nakatsu",
+     "lat": 33.59,
+     "lon": 131.235,
+     "number": ""
+    },
+    {
+     "name": "今津",
+     "kana": "いまづ",
+     "eng": "Imazu",
+     "lat": 33.588,
+     "lon": 131.27,
+     "number": ""
+    },
+    {
+     "name": "天津",
+     "kana": "あまつ",
+     "eng": "Amatsu",
+     "lat": 33.58,
+     "lon": 131.294,
+     "number": ""
+    },
+    {
+     "name": "豊前善光寺",
+     "kana": "ぶぜんぜんこうじ",
+     "eng": "Buzen-Zenkoji",
+     "lat": 33.565,
+     "lon": 131.32,
+     "number": ""
+    },
+    {
+     "name": "柳ケ浦",
+     "kana": "やなぎがうら",
+     "eng": "Yanagigaura",
+     "lat": 33.556,
+     "lon": 131.348,
+     "number": ""
+    },
+    {
+     "name": "豊前長洲",
+     "kana": "ぶぜんながす",
+     "eng": "Buzen-Nagasu",
+     "lat": 33.558,
+     "lon": 131.365,
+     "number": ""
+    },
+    {
+     "name": "宇佐",
+     "kana": "うさ",
+     "eng": "Usa",
+     "lat": 33.528,
+     "lon": 131.396,
+     "number": ""
+    },
+    {
+     "name": "西屋敷",
+     "kana": "にしやしき",
+     "eng": "Nishiyashiki",
+     "lat": 33.505,
+     "lon": 131.418,
+     "number": ""
+    },
+    {
+     "name": "立石",
+     "kana": "たていし",
+     "eng": "Tateishi",
+     "lat": 33.461,
+     "lon": 131.452,
+     "number": ""
+    },
+    {
+     "name": "中山香",
+     "kana": "なかやまが",
+     "eng": "Nakayamaga",
+     "lat": 33.428,
+     "lon": 131.515,
+     "number": ""
+    },
+    {
+     "name": "杵築",
+     "kana": "きつき",
+     "eng": "Kitsuki",
+     "lat": 33.413,
+     "lon": 131.587,
+     "number": ""
+    },
+    {
+     "name": "大神",
+     "kana": "おおが",
+     "eng": "Oga",
+     "lat": 33.393,
+     "lon": 131.564,
+     "number": ""
+    },
+    {
+     "name": "日出",
+     "kana": "ひじ",
+     "eng": "Hiji",
+     "lat": 33.369,
+     "lon": 131.533,
+     "number": ""
+    },
+    {
+     "name": "暘谷",
+     "kana": "ようこく",
+     "eng": "Yokoku",
+     "lat": 33.364,
+     "lon": 131.518,
+     "number": ""
+    },
+    {
+     "name": "豊後豊岡",
+     "kana": "ぶんごとよおか",
+     "eng": "Bungo-Toyooka",
+     "lat": 33.348,
+     "lon": 131.51,
+     "number": ""
+    },
+    {
+     "name": "亀川",
+     "kana": "かめがわ",
+     "eng": "Kamegawa",
+     "lat": 33.324,
+     "lon": 131.495,
+     "number": ""
+    },
+    {
+     "name": "別府大学",
+     "kana": "べっぷだいがく",
+     "eng": "Beppudaigaku",
+     "lat": 33.308,
+     "lon": 131.495,
+     "number": ""
+    },
+    {
+     "name": "別府",
+     "kana": "べっぷ",
+     "eng": "Beppu",
+     "lat": 33.2795,
+     "lon": 131.5005,
+     "number": ""
+    },
+    {
+     "name": "東別府",
+     "kana": "ひがしべっぷ",
+     "eng": "Higashi-Beppu",
+     "lat": 33.264,
+     "lon": 131.508,
+     "number": ""
+    },
+    {
+     "name": "西大分",
+     "kana": "にしおおいた",
+     "eng": "Nishi-Oita",
+     "lat": 33.247,
+     "lon": 131.585,
+     "number": ""
+    },
+    {
+     "name": "大分",
+     "kana": "おおいた",
+     "eng": "Oita",
+     "lat": 33.233,
+     "lon": 131.606,
+     "number": ""
+    },
+    {
+     "name": "牧",
+     "kana": "まき",
+     "eng": "Maki",
+     "lat": 33.231,
+     "lon": 131.635,
+     "number": ""
+    },
+    {
+     "name": "高城",
+     "kana": "たかじょう",
+     "eng": "Takajo",
+     "lat": 33.238,
+     "lon": 131.656,
+     "number": ""
+    },
+    {
+     "name": "鶴崎",
+     "kana": "つるさき",
+     "eng": "Tsurusaki",
+     "lat": 33.24,
+     "lon": 131.688,
+     "number": ""
+    },
+    {
+     "name": "大在",
+     "kana": "おおざい",
+     "eng": "Ozai",
+     "lat": 33.239,
+     "lon": 131.723,
+     "number": ""
+    },
+    {
+     "name": "坂ノ市",
+     "kana": "さかのいち",
+     "eng": "Sakanoichi",
+     "lat": 33.229,
+     "lon": 131.757,
+     "number": ""
+    },
+    {
+     "name": "幸崎",
+     "kana": "こうざき",
+     "eng": "Kozaki",
+     "lat": 33.222,
+     "lon": 131.798,
+     "number": ""
+    },
+    {
+     "name": "佐志生",
+     "kana": "さしう",
+     "eng": "Sashiu",
+     "lat": 33.195,
+     "lon": 131.815,
+     "number": ""
+    },
+    {
+     "name": "下ノ江",
+     "kana": "したのえ",
+     "eng": "Shitanoe",
+     "lat": 33.17,
+     "lon": 131.818,
+     "number": ""
+    },
+    {
+     "name": "熊崎",
+     "kana": "くまさき",
+     "eng": "Kumasaki",
+     "lat": 33.151,
+     "lon": 131.805,
+     "number": ""
+    },
+    {
+     "name": "上臼杵",
+     "kana": "かみうすき",
+     "eng": "Kami-Usuki",
+     "lat": 33.124,
+     "lon": 131.798,
+     "number": ""
+    },
+    {
+     "name": "臼杵",
+     "kana": "うすき",
+     "eng": "Usuki",
+     "lat": 33.122,
+     "lon": 131.806,
+     "number": ""
+    },
+    {
+     "name": "津久見",
+     "kana": "つくみ",
+     "eng": "Tsukumi",
+     "lat": 33.071,
+     "lon": 131.862,
+     "number": ""
+    },
+    {
+     "name": "日代",
+     "kana": "ひしろ",
+     "eng": "Hishiro",
+     "lat": 33.036,
+     "lon": 131.871,
+     "number": ""
+    },
+    {
+     "name": "浅海井",
+     "kana": "あざむい",
+     "eng": "Azamui",
+     "lat": 33.014,
+     "lon": 131.873,
+     "number": ""
+    },
+    {
+     "name": "狩生",
+     "kana": "かりう",
+     "eng": "Kariu",
+     "lat": 32.993,
+     "lon": 131.873,
+     "number": ""
+    },
+    {
+     "name": "海崎",
+     "kana": "かいざき",
+     "eng": "Kaizaki",
+     "lat": 32.975,
+     "lon": 131.88,
+     "number": ""
+    },
+    {
+     "name": "佐伯",
+     "kana": "さいき",
+     "eng": "Saiki",
+     "lat": 32.957,
+     "lon": 131.899,
+     "number": ""
+    },
+    {
+     "name": "上岡",
+     "kana": "かみおか",
+     "eng": "Kamioka",
+     "lat": 32.931,
+     "lon": 131.865,
+     "number": ""
+    },
+    {
+     "name": "直見",
+     "kana": "なおみ",
+     "eng": "Naomi",
+     "lat": 32.9,
+     "lon": 131.818,
+     "number": ""
+    },
+    {
+     "name": "直川",
+     "kana": "なおかわ",
+     "eng": "Naokawa",
+     "lat": 32.877,
+     "lon": 131.79,
+     "number": ""
+    },
+    {
+     "name": "重岡",
+     "kana": "しげおか",
+     "eng": "Shigeoka",
+     "lat": 32.813,
+     "lon": 131.711,
+     "number": ""
+    },
+    {
+     "name": "宗太郎",
+     "kana": "そうたろう",
+     "eng": "Sotaro",
+     "lat": 32.781,
+     "lon": 131.684,
+     "number": ""
+    },
+    {
+     "name": "市棚",
+     "kana": "いちたな",
+     "eng": "Ichitana",
+     "lat": 32.731,
+     "lon": 131.664,
+     "number": ""
+    },
+    {
+     "name": "北川",
+     "kana": "きたがわ",
+     "eng": "Kitagawa",
+     "lat": 32.696,
+     "lon": 131.691,
+     "number": ""
+    },
+    {
+     "name": "日向長井",
+     "kana": "ひゅうがながい",
+     "eng": "Hyuga-Nagai",
+     "lat": 32.662,
+     "lon": 131.693,
+     "number": ""
+    },
+    {
+     "name": "北延岡",
+     "kana": "きたのべおか",
+     "eng": "Kita-Nobeoka",
+     "lat": 32.607,
+     "lon": 131.682,
+     "number": ""
+    },
+    {
+     "name": "延岡",
+     "kana": "のべおか",
+     "eng": "Nobeoka",
+     "lat": 32.585,
+     "lon": 131.674,
+     "number": ""
+    },
+    {
+     "name": "南延岡",
+     "kana": "みなみのべおか",
+     "eng": "Minami-Nobeoka",
+     "lat": 32.562,
+     "lon": 131.663,
+     "number": ""
+    },
+    {
+     "name": "旭ケ丘",
+     "kana": "あさひがおか",
+     "eng": "Asahigaoka",
+     "lat": 32.535,
+     "lon": 131.662,
+     "number": ""
+    },
+    {
+     "name": "土々呂",
+     "kana": "ととろ",
+     "eng": "Totoro",
+     "lat": 32.512,
+     "lon": 131.657,
+     "number": ""
+    },
+    {
+     "name": "門川",
+     "kana": "かどがわ",
+     "eng": "Kadogawa",
+     "lat": 32.471,
+     "lon": 131.646,
+     "number": ""
+    },
+    {
+     "name": "日向市",
+     "kana": "ひゅうがし",
+     "eng": "Hyugashi",
+     "lat": 32.423,
+     "lon": 131.623,
+     "number": ""
+    },
+    {
+     "name": "財光寺",
+     "kana": "ざいこうじ",
+     "eng": "Zaikoji",
+     "lat": 32.401,
+     "lon": 131.608,
+     "number": ""
+    },
+    {
+     "name": "南日向",
+     "kana": "みなみひゅうが",
+     "eng": "Minami-Hyuga",
+     "lat": 32.372,
+     "lon": 131.588,
+     "number": ""
+    },
+    {
+     "name": "美々津",
+     "kana": "みみつ",
+     "eng": "Mimitsu",
+     "lat": 32.338,
+     "lon": 131.575,
+     "number": ""
+    },
+    {
+     "name": "東都農",
+     "kana": "ひがしつの",
+     "eng": "Higashi-Tsuno",
+     "lat": 32.281,
+     "lon": 131.566,
+     "number": ""
+    },
+    {
+     "name": "都農",
+     "kana": "つの",
+     "eng": "Tsuno",
+     "lat": 32.253,
+     "lon": 131.554,
+     "number": ""
+    },
+    {
+     "name": "川南",
+     "kana": "かわみなみ",
+     "eng": "Kawaminami",
+     "lat": 32.192,
+     "lon": 131.542,
+     "number": ""
+    },
+    {
+     "name": "高鍋",
+     "kana": "たかなべ",
+     "eng": "Takanabe",
+     "lat": 32.13,
+     "lon": 131.511,
+     "number": ""
+    },
+    {
+     "name": "日向新富",
+     "kana": "ひゅうがしんとみ",
+     "eng": "Hyuga-Shintomi",
+     "lat": 32.079,
+     "lon": 131.488,
+     "number": ""
+    },
+    {
+     "name": "佐土原",
+     "kana": "さどわら",
+     "eng": "Sadowara",
+     "lat": 32.043,
+     "lon": 131.456,
+     "number": ""
+    },
+    {
+     "name": "日向住吉",
+     "kana": "ひゅうがすみよし",
+     "eng": "Hyuga-Sumiyoshi",
+     "lat": 31.999,
+     "lon": 131.457,
+     "number": ""
+    },
+    {
+     "name": "蓮ケ池",
+     "kana": "はすがいけ",
+     "eng": "Hasugaike",
+     "lat": 31.974,
+     "lon": 131.443,
+     "number": ""
+    },
+    {
+     "name": "宮崎神宮",
+     "kana": "みやざきじんぐう",
+     "eng": "Miyazakijingu",
+     "lat": 31.933,
+     "lon": 131.431,
+     "number": ""
+    },
+    {
+     "name": "宮崎",
+     "kana": "みやざき",
+     "eng": "Miyazaki",
+     "lat": 31.9157,
+     "lon": 131.4318,
+     "number": ""
+    },
+    {
+     "name": "南宮崎",
+     "kana": "みなみみやざき",
+     "eng": "Minami-Miyazaki",
+     "lat": 31.898,
+     "lon": 131.422,
+     "number": ""
+    },
+    {
+     "name": "加納",
+     "kana": "かのう",
+     "eng": "Kano",
+     "lat": 31.877,
+     "lon": 131.394,
+     "number": ""
+    },
+    {
+     "name": "清武",
+     "kana": "きよたけ",
+     "eng": "Kiyotake",
+     "lat": 31.863,
+     "lon": 131.383,
+     "number": ""
+    },
+    {
+     "name": "日向沓掛",
+     "kana": "ひゅうがくつかけ",
+     "eng": "Hyuga-Kutsukake",
+     "lat": 31.847,
+     "lon": 131.35,
+     "number": ""
+    },
+    {
+     "name": "田野",
+     "kana": "たの",
+     "eng": "Tano",
+     "lat": 31.853,
+     "lon": 131.3,
+     "number": ""
+    },
+    {
+     "name": "青井岳",
+     "kana": "あおいだけ",
+     "eng": "Aoidake",
+     "lat": 31.803,
+     "lon": 131.219,
+     "number": ""
+    },
+    {
+     "name": "山之口",
+     "kana": "やまのくち",
+     "eng": "Yamanokuchi",
+     "lat": 31.769,
+     "lon": 131.155,
+     "number": ""
+    },
+    {
+     "name": "餅原",
+     "kana": "もちばる",
+     "eng": "Mochibaru",
+     "lat": 31.752,
+     "lon": 131.12,
+     "number": ""
+    },
+    {
+     "name": "三股",
+     "kana": "みまた",
+     "eng": "Mimata",
+     "lat": 31.735,
+     "lon": 131.1,
+     "number": ""
+    },
+    {
+     "name": "都城",
+     "kana": "みやこのじょう",
+     "eng": "Miyakonojo",
+     "lat": 31.72,
+     "lon": 131.075,
+     "number": ""
+    },
+    {
+     "name": "西都城",
+     "kana": "にしみやこのじょう",
+     "eng": "Nishi-Miyakonojo",
+     "lat": 31.724,
+     "lon": 131.051,
+     "number": ""
+    },
+    {
+     "name": "五十市",
+     "kana": "いそいち",
+     "eng": "Isoichi",
+     "lat": 31.714,
+     "lon": 131.028,
+     "number": ""
+    },
+    {
+     "name": "財部",
+     "kana": "たからべ",
+     "eng": "Takarabe",
+     "lat": 31.723,
+     "lon": 130.991,
+     "number": ""
+    },
+    {
+     "name": "北俣",
+     "kana": "きたまた",
+     "eng": "Kitamata",
+     "lat": 31.732,
+     "lon": 130.954,
+     "number": ""
+    },
+    {
+     "name": "大隅大川原",
+     "kana": "おおすみおおかわら",
+     "eng": "Osumi-Okawara",
+     "lat": 31.743,
+     "lon": 130.902,
+     "number": ""
+    },
+    {
+     "name": "北永野田",
+     "kana": "きたながのだ",
+     "eng": "Kita-Naganoda",
+     "lat": 31.748,
+     "lon": 130.853,
+     "number": ""
+    },
+    {
+     "name": "霧島神宮",
+     "kana": "きりしまじんぐう",
+     "eng": "Kirishimajingu",
+     "lat": 31.759,
+     "lon": 130.814,
+     "number": ""
+    },
+    {
+     "name": "国分",
+     "kana": "こくぶ",
+     "eng": "Kokubu",
+     "lat": 31.744,
+     "lon": 130.764,
+     "number": ""
+    },
+    {
+     "name": "隼人",
+     "kana": "はやと",
+     "eng": "Hayato",
+     "lat": 31.747,
+     "lon": 130.738,
+     "number": ""
+    },
+    {
+     "name": "加治木",
+     "kana": "かじき",
+     "eng": "Kajiki",
+     "lat": 31.735,
+     "lon": 130.668,
+     "number": ""
+    },
+    {
+     "name": "錦江",
+     "kana": "きんこう",
+     "eng": "Kinko",
+     "lat": 31.733,
+     "lon": 130.643,
+     "number": ""
+    },
+    {
+     "name": "帖佐",
+     "kana": "ちょうさ",
+     "eng": "Chosa",
+     "lat": 31.731,
+     "lon": 130.627,
+     "number": ""
+    },
+    {
+     "name": "姶良",
+     "kana": "あいら",
+     "eng": "Aira",
+     "lat": 31.722,
+     "lon": 130.61,
+     "number": ""
+    },
+    {
+     "name": "重富",
+     "kana": "しげとみ",
+     "eng": "Shigetomi",
+     "lat": 31.715,
+     "lon": 130.596,
+     "number": ""
+    },
+    {
+     "name": "竜ケ水",
+     "kana": "りゅうがみず",
+     "eng": "Ryugamizu",
+     "lat": 31.65,
+     "lon": 130.572,
+     "number": ""
+    },
+    {
+     "name": "仙巌園",
+     "kana": "せんがんえん",
+     "eng": "Senganen",
+     "lat": 31.617,
+     "lon": 130.573,
+     "number": ""
+    },
+    {
+     "name": "鹿児島",
+     "kana": "かごしま",
+     "eng": "Kagoshima",
+     "lat": 31.602,
+     "lon": 130.564,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 160,
+   "name": "宮崎空港線",
+   "kana": "みやざきくうこうせん",
+   "eng": "Miyazaki Airport Line",
+   "color": "#36B558",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "田吉",
+     "kana": "たよし",
+     "eng": "Tayoshi",
+     "lat": 31.879,
+     "lon": 131.421,
+     "number": ""
+    },
+    {
+     "name": "宮崎空港",
+     "kana": "みやざきくうこう",
+     "eng": "Miyazaki Airport",
+     "lat": 31.877,
+     "lon": 131.442,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 161,
+   "name": "日南線",
+   "kana": "にちなんせん",
+   "eng": "Nichinan Line",
+   "color": "#FAAF18",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "南宮崎",
+     "kana": "みなみみやざき",
+     "eng": "Minami-Miyazaki",
+     "lat": 31.898,
+     "lon": 131.422,
+     "number": ""
+    },
+    {
+     "name": "田吉",
+     "kana": "たよし",
+     "eng": "Tayoshi",
+     "lat": 31.879,
+     "lon": 131.421,
+     "number": ""
+    },
+    {
+     "name": "南方",
+     "kana": "みなみかた",
+     "eng": "Minamikata",
+     "lat": 31.865,
+     "lon": 131.424,
+     "number": ""
+    },
+    {
+     "name": "木花",
+     "kana": "きばな",
+     "eng": "Kibana",
+     "lat": 31.841,
+     "lon": 131.437,
+     "number": ""
+    },
+    {
+     "name": "運動公園",
+     "kana": "うんどうこうえん",
+     "eng": "Undokoen",
+     "lat": 31.825,
+     "lon": 131.443,
+     "number": ""
+    },
+    {
+     "name": "曽山寺",
+     "kana": "そさんじ",
+     "eng": "Sosanji",
+     "lat": 31.816,
+     "lon": 131.45,
+     "number": ""
+    },
+    {
+     "name": "子供の国",
+     "kana": "こどものくに",
+     "eng": "Kodomonokuni",
+     "lat": 31.809,
+     "lon": 131.46,
+     "number": ""
+    },
+    {
+     "name": "青島",
+     "kana": "あおしま",
+     "eng": "Aoshima",
+     "lat": 31.803,
+     "lon": 131.463,
+     "number": ""
+    },
+    {
+     "name": "折生迫",
+     "kana": "おりうざこ",
+     "eng": "Oriuzako",
+     "lat": 31.79,
+     "lon": 131.461,
+     "number": ""
+    },
+    {
+     "name": "内海",
+     "kana": "うちうみ",
+     "eng": "Uchiumi",
+     "lat": 31.756,
+     "lon": 131.455,
+     "number": ""
+    },
+    {
+     "name": "小内海",
+     "kana": "こうちうみ",
+     "eng": "Kouchiumi",
+     "lat": 31.737,
+     "lon": 131.451,
+     "number": ""
+    },
+    {
+     "name": "伊比井",
+     "kana": "いびい",
+     "eng": "Ibii",
+     "lat": 31.702,
+     "lon": 131.437,
+     "number": ""
+    },
+    {
+     "name": "北郷",
+     "kana": "きたごう",
+     "eng": "Kitago",
+     "lat": 31.669,
+     "lon": 131.391,
+     "number": ""
+    },
+    {
+     "name": "内之田",
+     "kana": "うちのだ",
+     "eng": "Uchinoda",
+     "lat": 31.653,
+     "lon": 131.377,
+     "number": ""
+    },
+    {
+     "name": "飫肥",
+     "kana": "おび",
+     "eng": "Obi",
+     "lat": 31.627,
+     "lon": 131.357,
+     "number": ""
+    },
+    {
+     "name": "日南",
+     "kana": "にちなん",
+     "eng": "Nichinan",
+     "lat": 31.612,
+     "lon": 131.375,
+     "number": ""
+    },
+    {
+     "name": "油津",
+     "kana": "あぶらつ",
+     "eng": "Aburatsu",
+     "lat": 31.592,
+     "lon": 131.392,
+     "number": ""
+    },
+    {
+     "name": "大堂津",
+     "kana": "おおどうつ",
+     "eng": "Odotsu",
+     "lat": 31.556,
+     "lon": 131.372,
+     "number": ""
+    },
+    {
+     "name": "南郷",
+     "kana": "なんごう",
+     "eng": "Nango",
+     "lat": 31.537,
+     "lon": 131.344,
+     "number": ""
+    },
+    {
+     "name": "谷之口",
+     "kana": "たにのくち",
+     "eng": "Taninokuchi",
+     "lat": 31.518,
+     "lon": 131.317,
+     "number": ""
+    },
+    {
+     "name": "榎原",
+     "kana": "よわら",
+     "eng": "Yowara",
+     "lat": 31.5,
+     "lon": 131.296,
+     "number": ""
+    },
+    {
+     "name": "日向大束",
+     "kana": "ひゅうがおおつか",
+     "eng": "Hyuga-Otsuka",
+     "lat": 31.495,
+     "lon": 131.25,
+     "number": ""
+    },
+    {
+     "name": "日向北方",
+     "kana": "ひゅうがきたかた",
+     "eng": "Hyuga-Kitakata",
+     "lat": 31.48,
+     "lon": 131.234,
+     "number": ""
+    },
+    {
+     "name": "串間",
+     "kana": "くしま",
+     "eng": "Kushima",
+     "lat": 31.463,
+     "lon": 131.228,
+     "number": ""
+    },
+    {
+     "name": "福島今町",
+     "kana": "ふくしまいまち",
+     "eng": "Fukushima-Imachi",
+     "lat": 31.463,
+     "lon": 131.196,
+     "number": ""
+    },
+    {
+     "name": "福島高松",
+     "kana": "ふくしまたかまつ",
+     "eng": "Fukushima-Takamatsu",
+     "lat": 31.465,
+     "lon": 131.163,
+     "number": ""
+    },
+    {
+     "name": "大隅夏井",
+     "kana": "おおすみなつい",
+     "eng": "Osumi-Natsui",
+     "lat": 31.459,
+     "lon": 131.128,
+     "number": ""
+    },
+    {
+     "name": "志布志",
+     "kana": "しぶし",
+     "eng": "Shibushi",
+     "lat": 31.474,
+     "lon": 131.102,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

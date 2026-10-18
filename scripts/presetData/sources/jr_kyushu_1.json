@@ -1,0 +1,1426 @@
+{
+ "lines": [
+  {
+   "no": 149,
+   "name": "鹿児島本線",
+   "kana": "かごしまほんせん",
+   "eng": "Kagoshima Line",
+   "color": "#EE3D49",
+   "symbol": "JA",
+   "stations": [
+    {
+     "name": "門司港",
+     "kana": "もじこう",
+     "eng": "Mojiko",
+     "lat": 33.9451,
+     "lon": 130.9615,
+     "number": "JA 31"
+    },
+    {
+     "name": "小森江",
+     "kana": "こもりえ",
+     "eng": "Komorie",
+     "lat": 33.9153,
+     "lon": 130.9385,
+     "number": "JA 30"
+    },
+    {
+     "name": "門司",
+     "kana": "もじ",
+     "eng": "Moji",
+     "lat": 33.9042,
+     "lon": 130.9331,
+     "number": "JA 29"
+    },
+    {
+     "name": "小倉",
+     "kana": "こくら",
+     "eng": "Kokura",
+     "lat": 33.8867,
+     "lon": 130.8827,
+     "number": "JA 28"
+    },
+    {
+     "name": "西小倉",
+     "kana": "にしこくら",
+     "eng": "Nishi-Kokura",
+     "lat": 33.8886,
+     "lon": 130.8739,
+     "number": "JA 27"
+    },
+    {
+     "name": "九州工大前",
+     "kana": "きゅうしゅうこうだいまえ",
+     "eng": "Kyushukodai-mae",
+     "lat": 33.9004,
+     "lon": 130.8401,
+     "number": "JA 26"
+    },
+    {
+     "name": "戸畑",
+     "kana": "とばた",
+     "eng": "Tobata",
+     "lat": 33.8969,
+     "lon": 130.8205,
+     "number": "JA 25"
+    },
+    {
+     "name": "枝光",
+     "kana": "えだみつ",
+     "eng": "Edamitsu",
+     "lat": 33.8794,
+     "lon": 130.8133,
+     "number": "JA 24"
+    },
+    {
+     "name": "スペースワールド",
+     "kana": "スペースワールド",
+     "eng": "Space World",
+     "lat": 33.8712,
+     "lon": 130.8064,
+     "number": "JA 23"
+    },
+    {
+     "name": "八幡",
+     "kana": "やはた",
+     "eng": "Yahata",
+     "lat": 33.8689,
+     "lon": 130.7954,
+     "number": "JA 22"
+    },
+    {
+     "name": "黒崎",
+     "kana": "くろさき",
+     "eng": "Kurosaki",
+     "lat": 33.8668,
+     "lon": 130.7661,
+     "number": "JA 21"
+    },
+    {
+     "name": "陣原",
+     "kana": "じんのはる",
+     "eng": "Jinnoharu",
+     "lat": 33.8682,
+     "lon": 130.743,
+     "number": "JA 20"
+    },
+    {
+     "name": "折尾",
+     "kana": "おりお",
+     "eng": "Orio",
+     "lat": 33.8637,
+     "lon": 130.7139,
+     "number": "JA 19"
+    },
+    {
+     "name": "水巻",
+     "kana": "みずまき",
+     "eng": "Mizumaki",
+     "lat": 33.8523,
+     "lon": 130.6946,
+     "number": "JA 18"
+    },
+    {
+     "name": "遠賀川",
+     "kana": "おんががわ",
+     "eng": "Ongagawa",
+     "lat": 33.8469,
+     "lon": 130.6735,
+     "number": "JA 17"
+    },
+    {
+     "name": "海老津",
+     "kana": "えびつ",
+     "eng": "Ebitsu",
+     "lat": 33.8402,
+     "lon": 130.6232,
+     "number": "JA 16"
+    },
+    {
+     "name": "教育大前",
+     "kana": "きょういくだいまえ",
+     "eng": "Kyoikudai-mae",
+     "lat": 33.8085,
+     "lon": 130.5918,
+     "number": "JA 15"
+    },
+    {
+     "name": "赤間",
+     "kana": "あかま",
+     "eng": "Akama",
+     "lat": 33.8083,
+     "lon": 130.5696,
+     "number": "JA 14"
+    },
+    {
+     "name": "東郷",
+     "kana": "とうごう",
+     "eng": "Togo",
+     "lat": 33.7947,
+     "lon": 130.5288,
+     "number": "JA 13"
+    },
+    {
+     "name": "東福間",
+     "kana": "ひがしふくま",
+     "eng": "Higashi-Fukuma",
+     "lat": 33.7742,
+     "lon": 130.5108,
+     "number": "JA 12"
+    },
+    {
+     "name": "福間",
+     "kana": "ふくま",
+     "eng": "Fukuma",
+     "lat": 33.7633,
+     "lon": 130.4861,
+     "number": "JA 11"
+    },
+    {
+     "name": "千鳥",
+     "kana": "ちどり",
+     "eng": "Chidori",
+     "lat": 33.7486,
+     "lon": 130.4761,
+     "number": "JA 10"
+    },
+    {
+     "name": "古賀",
+     "kana": "こが",
+     "eng": "Koga",
+     "lat": 33.7324,
+     "lon": 130.4666,
+     "number": "JA 09"
+    },
+    {
+     "name": "ししぶ",
+     "kana": "ししぶ",
+     "eng": "Shishibu",
+     "lat": 33.7217,
+     "lon": 130.4583,
+     "number": "JA 08"
+    },
+    {
+     "name": "新宮中央",
+     "kana": "しんぐうちゅうおう",
+     "eng": "Shingu-Chuo",
+     "lat": 33.7116,
+     "lon": 130.4492,
+     "number": "JA 07"
+    },
+    {
+     "name": "福工大前",
+     "kana": "ふっこうだいまえ",
+     "eng": "Fukkodai-mae",
+     "lat": 33.6984,
+     "lon": 130.4401,
+     "number": "JA 06"
+    },
+    {
+     "name": "九産大前",
+     "kana": "きゅうさんだいまえ",
+     "eng": "Kyusandai-mae",
+     "lat": 33.6736,
+     "lon": 130.4412,
+     "number": "JA 05"
+    },
+    {
+     "name": "香椎",
+     "kana": "かしい",
+     "eng": "Kashii",
+     "lat": 33.6595,
+     "lon": 130.4441,
+     "number": "JA 04"
+    },
+    {
+     "name": "千早",
+     "kana": "ちはや",
+     "eng": "Chihaya",
+     "lat": 33.6493,
+     "lon": 130.4402,
+     "number": "JA 03"
+    },
+    {
+     "name": "箱崎",
+     "kana": "はこざき",
+     "eng": "Hakozaki",
+     "lat": 33.6181,
+     "lon": 130.427,
+     "number": "JA 02"
+    },
+    {
+     "name": "吉塚",
+     "kana": "よしづか",
+     "eng": "Yoshizuka",
+     "lat": 33.6072,
+     "lon": 130.4239,
+     "number": "JA 01"
+    },
+    {
+     "name": "博多",
+     "kana": "はかた",
+     "eng": "Hakata",
+     "lat": 33.59,
+     "lon": 130.4206,
+     "number": "JA 00"
+    }
+   ]
+  },
+  {
+   "no": 150,
+   "name": "鹿児島本線",
+   "kana": "かごしまほんせん",
+   "eng": "Kagoshima Line",
+   "color": "#EE3D49",
+   "symbol": "JB",
+   "stations": [
+    {
+     "name": "博多",
+     "kana": "はかた",
+     "eng": "Hakata",
+     "lat": 33.59,
+     "lon": 130.4206,
+     "number": "JB 00"
+    },
+    {
+     "name": "竹下",
+     "kana": "たけした",
+     "eng": "Takeshita",
+     "lat": 33.5687,
+     "lon": 130.4314,
+     "number": "JB 01"
+    },
+    {
+     "name": "笹原",
+     "kana": "ささばる",
+     "eng": "Sasabaru",
+     "lat": 33.5533,
+     "lon": 130.4486,
+     "number": "JB 02"
+    },
+    {
+     "name": "南福岡",
+     "kana": "みなみふくおか",
+     "eng": "Minami-Fukuoka",
+     "lat": 33.5421,
+     "lon": 130.4606,
+     "number": "JB 03"
+    },
+    {
+     "name": "春日",
+     "kana": "かすが",
+     "eng": "Kasuga",
+     "lat": 33.5354,
+     "lon": 130.4685,
+     "number": "JB 04"
+    },
+    {
+     "name": "大野城",
+     "kana": "おおのじょう",
+     "eng": "Onojo",
+     "lat": 33.5255,
+     "lon": 130.4796,
+     "number": "JB 05"
+    },
+    {
+     "name": "水城",
+     "kana": "みずき",
+     "eng": "Mizuki",
+     "lat": 33.5179,
+     "lon": 130.4904,
+     "number": "JB 06"
+    },
+    {
+     "name": "都府楼南",
+     "kana": "とふろうみなみ",
+     "eng": "Tofuro-Minami",
+     "lat": 33.5031,
+     "lon": 130.5067,
+     "number": "JB 07"
+    },
+    {
+     "name": "二日市",
+     "kana": "ふつかいち",
+     "eng": "Futsukaichi",
+     "lat": 33.4951,
+     "lon": 130.5186,
+     "number": "JB 08"
+    },
+    {
+     "name": "天拝山",
+     "kana": "てんぱいざん",
+     "eng": "Tenpaizan",
+     "lat": 33.4819,
+     "lon": 130.5303,
+     "number": "JB 09"
+    },
+    {
+     "name": "原田",
+     "kana": "はるだ",
+     "eng": "Haruda",
+     "lat": 33.4511,
+     "lon": 130.5394,
+     "number": "JB 10"
+    },
+    {
+     "name": "けやき台",
+     "kana": "けやきだい",
+     "eng": "Keyakidai",
+     "lat": 33.4344,
+     "lon": 130.5334,
+     "number": "JB 11"
+    },
+    {
+     "name": "基山",
+     "kana": "きやま",
+     "eng": "Kiyama",
+     "lat": 33.4209,
+     "lon": 130.5322,
+     "number": "JB 12"
+    },
+    {
+     "name": "弥生が丘",
+     "kana": "やよいがおか",
+     "eng": "Yayoigaoka",
+     "lat": 33.4022,
+     "lon": 130.5283,
+     "number": "JB 13"
+    },
+    {
+     "name": "田代",
+     "kana": "たしろ",
+     "eng": "Tashiro",
+     "lat": 33.384,
+     "lon": 130.5245,
+     "number": "JB 14"
+    },
+    {
+     "name": "鳥栖",
+     "kana": "とす",
+     "eng": "Tosu",
+     "lat": 33.3739,
+     "lon": 130.5193,
+     "number": "JB 15"
+    },
+    {
+     "name": "肥前旭",
+     "kana": "ひぜんあさひ",
+     "eng": "Hizen-Asahi",
+     "lat": 33.3502,
+     "lon": 130.496,
+     "number": "JB 16"
+    },
+    {
+     "name": "久留米",
+     "kana": "くるめ",
+     "eng": "Kurume",
+     "lat": 33.3204,
+     "lon": 130.5013,
+     "number": "JB 17"
+    },
+    {
+     "name": "荒木",
+     "kana": "あらき",
+     "eng": "Araki",
+     "lat": 33.2761,
+     "lon": 130.5025,
+     "number": "JB 18"
+    },
+    {
+     "name": "西牟田",
+     "kana": "にしむた",
+     "eng": "Nishimuta",
+     "lat": 33.2466,
+     "lon": 130.501,
+     "number": "JB 19"
+    },
+    {
+     "name": "羽犬塚",
+     "kana": "はいぬづか",
+     "eng": "Hainuzuka",
+     "lat": 33.2104,
+     "lon": 130.4981,
+     "number": "JB 20"
+    },
+    {
+     "name": "筑後船小屋",
+     "kana": "ちくごふなごや",
+     "eng": "Chikugo-Funagoya",
+     "lat": 33.1779,
+     "lon": 130.4924,
+     "number": "JB 21"
+    },
+    {
+     "name": "瀬高",
+     "kana": "せたか",
+     "eng": "Setaka",
+     "lat": 33.157,
+     "lon": 130.4851,
+     "number": "JB 22"
+    },
+    {
+     "name": "南瀬高",
+     "kana": "みなみせたか",
+     "eng": "Minami-Setaka",
+     "lat": 33.1337,
+     "lon": 130.4712,
+     "number": "JB 23"
+    },
+    {
+     "name": "渡瀬",
+     "kana": "わたぜ",
+     "eng": "Watase",
+     "lat": 33.0999,
+     "lon": 130.4598,
+     "number": "JB 24"
+    },
+    {
+     "name": "吉野",
+     "kana": "よしの",
+     "eng": "Yoshino",
+     "lat": 33.0758,
+     "lon": 130.4664,
+     "number": "JB 25"
+    },
+    {
+     "name": "銀水",
+     "kana": "ぎんすい",
+     "eng": "Ginsui",
+     "lat": 33.0549,
+     "lon": 130.461,
+     "number": "JB 26"
+    },
+    {
+     "name": "大牟田",
+     "kana": "おおむた",
+     "eng": "Omuta",
+     "lat": 33.0297,
+     "lon": 130.4441,
+     "number": "JB 27"
+    },
+    {
+     "name": "荒尾",
+     "kana": "あらお",
+     "eng": "Arao",
+     "lat": 32.9943,
+     "lon": 130.4342,
+     "number": "JB 28"
+    }
+   ]
+  },
+  {
+   "no": 153,
+   "name": "山陽本線",
+   "kana": "さんようほんせん",
+   "eng": "Sanyo Line",
+   "color": "#EE3D49",
+   "symbol": "JA",
+   "stations": [
+    {
+     "name": "下関",
+     "kana": "しものせき",
+     "eng": "Shimonoseki",
+     "lat": 33.9504,
+     "lon": 130.9231,
+     "number": "JA 53"
+    },
+    {
+     "name": "門司",
+     "kana": "もじ",
+     "eng": "Moji",
+     "lat": 33.9042,
+     "lon": 130.9331,
+     "number": "JA 52"
+    }
+   ]
+  },
+  {
+   "no": 154,
+   "name": "福北ゆたか線",
+   "kana": "ふくほくゆたかせん",
+   "eng": "Fukuhoku Yutaka Line",
+   "color": "#FAAF18",
+   "symbol": "JC",
+   "stations": [
+    {
+     "name": "博多",
+     "kana": "はかた",
+     "eng": "Hakata",
+     "lat": 33.59,
+     "lon": 130.4206,
+     "number": "JC 00"
+    },
+    {
+     "name": "吉塚",
+     "kana": "よしづか",
+     "eng": "Yoshizuka",
+     "lat": 33.6072,
+     "lon": 130.4239,
+     "number": "JC 01"
+    },
+    {
+     "name": "柚須",
+     "kana": "ゆす",
+     "eng": "Yusu",
+     "lat": 33.6132,
+     "lon": 130.4451,
+     "number": "JC 02"
+    },
+    {
+     "name": "原町",
+     "kana": "はるまち",
+     "eng": "Harumachi",
+     "lat": 33.6119,
+     "lon": 130.4709,
+     "number": "JC 03"
+    },
+    {
+     "name": "長者原",
+     "kana": "ちょうじゃばる",
+     "eng": "Chojabaru",
+     "lat": 33.6135,
+     "lon": 130.4778,
+     "number": "JC 04"
+    },
+    {
+     "name": "門松",
+     "kana": "かどまつ",
+     "eng": "Kadomatsu",
+     "lat": 33.6206,
+     "lon": 130.4966,
+     "number": "JC 05"
+    },
+    {
+     "name": "篠栗",
+     "kana": "ささぐり",
+     "eng": "Sasaguri",
+     "lat": 33.624,
+     "lon": 130.5248,
+     "number": "JC 06"
+    },
+    {
+     "name": "筑前山手",
+     "kana": "ちくぜんやまて",
+     "eng": "Chikuzen-Yamate",
+     "lat": 33.6221,
+     "lon": 130.5573,
+     "number": "JC 07"
+    },
+    {
+     "name": "城戸南蔵院前",
+     "kana": "きどなんぞういんまえ",
+     "eng": "Kido-Nanzoin-mae",
+     "lat": 33.6182,
+     "lon": 130.5721,
+     "number": "JC 08"
+    },
+    {
+     "name": "九郎原",
+     "kana": "くろうばる",
+     "eng": "Kurobaru",
+     "lat": 33.5923,
+     "lon": 130.6116,
+     "number": "JC 09"
+    },
+    {
+     "name": "筑前大分",
+     "kana": "ちくぜんだいぶ",
+     "eng": "Chikuzen-Daibu",
+     "lat": 33.5902,
+     "lon": 130.6296,
+     "number": "JC 10"
+    },
+    {
+     "name": "桂川",
+     "kana": "けいせん",
+     "eng": "Keisen",
+     "lat": 33.5848,
+     "lon": 130.6623,
+     "number": "JC 11"
+    },
+    {
+     "name": "天道",
+     "kana": "てんとう",
+     "eng": "Tento",
+     "lat": 33.6054,
+     "lon": 130.6778,
+     "number": "JC 12"
+    },
+    {
+     "name": "飯塚",
+     "kana": "いいづか",
+     "eng": "Iizuka",
+     "lat": 33.6285,
+     "lon": 130.6894,
+     "number": "JC 13"
+    },
+    {
+     "name": "新飯塚",
+     "kana": "しんいいづか",
+     "eng": "Shin-Iizuka",
+     "lat": 33.6442,
+     "lon": 130.6941,
+     "number": "JC 14"
+    },
+    {
+     "name": "浦田",
+     "kana": "うらた",
+     "eng": "Urata",
+     "lat": 33.6565,
+     "lon": 130.6994,
+     "number": "JC 15"
+    },
+    {
+     "name": "鯰田",
+     "kana": "なまずた",
+     "eng": "Namazuta",
+     "lat": 33.6688,
+     "lon": 130.702,
+     "number": "JC 16"
+    },
+    {
+     "name": "小竹",
+     "kana": "こたけ",
+     "eng": "Kotake",
+     "lat": 33.6964,
+     "lon": 130.7106,
+     "number": "JC 17"
+    },
+    {
+     "name": "勝野",
+     "kana": "かつの",
+     "eng": "Katsuno",
+     "lat": 33.7284,
+     "lon": 130.7163,
+     "number": "JC 18"
+    },
+    {
+     "name": "直方",
+     "kana": "のおがた",
+     "eng": "Nogata",
+     "lat": 33.7481,
+     "lon": 130.725,
+     "number": "JC 19"
+    },
+    {
+     "name": "新入",
+     "kana": "しんにゅう",
+     "eng": "Shinnyu",
+     "lat": 33.764,
+     "lon": 130.7136,
+     "number": "JC 20"
+    },
+    {
+     "name": "筑前植木",
+     "kana": "ちくぜんうえき",
+     "eng": "Chikuzen-Ueki",
+     "lat": 33.7765,
+     "lon": 130.7085,
+     "number": "JC 21"
+    },
+    {
+     "name": "鞍手",
+     "kana": "くらて",
+     "eng": "Kurate",
+     "lat": 33.7977,
+     "lon": 130.6994,
+     "number": "JC 22"
+    },
+    {
+     "name": "筑前垣生",
+     "kana": "ちくぜんはぶ",
+     "eng": "Chikuzen-Habu",
+     "lat": 33.8181,
+     "lon": 130.7018,
+     "number": "JC 23"
+    },
+    {
+     "name": "中間",
+     "kana": "なかま",
+     "eng": "Nakama",
+     "lat": 33.8276,
+     "lon": 130.7098,
+     "number": "JC 24"
+    },
+    {
+     "name": "東水巻",
+     "kana": "ひがしみずまき",
+     "eng": "Higashi-Mizumaki",
+     "lat": 33.8409,
+     "lon": 130.7083,
+     "number": "JC 25"
+    },
+    {
+     "name": "折尾",
+     "kana": "おりお",
+     "eng": "Orio",
+     "lat": 33.8637,
+     "lon": 130.7139,
+     "number": "JC 26"
+    }
+   ]
+  },
+  {
+   "no": 155,
+   "name": "若松線",
+   "kana": "わかまつせん",
+   "eng": "Wakamatsu Line",
+   "color": "#0095D9",
+   "symbol": "JE",
+   "stations": [
+    {
+     "name": "折尾",
+     "kana": "おりお",
+     "eng": "Orio",
+     "lat": 33.8637,
+     "lon": 130.7139,
+     "number": "JE 01"
+    },
+    {
+     "name": "本城",
+     "kana": "ほんじょう",
+     "eng": "Honjo",
+     "lat": 33.8748,
+     "lon": 130.7228,
+     "number": "JE 02"
+    },
+    {
+     "name": "二島",
+     "kana": "ふたじま",
+     "eng": "Futajima",
+     "lat": 33.8897,
+     "lon": 130.7484,
+     "number": "JE 03"
+    },
+    {
+     "name": "奥洞海",
+     "kana": "おくどうかい",
+     "eng": "Okudokai",
+     "lat": 33.8892,
+     "lon": 130.7649,
+     "number": "JE 04"
+    },
+    {
+     "name": "藤ノ木",
+     "kana": "ふじのき",
+     "eng": "Fujinoki",
+     "lat": 33.8934,
+     "lon": 130.7818,
+     "number": "JE 05"
+    },
+    {
+     "name": "若松",
+     "kana": "わかまつ",
+     "eng": "Wakamatsu",
+     "lat": 33.9011,
+     "lon": 130.8063,
+     "number": "JE 06"
+    }
+   ]
+  },
+  {
+   "no": 156,
+   "name": "原田線",
+   "kana": "はらだせん",
+   "eng": "Harada Line",
+   "color": "#36B558",
+   "symbol": "JG",
+   "stations": [
+    {
+     "name": "桂川",
+     "kana": "けいせん",
+     "eng": "Keisen",
+     "lat": 33.5848,
+     "lon": 130.6623,
+     "number": "JG 01"
+    },
+    {
+     "name": "上穂波",
+     "kana": "かみほなみ",
+     "eng": "Kamihonami",
+     "lat": 33.5669,
+     "lon": 130.6452,
+     "number": "JG 02"
+    },
+    {
+     "name": "筑前内野",
+     "kana": "ちくぜんうちの",
+     "eng": "Chikuzen-Uchino",
+     "lat": 33.5401,
+     "lon": 130.6381,
+     "number": "JG 03"
+    },
+    {
+     "name": "筑前山家",
+     "kana": "ちくぜんやまえ",
+     "eng": "Chikuzen-Yamae",
+     "lat": 33.4774,
+     "lon": 130.5738,
+     "number": "JG 04"
+    },
+    {
+     "name": "原田",
+     "kana": "はるだ",
+     "eng": "Haruda",
+     "lat": 33.4511,
+     "lon": 130.5394,
+     "number": "JG 05"
+    }
+   ]
+  },
+  {
+   "no": 157,
+   "name": "香椎線",
+   "kana": "かしいせん",
+   "eng": "Kashii Line",
+   "color": "#0095D9",
+   "symbol": "JD",
+   "stations": [
+    {
+     "name": "西戸崎",
+     "kana": "さいとざき",
+     "eng": "Saitozaki",
+     "lat": 33.6502,
+     "lon": 130.3578,
+     "number": "JD 01"
+    },
+    {
+     "name": "海ノ中道",
+     "kana": "うみのなかみち",
+     "eng": "Uminonakamichi",
+     "lat": 33.6642,
+     "lon": 130.3616,
+     "number": "JD 02"
+    },
+    {
+     "name": "雁ノ巣",
+     "kana": "がんのす",
+     "eng": "Gannosu",
+     "lat": 33.6839,
+     "lon": 130.4033,
+     "number": "JD 03"
+    },
+    {
+     "name": "奈多",
+     "kana": "なた",
+     "eng": "Nata",
+     "lat": 33.6867,
+     "lon": 130.4125,
+     "number": "JD 04"
+    },
+    {
+     "name": "和白",
+     "kana": "わじろ",
+     "eng": "Wajiro",
+     "lat": 33.6892,
+     "lon": 130.4296,
+     "number": "JD 05"
+    },
+    {
+     "name": "香椎",
+     "kana": "かしい",
+     "eng": "Kashii",
+     "lat": 33.6595,
+     "lon": 130.4441,
+     "number": "JD 06"
+    },
+    {
+     "name": "香椎神宮",
+     "kana": "かしいじんぐう",
+     "eng": "Kashiijingu",
+     "lat": 33.6498,
+     "lon": 130.4526,
+     "number": "JD 07"
+    },
+    {
+     "name": "舞松原",
+     "kana": "まいまつばら",
+     "eng": "Maimatsubara",
+     "lat": 33.6452,
+     "lon": 130.4551,
+     "number": "JD 08"
+    },
+    {
+     "name": "土井",
+     "kana": "どい",
+     "eng": "Doi",
+     "lat": 33.635,
+     "lon": 130.4661,
+     "number": "JD 09"
+    },
+    {
+     "name": "伊賀",
+     "kana": "いが",
+     "eng": "Iga",
+     "lat": 33.6208,
+     "lon": 130.4736,
+     "number": "JD 10"
+    },
+    {
+     "name": "長者原",
+     "kana": "ちょうじゃばる",
+     "eng": "Chojabaru",
+     "lat": 33.6135,
+     "lon": 130.4778,
+     "number": "JD 11"
+    },
+    {
+     "name": "酒殿",
+     "kana": "さかど",
+     "eng": "Sakado",
+     "lat": 33.6026,
+     "lon": 130.4861,
+     "number": "JD 12"
+    },
+    {
+     "name": "須恵",
+     "kana": "すえ",
+     "eng": "Sue",
+     "lat": 33.5966,
+     "lon": 130.4982,
+     "number": "JD 13"
+    },
+    {
+     "name": "須恵中央",
+     "kana": "すえちゅうおう",
+     "eng": "Sue-Chuo",
+     "lat": 33.587,
+     "lon": 130.5051,
+     "number": "JD 14"
+    },
+    {
+     "name": "新原",
+     "kana": "しんばる",
+     "eng": "Shinbaru",
+     "lat": 33.5791,
+     "lon": 130.5089,
+     "number": "JD 15"
+    },
+    {
+     "name": "宇美",
+     "kana": "うみ",
+     "eng": "Umi",
+     "lat": 33.5691,
+     "lon": 130.5132,
+     "number": "JD 16"
+    }
+   ]
+  },
+  {
+   "no": 158,
+   "name": "日豊本線",
+   "kana": "にっぽうほんせん",
+   "eng": "Nippo Line",
+   "color": "#0095D9",
+   "symbol": "JF",
+   "stations": [
+    {
+     "name": "小倉",
+     "kana": "こくら",
+     "eng": "Kokura",
+     "lat": 33.8867,
+     "lon": 130.8827,
+     "number": "JF 01"
+    },
+    {
+     "name": "西小倉",
+     "kana": "にしこくら",
+     "eng": "Nishi-Kokura",
+     "lat": 33.8886,
+     "lon": 130.8739,
+     "number": "JF 02"
+    },
+    {
+     "name": "南小倉",
+     "kana": "みなみこくら",
+     "eng": "Minami-Kokura",
+     "lat": 33.8704,
+     "lon": 130.8645,
+     "number": "JF 03"
+    },
+    {
+     "name": "城野",
+     "kana": "じょうの",
+     "eng": "Jono",
+     "lat": 33.8582,
+     "lon": 130.8863,
+     "number": "JF 04"
+    },
+    {
+     "name": "安部山公園",
+     "kana": "あべやまこうえん",
+     "eng": "Abeyama-Koen",
+     "lat": 33.844,
+     "lon": 130.9041,
+     "number": "JF 05"
+    },
+    {
+     "name": "下曽根",
+     "kana": "しもそね",
+     "eng": "Shimosone",
+     "lat": 33.8324,
+     "lon": 130.9348,
+     "number": "JF 06"
+    },
+    {
+     "name": "朽網",
+     "kana": "くさみ",
+     "eng": "Kusami",
+     "lat": 33.8073,
+     "lon": 130.9551,
+     "number": "JF 07"
+    },
+    {
+     "name": "苅田",
+     "kana": "かんだ",
+     "eng": "Kanda",
+     "lat": 33.7846,
+     "lon": 130.979,
+     "number": "JF 08"
+    },
+    {
+     "name": "小波瀬西工大前",
+     "kana": "おばせにしこうだいまえ",
+     "eng": "Obase-Nishikodai-mae",
+     "lat": 33.753,
+     "lon": 130.9719,
+     "number": "JF 09"
+    },
+    {
+     "name": "行橋",
+     "kana": "ゆくはし",
+     "eng": "Yukuhashi",
+     "lat": 33.7286,
+     "lon": 130.9703,
+     "number": "JF 10"
+    }
+   ]
+  },
+  {
+   "no": 174,
+   "name": "筑肥線",
+   "kana": "ちくひせん",
+   "eng": "Chikuhi Line",
+   "color": "#8F3E97",
+   "symbol": "JK",
+   "stations": [
+    {
+     "name": "姪浜",
+     "kana": "めいのはま",
+     "eng": "Meinohama",
+     "lat": 33.5837,
+     "lon": 130.3252,
+     "number": "JK 01"
+    },
+    {
+     "name": "下山門",
+     "kana": "しもやまと",
+     "eng": "Shimoyamato",
+     "lat": 33.5819,
+     "lon": 130.3082,
+     "number": "JK 02"
+    },
+    {
+     "name": "今宿",
+     "kana": "いまじゅく",
+     "eng": "Imajuku",
+     "lat": 33.5794,
+     "lon": 130.2736,
+     "number": "JK 03"
+    },
+    {
+     "name": "九大学研都市",
+     "kana": "きゅうだいがっけんとし",
+     "eng": "Kyudai-Gakkentoshi",
+     "lat": 33.5782,
+     "lon": 130.2599,
+     "number": "JK 04"
+    },
+    {
+     "name": "周船寺",
+     "kana": "すせんじ",
+     "eng": "Susenji",
+     "lat": 33.5708,
+     "lon": 130.2458,
+     "number": "JK 05"
+    },
+    {
+     "name": "波多江",
+     "kana": "はたえ",
+     "eng": "Hatae",
+     "lat": 33.5641,
+     "lon": 130.2268,
+     "number": "JK 06"
+    },
+    {
+     "name": "糸島高校前",
+     "kana": "いとしまこうこうまえ",
+     "eng": "Itoshimakoko-mae",
+     "lat": 33.5607,
+     "lon": 130.2133,
+     "number": "JK 07"
+    },
+    {
+     "name": "筑前前原",
+     "kana": "ちくぜんまえばる",
+     "eng": "Chikuzen-Maebaru",
+     "lat": 33.5571,
+     "lon": 130.1993,
+     "number": "JK 08"
+    },
+    {
+     "name": "美咲が丘",
+     "kana": "みさきがおか",
+     "eng": "Misakigaoka",
+     "lat": 33.5499,
+     "lon": 130.1855,
+     "number": "JK 09"
+    },
+    {
+     "name": "加布里",
+     "kana": "かふり",
+     "eng": "Kafuri",
+     "lat": 33.5434,
+     "lon": 130.1764,
+     "number": "JK 10"
+    },
+    {
+     "name": "一貴山",
+     "kana": "いきさん",
+     "eng": "Ikisan",
+     "lat": 33.5343,
+     "lon": 130.1682,
+     "number": "JK 11"
+    },
+    {
+     "name": "筑前深江",
+     "kana": "ちくぜんふかえ",
+     "eng": "Chikuzen-Fukae",
+     "lat": 33.5151,
+     "lon": 130.1393,
+     "number": "JK 12"
+    },
+    {
+     "name": "大入",
+     "kana": "だいにゅう",
+     "eng": "Dainyu",
+     "lat": 33.5089,
+     "lon": 130.1059,
+     "number": "JK 13"
+    },
+    {
+     "name": "福吉",
+     "kana": "ふくよし",
+     "eng": "Fukuyoshi",
+     "lat": 33.5016,
+     "lon": 130.0796,
+     "number": "JK 14"
+    },
+    {
+     "name": "鹿家",
+     "kana": "しかか",
+     "eng": "Shikaka",
+     "lat": 33.4844,
+     "lon": 130.0474,
+     "number": "JK 15"
+    },
+    {
+     "name": "浜崎",
+     "kana": "はまさき",
+     "eng": "Hamasaki",
+     "lat": 33.4469,
+     "lon": 130.0368,
+     "number": "JK 16"
+    },
+    {
+     "name": "虹ノ松原",
+     "kana": "にじのまつばら",
+     "eng": "Nijinomatsubara",
+     "lat": 33.4411,
+     "lon": 130.0161,
+     "number": "JK 17"
+    },
+    {
+     "name": "東唐津",
+     "kana": "ひがしからつ",
+     "eng": "Higashi-Karatsu",
+     "lat": 33.4397,
+     "lon": 129.9978,
+     "number": "JK 18"
+    },
+    {
+     "name": "和多田",
+     "kana": "わただ",
+     "eng": "Watada",
+     "lat": 33.4371,
+     "lon": 129.9802,
+     "number": "JK 19"
+    },
+    {
+     "name": "唐津",
+     "kana": "からつ",
+     "eng": "Karatsu",
+     "lat": 33.4462,
+     "lon": 129.9677,
+     "number": "JK 20"
+    }
+   ]
+  },
+  {
+   "no": 176,
+   "name": "日田彦山線",
+   "kana": "ひたひこさんせん",
+   "eng": "Hitahikosan Line",
+   "color": "#B96F30",
+   "symbol": "JI",
+   "stations": [
+    {
+     "name": "城野",
+     "kana": "じょうの",
+     "eng": "Jono",
+     "lat": 33.8582,
+     "lon": 130.8863,
+     "number": "JI 04"
+    },
+    {
+     "name": "石田",
+     "kana": "いしだ",
+     "eng": "Ishida",
+     "lat": 33.8321,
+     "lon": 130.889,
+     "number": "JI 05"
+    },
+    {
+     "name": "志井公園",
+     "kana": "しいこうえん",
+     "eng": "Shii-Koen",
+     "lat": 33.8185,
+     "lon": 130.8797,
+     "number": "JI 06"
+    },
+    {
+     "name": "志井",
+     "kana": "しい",
+     "eng": "Shii",
+     "lat": 33.8035,
+     "lon": 130.8747,
+     "number": "JI 07"
+    },
+    {
+     "name": "石原町",
+     "kana": "いしはらまち",
+     "eng": "Ishiharamachi",
+     "lat": 33.7851,
+     "lon": 130.8659,
+     "number": "JI 08"
+    },
+    {
+     "name": "呼野",
+     "kana": "よぶの",
+     "eng": "Yobuno",
+     "lat": 33.7547,
+     "lon": 130.8617,
+     "number": "JI 09"
+    },
+    {
+     "name": "採銅所",
+     "kana": "さいどうしょ",
+     "eng": "Saidosho",
+     "lat": 33.7073,
+     "lon": 130.8532,
+     "number": "JI 10"
+    },
+    {
+     "name": "香春",
+     "kana": "かわら",
+     "eng": "Kawara",
+     "lat": 33.6661,
+     "lon": 130.847,
+     "number": "JI 11"
+    },
+    {
+     "name": "一本松",
+     "kana": "いっぽんまつ",
+     "eng": "Ippommatsu",
+     "lat": 33.6559,
+     "lon": 130.8354,
+     "number": "JI 12"
+    },
+    {
+     "name": "田川伊田",
+     "kana": "たがわいた",
+     "eng": "Tagawa-Ita",
+     "lat": 33.6421,
+     "lon": 130.8177,
+     "number": "JI 13"
+    },
+    {
+     "name": "田川後藤寺",
+     "kana": "たがわごとうじ",
+     "eng": "Tagawa-Gotoji",
+     "lat": 33.6304,
+     "lon": 130.8001,
+     "number": "JI 14"
+    }
+   ]
+  },
+  {
+   "no": 178,
+   "name": "後藤寺線",
+   "kana": "ごとうじせん",
+   "eng": "Gotoji Line",
+   "color": "#8F3E97",
+   "symbol": "JJ",
+   "stations": [
+    {
+     "name": "新飯塚",
+     "kana": "しんいいづか",
+     "eng": "Shin-Iizuka",
+     "lat": 33.6442,
+     "lon": 130.6941,
+     "number": "JJ 01"
+    },
+    {
+     "name": "上三緒",
+     "kana": "かみみお",
+     "eng": "Kamimio",
+     "lat": 33.623,
+     "lon": 130.7134,
+     "number": "JJ 02"
+    },
+    {
+     "name": "下鴨生",
+     "kana": "しもかもお",
+     "eng": "Shimokamo",
+     "lat": 33.6146,
+     "lon": 130.7285,
+     "number": "JJ 03"
+    },
+    {
+     "name": "筑前庄内",
+     "kana": "ちくぜんしょうない",
+     "eng": "Chikuzen-Shonai",
+     "lat": 33.6165,
+     "lon": 130.7384,
+     "number": "JJ 04"
+    },
+    {
+     "name": "船尾",
+     "kana": "ふなお",
+     "eng": "Funao",
+     "lat": 33.6304,
+     "lon": 130.7674,
+     "number": "JJ 05"
+    },
+    {
+     "name": "田川後藤寺",
+     "kana": "たがわごとうじ",
+     "eng": "Tagawa-Gotoji",
+     "lat": 33.6304,
+     "lon": 130.8001,
+     "number": "JJ 06"
+    }
+   ]
+  }
+ ]
+}
