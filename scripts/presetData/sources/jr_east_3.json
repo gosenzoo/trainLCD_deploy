@@ -305,7 +305,7 @@
       "name": "東北本線",
       "kana": "とうほくほんせん",
       "eng": "Tohoku Line",
-      "color": "#F68B1E",
+      "color": "#3CB371",
       "symbol": "",
       "stations": [
         {
@@ -338,6 +338,638 @@
           "eng": "Toyohara",
           "lat": 37.0786,
           "lon": 140.1503,
+          "number": ""
+        },
+        {
+          "name": "白坂",
+          "kana": "しらさか",
+          "eng": "Shirasaka",
+          "lat": 37.0945,
+          "lon": 140.1843,
+          "number": ""
+        },
+        {
+          "name": "新白河",
+          "kana": "しんしらかわ",
+          "eng": "Shin-Shirakawa",
+          "lat": 37.1228,
+          "lon": 140.1884,
+          "number": ""
+        },
+        {
+          "name": "白河",
+          "kana": "しらかわ",
+          "eng": "Shirakawa",
+          "lat": 37.1299,
+          "lon": 140.2137,
+          "number": ""
+        },
+        {
+          "name": "久田野",
+          "kana": "くたの",
+          "eng": "Kutano",
+          "lat": 37.1371,
+          "lon": 140.2595,
+          "number": ""
+        },
+        {
+          "name": "泉崎",
+          "kana": "いずみざき",
+          "eng": "Izumizaki",
+          "lat": 37.1584,
+          "lon": 140.299,
+          "number": ""
+        },
+        {
+          "name": "矢吹",
+          "kana": "やぶき",
+          "eng": "Yabuki",
+          "lat": 37.2052,
+          "lon": 140.328,
+          "number": ""
+        },
+        {
+          "name": "鏡石",
+          "kana": "かがみいし",
+          "eng": "Kagamiishi",
+          "lat": 37.2507,
+          "lon": 140.3469,
+          "number": ""
+        },
+        {
+          "name": "須賀川",
+          "kana": "すかがわ",
+          "eng": "Sukagawa",
+          "lat": 37.3003,
+          "lon": 140.372,
+          "number": ""
+        },
+        {
+          "name": "安積永盛",
+          "kana": "あさかながもり",
+          "eng": "Asakanagamori",
+          "lat": 37.357,
+          "lon": 140.3691,
+          "number": ""
+        },
+        {
+          "name": "郡山",
+          "kana": "こおりやま",
+          "eng": "Koriyama",
+          "lat": 37.3978,
+          "lon": 140.3883,
+          "number": ""
+        },
+        {
+          "name": "日和田",
+          "kana": "ひわだ",
+          "eng": "Hiwada",
+          "lat": 37.4464,
+          "lon": 140.3884,
+          "number": ""
+        },
+        {
+          "name": "五百川",
+          "kana": "ごひゃくがわ",
+          "eng": "Gohyakugawa",
+          "lat": 37.4829,
+          "lon": 140.3879,
+          "number": ""
+        },
+        {
+          "name": "本宮",
+          "kana": "もとみや",
+          "eng": "Motomiya",
+          "lat": 37.5142,
+          "lon": 140.3996,
+          "number": ""
+        },
+        {
+          "name": "杉田",
+          "kana": "すぎた",
+          "eng": "Sugita",
+          "lat": 37.5633,
+          "lon": 140.4136,
+          "number": ""
+        },
+        {
+          "name": "二本松",
+          "kana": "にほんまつ",
+          "eng": "Nihonmatsu",
+          "lat": 37.5896,
+          "lon": 140.4353,
+          "number": ""
+        },
+        {
+          "name": "安達",
+          "kana": "あだち",
+          "eng": "Adachi",
+          "lat": 37.6117,
+          "lon": 140.4661,
+          "number": ""
+        },
+        {
+          "name": "松川",
+          "kana": "まつかわ",
+          "eng": "Matsukawa",
+          "lat": 37.6538,
+          "lon": 140.4844,
+          "number": ""
+        },
+        {
+          "name": "金谷川",
+          "kana": "かなやがわ",
+          "eng": "Kanayagawa",
+          "lat": 37.6805,
+          "lon": 140.4522,
+          "number": ""
+        },
+        {
+          "name": "南福島",
+          "kana": "みなみふくしま",
+          "eng": "Minami-Fukushima",
+          "lat": 37.7236,
+          "lon": 140.4561,
+          "number": ""
+        },
+        {
+          "name": "福島",
+          "kana": "ふくしま",
+          "eng": "Fukushima",
+          "lat": 37.7541,
+          "lon": 140.4603,
+          "number": ""
+        },
+        {
+          "name": "東福島",
+          "kana": "ひがしふくしま",
+          "eng": "Higashi-Fukushima",
+          "lat": 37.7967,
+          "lon": 140.4752,
+          "number": ""
+        },
+        {
+          "name": "伊達",
+          "kana": "だて",
+          "eng": "Date",
+          "lat": 37.824,
+          "lon": 140.4933,
+          "number": ""
+        },
+        {
+          "name": "桑折",
+          "kana": "こおり",
+          "eng": "Koori",
+          "lat": 37.8553,
+          "lon": 140.5175,
+          "number": ""
+        },
+        {
+          "name": "藤田",
+          "kana": "ふじた",
+          "eng": "Fujita",
+          "lat": 37.8791,
+          "lon": 140.5396,
+          "number": ""
+        },
+        {
+          "name": "貝田",
+          "kana": "かいだ",
+          "eng": "Kaida",
+          "lat": 37.9081,
+          "lon": 140.581,
+          "number": ""
+        },
+        {
+          "name": "越河",
+          "kana": "こすごう",
+          "eng": "Kosugo",
+          "lat": 37.9339,
+          "lon": 140.6045,
+          "number": ""
+        },
+        {
+          "name": "白石",
+          "kana": "しろいし",
+          "eng": "Shiroishi",
+          "lat": 38.0035,
+          "lon": 140.6262,
+          "number": ""
+        },
+        {
+          "name": "東白石",
+          "kana": "ひがししろいし",
+          "eng": "Higashi-Shiroishi",
+          "lat": 38.0349,
+          "lon": 140.6511,
+          "number": ""
+        },
+        {
+          "name": "北白川",
+          "kana": "きたしらかわ",
+          "eng": "Kita-Shirakawa",
+          "lat": 38.0325,
+          "lon": 140.6925,
+          "number": ""
+        },
+        {
+          "name": "大河原",
+          "kana": "おおがわら",
+          "eng": "Ogawara",
+          "lat": 38.0473,
+          "lon": 140.74,
+          "number": ""
+        },
+        {
+          "name": "船岡",
+          "kana": "ふなおか",
+          "eng": "Funaoka",
+          "lat": 38.0593,
+          "lon": 140.768,
+          "number": ""
+        },
+        {
+          "name": "槻木",
+          "kana": "つきのき",
+          "eng": "Tsukinoki",
+          "lat": 38.0786,
+          "lon": 140.81,
+          "number": ""
+        },
+        {
+          "name": "岩沼",
+          "kana": "いわぬま",
+          "eng": "Iwanuma",
+          "lat": 38.1119,
+          "lon": 140.8641,
+          "number": ""
+        },
+        {
+          "name": "館腰",
+          "kana": "たてこし",
+          "eng": "Tatekoshi",
+          "lat": 38.1431,
+          "lon": 140.8802,
+          "number": ""
+        },
+        {
+          "name": "名取",
+          "kana": "なとり",
+          "eng": "Natori",
+          "lat": 38.1732,
+          "lon": 140.8829,
+          "number": ""
+        },
+        {
+          "name": "南仙台",
+          "kana": "みなみせんだい",
+          "eng": "Minami-Sendai",
+          "lat": 38.1974,
+          "lon": 140.8834,
+          "number": ""
+        },
+        {
+          "name": "太子堂",
+          "kana": "たいしどう",
+          "eng": "Taishido",
+          "lat": 38.2179,
+          "lon": 140.8833,
+          "number": ""
+        },
+        {
+          "name": "長町",
+          "kana": "ながまち",
+          "eng": "Nagamachi",
+          "lat": 38.227,
+          "lon": 140.8855,
+          "number": ""
+        },
+        {
+          "name": "仙台",
+          "kana": "せんだい",
+          "eng": "Sendai",
+          "lat": 38.2603,
+          "lon": 140.8822,
+          "number": ""
+        },
+        {
+          "name": "東仙台",
+          "kana": "ひがしせんだい",
+          "eng": "Higashi-Sendai",
+          "lat": 38.2765,
+          "lon": 140.9202,
+          "number": ""
+        },
+        {
+          "name": "岩切",
+          "kana": "いわきり",
+          "eng": "Iwakiri",
+          "lat": 38.3008,
+          "lon": 140.9547,
+          "number": ""
+        },
+        {
+          "name": "陸前山王",
+          "kana": "りくぜんさんのう",
+          "eng": "Rikuzen-Sanno",
+          "lat": 38.2996,
+          "lon": 140.9793,
+          "number": ""
+        },
+        {
+          "name": "国府多賀城",
+          "kana": "こくふたがじょう",
+          "eng": "Kokufu-Tagajo",
+          "lat": 38.3009,
+          "lon": 140.9941,
+          "number": ""
+        },
+        {
+          "name": "塩釜",
+          "kana": "しおがま",
+          "eng": "Shiogama",
+          "lat": 38.3096,
+          "lon": 141.0097,
+          "number": ""
+        },
+        {
+          "name": "松島",
+          "kana": "まつしま",
+          "eng": "Matsushima",
+          "lat": 38.375,
+          "lon": 141.063,
+          "number": ""
+        },
+        {
+          "name": "愛宕",
+          "kana": "あたご",
+          "eng": "Atago",
+          "lat": 38.3974,
+          "lon": 141.065,
+          "number": ""
+        },
+        {
+          "name": "品井沼",
+          "kana": "しないぬま",
+          "eng": "Shinainuma",
+          "lat": 38.4315,
+          "lon": 141.0823,
+          "number": ""
+        },
+        {
+          "name": "鹿島台",
+          "kana": "かしまだい",
+          "eng": "Kashimadai",
+          "lat": 38.4746,
+          "lon": 141.098,
+          "number": ""
+        },
+        {
+          "name": "松山町",
+          "kana": "まつやままち",
+          "eng": "Matsuyamamachi",
+          "lat": 38.5123,
+          "lon": 141.0752,
+          "number": ""
+        },
+        {
+          "name": "小牛田",
+          "kana": "こごた",
+          "eng": "Kogota",
+          "lat": 38.5411,
+          "lon": 141.0643,
+          "number": ""
+        },
+        {
+          "name": "田尻",
+          "kana": "たじり",
+          "eng": "Tajiri",
+          "lat": 38.5962,
+          "lon": 141.0588,
+          "number": ""
+        },
+        {
+          "name": "瀬峰",
+          "kana": "せみね",
+          "eng": "Semine",
+          "lat": 38.6551,
+          "lon": 141.0737,
+          "number": ""
+        },
+        {
+          "name": "梅ケ沢",
+          "kana": "うめがさわ",
+          "eng": "Umegasawa",
+          "lat": 38.6818,
+          "lon": 141.0858,
+          "number": ""
+        },
+        {
+          "name": "新田",
+          "kana": "にった",
+          "eng": "Nitta",
+          "lat": 38.7115,
+          "lon": 141.1196,
+          "number": ""
+        },
+        {
+          "name": "石越",
+          "kana": "いしこし",
+          "eng": "Ishikoshi",
+          "lat": 38.7688,
+          "lon": 141.159,
+          "number": ""
+        },
+        {
+          "name": "油島",
+          "kana": "ゆしま",
+          "eng": "Yushima",
+          "lat": 38.7971,
+          "lon": 141.1756,
+          "number": ""
+        },
+        {
+          "name": "花泉",
+          "kana": "はないずみ",
+          "eng": "Hanaizumi",
+          "lat": 38.8335,
+          "lon": 141.1801,
+          "number": ""
+        },
+        {
+          "name": "清水原",
+          "kana": "しみずはら",
+          "eng": "Shimizuhara",
+          "lat": 38.8548,
+          "lon": 141.1568,
+          "number": ""
+        },
+        {
+          "name": "有壁",
+          "kana": "ありかべ",
+          "eng": "Arikabe",
+          "lat": 38.8675,
+          "lon": 141.1208,
+          "number": ""
+        },
+        {
+          "name": "一ノ関",
+          "kana": "いちのせき",
+          "eng": "Ichinoseki",
+          "lat": 38.9261,
+          "lon": 141.1392,
+          "number": ""
+        },
+        {
+          "name": "山ノ目",
+          "kana": "やまのめ",
+          "eng": "Yamanome",
+          "lat": 38.9513,
+          "lon": 141.1318,
+          "number": ""
+        },
+        {
+          "name": "平泉",
+          "kana": "ひらいずみ",
+          "eng": "Hiraizumi",
+          "lat": 38.9881,
+          "lon": 141.1175,
+          "number": ""
+        },
+        {
+          "name": "前沢",
+          "kana": "まえさわ",
+          "eng": "Maesawa",
+          "lat": 39.0485,
+          "lon": 141.1261,
+          "number": ""
+        },
+        {
+          "name": "陸中折居",
+          "kana": "りくちゅうおりい",
+          "eng": "Rikuchu-Orii",
+          "lat": 39.0942,
+          "lon": 141.1408,
+          "number": ""
+        },
+        {
+          "name": "水沢",
+          "kana": "みずさわ",
+          "eng": "Mizusawa",
+          "lat": 39.1388,
+          "lon": 141.1463,
+          "number": ""
+        },
+        {
+          "name": "金ケ崎",
+          "kana": "かねがさき",
+          "eng": "Kanegasaki",
+          "lat": 39.2,
+          "lon": 141.1128,
+          "number": ""
+        },
+        {
+          "name": "六原",
+          "kana": "ろくはら",
+          "eng": "Rokuhara",
+          "lat": 39.2278,
+          "lon": 141.0975,
+          "number": ""
+        },
+        {
+          "name": "北上",
+          "kana": "きたかみ",
+          "eng": "Kitakami",
+          "lat": 39.2818,
+          "lon": 141.1222,
+          "number": ""
+        },
+        {
+          "name": "村崎野",
+          "kana": "むらさきの",
+          "eng": "Murasakino",
+          "lat": 39.323,
+          "lon": 141.1205,
+          "number": ""
+        },
+        {
+          "name": "花巻",
+          "kana": "はなまき",
+          "eng": "Hanamaki",
+          "lat": 39.3937,
+          "lon": 141.1103,
+          "number": ""
+        },
+        {
+          "name": "花巻空港",
+          "kana": "はなまきくうこう",
+          "eng": "Hanamaki-Kuko",
+          "lat": 39.4426,
+          "lon": 141.1277,
+          "number": ""
+        },
+        {
+          "name": "石鳥谷",
+          "kana": "いしどりや",
+          "eng": "Ishidoriya",
+          "lat": 39.4913,
+          "lon": 141.147,
+          "number": ""
+        },
+        {
+          "name": "日詰",
+          "kana": "ひづめ",
+          "eng": "Hizume",
+          "lat": 39.5387,
+          "lon": 141.1607,
+          "number": ""
+        },
+        {
+          "name": "紫波中央",
+          "kana": "しわちゅうおう",
+          "eng": "Shiwa-Chuo",
+          "lat": 39.5549,
+          "lon": 141.1598,
+          "number": ""
+        },
+        {
+          "name": "古館",
+          "kana": "ふるだて",
+          "eng": "Furudate",
+          "lat": 39.5809,
+          "lon": 141.1546,
+          "number": ""
+        },
+        {
+          "name": "矢幅",
+          "kana": "やはば",
+          "eng": "Yahaba",
+          "lat": 39.6132,
+          "lon": 141.1482,
+          "number": ""
+        },
+        {
+          "name": "岩手飯岡",
+          "kana": "いわていいおか",
+          "eng": "Iwate-Iioka",
+          "lat": 39.6538,
+          "lon": 141.1469,
+          "number": ""
+        },
+        {
+          "name": "仙北町",
+          "kana": "せんぼくちょう",
+          "eng": "Senbokucho",
+          "lat": 39.6878,
+          "lon": 141.1489,
+          "number": ""
+        },
+        {
+          "name": "盛岡",
+          "kana": "もりおか",
+          "eng": "Morioka",
+          "lat": 39.7017,
+          "lon": 141.1364,
           "number": ""
         }
       ]
@@ -833,7 +1465,7 @@
       "name": "上越線",
       "kana": "じょうえつせん",
       "eng": "Joetsu Line",
-      "color": "#EE7B1A",
+      "color": "#00B3E6",
       "symbol": "",
       "stations": [
         {
@@ -962,6 +1594,158 @@
           "eng": "Doai",
           "lat": 36.8313,
           "lon": 138.9655,
+          "number": ""
+        },
+        {
+          "name": "土樽",
+          "kana": "つちたる",
+          "eng": "Tsuchitaru",
+          "lat": 36.8749,
+          "lon": 138.8623,
+          "number": ""
+        },
+        {
+          "name": "越後中里",
+          "kana": "えちごなかざと",
+          "eng": "Echigo-Nakazato",
+          "lat": 36.9094,
+          "lon": 138.8484,
+          "number": ""
+        },
+        {
+          "name": "岩原スキー場前",
+          "kana": "いわっぱらすきーじょうまえ",
+          "eng": "Iwappara-Skijomae",
+          "lat": 36.9244,
+          "lon": 138.8394,
+          "number": ""
+        },
+        {
+          "name": "越後湯沢",
+          "kana": "えちごゆざわ",
+          "eng": "Echigo-Yuzawa",
+          "lat": 36.9359,
+          "lon": 138.8096,
+          "number": ""
+        },
+        {
+          "name": "石打",
+          "kana": "いしうち",
+          "eng": "Ishiuchi",
+          "lat": 36.9894,
+          "lon": 138.8043,
+          "number": ""
+        },
+        {
+          "name": "大沢",
+          "kana": "おおさわ",
+          "eng": "Osawa",
+          "lat": 37.0216,
+          "lon": 138.8217,
+          "number": ""
+        },
+        {
+          "name": "上越国際スキー場前",
+          "kana": "じょうえつこくさいすきーじょうまえ",
+          "eng": "Joetsukokusai-Skijomae",
+          "lat": 37.0289,
+          "lon": 138.8286,
+          "number": ""
+        },
+        {
+          "name": "塩沢",
+          "kana": "しおざわ",
+          "eng": "Shiozawa",
+          "lat": 37.0414,
+          "lon": 138.8485,
+          "number": ""
+        },
+        {
+          "name": "六日町",
+          "kana": "むいかまち",
+          "eng": "Muikamachi",
+          "lat": 37.0671,
+          "lon": 138.8759,
+          "number": ""
+        },
+        {
+          "name": "五日町",
+          "kana": "いつかまち",
+          "eng": "Itsukamachi",
+          "lat": 37.1193,
+          "lon": 138.9078,
+          "number": ""
+        },
+        {
+          "name": "浦佐",
+          "kana": "うらさ",
+          "eng": "Urasa",
+          "lat": 37.1672,
+          "lon": 138.9228,
+          "number": ""
+        },
+        {
+          "name": "八色",
+          "kana": "やいろ",
+          "eng": "Yairo",
+          "lat": 37.1917,
+          "lon": 138.9349,
+          "number": ""
+        },
+        {
+          "name": "小出",
+          "kana": "こいで",
+          "eng": "Koide",
+          "lat": 37.2332,
+          "lon": 138.9536,
+          "number": ""
+        },
+        {
+          "name": "越後堀之内",
+          "kana": "えちごほりのうち",
+          "eng": "Echigo-Horinouchi",
+          "lat": 37.2391,
+          "lon": 138.928,
+          "number": ""
+        },
+        {
+          "name": "北堀之内",
+          "kana": "きたほりのうち",
+          "eng": "Kita-Horinouchi",
+          "lat": 37.2558,
+          "lon": 138.8965,
+          "number": ""
+        },
+        {
+          "name": "越後川口",
+          "kana": "えちごかわぐち",
+          "eng": "Echigo-Kawaguchi",
+          "lat": 37.273,
+          "lon": 138.8615,
+          "number": ""
+        },
+        {
+          "name": "小千谷",
+          "kana": "おぢや",
+          "eng": "Ojiya",
+          "lat": 37.3098,
+          "lon": 138.8132,
+          "number": ""
+        },
+        {
+          "name": "越後滝谷",
+          "kana": "えちごたきや",
+          "eng": "Echigo-Takiya",
+          "lat": 37.3691,
+          "lon": 138.8351,
+          "number": ""
+        },
+        {
+          "name": "宮内",
+          "kana": "みやうち",
+          "eng": "Miyauchi",
+          "lat": 37.4221,
+          "lon": 138.84,
           "number": ""
         }
       ]

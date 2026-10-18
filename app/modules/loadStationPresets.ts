@@ -8,6 +8,8 @@ export type PresetStation = {
     // 路線図の配置に使う座標（現在は仮値。未設定の場合は null）
     lat: number | null
     lon: number | null
+    // 駅ごとのナンバリングアイコンのプリセット名（N_*。7.47節）。空文字なら所属路線のものを使う
+    numIconPresetKey: string
     // 所属路線は lineConnectDB から導出する（このオブジェクトには持たない）
 }
 
@@ -87,6 +89,8 @@ export const loadStationDB = async (): Promise<PresetStation[]> => {
                 eng: cols[3]?.trim() ?? '',
                 lat: num(cols[4]),
                 lon: num(cols[5]),
+                // 列順: 駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度, ナンバリングアイコン（列がなければ空文字）
+                numIconPresetKey: cols[6]?.trim() ?? '',
             }
         })
         .filter(s => s.id !== '')

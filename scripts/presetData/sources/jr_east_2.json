@@ -883,7 +883,7 @@
       "name": "中央線",
       "kana": "ちゅうおうせん",
       "eng": "Chuo Line",
-      "color": "#1D6FB8",
+      "color": "#0074BE",
       "symbol": "CO",
       "stations": [
         {
@@ -1069,6 +1069,126 @@
           "lat": 35.709,
           "lon": 138.451,
           "number": "CO 46"
+        },
+        {
+          "name": "新府",
+          "kana": "しんぷ",
+          "eng": "Shimpu",
+          "lat": 35.7372,
+          "lon": 138.4333,
+          "number": "CO 47"
+        },
+        {
+          "name": "穴山",
+          "kana": "あなやま",
+          "eng": "Anayama",
+          "lat": 35.7511,
+          "lon": 138.414,
+          "number": "CO 48"
+        },
+        {
+          "name": "日野春",
+          "kana": "ひのはる",
+          "eng": "Hinoharu",
+          "lat": 35.7901,
+          "lon": 138.3947,
+          "number": "CO 49"
+        },
+        {
+          "name": "長坂",
+          "kana": "ながさか",
+          "eng": "Nagasaka",
+          "lat": 35.8274,
+          "lon": 138.3669,
+          "number": "CO 50"
+        },
+        {
+          "name": "小淵沢",
+          "kana": "こぶちざわ",
+          "eng": "Kobuchizawa",
+          "lat": 35.8636,
+          "lon": 138.3169,
+          "number": "CO 51"
+        },
+        {
+          "name": "信濃境",
+          "kana": "しなのさかい",
+          "eng": "Shinano-Sakai",
+          "lat": 35.8847,
+          "lon": 138.2757,
+          "number": "CO 52"
+        },
+        {
+          "name": "富士見",
+          "kana": "ふじみ",
+          "eng": "Fujimi",
+          "lat": 35.9121,
+          "lon": 138.2383,
+          "number": "CO 53"
+        },
+        {
+          "name": "すずらんの里",
+          "kana": "すずらんのさと",
+          "eng": "Suzurannosato",
+          "lat": 35.9304,
+          "lon": 138.212,
+          "number": "CO 54"
+        },
+        {
+          "name": "青柳",
+          "kana": "あおやぎ",
+          "eng": "Aoyagi",
+          "lat": 35.9424,
+          "lon": 138.1977,
+          "number": "CO 55"
+        },
+        {
+          "name": "茅野",
+          "kana": "ちの",
+          "eng": "Chino",
+          "lat": 35.9941,
+          "lon": 138.1523,
+          "number": "CO 56"
+        },
+        {
+          "name": "上諏訪",
+          "kana": "かみすわ",
+          "eng": "Kami-Suwa",
+          "lat": 36.0468,
+          "lon": 138.1165,
+          "number": "CO 57"
+        },
+        {
+          "name": "下諏訪",
+          "kana": "しもすわ",
+          "eng": "Shimo-Suwa",
+          "lat": 36.0721,
+          "lon": 138.0848,
+          "number": "CO 58"
+        },
+        {
+          "name": "岡谷",
+          "kana": "おかや",
+          "eng": "Okaya",
+          "lat": 36.0567,
+          "lon": 138.0446,
+          "number": "CO 59"
+        },
+        {
+          "name": "みどり湖",
+          "kana": "みどりこ",
+          "eng": "Midoriko",
+          "lat": 36.0943,
+          "lon": 137.9819,
+          "number": "CO 60"
+        },
+        {
+          "name": "塩尻",
+          "kana": "しおじり",
+          "eng": "Shiojiri",
+          "lat": 36.1143,
+          "lon": 137.9478,
+          "number": "CO 61"
         }
       ]
     },

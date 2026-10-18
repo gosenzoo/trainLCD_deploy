@@ -19,7 +19,16 @@ COMPANIES = [
     # JR九州・JR四国（7.45節）。路線アイコンは事業者のプリセットがないため路線カラーの四角
     (range(149, 179), 'JR九州', 'I_mono_color', 'N_JR_kyusyu'),
     (range(179, 190), 'JR四国', 'I_mono_color', 'N_JR_shikoku'),
+    # JR東日本の関東以外の路線・JR北海道（7.47節）。JR東日本は路線記号のない路線が I_mono_color になる（lineDB の出力時）
+    (range(190, 226), 'JR東日本', 'I_JR_east', 'N_JR_east'),
+    (range(226, 245), 'JR北海道', 'I_mono_color', 'N_JR_hokkaido'),
 ]
+
+# 駅ごとのナンバリングアイコン（7.47節）: 駅の識別キー → プリセット名。stationDB.csv の「ナンバリングアイコン」列に出力し、
+# 「路線図から追加」では路線のナンバリングアイコンより優先して使う
+STATION_NUM_ICON = {
+    'JR北海道:札幌': 'N_sapporo',  # 札幌駅は記号なしの「01」
+}
 def company(no):
     for rg, op, icon, num in COMPANIES:
         if no in rg: return op, icon, num
@@ -122,6 +131,9 @@ DISTINCT = {
     (121, '横川'): '横川@広島',           # 可部線
     (123, '下松'): '下松@山口',           # 山陽線（阪和線の下松とは別）
     (123, '戸田'): '戸田@山口',           # 山陽線（埼京線の戸田とは別）
+    (204, '根岸'): '根岸@福島',           # 只見線（根岸線の根岸とは別。7.47節）
+    (205, '大沢'): '大沢@山形',           # 山形線（上越線の大沢〔新潟〕とは別）
+    (206, '大久保'): '大久保@秋田',       # 奥羽本線（中央・総武線各駅停車の大久保とは別）
 }
 def load_groups(filename):
     path = os.path.join(HERE, 'sources', filename)
@@ -239,7 +251,7 @@ WIKIDATA_PATH = os.path.join(HERE, 'wikidata', 'stations.json')
 # このデータの事業者名 → Wikidata の事業者の日本語名
 # （1つの事業者が Wikidata 上の複数の事業者にあたる場合は配列で書く）
 OPERATOR_WD_NAME = {'JR東日本': '東日本旅客鉄道', 'JR東海': '東海旅客鉄道', 'JR西日本': '西日本旅客鉄道',
-                    'JR九州': '九州旅客鉄道', 'JR四国': '四国旅客鉄道',
+                    'JR九州': '九州旅客鉄道', 'JR四国': '四国旅客鉄道', 'JR北海道': '北海道旅客鉄道',
                     '東京地下鉄': ['東京地下鉄', '東京都交通局']}
 # 選んだ候補が今の座標からこれ以上離れていれば、同名の別駅との取り違えとみなして差し替えない（km）。
 # 事業者が一致した候補は取り違えの可能性が低いため、許容範囲を広げる
@@ -329,9 +341,13 @@ for l in lines:
     sym = l.get('symbol', '')
     for s in sts:
         n = s.get('number', '')
-        if n and not re.fullmatch(r'[A-Z][A-Za-z]? \d{2}', n):
+        # 駅ごとのナンバリングアイコンを指定した駅（札幌の「01」など）は形式・記号を調べない（7.47節）
+        if skey(l, s) in STATION_NUM_ICON: continue
+        # 枝番（例: U 02-1、G 11-1）と記号のない番号（例: 大糸線の 42）は正しい形式として扱う
+        if n and not re.fullmatch(r'([A-Z][A-Za-z]? )?\d{2}(-\d+)?', n):
             warnings.append(f'ナンバリング形式: {l["name"]} {s["name"]} {n!r}')
-        if n and sym and not n.startswith(sym + ' '):
+        # JR北海道は駅ごとに番号が1つだけで、分岐駅では優先されるルートの記号になるため、路線の記号との一致は調べない
+        if n and sym and company(l['no'])[0] != 'JR北海道' and not n.startswith(sym + ' '):
             warnings.append(f'記号不一致: {l["name"]} {s["name"]} {n} (symbol={sym})')
     names = [s['name'] for s in sts]
     # 環状線（先頭と末尾が同じ駅）と6の字の路線（末尾の駅が途中にも現れる）は、末尾の駅の重複を除いて調べる
@@ -405,8 +421,8 @@ def write(name, header, rows):
         fp.write(header + '\n')
         for r in rows: fp.write(','.join(str(x) for x in r) + '\n')
 
-write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度',
-      [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}') for n in order])
+write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度,ナンバリングアイコン',
+      [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}', STATION_NUM_ICON.get(n, '')) for n in order])
 write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別',
       # 路線記号のない路線は、路線アイコンを路線カラーの四角（I_mono_color）にする（7.32節）
       [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l)) for l in lines])

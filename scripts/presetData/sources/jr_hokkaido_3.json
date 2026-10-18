@@ -1,0 +1,686 @@
+{
+ "lines": [
+  {
+   "no": 235,
+   "name": "石勝線",
+   "kana": "せきしょうせん",
+   "eng": "Sekisho Line",
+   "color": "#8CC63E",
+   "symbol": "K",
+   "stations": [
+    {
+     "name": "南千歳",
+     "kana": "みなみちとせ",
+     "eng": "Minami-Chitose",
+     "lat": 42.8081,
+     "lon": 141.6753,
+     "number": "H 14"
+    },
+    {
+     "name": "追分",
+     "kana": "おいわけ",
+     "eng": "Oiwake",
+     "lat": 42.8733,
+     "lon": 141.8107,
+     "number": "K 15"
+    },
+    {
+     "name": "川端",
+     "kana": "かわばた",
+     "eng": "Kawabata",
+     "lat": 42.9147,
+     "lon": 141.8948,
+     "number": "K 17"
+    },
+    {
+     "name": "新夕張",
+     "kana": "しんゆうばり",
+     "eng": "Shin-Yubari",
+     "lat": 42.9366,
+     "lon": 142.0366,
+     "number": "K 20"
+    },
+    {
+     "name": "占冠",
+     "kana": "しむかっぷ",
+     "eng": "Shimukappu",
+     "lat": 42.993,
+     "lon": 142.4001,
+     "number": "K 21"
+    },
+    {
+     "name": "トマム",
+     "kana": "トマム",
+     "eng": "Tomamu",
+     "lat": 43.0559,
+     "lon": 142.6109,
+     "number": "K 22"
+    },
+    {
+     "name": "新得",
+     "kana": "しんとく",
+     "eng": "Shintoku",
+     "lat": 43.0824,
+     "lon": 142.8325,
+     "number": "K 23"
+    }
+   ]
+  },
+  {
+   "no": 236,
+   "name": "根室本線",
+   "kana": "ねむろほんせん",
+   "eng": "Nemuro Line",
+   "color": "#8CC63E",
+   "symbol": "K",
+   "stations": [
+    {
+     "name": "新得",
+     "kana": "しんとく",
+     "eng": "Shintoku",
+     "lat": 43.0824,
+     "lon": 142.8325,
+     "number": "K 23"
+    },
+    {
+     "name": "十勝清水",
+     "kana": "とかちしみず",
+     "eng": "Tokachi-Shimizu",
+     "lat": 43.0138,
+     "lon": 142.8798,
+     "number": "K 24"
+    },
+    {
+     "name": "御影",
+     "kana": "みかげ",
+     "eng": "Mikage",
+     "lat": 42.9424,
+     "lon": 142.9357,
+     "number": "K 26"
+    },
+    {
+     "name": "芽室",
+     "kana": "めむろ",
+     "eng": "Memuro",
+     "lat": 42.91,
+     "lon": 143.0483,
+     "number": "K 27"
+    },
+    {
+     "name": "大成",
+     "kana": "たいせい",
+     "eng": "Taisei",
+     "lat": 42.9161,
+     "lon": 143.0697,
+     "number": "K 28"
+    },
+    {
+     "name": "西帯広",
+     "kana": "にしおびひろ",
+     "eng": "Nishi-Obihiro",
+     "lat": 42.9241,
+     "lon": 143.1254,
+     "number": "K 29"
+    },
+    {
+     "name": "柏林台",
+     "kana": "はくりんだい",
+     "eng": "Hakurindai",
+     "lat": 42.9289,
+     "lon": 143.1645,
+     "number": "K 30"
+    },
+    {
+     "name": "帯広",
+     "kana": "おびひろ",
+     "eng": "Obihiro",
+     "lat": 42.918,
+     "lon": 143.2021,
+     "number": "K 31"
+    },
+    {
+     "name": "札内",
+     "kana": "さつない",
+     "eng": "Satsunai",
+     "lat": 42.9127,
+     "lon": 143.2562,
+     "number": "K 32"
+    },
+    {
+     "name": "幕別",
+     "kana": "まくべつ",
+     "eng": "Makubetsu",
+     "lat": 42.9078,
+     "lon": 143.3592,
+     "number": "K 34"
+    },
+    {
+     "name": "利別",
+     "kana": "としべつ",
+     "eng": "Toshibetsu",
+     "lat": 42.9347,
+     "lon": 143.4244,
+     "number": "K 35"
+    },
+    {
+     "name": "池田",
+     "kana": "いけだ",
+     "eng": "Ikeda",
+     "lat": 42.9215,
+     "lon": 143.4531,
+     "number": "K 36"
+    },
+    {
+     "name": "十弗",
+     "kana": "とおふつ",
+     "eng": "Tofutsu",
+     "lat": 42.8557,
+     "lon": 143.5008,
+     "number": "K 37"
+    },
+    {
+     "name": "豊頃",
+     "kana": "とよころ",
+     "eng": "Toyokoro",
+     "lat": 42.8175,
+     "lon": 143.5386,
+     "number": "K 38"
+    },
+    {
+     "name": "新吉野",
+     "kana": "しんよしの",
+     "eng": "Shin-Yoshino",
+     "lat": 42.7782,
+     "lon": 143.6083,
+     "number": "K 39"
+    },
+    {
+     "name": "浦幌",
+     "kana": "うらほろ",
+     "eng": "Urahoro",
+     "lat": 42.8105,
+     "lon": 143.6515,
+     "number": "K 40"
+    },
+    {
+     "name": "厚内",
+     "kana": "あつない",
+     "eng": "Atsunai",
+     "lat": 42.8095,
+     "lon": 143.8144,
+     "number": "K 42"
+    },
+    {
+     "name": "音別",
+     "kana": "おんべつ",
+     "eng": "Ombetsu",
+     "lat": 42.8891,
+     "lon": 143.9318,
+     "number": "K 45"
+    },
+    {
+     "name": "白糠",
+     "kana": "しらぬか",
+     "eng": "Shiranuka",
+     "lat": 42.9562,
+     "lon": 144.0769,
+     "number": "K 47"
+    },
+    {
+     "name": "西庶路",
+     "kana": "にししょろ",
+     "eng": "Nishi-Shoro",
+     "lat": 42.9761,
+     "lon": 144.1298,
+     "number": "K 48"
+    },
+    {
+     "name": "庶路",
+     "kana": "しょろ",
+     "eng": "Shoro",
+     "lat": 42.9836,
+     "lon": 144.15,
+     "number": "K 49"
+    },
+    {
+     "name": "大楽毛",
+     "kana": "おたのしけ",
+     "eng": "Otanoshike",
+     "lat": 43.0093,
+     "lon": 144.2726,
+     "number": "K 50"
+    },
+    {
+     "name": "新大楽毛",
+     "kana": "しんおたのしけ",
+     "eng": "Shin-Otanoshike",
+     "lat": 43.0094,
+     "lon": 144.2947,
+     "number": "K 51"
+    },
+    {
+     "name": "新富士",
+     "kana": "しんふじ",
+     "eng": "Shin-Fuji",
+     "lat": 43.0018,
+     "lon": 144.3498,
+     "number": "K 52"
+    },
+    {
+     "name": "釧路",
+     "kana": "くしろ",
+     "eng": "Kushiro",
+     "lat": 42.9903,
+     "lon": 144.3822,
+     "number": "K 53"
+    }
+   ]
+  },
+  {
+   "no": 237,
+   "name": "根室本線",
+   "kana": "ねむろほんせん",
+   "eng": "Nemuro Line",
+   "color": "#F6989D",
+   "symbol": "T",
+   "stations": [
+    {
+     "name": "滝川",
+     "kana": "たきかわ",
+     "eng": "Takikawa",
+     "lat": 43.5551,
+     "lon": 141.9012,
+     "number": "A 21"
+    },
+    {
+     "name": "赤平",
+     "kana": "あかびら",
+     "eng": "Akabira",
+     "lat": 43.5552,
+     "lon": 142.0487,
+     "number": "T 23"
+    },
+    {
+     "name": "茂尻",
+     "kana": "もしり",
+     "eng": "Moshiri",
+     "lat": 43.5373,
+     "lon": 142.0822,
+     "number": "T 24"
+    },
+    {
+     "name": "平岸",
+     "kana": "ひらぎし",
+     "eng": "Hiragishi",
+     "lat": 43.5414,
+     "lon": 142.1239,
+     "number": "T 25"
+    },
+    {
+     "name": "芦別",
+     "kana": "あしべつ",
+     "eng": "Ashibetsu",
+     "lat": 43.5166,
+     "lon": 142.1845,
+     "number": "T 26"
+    },
+    {
+     "name": "上芦別",
+     "kana": "かみあしべつ",
+     "eng": "Kami-Ashibetsu",
+     "lat": 43.4888,
+     "lon": 142.2111,
+     "number": "T 27"
+    },
+    {
+     "name": "野花南",
+     "kana": "のかなん",
+     "eng": "Nokanan",
+     "lat": 43.4743,
+     "lon": 142.2618,
+     "number": "T 28"
+    },
+    {
+     "name": "富良野",
+     "kana": "ふらの",
+     "eng": "Furano",
+     "lat": 43.3469,
+     "lon": 142.3913,
+     "number": "T 30"
+    }
+   ]
+  },
+  {
+   "no": 238,
+   "name": "花咲線",
+   "kana": "はなさきせん",
+   "eng": "Hanasaki Line",
+   "color": "#00A73C",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "釧路",
+     "kana": "くしろ",
+     "eng": "Kushiro",
+     "lat": 42.9903,
+     "lon": 144.3822,
+     "number": "K 53"
+    },
+    {
+     "name": "東釧路",
+     "kana": "ひがしくしろ",
+     "eng": "Higashi-Kushiro",
+     "lat": 42.9954,
+     "lon": 144.4115,
+     "number": "B 54"
+    },
+    {
+     "name": "武佐",
+     "kana": "むさ",
+     "eng": "Musa",
+     "lat": 42.9918,
+     "lon": 144.4257,
+     "number": ""
+    },
+    {
+     "name": "別保",
+     "kana": "べっぽ",
+     "eng": "Beppo",
+     "lat": 42.9944,
+     "lon": 144.4696,
+     "number": ""
+    },
+    {
+     "name": "上尾幌",
+     "kana": "かみおぼろ",
+     "eng": "Kami-Oboro",
+     "lat": 43.0329,
+     "lon": 144.6124,
+     "number": ""
+    },
+    {
+     "name": "尾幌",
+     "kana": "おぼろ",
+     "eng": "Oboro",
+     "lat": 43.0185,
+     "lon": 144.7039,
+     "number": ""
+    },
+    {
+     "name": "門静",
+     "kana": "もんしず",
+     "eng": "Monshizu",
+     "lat": 43.0576,
+     "lon": 144.7827,
+     "number": ""
+    },
+    {
+     "name": "厚岸",
+     "kana": "あっけし",
+     "eng": "Akkeshi",
+     "lat": 43.0562,
+     "lon": 144.8412,
+     "number": ""
+    },
+    {
+     "name": "茶内",
+     "kana": "ちゃない",
+     "eng": "Chanai",
+     "lat": 43.1293,
+     "lon": 145.028,
+     "number": ""
+    },
+    {
+     "name": "浜中",
+     "kana": "はまなか",
+     "eng": "Hamanaka",
+     "lat": 43.1575,
+     "lon": 145.0997,
+     "number": ""
+    },
+    {
+     "name": "姉別",
+     "kana": "あねべつ",
+     "eng": "Anebetsu",
+     "lat": 43.1962,
+     "lon": 145.1951,
+     "number": ""
+    },
+    {
+     "name": "厚床",
+     "kana": "あっとこ",
+     "eng": "Attoko",
+     "lat": 43.2282,
+     "lon": 145.2524,
+     "number": ""
+    },
+    {
+     "name": "別当賀",
+     "kana": "べっとが",
+     "eng": "Bettoga",
+     "lat": 43.2184,
+     "lon": 145.4236,
+     "number": ""
+    },
+    {
+     "name": "落石",
+     "kana": "おちいし",
+     "eng": "Ochiishi",
+     "lat": 43.1984,
+     "lon": 145.5195,
+     "number": ""
+    },
+    {
+     "name": "昆布盛",
+     "kana": "こんぶもり",
+     "eng": "Kombumori",
+     "lat": 43.2286,
+     "lon": 145.5424,
+     "number": ""
+    },
+    {
+     "name": "西和田",
+     "kana": "にしわだ",
+     "eng": "Nishi-Wada",
+     "lat": 43.268,
+     "lon": 145.5419,
+     "number": ""
+    },
+    {
+     "name": "根室",
+     "kana": "ねむろ",
+     "eng": "Nemuro",
+     "lat": 43.3269,
+     "lon": 145.5827,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 242,
+   "name": "釧網本線",
+   "kana": "せんもうほんせん",
+   "eng": "Senmo Line",
+   "color": "#EF59A1",
+   "symbol": "B",
+   "stations": [
+    {
+     "name": "東釧路",
+     "kana": "ひがしくしろ",
+     "eng": "Higashi-Kushiro",
+     "lat": 42.9954,
+     "lon": 144.4115,
+     "number": "B 54"
+    },
+    {
+     "name": "遠矢",
+     "kana": "とおや",
+     "eng": "Toya",
+     "lat": 43.0479,
+     "lon": 144.4584,
+     "number": "B 55"
+    },
+    {
+     "name": "釧路湿原",
+     "kana": "くしろしつげん",
+     "eng": "Kushiro-Shitsugen",
+     "lat": 43.1006,
+     "lon": 144.4479,
+     "number": "B 56"
+    },
+    {
+     "name": "塘路",
+     "kana": "とうろ",
+     "eng": "Toro",
+     "lat": 43.1517,
+     "lon": 144.4968,
+     "number": "B 58"
+    },
+    {
+     "name": "茅沼",
+     "kana": "かやぬま",
+     "eng": "Kayanuma",
+     "lat": 43.2021,
+     "lon": 144.5038,
+     "number": "B 59"
+    },
+    {
+     "name": "標茶",
+     "kana": "しべちゃ",
+     "eng": "Shibecha",
+     "lat": 43.2984,
+     "lon": 144.6084,
+     "number": "B 61"
+    },
+    {
+     "name": "磯分内",
+     "kana": "いそぶんない",
+     "eng": "Isobunnai",
+     "lat": 43.3795,
+     "lon": 144.5544,
+     "number": "B 62"
+    },
+    {
+     "name": "摩周",
+     "kana": "ましゅう",
+     "eng": "Mashu",
+     "lat": 43.4873,
+     "lon": 144.464,
+     "number": "B 64"
+    },
+    {
+     "name": "美留和",
+     "kana": "びるわ",
+     "eng": "Biruwa",
+     "lat": 43.5553,
+     "lon": 144.4376,
+     "number": "B 65"
+    },
+    {
+     "name": "川湯温泉",
+     "kana": "かわゆおんせん",
+     "eng": "Kawayu-Onsen",
+     "lat": 43.6165,
+     "lon": 144.4581,
+     "number": "B 66"
+    },
+    {
+     "name": "緑",
+     "kana": "みどり",
+     "eng": "Midori",
+     "lat": 43.7183,
+     "lon": 144.5055,
+     "number": "B 67"
+    },
+    {
+     "name": "札弦",
+     "kana": "さっつる",
+     "eng": "Sattsuru",
+     "lat": 43.7865,
+     "lon": 144.5317,
+     "number": "B 68"
+    },
+    {
+     "name": "清里町",
+     "kana": "きよさとちょう",
+     "eng": "Kiyosato-cho",
+     "lat": 43.8389,
+     "lon": 144.5941,
+     "number": "B 69"
+    },
+    {
+     "name": "中斜里",
+     "kana": "なかしゃり",
+     "eng": "Naka-Shari",
+     "lat": 43.8746,
+     "lon": 144.659,
+     "number": "B 71"
+    },
+    {
+     "name": "知床斜里",
+     "kana": "しれとこしゃり",
+     "eng": "Shiretoko-Shari",
+     "lat": 43.9108,
+     "lon": 144.6617,
+     "number": "B 72"
+    },
+    {
+     "name": "止別",
+     "kana": "やむべつ",
+     "eng": "Yamubetsu",
+     "lat": 43.9215,
+     "lon": 144.52,
+     "number": "B 73"
+    },
+    {
+     "name": "浜小清水",
+     "kana": "はまこしみず",
+     "eng": "Hama-Koshimizu",
+     "lat": 43.934,
+     "lon": 144.4532,
+     "number": "B 74"
+    },
+    {
+     "name": "北浜",
+     "kana": "きたはま",
+     "eng": "Kitahama",
+     "lat": 43.9584,
+     "lon": 144.3526,
+     "number": "B 76"
+    },
+    {
+     "name": "藻琴",
+     "kana": "もこと",
+     "eng": "Mokoto",
+     "lat": 43.9683,
+     "lon": 144.3202,
+     "number": "B 77"
+    },
+    {
+     "name": "鱒浦",
+     "kana": "ますうら",
+     "eng": "Masuura",
+     "lat": 43.9828,
+     "lon": 144.2966,
+     "number": "B 78"
+    },
+    {
+     "name": "桂台",
+     "kana": "かつらだい",
+     "eng": "Katsuradai",
+     "lat": 44.017,
+     "lon": 144.2733,
+     "number": "B 79"
+    },
+    {
+     "name": "網走",
+     "kana": "あばしり",
+     "eng": "Abashiri",
+     "lat": 44.0201,
+     "lon": 144.2541,
+     "number": "A 69"
+    }
+   ]
+  }
+ ]
+}

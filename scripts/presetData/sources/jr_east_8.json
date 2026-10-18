@@ -1,0 +1,38 @@
+{
+ "lines": [
+  {
+   "no": 210,
+   "name": "東北本線（利府支線）",
+   "kana": "とうほくほんせん（りふしせん）",
+   "eng": "Tohoku Line (Rifu Branch)",
+   "color": "#3CB371",
+   "symbol": "",
+   "stations": [
+    {
+     "name": "岩切",
+     "kana": "いわきり",
+     "eng": "Iwakiri",
+     "lat": 38.3008,
+     "lon": 140.9547,
+     "number": ""
+    },
+    {
+     "name": "新利府",
+     "kana": "しんりふ",
+     "eng": "Shin-Rifu",
+     "lat": 38.3173,
+     "lon": 140.9731,
+     "number": ""
+    },
+    {
+     "name": "利府",
+     "kana": "りふ",
+     "eng": "Rifu",
+     "lat": 38.3293,
+     "lon": 140.9846,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

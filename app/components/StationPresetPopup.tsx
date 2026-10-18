@@ -82,13 +82,14 @@ const emptyNumIconNext = (presetKey: string): stationNumIconType =>
 
 // プリセット駅から stationType を生成する（lineColor・number は lineConnectDB から取得、その他未設定は暫定デフォルト）
 // lineId: この駅以降の区間路線ID（resolveLineKey で解決した lineDict のキー）
-// numIconPresetKey: 所属路線のナンバリングアイコンのプリセットキー
-const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string, numIconPresetKey: string): stationType => {
+// numIconPresetKey: 所属路線のナンバリングアイコンのプリセットキー（2つ目のナンバリングの初期値に使う）
+// stationNumIconPresetKey: この駅のナンバリングに使うプリセットキー（駅ごとの指定があればそれ、なければ路線のもの。7.47節）
+const toStationType = (station: PresetStation, lineColor: string, numberStr: string, lineId: string, numIconPresetKey: string, stationNumIconPresetKey: string): stationType => {
     return {
     name: station.name,
     kana: station.kana,
     eng: station.eng,
-    numIcon: toNumIcon(numberStr, lineColor, numIconPresetKey),
+    numIcon: toNumIcon(numberStr, lineColor, stationNumIconPresetKey),
     numIconNext: emptyNumIconNext(numIconPresetKey),
     lineNumberType: "0",
     transfers: [],
@@ -288,6 +289,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 lastKey = key
                 const station = allStations.find(s => s.id === connect.stationId)
                 if (!station) continue
+                // この駅のナンバリングのプリセット: 駅ごとの指定（例: 札幌駅の N_sapporo）があればそれ、なければ路線のもの（7.47節）
+                const stationNumIconPresetKey = station.numIconPresetKey || numIconPresetKey
                 // 路線が変わる接続駅（前区間の最終駅＝次区間の開始駅）は1行に統合する。
                 // numIcon（前の路線）はそのまま残し、次の路線のナンバリングを numIconNext に入れる。
                 // lineId は「この駅以降の区間路線ID」なので次の路線で上書きする
@@ -297,13 +300,17 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     // 同じ路線の区間どうし（環状線の継ぎ目）は同じ駅を通過するだけなので、統合のみで値は変えない
                     if (lastSectionLineId === section.lineId) continue
                     // 次の路線のナンバリングが1つ目と全ての値で同じ場合（例: 京浜東北線→根岸線の横浜 JK 12）は2つ目を設定しない
-                    const nextNumIcon = toNumIcon(connect.number, lineColor, numIconPresetKey)
-                    if (!isSameNumIcon(prev.numIcon, nextNumIcon)) prev.numIconNext = nextNumIcon
+                    const nextNumIcon = toNumIcon(connect.number, lineColor, stationNumIconPresetKey)
+                    // 駅ごとの指定のプリセットは路線カラーを使わないため、記号・番号・プリセットが同じなら色が違っても同じナンバリングとみなす（7.47節）
+                    const isSameStationPreset = station.numIconPresetKey !== '' &&
+                        prev.numIcon.presetKey === station.numIconPresetKey && nextNumIcon.presetKey === station.numIconPresetKey &&
+                        prev.numIcon.symbol === nextNumIcon.symbol && prev.numIcon.number === nextNumIcon.number
+                    if (!isSameStationPreset && !isSameNumIcon(prev.numIcon, nextNumIcon)) prev.numIconNext = nextNumIcon
                     prev.lineId = resolvedLineKey
                     lastSectionLineId = section.lineId
                     continue
                 }
-                result.push(toStationType(station, lineColor, connect.number, resolvedLineKey, numIconPresetKey))
+                result.push(toStationType(station, lineColor, connect.number, resolvedLineKey, numIconPresetKey, stationNumIconPresetKey))
                 const usage = { stationId: station.id, lines: new Map<string, Set<string>>() }
                 recordUsage(usage, section.lineId, usedNeighbors)
                 rowUsages.push(usage)
