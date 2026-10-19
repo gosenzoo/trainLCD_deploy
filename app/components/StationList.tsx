@@ -81,9 +81,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [seqStart, setSeqStart] = useState<string>('01')
     const [seqOrder, setSeqOrder] = useState<'asc' | 'desc'>('asc')
     // 路線セルクリック時に表示する吹き出しの状態（対象の路線とクリック位置）
-    const [lineInfoBalloon, setLineInfoBalloon] = useState<{ line: lineType, x: number, y: number } | null>(null)
+    const [lineInfoBalloon, setLineInfoBalloon] = useState<{ line: lineType | null, x: number, y: number } | null>(null)
     // 運用セルクリック時に表示する吹き出しの状態（対象の運用IDと運用データ、クリック位置）
-    const [operationInfoBalloon, setOperationInfoBalloon] = useState<{ operationId: string, operation: operationType, x: number, y: number } | null>(null)
+    const [operationInfoBalloon, setOperationInfoBalloon] = useState<{ operationId: string, operation: operationType | null, x: number, y: number } | null>(null)
 
     const presetIconDict = loadIconPresetTexts()
 
@@ -341,8 +341,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     setSectionPopup({ kind: 'operation', ...sectionRange })
                     return
                 }
-                const operation = setting.operationDict[station.operationId]
-                if (!operation) return
+                // 運用が未設定の区間は「運用未設定」の吹き出しを出す（7.60節）
+                const operation = setting.operationDict[station.operationId] ?? null
                 setOperationInfoBalloon({ operationId: station.operationId, operation, x: e.clientX, y: e.clientY })
             },
         },
@@ -383,8 +383,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     setSectionPopup({ kind: 'line', ...sectionRange })
                     return
                 }
-                const line = setting.lineDict[station.lineId]
-                if (!line) return
+                // 路線が未設定の区間は「路線未設定」の吹き出しを出す（7.60節）
+                const line = setting.lineDict[station.lineId] ?? null
                 setLineInfoBalloon({ line, x: e.clientX, y: e.clientY })
             },
         },

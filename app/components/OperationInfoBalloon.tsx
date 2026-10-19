@@ -9,7 +9,8 @@ import { resolveDestination } from '../modules/resolveDestination'
 type OperationInfoBalloonProps = {
     // 表示する運用のID（operationDictのキー）と運用データ
     operationId: string
-    operation: operationType
+    // 運用が未設定の区間は null（「運用未設定」と表示する。7.60節）
+    operation: operationType | null
     // 実際に表示される行先（7.49節）を求めるための駅一覧
     stationList: stationType[]
     // 吹き出しの表示位置（クリックされた位置を基準にする）
@@ -50,6 +51,23 @@ const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId
         document.addEventListener('mousedown', handleMouseDown)
         return () => document.removeEventListener('mousedown', handleMouseDown)
     }, [onClose])
+
+    // 運用が未設定（またはoperationDictに無い）区間は「運用未設定」とだけ表示する（7.60節）
+    if (!operation) {
+        return (
+            <div
+                ref={balloonRef}
+                className="line-info-balloon"
+                style={{ position: 'fixed', left: x, top: y }}
+                onClick={e => e.stopPropagation()}
+            >
+                <button className="line-info-balloon-close" onClick={onClose} title="閉じる">×</button>
+                <div className="line-info-balloon-row">
+                    <span>運用未設定</span>
+                </div>
+            </div>
+        )
+    }
 
     // 行先は実際に表示されるもの（「行先を自動で設定する」がオンなら末尾停車駅の値）を出す（7.49節）
     const isAuto = operation.isAutoDestination !== false

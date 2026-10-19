@@ -327,6 +327,19 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
         // 各駅に乗換路線を設定する（7.31節）
         result.forEach((row, i) => { row.transfers = buildTransfers(rowUsages[i], resolveIconKey) })
+        // ナンバリングは所属路線の設定を使う（自動）で入れる（7.59節）。
+        // 路線記号・プリセット・色が所属路線（lineId の路線）とすべて一致する場合だけ自動にし、
+        // 一致しない場合（路線をまたぐ駅の1つ目、駅ごとのプリセット、記号の違う駅など）は表示が変わらないよう手動のままにする
+        const allLines = { ...setting.lineDict, ...newLines }
+        result.forEach(row => {
+            const line = allLines[row.lineId]
+            if (!line) return
+            ;([row.numIcon, row.numIconNext]).forEach(numIcon => {
+                if (numIcon.symbol === line.symbol && numIcon.presetKey === line.numIconPresetKey && numIcon.color === line.color) {
+                    numIcon.colorMode = 'auto'
+                }
+            })
+        })
         return { stations: result, newLines, newIcons }
     }
 

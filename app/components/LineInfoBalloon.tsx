@@ -7,7 +7,8 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { iconIndexes, numberIndexes } from '../modules/presetIndex'
 
 type LineInfoBalloonProps = {
-    line: lineType
+    // 路線が未設定の区間は null（「路線未設定」と表示する。7.60節）
+    line: lineType | null
     // 路線記号（line.lineIconKey）を引くためのアイコン辞書
     iconDict: settingType['iconDict']
     // 吹き出しの表示位置（クリックされた位置を基準にする）
@@ -32,6 +33,23 @@ const LineInfoBalloon: React.FC<LineInfoBalloonProps> = ({ line, iconDict, x, y,
         document.addEventListener('mousedown', handleMouseDown)
         return () => document.removeEventListener('mousedown', handleMouseDown)
     }, [onClose])
+
+    // 路線が未設定（またはlineDictに無い）区間は「路線未設定」とだけ表示する（7.60節）
+    if (!line) {
+        return (
+            <div
+                ref={balloonRef}
+                className="line-info-balloon"
+                style={{ position: 'fixed', left: x, top: y }}
+                onClick={e => e.stopPropagation()}
+            >
+                <button className="line-info-balloon-close" onClick={onClose} title="閉じる">×</button>
+                <div className="line-info-balloon-row">
+                    <span>路線未設定</span>
+                </div>
+            </div>
+        )
+    }
 
     // プリセットのアイコンと [プリセット名] を描く。一覧にないキーはアイコンを描けないので「キー:[キー](未登録)」の文字にする（7.50節）
     const renderPreset = (indexes: { key: string, name: string }[], presetKey: string, symbol: string, color: string) => {

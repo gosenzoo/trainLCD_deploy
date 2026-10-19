@@ -10,6 +10,7 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
+import ToggleSwitch from './ToggleSwitch'
 import { IconArrowUp, IconArrowDown, IconTrash, IconPlus } from './SvgIcons'
 
 type stationParamsSetterProps = {
@@ -298,6 +299,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         const isAuto = numIcon?.colorMode === 'auto'
         const fields = (
             <>
+                {/* 所属路線の設定を使う（オン＝自動）: lineId 変更・切替時に symbol・presetKey・color を路線設定値で自動更新する（7.59節） */}
+                <div className="form-row">
+                    <label>所属路線の設定を使う</label>
+                    <ToggleSwitch checked={(numIcon?.colorMode ?? 'auto') === 'auto'} onChange={(v) => colorModeUpdated(v ? 'auto' : 'manual', target)} />
+                </div>
                 <label>路線記号</label>
                 {/* 自動モード時は disabled。値は常に manualSymbol を表示する */}
                 <input type="text" id={target === 'numIcon' ? 'symbolInput' : undefined}
@@ -332,13 +338,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     {numberIndexes.map(num => (
                         <option key={num.key} value={num.key}>{num.name}</option>
                     ))}
-                </select>
-                <br></br>
-                <label>路線カラー設定</label>
-                {/* auto: lineId 変更・モード切替時に symbol・presetKey・color を路線設定値で自動更新 */}
-                <select onChange={(e) => colorModeUpdated(e.target.value, target)} value={numIcon?.colorMode ?? 'auto'}>
-                    <option value="auto">自動</option>
-                    <option value="manual">手動</option>
                 </select>
                 <br></br>
             </>
@@ -560,23 +559,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     {isNumIconNextOpen && renderNumIconFields('numIconNext', true)}
                 </fieldset>
                 {/* 次区間路線・次区間運用は駅一覧の路線列・運用列から設定する（7.58節） */}
-                <label>開くドア</label>
-                <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide ?? 'right'}>
-                    <option value={'right'}>右</option>
-                    <option value={'left'}>左</option>
-                </select>
-                <br></br>
-                <label>次駅までの走行時間(秒)</label>
-                <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
-                    value={targetStation?.sectionTime ?? ''}
-                ></input>
-                <br></br>
-                {/* 停車時間（秒）。自動(時間)の画面送りと所要時間の表示に使う（7.53節） */}
-                <label>停車時間(秒)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'stopTime')}
-                    value={targetStation?.stopTime ?? ''}
-                ></input>
-                <br></br>
                 <label>上部ナンバリング表示形式</label>
                 <select onChange={(e) => {formUpdated(e, 'headerNumberingType')}} value={targetStation?.headerNumberingType ?? '0'}>
                     <option value="0">通常</option>
@@ -871,6 +853,27 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         </>
                     )
                 })()}
+                </fieldset>
+                {/* ── その他設定（開くドア・走行時間・停車時間。7.59節） ── */}
+                <fieldset style={{marginBottom: '6px'}}>
+                <legend>その他設定</legend>
+                <label>開くドア</label>
+                <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide ?? 'right'}>
+                    <option value={'right'}>右</option>
+                    <option value={'left'}>左</option>
+                </select>
+                <br></br>
+                <label>次駅までの走行時間(秒)</label>
+                <input type="text" id="sectionTimeInput" onChange={(e) => formUpdated(e, 'sectionTime')}
+                    value={targetStation?.sectionTime ?? ''}
+                ></input>
+                <br></br>
+                {/* 停車時間（秒）。自動(時間)の画面送りと所要時間の表示に使う（7.53節） */}
+                <label>停車時間(秒)</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'stopTime')}
+                    value={targetStation?.stopTime ?? ''}
+                ></input>
+                <br></br>
                 </fieldset>
 
             </>)}
