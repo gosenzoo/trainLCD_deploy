@@ -10,8 +10,6 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
-import LineAddPopup from './LineAddPopup'
-import { getOperationLabel } from '../modules/resolveDestination'
 import { IconArrowUp, IconArrowDown, IconTrash, IconPlus } from './SvgIcons'
 
 type stationParamsSetterProps = {
@@ -26,8 +24,6 @@ type stationParamsSetterProps = {
 const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSetting, selectedIndexes, activeSection}) => {
     // 路線情報フォームのアイコンピッカー用
     const [lineFormIconPickerMode, setLineFormIconPickerMode] = useState<'new' | 'list' | null>(null)
-    // 路線追加ポップアップの表示状態
-    const [isLineAddPopupOpen, setIsLineAddPopupOpen] = useState<boolean>(false)
     // 「路線記号２」エリアの開閉状態（路線をまたぐ駅でのみ使うため初期状態は折りたたみ）
     const [isNumIconNextOpen, setIsNumIconNextOpen] = useState<boolean>(false)
     // 乗換路線リストの選択インデックス（0-based、null: 未選択）
@@ -118,50 +114,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             }
         })
         setSetting(_setting)
-    }
-
-    // 次区間路線（lineId）変更: auto モードなら路線設定値を3フィールドに書き込む（未定義も auto として扱う）
-    // numIcon・numIconNext はどちらも次区間路線を参照するため、auto の欄をまとめて更新する
-    const lineIdUpdated = (value: string) => {
-        if (!setting) return
-        const _setting: settingType = structuredClone(setting)
-        selectedIndexes.forEach(ind => {
-            const s = _setting.stationList[ind - 1]
-            if (!s) return
-            s.lineId = value
-            const line = _setting.lineDict[value]
-            if (!line) return
-            ;(['numIcon', 'numIconNext'] as NumIconTarget[]).forEach(target => {
-                if ((s[target]?.colorMode ?? 'auto') !== 'auto') return
-                // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
-                s[target].color     = line.color
-                s[target].symbol    = line.symbol
-                s[target].presetKey = line.numIconPresetKey
-            })
-        })
-        setSetting(_setting)
-    }
-
-    // 路線追加ポップアップから路線データを受け取り、lineDict 追加と駅 lineId 更新を一括で行う
-    const handleLineAdd = (lineData: lineType) => {
-        const _setting = structuredClone(setting)
-        const keys = Object.keys(_setting.lineDict)
-        const newKey = keys.length > 0 ? String(Math.max(...keys.map(Number)) + 1) : '0'
-        _setting.lineDict[newKey] = lineData
-        // 選択中の全駅の lineId を新路線キーに設定し、auto モードなら numIcon も更新する
-        selectedIndexes.forEach(ind => {
-            const s = _setting.stationList[ind - 1]
-            if (!s) return
-            s.lineId = newKey
-            if ((s.numIcon.colorMode ?? 'auto') === 'auto') {
-                // 空欄を含め路線設定値をそのまま反映する（if ガードを外す）
-                s.numIcon.color     = lineData.color
-                s.numIcon.symbol    = lineData.symbol
-                s.numIcon.presetKey = lineData.numIconPresetKey
-            }
-        })
-        setSetting(_setting)
-        setIsLineAddPopupOpen(false)
     }
 
     const formUpdated = (e:any, field: stationMembers) => {
@@ -607,35 +559,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     </legend>
                     {isNumIconNextOpen && renderNumIconFields('numIconNext', true)}
                 </fieldset>
-                <label>次区間路線</label>
-                {/* lineDict に登録された路線を数値キー昇順で列挙し、選択結果を lineId に保存する。auto モード時は路線色も同時に更新する */}
-                <div style={{display: 'flex', gap: '6px', alignItems: 'center'}}>
-                    <select onChange={(e) => lineIdUpdated(e.target.value)} value={targetStation?.lineId ?? ''}>
-                        <option value="">（未設定）</option>
-                        {Object.entries(setting.lineDict)
-                            .sort((a, b) => Number(a[0]) - Number(b[0]))
-                            .map(([key, line]) => (
-                                <option key={key} value={key}>{line.name}</option>
-                            ))
-                        }
-                    </select>
-                    {/* 路線追加ポップアップを開くボタン */}
-                    <button className="btn-primary" onClick={() => setIsLineAddPopupOpen(true)}>新規追加</button>
-                </div>
-                <br></br>
-                <label>次区間運用</label>
-                {/* operationDict に登録された運用を数値キー昇順で列挙し、選択結果を operationId に保存する */}
-                <select onChange={(e) => formUpdated(e, 'operationId')} value={targetStation?.operationId ?? ''}>
-                    <option value="">（なし）</option>
-                    {Object.entries(setting.operationDict ?? {})
-                        .sort((a, b) => Number(a[0]) - Number(b[0]))
-                        .map(([key, op]) => (
-                            // 運用タブと同じラベル「運用[id]: [行先自動][種別] [行先]行」（7.49節）
-                            <option key={key} value={key}>{getOperationLabel(key, op, setting.stationList ?? [])}</option>
-                        ))
-                    }
-                </select>
-                <br></br>
+                {/* 次区間路線・次区間運用は駅一覧の路線列・運用列から設定する（7.58節） */}
                 <label>開くドア</label>
                 <select onChange={(e) => {formUpdated(e, 'doorSide')}} value={targetStation?.doorSide ?? 'right'}>
                     <option value={'right'}>右</option>
@@ -1108,15 +1032,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             </>)}
 
         </div>
-        {/* 路線追加ポップアップ（basic タブの「次区間路線」横「新規追加」ボタンから起動） */}
-        {isLineAddPopupOpen && (
-            <LineAddPopup
-                setting={setting}
-                setSetting={setSetting}
-                onAdd={handleLineAdd}
-                onClose={() => setIsLineAddPopupOpen(false)}
-            />
-        )}
         </>
     )
 }

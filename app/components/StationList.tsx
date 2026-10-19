@@ -14,6 +14,7 @@ import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import StationPresetPopup from './StationPresetPopup'
 import LineInfoBalloon from './LineInfoBalloon'
 import OperationInfoBalloon from './OperationInfoBalloon'
+import SectionSettingPopup from './SectionSettingPopup'
 
 type stationListProps = {
     setting: settingType,
@@ -35,12 +36,40 @@ const railLineStyle: React.CSSProperties = {
     position: 'absolute', left: '50%', transform: 'translateX(-50%)',
     width: `${RAIL_LINE_WIDTH}px`, background: 'var(--text-primary)',
 }
+// 選択中の区間の縁取り（7.58節）。区間全体（最初の駅の中央〜最後の駅の中央）を囲む外周だけを青で描き、内側には線を引かない。
+// 行ごとに枠の一部を描き、最初の行は上辺、最後の行は下辺を付け、途中の行は左右の辺だけにしてつなげる
+const SECTION_HIGHLIGHT_COLOR = '#388bfd'
+const renderSectionOutline = (index: number, range: { start: number, end: number } | null, width: number): React.ReactNode => {
+    if (!range || index < range.start || index > range.end) return null
+    const isStart = index === range.start
+    const isEnd = index === range.end
+    const pad = width / 2  // 最初・最後の駅の中央から上下にはみ出す長さ（〇を囲めるようにする）
+    const border = `2px solid ${SECTION_HIGHLIGHT_COLOR}`
+    return (
+        <div style={{
+            position: 'absolute', left: '50%', transform: 'translateX(-50%)', width: `${width}px`, boxSizing: 'border-box',
+            top: isStart ? `calc(50% - ${pad}px)` : 0,
+            bottom: isEnd ? `calc(50% - ${pad}px)` : 0,
+            borderLeft: border, borderRight: border,
+            borderTop: isStart ? border : 'none',
+            borderBottom: isEnd ? border : 'none',
+            borderTopLeftRadius: isStart ? `${pad}px` : 0, borderTopRightRadius: isStart ? `${pad}px` : 0,
+            borderBottomLeftRadius: isEnd ? `${pad}px` : 0, borderBottomRightRadius: isEnd ? `${pad}px` : 0,
+            pointerEvents: 'none',
+        }} />
+    )
+}
+// 縁取りの幅: 運用列は線の太さ＋余白、路線列は〇（11px）を囲める幅
+const OPERATION_OUTLINE_WIDTH = RAIL_LINE_WIDTH + 6
+const LINE_OUTLINE_WIDTH = 17
 // タブID: 表示アプリ側の命名に合わせる（defaultLine=路線図, platform=ホーム案内）
 type TabType = 'basic' | 'defaultLine' | 'transfersDisp' | 'platform' | 'map';
 
 const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false)
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
+    // 区間の路線・運用を設定するポップアップ（7.58節）。start・end は 0-based の駅インデックス
+    const [sectionPopup, setSectionPopup] = useState<{ kind: 'line' | 'operation', start: number, end: number } | null>(null)
     // 連続選択モード（複数選択OFFの時のみ有効）
     const [isRangeSelectMode, setIsRangeSelectMode] = useState<boolean>(false)
     const [rangeStartIndex, setRangeStartIndex] = useState<number | null>(null)
@@ -57,6 +86,16 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
     const [operationInfoBalloon, setOperationInfoBalloon] = useState<{ operationId: string, operation: operationType, x: number, y: number } | null>(null)
 
     const presetIconDict = loadIconPresetTexts()
+
+    // 駅名列で連続した2駅以上を選んでいるときの区間の範囲（0-based。7.58節）。それ以外は null
+    const sectionRange = (() => {
+        if (selectedIndexes.length < 2) return null
+        const sorted = [...new Set(selectedIndexes)].sort((a, b) => a - b)
+        if (sorted[sorted.length - 1] - sorted[0] + 1 !== sorted.length) return null
+        return { start: sorted[0] - 1, end: sorted[sorted.length - 1] - 1 }
+    })()
+    // 行 index が選択中の区間（最初の駅〜最後の駅）に含まれるか
+    const isRowInSection = (index: number) => !!sectionRange && index >= sectionRange.start && index <= sectionRange.end
 
     // ナンバリング1つ分を、その駅を LCD の上部に表示するとしたら描画されるとおりに描く（7.57節）。
     // 上部に描画されない場合（番号が空、または通常形式でプリセットが空・未登録）は null を返す。
@@ -282,6 +321,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     <div style={{ position: 'absolute', inset: 0 }}>
                         {upperOn && <div style={{ ...railLineStyle, top: 0, height: '50%' }} />}
                         {lowerOn && <div style={{ ...railLineStyle, top: '50%', height: '50%' }} />}
+                        {/* 選択中の区間の外周を青で縁取る（運用が未設定で線が無い区間も、線の位置に描く。7.58節） */}
+                        {renderSectionOutline(index, sectionRange, OPERATION_OUTLINE_WIDTH)}
                         {isChange && (
                             <div style={{
                                 position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
@@ -293,8 +334,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             },
             cellStyle: () => railCellStyle,
             headerWidth: RAIL_COLUMN_WIDTH,
-            // クリックでその駅以降の区間の運用情報を吹き出しで表示する
-            onClick: (station, _key, e) => {
+            // 選択中の区間の行をクリックすると区間の運用を設定するポップアップを開く（7.58節）。
+            // それ以外はクリックでその駅以降の区間の運用情報を吹き出しで表示する
+            onClick: (station, key, e) => {
+                if (sectionRange && isRowInSection(parseInt(key))) {
+                    setSectionPopup({ kind: 'operation', ...sectionRange })
+                    return
+                }
                 const operation = setting.operationDict[station.operationId]
                 if (!operation) return
                 setOperationInfoBalloon({ operationId: station.operationId, operation, x: e.clientX, y: e.clientY })
@@ -318,6 +364,8 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     <div style={{ position: 'absolute', inset: 0 }}>
                         {prevColor && <div style={{ ...railLineStyle, top: 0, height: '50%', background: prevColor }} />}
                         {!isLast && thisColor && <div style={{ ...railLineStyle, top: '50%', height: '50%', background: thisColor }} />}
+                        {/* 選択中の区間の外周（駅の〇と線をまとめて囲む）を青で縁取る（7.58節） */}
+                        {renderSectionOutline(index, sectionRange, LINE_OUTLINE_WIDTH)}
                         <div style={{
                             position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
                             width: '11px', height: '11px', borderRadius: '50%', boxSizing: 'border-box',
@@ -328,8 +376,13 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             },
             cellStyle: () => railCellStyle,
             headerWidth: RAIL_COLUMN_WIDTH,
-            // クリックで路線情報（路線名・かな・英語・記号画像）を吹き出しで表示する
-            onClick: (station, _key, e) => {
+            // 選択中の区間の行をクリックすると区間の路線を設定するポップアップを開く（7.58節）。
+            // それ以外はクリックで路線情報（路線名・かな・英語・記号画像）を吹き出しで表示する
+            onClick: (station, key, e) => {
+                if (sectionRange && isRowInSection(parseInt(key))) {
+                    setSectionPopup({ kind: 'line', ...sectionRange })
+                    return
+                }
                 const line = setting.lineDict[station.lineId]
                 if (!line) return
                 setLineInfoBalloon({ line, x: e.clientX, y: e.clientY })
@@ -508,6 +561,17 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             )}
 
             {/* 運用セルクリック時の運用情報吹き出し */}
+            {/* 区間の路線・運用を設定するポップアップ（7.58節） */}
+            {sectionPopup && (
+                <SectionSettingPopup
+                    setting={setting}
+                    setSetting={setSetting}
+                    kind={sectionPopup.kind}
+                    start={sectionPopup.start}
+                    end={sectionPopup.end}
+                    onClose={() => setSectionPopup(null)}
+                />
+            )}
             {operationInfoBalloon && (
                 <OperationInfoBalloon
                     operationId={operationInfoBalloon.operationId}
