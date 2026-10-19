@@ -6065,3 +6065,20 @@ LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIco
 |---|---|
 | `app/components/LineInfoBalloon.tsx`・`OperationInfoBalloon.tsx` | 未設定の表示 |
 | `app/components/StationList.tsx` | 未設定でも吹き出しを開く |
+
+### 7.61 区間の運用設定から運用を新規追加する
+
+区間の運用を設定するポップアップ（7.58節）の一覧の右に「新規追加」ボタンを置く。押すと「運用追加」ポップアップを開く。
+
+- 内容は運用設定の各運用の設定項目（表示・行先・種別・列車・表示タイプ）と同じで、新しい運用の初期値から始める。項目が多いため、項目の部分は縦にスクロールできる
+- 「追加」を押すと、入力した運用を運用ID の末尾（キー最大値+1）に追加し、元のポップアップの一覧でその運用を選んだ状態にして閉じる。区間への反映は元のポップアップの「設定」で行う（路線の「新規追加」と同じ）
+- 「×」・「閉じる」・外側のクリック・`Esc` で何も追加せずに閉じる
+
+設定項目は運用設定（`OperationForm`）と共通の部品（`OperationFields`）にまとめる。全体号車の「反転」「入力」は、画面の要素を ID で探す方式をやめ、入力値から号車リストを作る（同時に複数のフォームがあっても干渉しないように）。
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/OperationFields.tsx` | 新規。運用の設定項目（`OperationForm` から切り出し） |
+| `app/components/OperationForm.tsx` | `OperationFields` を使う |
+| `app/components/OperationAddPopup.tsx` | 新規。運用追加ポップアップ |
+| `app/components/SectionSettingPopup.tsx` | 「新規追加」ボタン |

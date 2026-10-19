@@ -4,8 +4,8 @@ import React, { useState } from "react"
 import "../type"
 import initObjects from "../initSettingObject"
 import { numberIndexes } from "../modules/presetIndex"
-import ToggleSwitch from './ToggleSwitch'
 import { getOperationLabel } from "../modules/resolveDestination"
+import OperationFields from './OperationFields'
 
 type operationFormType = {
     setting: settingType,
@@ -25,24 +25,21 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
     const effectiveKey = dict[selectedKey] !== undefined ? selectedKey : (keys[0] ?? '')
     const operation = dict[effectiveKey]
 
-    const formUpdated = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: operationMembers) => {
+    // 項目の値の変更（入力欄・セレクトは文字列、トグルスイッチは boolean）。「すべての運用に適用」なら全運用に反映する
+    const valueUpdated = (field: operationMembers, value: string | boolean) => {
         const _setting: settingType = structuredClone(setting)
         if (isAll) {
-            Object.values(_setting.operationDict).forEach(op => { op[field] = e.target.value as never })
+            Object.values(_setting.operationDict).forEach(op => { op[field] = value as never })
         } else if (effectiveKey && _setting.operationDict[effectiveKey]) {
-            _setting.operationDict[effectiveKey][field] = e.target.value as never
+            _setting.operationDict[effectiveKey][field] = value as never
         }
         setSetting(_setting)
     }
 
-    // トグルスイッチ用ハンドラ（boolean 値を直接受け取る）
-    const toggleUpdated = (checked: boolean, field: operationMembers) => {
+    // 全体号車の「反転」「入力」は、表示中の運用だけに反映する（従来どおり）
+    const carNumberListUpdated = (value: string) => {
         const _setting: settingType = structuredClone(setting)
-        if (isAll) {
-            Object.values(_setting.operationDict).forEach(op => { op[field] = checked as never })
-        } else if (effectiveKey && _setting.operationDict[effectiveKey]) {
-            _setting.operationDict[effectiveKey][field] = checked as never
-        }
+        if (_setting.operationDict[effectiveKey]) _setting.operationDict[effectiveKey].carNumberList = value
         setSetting(_setting)
     }
 
@@ -104,177 +101,11 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             {/* タブに接続するフォーム本体: tab-form-body クラスで上端ボーダーとz-indexを設定 */}
             <div className="tab-form-body">
             {operation && (<>
-            <fieldset>
-            <legend>表示</legend>
-            <div className="form-row">
-                <label>進行方向</label>
-                <select onChange={(e) => formUpdated(e, 'leftOrRight')} value={operation.leftOrRight}>
-                    <option value="right">右</option>
-                    <option value="left">左</option>
-                </select>
-            </div>
-            <div className="form-row">
-                <label>所要時間表示</label>
-                <ToggleSwitch checked={operation.isDispTime} onChange={(v) => toggleUpdated(v, 'isDispTime')} />
-            </div>
-            <div className="form-row">
-                <label>路線名表示</label>
-                <ToggleSwitch checked={operation.isDispLineName} onChange={(v) => toggleUpdated(v, 'isDispLineName')} />
-            </div>
-            <div className="form-row">
-                <label>次停車駅表示</label>
-                <ToggleSwitch checked={operation.isDrawStopText} onChange={(v) => toggleUpdated(v, 'isDrawStopText')} />
-            </div>
-            </fieldset>
-            <fieldset>
-            <legend>行先</legend>
-            {/* オンのときは末尾停車駅を行先にし、下の6項目をグレーアウトする（7.49節）。経由等は対象外 */}
-            <div className="form-row">
-                <label>行先を自動で設定する</label>
-                <ToggleSwitch checked={operation.isAutoDestination} onChange={(v) => toggleUpdated(v, 'isAutoDestination')} />
-            </div>
-            <div className={operation.isAutoDestination ? 'form-disabled' : ''}>
-            <div className="form-row">
-                <label>行き先</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'destination')} value={operation.destination} />
-            </div>
-            <div className="form-row">
-                <label>行き先かな</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'destinationKana')} value={operation.destinationKana} />
-            </div>
-            <div className="form-row">
-                <label>行き先(英語)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'destinationEng')} value={operation.destinationEng} />
-            </div>
-            <div className="form-row">
-                <label>行き先ナンバリング</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'destinationNum')} value={operation.destinationNum} />
-            </div>
-            <div className="form-row">
-                <label>行き先色</label>
-                <input type="color" onChange={(e) => formUpdated(e, 'destinationColor')} value={operation.destinationColor} />
-            </div>
-            <div className="form-row">
-                <label>行先ナンバリング記号</label>
-                <select onChange={(e) => formUpdated(e, 'destinationNumIconKey')} value={operation.destinationNumIconKey}>
-                    {numberIndexes.map(num => (
-                        <option key={num.key} value={num.key}>{num.name}</option>
-                    ))}
-                </select>
-            </div>
-            </div>{/* /行先の自動設定でグレーアウトする範囲 */}
-            <div className="form-row">
-                <label>経由等</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'direction')} value={operation.direction} />
-            </div>
-            </fieldset>
-            <fieldset>
-            <legend>種別</legend>
-            <div className="form-row">
-                <label>種別</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainType')} value={operation.trainType} />
-            </div>
-            <div className="form-row">
-                <label>種別(英語)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeEng')} value={operation.trainTypeEng} />
-            </div>
-            {/* 種別の中国語・韓国語（7.54節） */}
-            <div className="form-row">
-                <label>種別(中国語)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeZh')} value={operation.trainTypeZh ?? ''} />
-            </div>
-            <div className="form-row">
-                <label>種別(韓国語)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeKo')} value={operation.trainTypeKo ?? ''} />
-            </div>
-            <div className="form-row">
-                <label>種別補足</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeSub')} value={operation.trainTypeSub} />
-            </div>
-            <div className="form-row">
-                <label>種別補足(英語)</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeSubEng')} value={operation.trainTypeSubEng} />
-            </div>
-            <div className="form-row">
-                <label>種別文字色</label>
-                <input type="color" onChange={(e) => formUpdated(e, 'trainTypeColor')} value={operation.trainTypeColor} />
-            </div>
-            <div className="form-row">
-                <label>種別背景色</label>
-                <input type="color" onChange={(e) => formUpdated(e, 'trainTypeBackColor')} value={operation.trainTypeBackColor || '#000000'} />
-            </div>
-            </fieldset>
-            {/* 列車路線記号～列車ラインの描画を「列車」欄にまとめる（7.52節） */}
-            <fieldset>
-            <legend>列車</legend>
-            <div className="form-row">
-                <label>列車路線記号</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'lineLogo')} value={operation.lineLogo} />
-            </div>
-            <div className="form-row">
-                <label>列車路線記号（色）</label>
-                <input type="color" onChange={(e) => formUpdated(e, 'lineColor')} value={operation.lineColor} />
-            </div>
-            <div className="form-row">
-                <label>号車</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'carNumber')} value={operation.carNumber} />
-            </div>
-            <div className="form-row">
-                <label>全体号車</label>
-                <input id="carNumberListInput" type="text" onChange={(e) => formUpdated(e, 'carNumberList')} value={operation.carNumberList} />
-                <button onClick={() => {
-                    const input = document.getElementById("carNumberListInput") as HTMLInputElement
-                    const arr = input.value.split(",")
-                    arr.reverse()
-                    input.value = arr.join(",")
-                    const _setting: settingType = structuredClone(setting)
-                    if (_setting.operationDict[effectiveKey]) _setting.operationDict[effectiveKey].carNumberList = input.value
-                    setSetting(_setting)
-                }}>反転</button>
-            </div>
-            <div className="form-row">
-                <label>全体号車連番入力</label>
-                <input id="sequenceCarTextInput" type="text" />
-                <button onClick={() => {
-                    const seqInput = document.getElementById("sequenceCarTextInput") as HTMLInputElement
-                    const listInput = document.getElementById("carNumberListInput") as HTMLInputElement
-                    const maxNum = parseInt(seqInput.value)
-                    let str = ""
-                    for (let i = 1; i <= maxNum; i++) {
-                        str += i.toString()
-                        if (i.toString() === operation.carNumber) str += "*"
-                        if (i !== maxNum) str += ","
-                    }
-                    listInput.value = str
-                    const _setting: settingType = structuredClone(setting)
-                    if (_setting.operationDict[effectiveKey]) _setting.operationDict[effectiveKey].carNumberList = str
-                    setSetting(_setting)
-                }}>入力</button>
-            </div>
-            <div className="form-row">
-                <label>前方オフセット</label>
-                <input type="number" onChange={(e) => formUpdated(e, 'headOffset')} value={operation.headOffset} />
-            </div>
-            <div className="form-row">
-                <label>後方オフセット</label>
-                <input type="number" onChange={(e) => formUpdated(e, 'backOffset')} value={operation.backOffset} />
-            </div>
-            <div className="form-row">
-                <label>列車ライン色</label>
-                <input type="color" onChange={(e) => formUpdated(e, 'carLineColor')} value={operation.carLineColor} />
-            </div>
-            <div className="form-row">
-                <label>列車にラインを描画するか</label>
-                <ToggleSwitch checked={operation.isDrawLine} onChange={(v) => toggleUpdated(v, 'isDrawLine')} />
-            </div>
-            </fieldset>
-            {/* 画面レイアウトの表示タイプ（7.52節）。運用ごとに設定する */}
-            <div className="form-row">
-                <label>表示タイプ</label>
-                <select onChange={(e) => formUpdated(e, 'displayType')} value={operation.displayType || 'tokyu'}>
-                    <option value="tokyu">東急</option>
-                </select>
-            </div>
+            <OperationFields
+                operation={operation}
+                onValue={valueUpdated}
+                onCarNumberListChange={carNumberListUpdated}
+            />
             </>)}
             </div>{/* /tab-form-body */}
         </div>

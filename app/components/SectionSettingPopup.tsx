@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import "../type"
 import LineAddPopup from './LineAddPopup'
+import OperationAddPopup from './OperationAddPopup'
 import { getOperationLabel } from '../modules/resolveDestination'
 
 type SectionSettingPopupProps = {
@@ -23,13 +24,15 @@ const SectionSettingPopup: React.FC<SectionSettingPopupProps> = ({ setting, setS
     // 一覧の初期値は始発側の最初の区間の値
     const [value, setValue] = useState<string>(stations[start]?.[field] ?? '')
     const [isLineAddOpen, setIsLineAddOpen] = useState<boolean>(false)
+    // 運用追加ポップアップの表示状態（7.61節）
+    const [isOperationAddOpen, setIsOperationAddOpen] = useState<boolean>(false)
 
-    // Esc で何も変えずに閉じる（路線追加ポップアップを開いているときはそちらを優先する）
+    // Esc で何も変えずに閉じる（路線追加・運用追加のポップアップを開いているときはそちらを優先する）
     useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape' && !isLineAddOpen) onClose() }
+        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape' && !isLineAddOpen && !isOperationAddOpen) onClose() }
         document.addEventListener('keydown', onKeyDown)
         return () => document.removeEventListener('keydown', onKeyDown)
-    }, [onClose, isLineAddOpen])
+    }, [onClose, isLineAddOpen, isOperationAddOpen])
 
     // 範囲の区間（start〜end-1 の駅）を選んだ値に書き換える
     const apply = () => {
@@ -66,6 +69,16 @@ const SectionSettingPopup: React.FC<SectionSettingPopupProps> = ({ setting, setS
         setIsLineAddOpen(false)
     }
 
+    // 運用追加ポップアップで入力した運用を、運用IDの末尾（キー最大値+1）に追加し、一覧で選んだ状態にする（7.61節）。
+    // 範囲への反映は「設定」で行う
+    const handleOperationAdd = (operation: operationType) => {
+        const keys = Object.keys(setting.operationDict ?? {})
+        const newKey = keys.length > 0 ? String(Math.max(...keys.map(Number)) + 1) : '0'
+        setSetting(prev => ({ ...prev, operationDict: { ...prev.operationDict, [newKey]: operation } }))
+        setValue(newKey)
+        setIsOperationAddOpen(false)
+    }
+
     const title = `「${stations[start]?.name ?? ''}」～「${stations[end]?.name ?? ''}」の${kind === 'line' ? '路線' : '運用'}を設定`
 
     return (
@@ -89,8 +102,8 @@ const SectionSettingPopup: React.FC<SectionSettingPopupProps> = ({ setting, setS
                             }
                         </select>
                         <button className="btn-primary" onClick={() => setIsLineAddOpen(true)}>新規追加</button>
-                    </>) : (
-                        // 旧「次区間運用」と同じ一覧（運用タブと同じラベル）
+                    </>) : (<>
+                        {/* 旧「次区間運用」と同じ一覧（運用タブと同じラベル）と「新規追加」（7.61節） */}
                         <select onChange={e => setValue(e.target.value)} value={value}>
                             <option value="">（なし）</option>
                             {Object.entries(setting.operationDict ?? {})
@@ -100,7 +113,8 @@ const SectionSettingPopup: React.FC<SectionSettingPopupProps> = ({ setting, setS
                                 ))
                             }
                         </select>
-                    )}
+                        <button className="btn-primary" onClick={() => setIsOperationAddOpen(true)}>新規追加</button>
+                    </>)}
                 </div>
                 <div className="modal-footer">
                     <button className="btn-primary" onClick={apply}>設定</button>
@@ -108,6 +122,12 @@ const SectionSettingPopup: React.FC<SectionSettingPopupProps> = ({ setting, setS
                 </div>
             </div>
         </div>
+        {isOperationAddOpen && (
+            <OperationAddPopup
+                onAdd={handleOperationAdd}
+                onClose={() => setIsOperationAddOpen(false)}
+            />
+        )}
         {isLineAddOpen && (
             <LineAddPopup
                 setting={setting}
