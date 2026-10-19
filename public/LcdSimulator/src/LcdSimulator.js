@@ -54,13 +54,19 @@ class LcdSimulator {
 
         // 画面送り（7.53節）。自動(時間)・自動(座標)のときだけ自動送りを使う（手動は従来どおり）
         this._onGeoError = null;
-        const mode = settings.info?.pageAdvanceMode;
-        this._autoAdvance = (mode === 'time' || mode === 'coord')
-            ? new AutoAdvanceController(this._controller, settings.stationList, mode, {
-                onMove:     (drawParams) => this._render(drawParams),
-                onGeoError: (message) => { if (this._onGeoError) this._onGeoError(message); },
-            })
-            : null;
+        this._stationList = settings.stationList;
+        // 「ページ・言語」の「ページ自動切換え」の値（画面送りを切り替えたときに使う。7.56節）
+        this._basePageAuto = pageParams.basePageAuto ?? pageParams.isPageAuto ?? true;
+        this._autoAdvance = this._createAutoAdvance(settings.info?.pageAdvanceMode);
+    }
+
+    /** 画面送りの方式に応じた自動送りを作る（手動なら null） */
+    _createAutoAdvance(mode) {
+        if (mode !== 'time' && mode !== 'coord') return null;
+        return new AutoAdvanceController(this._controller, this._stationList, mode, {
+            onMove:     (drawParams) => this._render(drawParams),
+            onGeoError: (message) => { if (this._onGeoError) this._onGeoError(message); },
+        });
     }
 
     // ============================================================
@@ -102,6 +108,19 @@ class LcdSimulator {
     /** 言語を一つ進めて再描画する（デバッグ用） */
     langRotate() {
         this._render(this._controller.langRotate());
+    }
+
+    /**
+     * 表示中に画面送りの方式を切り替える（7.56節）。
+     * 今の自動送りを止め、新しい方式で今の状態からやり直す。ページ自動切換えも新しい方式に合わせる
+     * @param {'manual'|'time'|'coord'} mode
+     */
+    setPageAdvanceMode(mode) {
+        if (this._autoAdvance) this._autoAdvance.stop();
+        this._autoAdvance = this._createAutoAdvance(mode);
+        // 自動のときは「1周」の終わりを決めるため、ページ自動切換えがオフでもページを回す（7.53節）
+        this._controller.setPageAuto(this._basePageAuto || mode !== 'manual');
+        if (this._autoAdvance) this._autoAdvance.start();
     }
 
     /** 現在のdrawParamsを返す */

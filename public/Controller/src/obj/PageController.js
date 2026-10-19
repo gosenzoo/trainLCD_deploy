@@ -33,6 +33,16 @@ class PageController {
         this._onPageTimer = callback;
     }
 
+    /**
+     * ページ自動切換えのオン・オフを切り替え、現在のページのタイマーをかけ直す（7.56節。表示中に画面送りを変えたとき）
+     * @param {boolean} isPageAuto
+     */
+    setPageAuto(isPageAuto) {
+        this._isPageAuto = isPageAuto;
+        if (this._timerId) { clearTimeout(this._timerId); this._timerId = null; }
+        this._startTimer();
+    }
+
     /** 現在のページエントリを返す（リストが空の場合はnull） */
     get currentPage() {
         return this._currentList[this._currentIndex] ?? null;

@@ -53,6 +53,8 @@
 
     <!-- LcdSimulator統合クラス -->
     <script src="./LcdSimulator/src/LcdSimulator.js"></script>
+    <!-- LCD表示中の「表示設定」ポップアップ（7.56節） -->
+    <script src="./js/displaySettingPopup.js"></script>
 
     <script>
         // ============================================================
@@ -114,6 +116,13 @@
         let sim  = null;
         // キーボード・タッチの操作を受け付けるか（7.53節）。画面送りが自動で「手動操作を許可」がオフのときだけ false
         let isManualControlAllowed = true;
+        // 「表示設定」ポップアップ（7.56節）と、今の画面送り・手動操作を許可（ポップアップで変えられる。保存はしない）
+        let settingPopup = null;
+        let pageAdvanceModeNow = 'manual';
+        let allowManualNow = true;
+        const updateManualControlAllowed = () => {
+            isManualControlAllowed = pageAdvanceModeNow === 'manual' || allowManualNow;
+        };
         let width, height;
 
         // ============================================================
@@ -123,7 +132,14 @@
         // キーボード操作（PC）
         // P: ページ送り / ArrowLeft・ArrowRight: 状態移動 / A・D: 駅移動
         function keyDown(e) {
-            if (!sim || !isManualControlAllowed) return;
+            if (!sim) return;
+            // c: 「表示設定」ポップアップの開閉（手動操作を許可がオフでも開ける）。Esc でも閉じる
+            if (settingPopup && (e.key === 'c' || e.key === 'C')) { settingPopup.toggle(); return; }
+            if (settingPopup && settingPopup.isOpen) {
+                if (e.key === 'Escape') settingPopup.close();
+                return;  // ポップアップ表示中は LCD の操作を受け付けない
+            }
+            if (!isManualControlAllowed) return;
             if      (e.key === 'p' || e.key === 'P') { sim.pageRotate();     }
             else if (e.key === 'ArrowLeft')           { sim.moveState(-1);   }
             else if (e.key === 'ArrowRight')          { sim.moveState(1);    }
@@ -136,10 +152,18 @@
         // 右1/4: 上半分→駅+1, 下半分→状態+1
         // 中央1/2 かつ 下1/3: ページ送り
         function windowTouched(e) {
-            if (!sim || !isManualControlAllowed) return;
+            if (!sim) return;
+            // ポップアップ表示中は LCD の操作を受け付けない（閉じる操作はポップアップ側で受ける）
+            if (settingPopup && settingPopup.isOpen) return;
             const touch = e.changedTouches[0];
             const w = window.innerWidth;
             const h = window.innerHeight;
+            // 中央1/2 かつ 上1/3: 「表示設定」ポップアップを開く（手動操作を許可がオフでも開ける）
+            if (settingPopup && touch.pageX >= w / 4 && touch.pageX <= w * 3 / 4 && touch.pageY < h / 3) {
+                settingPopup.open();
+                return;
+            }
+            if (!isManualControlAllowed) return;
             if (touch.pageX < w / 4) {
                 if (touch.pageY > h / 2) { sim.moveState(-1);  }
                 else                     { sim.moveStation(-1); }
@@ -228,9 +252,12 @@
             // PAGE_PARAMS: pageDispList と isPageAuto を渡す（Controller が pageState ごとに参照）
             // 画面送りが自動（7.53節）のときは、「1周」の終わりを決めるため「ページ自動切換え」がオフでもページを回す
             const pageAdvanceMode = settings.info?.pageAdvanceMode ?? 'manual';
-            isManualControlAllowed = pageAdvanceMode === 'manual' || (settings.info?.allowManualControl ?? true);
+            pageAdvanceModeNow = pageAdvanceMode;
+            allowManualNow = settings.info?.allowManualControl ?? true;
+            updateManualControlAllowed();
             const isPageAuto   = (settings.dispConfig?.isPageAuto ?? true) || pageAdvanceMode !== 'manual';
-            const PAGE_PARAMS  = { pageDispList, isPageAuto };
+            // basePageAuto: 「ページ自動切換え」の設定値（表示中に画面送りを切り替えたときに使う。7.56節）
+            const PAGE_PARAMS  = { pageDispList, isPageAuto, basePageAuto: settings.dispConfig?.isPageAuto ?? true };
             // SVGロード用に全状態から一意のページ名を収集する
             const pageNameList = [...new Set(Object.values(pageDispList).flat().map(e => e.pageName))];
 
@@ -291,6 +318,23 @@
             const drawerResources = { iconList: settings.iconDict || {}, numIconPresets, iconPresets, headerSVG, bodySVGMap };
             sim = new LcdSimulator(settings, PAGE_PARAMS, LANG_PARAMS, drawer, displaySVG, drawerResources);
             // 自動(座標)で位置情報が使えないときは、画面左上に小さく表示する（7.53節）
+            // 「表示設定」ポップアップ（7.56節）。変更はその場で LCD に反映し、設定データには保存しない
+            settingPopup = new DisplaySettingPopup(
+                { mode: pageAdvanceModeNow, allowManual: allowManualNow, isLoop: false },
+                {
+                    onModeChange: (mode) => {
+                        pageAdvanceModeNow = mode;
+                        updateManualControlAllowed();
+                        // 自動(座標)をやめたら、位置情報のエラー表示も消す
+                        if (mode !== 'coord') document.getElementById('geoError').style.display = 'none';
+                        sim.setPageAdvanceMode(mode);
+                    },
+                    onAllowManualChange: (allow) => {
+                        allowManualNow = allow;
+                        updateManualControlAllowed();
+                    },
+                }
+            );
             sim.onGeoError = (message) => {
                 const el = document.getElementById('geoError');
                 el.textContent = message;

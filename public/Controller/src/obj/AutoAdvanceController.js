@@ -40,6 +40,7 @@ class AutoAdvanceController {
         this._onMove      = callbacks.onMove;
         this._onGeoError  = callbacks.onGeoError ?? (() => {});
         this._timerId     = null;
+        this._stopped     = false;  // stop() 済みなら true（7.56節）
 
         // 自動(時間): 通過で使った時間（ms）。通過した後の区間の走行時間から差し引く
         this._passCarry = 0;
@@ -60,6 +61,16 @@ class AutoAdvanceController {
     start() {
         if (this._mode === 'coord') this._startGeolocation();
         this._onStateEntered();
+    }
+
+    /** 自動送りを止める（タイマーと位置情報の監視を止める）。画面送りの方式を切り替えるときに使う（7.56節） */
+    stop() {
+        this._clearTimer();
+        if (this._watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(this._watchId);
+        if (this._checkId !== null) clearInterval(this._checkId);
+        this._watchId = null;
+        this._checkId = null;
+        this._stopped = true;
     }
 
     /** 手動操作で状態が変わったときに呼ぶ。操作した先の状態から自動送りをやり直す */
@@ -90,6 +101,7 @@ class AutoAdvanceController {
     /** 状態に入ったときの処理。モードごとに次の遷移のタイマーを仕掛ける */
     _onStateEntered() {
         this._clearTimer();
+        if (this._stopped) return;
         const state = this._controller.getProgressState();
         if (this._mode === 'time') this._scheduleByTime(state);
         else                       this._scheduleByCoord(state);
@@ -179,6 +191,7 @@ class AutoAdvanceController {
 
     /** 位置情報の更新ごとに、速度を求めて遷移を判定する */
     _onPosition(pos) {
+        if (this._stopped) return;
         const now = pos.timestamp ?? Date.now();
         const here = { lat: pos.coords.latitude, lng: pos.coords.longitude };
 

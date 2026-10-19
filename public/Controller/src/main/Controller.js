@@ -151,6 +151,14 @@ class Controller {
     }
 
     /**
+     * ページ自動切換えのオン・オフを切り替える（7.56節）
+     * @param {boolean} isPageAuto
+     */
+    setPageAuto(isPageAuto) {
+        this._pageController.setPageAuto(isPageAuto);
+    }
+
+    /**
      * ページを一つ進め、言語をリセットしてdrawParamsを返す
      * @returns {object} drawParams
      */
