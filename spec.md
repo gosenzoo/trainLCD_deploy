@@ -1188,7 +1188,7 @@ export function moveDictItemsDown<T>(
 - **意味**: `numIcon` ＝ 今までの路線のナンバリング、`numIconNext` ＝ 次の路線のナンバリング
 - **既定値**: 全フィールド空文字（`presetKey` / `manualPresetKey` のみ `"N_tokyu"`）、`colorMode` は `'manual'`。2つ目は使わない駅のほうが多い任意項目のため、既定では自動補完を行わない
 - **`colorMode: 'auto'` の挙動**: `numIcon` と同じく `lineDict[station.lineId]`（次区間路線）の `symbol`・`numIconPresetKey`・`color` を参照する。`numIcon` の自動補完が働く場面（次区間路線の変更、路線カラー設定の切替、`LineList` での路線情報変更）では `numIconNext` も同じ条件で追従する
-- **駅情報表（`StationList`）の「ナンバリング」列**: `numIcon` のアイコンを描画し、その**右に並べて** `numIconNext` のアイコンを描画する。`numIconNext.number` が空の駅は2つ目を描画しない（`presetKey` だけが入っている駅で空のアイコンが並ぶのを防ぐため）
+- **駅情報表（`StationList`）の「ナンバリング」列**: `numIcon` のアイコンを描画し、その**右に並べて** `numIconNext` のアイコンを描画する。`numIconNext.number` が空の駅は2つ目を描画しない（`presetKey` だけが入っている駅で空のアイコンが並ぶのを防ぐため）（7.57節で表示規則を変更）
 - **LCD表示側は路線図（defaultLine）ページのみ対応する**。ヘッダー（現在駅の大きい表示）と追加路線図（overLine）は `numIcon` のみを参照する従来の動作のままとする（下記参照）
 
 ##### LCD表示側（路線図ページ）への反映
@@ -5960,3 +5960,30 @@ LCD表示（`display.html`）の表示中に、エディタの「表示設定」
 | `public/LcdSimulator/src/LcdSimulator.js` | 表示中に画面送りの方式を切り替える |
 | `public/Controller/src/obj/AutoAdvanceController.js` | 自動送りを止める |
 | `public/Controller/src/main/Controller.js`・`public/Controller/src/obj/PageController.js` | ページ自動切換えの切り替え |
+
+### 7.57 駅一覧の「ナンバリング」欄を LCD 上部の表示に合わせる
+
+駅一覧の表の「ナンバリング」欄は、「その駅を LCD の上部（ヘッダー）に表示するとしたら、どう描画されるか」を表示する。通過駅も同じ規則で表示する。
+
+#### 1つ目（`numIcon`）
+
+| 番号 | 上部ナンバリング表示形式 | プリセット | 表示 |
+|---|---|---|---|
+| 空 | （問わない） | （問わない） | `-` |
+| あり | 通常 | 空・未登録 | `-` |
+| あり | 通常 | 登録済み | プリセットのアイコン（従来どおり） |
+| あり | 地下鉄 | （問わない） | 地下鉄形式の記号（下記） |
+
+#### 2つ目（`numIconNext`）
+
+1つ目と同じ規則（表示形式は駅の「上部ナンバリング表示形式」）で描画できる場合だけ、1つ目の右に並べる。描画できない場合は何も出さない（`-` も出さない）。1つ目が `-` で2つ目が描画できる場合は、`-` の右に2つ目を並べる。
+
+#### 地下鉄形式の記号
+
+LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIcon.color`）の円の下側を水平に切り落とした形の中に白い円を置き、上に記号、下に番号を書く。
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/StationList.tsx` | 「ナンバリング」欄の描画 |

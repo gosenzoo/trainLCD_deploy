@@ -58,15 +58,27 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
 
     const presetIconDict = loadIconPresetTexts()
 
-    // ナンバリングアイコン1つ分を描画する。
-    // presetKey が設定されていれば symbol/number が空でも画像を生成する（空文字のまま渡す）
-    const renderNumIcon = (numIcon: stationNumIconType): React.ReactNode => {
+    // ナンバリング1つ分を、その駅を LCD の上部に表示するとしたら描画されるとおりに描く（7.57節）。
+    // 上部に描画されない場合（番号が空、または通常形式でプリセットが空・未登録）は null を返す。
+    // headerNumberingType: 駅の「上部ナンバリング表示形式」（"0": 通常 / "1": 地下鉄）
+    const renderNumIcon = (numIcon: stationNumIconType | undefined, headerNumberingType: string): React.ReactNode => {
+        if (!numIcon?.number) return null
         const { presetKey, symbol, number, color } = numIcon
-        if (presetKey) {
-            const html = createNumIconFromPreset(presetIconDict, presetKey, symbol, number, color)?.outerHTML
-            if (html) return <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} />
+        if (headerNumberingType === '1') {
+            // 地下鉄形式: LCD 上部と同じ形（下側を切り落とした路線色の円＋白い円＋記号・番号）を小さく描く
+            return (
+                <svg viewBox='416 132 228 218' width="25px" height="24px">
+                    <path d="M 482.5 350 A 114 114 1 1 1 577.5 350 Z" fill={color || '#000000'} />
+                    <circle r="87" cx="530" cy="246" fill="#FFFFFF" />
+                    <text x="530" y="222" textAnchor="middle" fontSize="56" fontWeight="600" fontFamily="sans-serif" fill="#000000">{symbol}</text>
+                    <text x="530" y="300" textAnchor="middle" fontSize="62" fontWeight="600" fontFamily="sans-serif" fill="#000000">{number}</text>
+                </svg>
+            )
         }
-        return <>{symbol} {number}</>
+        // 通常形式: プリセットのアイコン。プリセットが空・未登録なら上部には描画されない
+        if (!presetKey) return null
+        const html = createNumIconFromPreset(presetIconDict, presetKey, symbol, number, color)?.outerHTML
+        return html ? <svg viewBox='0 0 225 225' width="24px" height="24px" dangerouslySetInnerHTML={{ __html: html }} /> : null
     }
 
     // GenericItemList は 0-based string key を返す。
@@ -362,14 +374,19 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
         },
         {
             header: 'ナンバリング',
-            // numIcon（今までの路線）と numIconNext（次の路線）を横に並べて表示する。
-            // numIconNext は路線をまたぐ駅でのみ使うため、number が空の駅は描画しない
-            cell: (station) => (
-                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                    {renderNumIcon(station.numIcon)}
-                    {station.numIconNext?.number ? renderNumIcon(station.numIconNext) : null}
-                </div>
-            ),
+            // numIcon（今までの路線）と numIconNext（次の路線）を横に並べて表示する（7.57節）。
+            // 1つ目が上部に描画されない場合は「-」、2つ目は描画される場合だけ並べる（描画されなければ何も出さない）
+            cell: (station) => {
+                const headerType = station.headerNumberingType ?? '0'
+                const first = renderNumIcon(station.numIcon, headerType)
+                const second = renderNumIcon(station.numIconNext, headerType)
+                return (
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        {first ?? '-'}
+                        {second}
+                    </div>
+                )
+            },
         },
         {
             header: '乗換路線',
