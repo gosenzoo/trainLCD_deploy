@@ -91,6 +91,8 @@ type operationType = {
     direction: string,
     trainType: string,
     trainTypeEng: string,
+    trainTypeZh: string,  // 種別の中国語（7.54節）
+    trainTypeKo: string,  // 種別の韓国語（7.54節）
     trainTypeSub: string,
     trainTypeSubEng: string,
     trainTypeColor: string,
@@ -132,6 +134,9 @@ type stationType = {
     name: string,
     kana: string,
     eng: string,
+    zh: string,       // 駅名の中国語（簡体字。7.54節）
+    ko: string,       // 駅名の韓国語（7.54節）
+    subName: string,  // 副駅名（括弧なしの中身。7.54節。LCDには表示しない）
     numIcon: stationNumIconType,
     // 2つ目のナンバリング（路線をまたぐ駅で「次の路線」側の駅番号を保持する）。
     // numIcon は「今までの路線」側を保持する。使わない駅は number を空にしておく
@@ -174,12 +179,12 @@ type iconParamsType = {
     symbol: string
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'transfers' | 'sectionTime' | 'stopTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+type stationMembers = 'name' | 'kana' | 'eng' | 'zh' | 'ko' | 'subName' | 'transfers' | 'sectionTime' | 'stopTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
     'otherCarNum' | 'otherLeftSlotInd' | 'transferListTransfers'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' | 'numIconPresetKey'
 
 type infoMembers = 'settingName' | 'isLoop' | 'pageAdvanceMode' | 'allowManualControl'
 
-type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng'| 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
+type operationMembers = 'destination' | 'destinationKana' | 'destinationEng' | 'destinationNum' | 'destinationColor' | 'destinationNumIconKey' | 'direction' | 'trainType' | 'trainTypeEng' | 'trainTypeZh' | 'trainTypeKo' | 'trainTypeSub' | 'trainTypeSubEng' | 'trainTypeColor' | 'trainTypeBackColor' | 'lineLogo' | 'lineColor' |
     'carNumber' | 'leftOrRight' | 'isDispTime' | 'isDispLineName' | 'carNumberList' | 'headOffset' | 'backOffset' | 'isDrawStopText' | 'isDrawLine' | 'carLineColor' | 'isAutoDestination' | 'displayType'

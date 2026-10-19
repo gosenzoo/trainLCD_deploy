@@ -10,6 +10,10 @@ export type PresetStation = {
     lon: number | null
     // 駅ごとのナンバリングアイコンのプリセット名（N_*。7.47節）。空文字なら所属路線のものを使う
     numIconPresetKey: string
+    // 中国語（簡体字）・韓国語・副駅名（7.54節）。無ければ空文字
+    zh: string
+    ko: string
+    subName: string
     // 所属路線は lineConnectDB から導出する（このオブジェクトには持たない）
 }
 
@@ -89,8 +93,11 @@ export const loadStationDB = async (): Promise<PresetStation[]> => {
                 eng: cols[3]?.trim() ?? '',
                 lat: num(cols[4]),
                 lon: num(cols[5]),
-                // 列順: 駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度, ナンバリングアイコン（列がなければ空文字）
+                // 列順: 駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度, ナンバリングアイコン, 中国語, 韓国語, 副駅名（列がなければ空文字）
                 numIconPresetKey: cols[6]?.trim() ?? '',
+                zh: cols[7]?.trim() ?? '',
+                ko: cols[8]?.trim() ?? '',
+                subName: cols[9]?.trim() ?? '',
             }
         })
         .filter(s => s.id !== '')

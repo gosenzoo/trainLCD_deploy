@@ -460,6 +460,9 @@ class ProgressController {
         return {
             trainType:        operation.trainType   || "普通",
             trainTypeEng:     operation.trainTypeEng || "Local",
+            // 種別の中国語・韓国語（7.54節）。空なら空のまま表示する
+            trainTypeZh:      operation.trainTypeZh || "",
+            trainTypeKo:      operation.trainTypeKo || "",
             trainTypeSubText: operation.trainTypeSub    || "",
             trainTypeSubTextEng: operation.trainTypeSubEng || "",
             trainTypeBackColor: operation.trainTypeBackColor || "",
@@ -468,6 +471,9 @@ class ProgressController {
                 name:     displayStation.name,
                 kana:     displayStation.kana,
                 eng:      displayStation.eng,
+                // 駅名の中国語・韓国語（7.54節）。空なら空のまま表示する
+                zh:       displayStation.zh || "",
+                ko:       displayStation.ko || "",
                 numIcon:  this._buildNumIconFromStation(displayStation),
                 doorSide: displayStation.doorSide === "left" ? 1 : 0
             },

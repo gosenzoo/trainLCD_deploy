@@ -89,6 +89,10 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     name: station.name,
     kana: station.kana,
     eng: station.eng,
+    // 中国語・韓国語・副駅名は駅プリセットの値を入れる（7.54節）
+    zh: station.zh,
+    ko: station.ko,
+    subName: station.subName,
     numIcon: toNumIcon(numberStr, lineColor, stationNumIconPresetKey),
     numIconNext: emptyNumIconNext(numIconPresetKey),
     lineNumberType: "0",

@@ -178,6 +178,15 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
                 <label>種別(英語)</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'trainTypeEng')} value={operation.trainTypeEng} />
             </div>
+            {/* 種別の中国語・韓国語（7.54節） */}
+            <div className="form-row">
+                <label>種別(中国語)</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeZh')} value={operation.trainTypeZh ?? ''} />
+            </div>
+            <div className="form-row">
+                <label>種別(韓国語)</label>
+                <input type="text" onChange={(e) => formUpdated(e, 'trainTypeKo')} value={operation.trainTypeKo ?? ''} />
+            </div>
             <div className="form-row">
                 <label>種別補足</label>
                 <input type="text" onChange={(e) => formUpdated(e, 'trainTypeSub')} value={operation.trainTypeSub} />

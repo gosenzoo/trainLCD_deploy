@@ -142,7 +142,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             }
         }
         _setting.stationList.splice(_index, 0, {
-            name: "", kana: "", eng: "", numIcon: _numIcon,
+            name: "", kana: "", eng: "", zh: "", ko: "", subName: "", numIcon: _numIcon,
             // 2つ目のナンバリングは路線をまたぐ駅でのみ使うため、前駅から引き継がず常に空で追加する
             numIconNext: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" },
             lineNumberType: "0", transfers: [],
@@ -353,8 +353,11 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             collapsible: true,       // 列の折りたたみを許可する
             defaultCollapsed: true,  // デフォルトで折りたたむ
             columns: [
-                { header: '駅名かな', cell: (station) => station.kana },
-                { header: '駅名英語', cell: (station) => station.eng },
+                { header: 'かな', cell: (station) => station.kana },
+                { header: '英語', cell: (station) => station.eng },
+                // 中国語・韓国語（7.54節）
+                { header: '中国語', cell: (station) => station.zh ?? '' },
+                { header: '韓国語', cell: (station) => station.ko ?? '' },
             ],
         },
         {
@@ -395,6 +398,15 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                     })}
                 </div>
             ),
+        },
+        {
+            // 副駅名（7.54節）。1列だけのグループにして折りたためるようにする（初期状態は閉じる）
+            groupHeader: '副駅名',
+            collapsible: true,
+            defaultCollapsed: true,
+            columns: [
+                { header: '副駅名', cell: (station) => station.subName ?? '' },
+            ],
         },
         {
             header: 'ドア',

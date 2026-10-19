@@ -54,6 +54,10 @@ const normalizeLoadedSetting = (loaded: any): settingType => {
         if (line.numIconPresetKey === undefined) line.numIconPresetKey = ""
     })
     loaded.stationList.forEach((station: any) => {
+        // 中国語・韓国語・副駅名がない旧データは空文字にする（7.54節。駅設定の入力欄は存在する項目だけを更新するため）
+        if (station.zh === undefined) station.zh = ''
+        if (station.ko === undefined) station.ko = ''
+        if (station.subName === undefined) station.subName = ''
         // numIcon サブオブジェクトへのマイグレーション（旧: symbol/number/numIconPresetKey/lineColor が平坦）
         if (station.numIcon === undefined) {
             // さらに旧形式（symbol 分離前）: number が "TY 01" 形式の場合はスペースで分割する

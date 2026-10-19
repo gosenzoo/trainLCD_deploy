@@ -277,6 +277,10 @@ def local_detour(pa, pb, pc):
     ac = dist_km(pa, pc)
     return (dist_km(pa, pb) + dist_km(pb, pc)) / ac if ac > 0.5 else 1.0
 wikidata_report = None
+matched_qid = {}   # 駅の識別キー → 対応づけた Wikidata の項目（中国語・韓国語の表記に使う。7.54節）
+# 同じ駅名で近く（LABEL_NEAR_KM 以内）にある Wikidata の項目からも表記を探す。
+# 事業者ごとに分かれた項目に表記が無い場合や、座標が別の駅と重なっていて座標の差し替えには使わない項目も、表記には使う
+LABEL_NEAR_KM = 2.0
 if os.path.exists(WIKIDATA_PATH):
     wd_all = [w for w in json.load(open(WIKIDATA_PATH, encoding='utf-8'))['stations'] if not w['closed']]
     # 別の名前の駅とまったく同じ座標になっている項目は、座標の誤り（コピーなど）の可能性が高いため使わない
@@ -313,6 +317,8 @@ if os.path.exists(WIKIDATA_PATH):
         if d >= (WIKIDATA_MAX_SHIFT_SAME_OPERATOR_KM if same_op else WIKIDATA_MAX_SHIFT_KM):
             too_far.append((key, round(d, 1)))
             continue
+        # 中国語・韓国語の表記（7.54節）にも、この駅に対応づけた項目を使う
+        matched_qid[key] = best['qid']
         st['lat'], st['lon'] = best['lat'], best['lon']
         shifted[key] = d
     # 差し替えた結果、前後の駅との間で大きな遠回りになる駅は、差し替えを取り消して元の座標に戻す
@@ -417,6 +423,65 @@ for group in load_groups('transfer_groups.json'):
         ia, ib = stations[keys[a]]['id'], stations[keys[b]]['id']
         transfer_edges.append((min(ia, ib), max(ia, ib)))
 
+# ---- 中国語・韓国語・副駅名（7.54節） ----
+# 中国語・韓国語: wikidata/labels.json（fetch_wikidata_labels.py で取得。CC0）の、駅に対応づけた項目の表記。
+#   中国語は簡体字の表記だけを使い、無ければ空。韓国語は無ければかなから変換して作る
+# 副駅名: sources/sub_names.json（「事業者:駅名」→ 副駅名）。共同使用駅は代表の駅のキーに読み替える
+from kana_to_hangul import kana_to_hangul
+LABELS_PATH = os.path.join(HERE, 'wikidata', 'labels.json')
+wd_labels = json.load(open(LABELS_PATH, encoding='utf-8'))['labels'] if os.path.exists(LABELS_PATH) else {}
+# 簡体字の表記の優先順。無ければ中国語版 Wikipedia の記事名を簡体字に変換したもの（zhwiki-cn）を使う
+ZH_LANGS = ('zh-hans', 'zh-cn', 'zh-sg', 'zh-my', 'zhwiki-cn')
+def clean_label(label, suffixes):
+    # 括弧の注記（「大久保站 (东京都)」など）と末尾の「车站」「站」「역」を除く（長いものから順に試す）
+    name = re.sub(r'\s*[（(][^）)]*[）)]\s*$', '', label).strip()
+    for suffix in suffixes:
+        if name.endswith(suffix) and len(name) > len(suffix): return name[:-len(suffix)].strip()
+    return name
+_wd_label_items = {}   # 照合用の駅名 → 廃止されていない Wikidata の項目
+if os.path.exists(WIKIDATA_PATH):
+    for w in json.load(open(WIKIDATA_PATH, encoding='utf-8'))['stations']:
+        if not w['closed'] and w['qid'] not in WIKIDATA_EXCLUDE:
+            _wd_label_items.setdefault(match_name(w['name']), []).append(w)
+# stations.json に無く、fetch_wikidata_labels.py が日本語名で追加で見つけた項目（新宿・銀座など）も表記に使う
+for w in (json.load(open(LABELS_PATH, encoding='utf-8')).get('extra_items', []) if os.path.exists(LABELS_PATH) else []):
+    if w['qid'] not in WIKIDATA_EXCLUDE: _wd_label_items.setdefault(match_name(w['name']), []).append(w)
+def find_label(key, langs):
+    # 対応づけた項目 → 近くの同名の項目（近い順）の順に、langs の表記を探す
+    st = stations[key]
+    near = sorted((w for w in _wd_label_items.get(match_name(st['name']), []) if dist_km(st, w) < LABEL_NEAR_KM),
+                  key=lambda w: dist_km(st, w))
+    for qid in [matched_qid.get(key, '')] + [w['qid'] for w in near]:
+        labels = wd_labels.get(qid, {})
+        for l in langs:
+            if l in labels: return labels[l]
+    return None
+SUB_NAMES_PATH = os.path.join(HERE, 'sources', 'sub_names.json')
+sub_names = {}
+if os.path.exists(SUB_NAMES_PATH):
+    for k, v in json.load(open(SUB_NAMES_PATH, encoding='utf-8')).items():
+        if not k.startswith('_'): sub_names[SHARED_ALIAS.get(k, k)] = v
+ko_from_wikidata = 0
+for key, st in stations.items():
+    zh = find_label(key, ZH_LANGS)
+    st['zh'] = clean_label(zh, ('车站', '站')) if zh else ''
+    ko = find_label(key, ('ko',))
+    if ko:
+        st['ko'] = clean_label(ko, ('역',))
+        ko_from_wikidata += 1
+    else:
+        st['ko'] = kana_to_hangul(st['kana'])
+    st['subName'] = sub_names.get(key, '')
+    for k in ('zh', 'ko', 'subName'):
+        if re.search(r'[,"\n]', st[k]):
+            warnings.append(f'CSVに使えない文字のため空にした: {key} {k}={st[k]!r}')
+            st[k] = ''
+unknown_sub = [k for k in sub_names if k not in stations]
+if unknown_sub: warnings.append(f'副駅名の駅が見つからない: {unknown_sub}')
+labels_report = (f'中国語: {sum(1 for k in order if stations[k]["zh"])} / {len(order)} 駅（無し {sum(1 for k in order if not stations[k]["zh"])} 駅）'
+                 f'、韓国語: Wikidata {ko_from_wikidata} 駅・かなから変換 {len(stations) - ko_from_wikidata} 駅'
+                 f'、副駅名: {sum(1 for k in order if stations[k]["subName"])} 駅')
+
 os.makedirs(OUT, exist_ok=True)
 # 既存データとの比較用に、上書き前のCSVを読み込んでおく
 CSV_NAMES = ('stationDB.csv', 'lineDB.csv', 'lineConnectDB.csv', 'transferDB.csv')
@@ -430,8 +495,9 @@ def write(name, header, rows):
         fp.write(header + '\n')
         for r in rows: fp.write(','.join(str(x) for x in r) + '\n')
 
-write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度,ナンバリングアイコン',
-      [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}', STATION_NUM_ICON.get(n, '')) for n in order])
+write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度,ナンバリングアイコン,中国語,韓国語,副駅名',
+      [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}', STATION_NUM_ICON.get(n, ''),
+        stations[n]['zh'], stations[n]['ko'], stations[n]['subName']) for n in order])
 write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別',
       # 路線記号のない路線は、路線アイコンを路線カラーの四角（I_mono_color）にする（7.32節）
       [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l)) for l in lines])
@@ -442,6 +508,7 @@ write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)
 print(f'路線 {len(lines)} / 駅 {len(order)} / 路線接続 {sum(len(l["stations"]) for l in lines)}')
 for l in lines: print(f'  {l["no"]:2d} {l["name"]}: {len(l["stations"])}駅 {l["stations"][0]["name"]}→{l["stations"][-1]["name"]}')
 if wikidata_report: print(wikidata_report)
+print(labels_report)
 print(f'近接する同名駅として自動でまとめた駅: {sum(1 for k in SHARED_ALIAS if k not in {x for g in load_groups("shared_stations.json") for x in g})} 件')
 if far_same_name: print(f'1km より離れていてまとめなかった同名駅（3km 以内）: {far_same_name}')
 print(f'警告 {len(warnings)} 件')

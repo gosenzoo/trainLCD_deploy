@@ -332,7 +332,7 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `pageName` | string | ページファイル名。選択肢: `defaultLineSVG.svg` / `overLineSVG.svg` / `transfers.svg` / `platform.svg` / `trainTypeChange.svg` / `infoMessage.svg` |
-| `dispTime` | number | このページを表示し続ける時間（ms） |
+| `dispTime` | number | このページを表示し続ける時間（ms）。初期値 15000（7.55節） |
 | `type` | number | 表示条件（0: 無条件 / 1: 乗換あり / 2: 次運用あり / 3: メッセージあり）|
 
 #### `pageType=2`「次運用あり」の判定ロジック
@@ -416,10 +416,10 @@ _currentIndex = (_currentIndex + 1) % _currentList.length
 
 | pageState | ページ名 | dispTime | type | 追加位置 |
 |---|---|---|---|---|
-| 1（走行） | `trainTypeChange.svg` | 11000 | 2 | `defaultLineSVG.svg` の次 |
-| 1（走行） | `infoMessage.svg` | 11000 | 3 | `transfers.svg` の次 |
-| 3（停車） | `trainTypeChange.svg` | 11000 | 2 | `platform.svg` の次 |
-| 3（停車） | `infoMessage.svg` | 11000 | 3 | `trainTypeChange.svg` の次 |
+| 1（走行） | `trainTypeChange.svg` | 15000 | 2 | `defaultLineSVG.svg` の次 |
+| 1（走行） | `infoMessage.svg` | 15000 | 3 | `transfers.svg` の次 |
+| 3（停車） | `trainTypeChange.svg` | 15000 | 2 | `platform.svg` の次 |
+| 3（停車） | `infoMessage.svg` | 15000 | 3 | `trainTypeChange.svg` の次 |
 
 #### `pageState` — 走行状態
 | 値 | 意味 | 条件 |
@@ -5814,3 +5814,108 @@ LCDの路線図の各駅までの所要時間と、駅一覧の「通過」列�
 | `public/Controller/src/obj/AutoAdvanceController.js` | 新規。自動(時間)・自動(座標)の画面送り |
 | `public/Controller/src/main/Controller.js`・`public/LcdSimulator/src/LcdSimulator.js` | 画面送りの組み込み |
 | `public/display.html` | スクリプトの読み込み、環状運転をオフ扱い、位置情報のエラー表示 |
+
+### 7.54 駅名の中国語・韓国語・副駅名、LCDの中国語・韓国語表示
+
+#### 1. 駅のデータと入力欄
+
+`stationType` に次の3項目（いずれも文字列）を追加する。初期値は空文字。保存済みデータの移行はしない（読み込み時に無ければ空文字として扱う）。
+
+| 項目 | 内容 |
+|---|---|
+| `zh` | 駅名の中国語（簡体字のみ） |
+| `ko` | 駅名の韓国語 |
+| `subName` | 副駅名。駅名に添える名前（例: 押上の「スカイツリー前」、神戸市営地下鉄の「須磨パティオ前」、三陸鉄道の「日本最東端の駅」）。括弧は付けずに中身だけを持つ。今回はLCDに表示しない |
+
+**駅設定（`StationParamSetter`）の「駅名」欄**
+
+上から 駅名・かな・英語・中国語・韓国語・副駅名 の順に並べる。既存の「駅名かな」「駅名英語」の表示名は「かな」「英語」に改める。
+
+- かなを入力したとき、英語と同じく韓国語も自動で上書きする（下記「かな→韓国語の変換」）
+
+**駅一覧の表**
+
+| 列 | 内容 |
+|---|---|
+| 駅名多言語（既存のグループ） | かな・英語・中国語・韓国語。見出しの「駅名かな」「駅名英語」は「かな」「英語」に改める |
+| 副駅名（新規） | 「ドア」の左に置く。1列だけのグループにして折りたためるようにする（初期状態は閉じる） |
+
+**かな→韓国語の変換（`app/modules/KanaToHangul.ts`）**
+
+韓国の外来語表記法（日本語の表記）に沿ってかな（ひらがな・カタカナ）をハングルにする。
+
+- か・た行（濁らないもの）は、語頭では平音（ㄱ・ㄷ）、語中・語末では激音（ㅋ・ㅌ）。ちゃ行も同様（ㅈ・ㅊ）
+- ん → パッチム ㄴ、っ → パッチム ㅅ
+- 長音（ー、おう・えい などの母音の重なりのうち長音にあたるもの）は表記しない
+- 単語の区切り（空白・中黒）ごとに語頭として扱う
+
+#### 2. 運用の種別の中国語・韓国語
+
+`operationType` に `trainTypeZh`・`trainTypeKo`（文字列、初期値は空文字）を追加し、運用設定の「種別」欄の「種別(英語)」の下に「種別(中国語)」「種別(韓国語)」の入力欄を置く。
+
+#### 3. LCD表示
+
+**言語**
+
+| 言語ID | 言語 |
+|---|---|
+| 0 | 日本語（漢字） |
+| 1 | ひらがな |
+| 2 | 英語 |
+| 3 | 中国語（新規） |
+| 4 | 韓国語（新規） |
+
+- 「ページ・言語」の言語設定の初期値に、言語ID 3・4 をこの順（英語の後）で追加する。表示時間などはひらがな（言語ID 1）と同じ（表示 1500ms・遷移 400ms・間隔 100ms）。保存済みの設定には追加しない
+- 「ページ・言語」の言語ID の表示名に「中国語」「韓国語」を加える
+
+**中国語・韓国語の番に表示するもの（ヘッダー）**
+
+| 表示 | 中国語（3） | 韓国語（4） |
+|---|---|---|
+| 駅名 | 駅の `zh`。他の言語と同じアニメーション（kuru） | 駅の `ko` |
+| 種別 | 運用の `trainTypeZh` | 運用の `trainTypeKo` |
+| 「Next」にあたる文字（つぎは・まもなく） | 下一站 | 다음 역 |
+| 「Next Terminal」にあたる文字 | 下一站 终点站 | 다음 역 종점 |
+| 号車 | 号车（日本語と同じ位置） | 호차（日本語と同じ位置） |
+
+- 駅名・種別が空なら、空のまま表示する（その言語の番を飛ばさない）。ただし運用の種別（日本語）も空で「普通」で補っている場合は、中国語・韓国語も「普通」「보통」で補う
+- 上の表に無いもの（行先・経由・「for」・種別補足など）は、中国語・韓国語の番では英語の番と同じ表示にする
+- ボディ（路線図・乗換・ホームなど）は、中国語・韓国語の番では英語の番と同じ表示にする
+
+テンプレートの言語条件は次のように書き換える。
+
+| 今の条件 | 書き換え後 |
+|---|---|
+| 英語のときだけ表示（`langId == 2`） | 英語・中国語・韓国語のとき（`langId >= 2`）。ただし上の表で中国語・韓国語の表示を別に持つもの（駅名・種別・Next・Next Terminal・号車）は `langId == 2` のまま |
+| 英語以外で表示（`langId != 2`） | 日本語・ひらがなのとき（`langId <= 1`） |
+
+#### 4. 路線図から追加
+
+「路線図から追加」で追加する駅に、駅プリセットの中国語・韓国語・副駅名を入れる。
+
+- `stationDB.csv` の末尾に「中国語」「韓国語」「副駅名」の列を追加する
+- **中国語・韓国語**: Wikidata（CC0）の駅の項目の表記を使う。生成スクリプトが座標の差し替え（7.36節）と同じ規則で駅に対応づけた項目から取る
+  - 中国語は簡体字の表記（`zh-hans`・`zh-cn`・`zh-sg`・`zh-my` の順に探す）。無ければ、その項目の中国語版 Wikipedia の記事名を、中国語版 Wikipedia の字体変換で簡体字（`zh-cn`）にしたものを使う。末尾の「站」と括弧の注記は除く。どちらも見つからなければ空
+  - 韓国語は `ko` の表記。末尾の「역」と括弧の注記は除く。見つからなければ、かなから「かな→韓国語の変換」で作る
+- **副駅名**: 日本語版 Wikipedia の駅の情報欄などを調べ、副駅名のある駅だけを元データ（`scripts/presetData/sources/sub_names.json`。「事業者:駅名」→ 副駅名）に書く
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/type.ts`・`app/initSettingObject.tsx` | `zh`・`ko`・`subName`・`trainTypeZh`・`trainTypeKo`、言語設定の初期値 |
+| `app/modules/KanaToHangul.ts` | 新規。かな→韓国語の変換 |
+| `app/components/StationParamSetter.tsx` | 駅名欄（中国語・韓国語・副駅名、表示名の変更、韓国語の自動補完） |
+| `app/components/StationList.tsx` | 駅名多言語の列、副駅名の列 |
+| `app/components/OperationForm.tsx` | 種別(中国語)・種別(韓国語) |
+| `app/components/DispConfig.tsx` | 言語ID の表示名 |
+| `app/modules/loadStationPresets.ts`・`app/components/StationPresetPopup.tsx` | 中国語・韓国語・副駅名の読み込みと追加 |
+| `public/Controller/src/obj/ProgressController.js` | drawParams に駅名・種別の中国語・韓国語を追加 |
+| `public/Drawer/pageInput/tokyu/header/headerSVG.svg`・`body/*.svg` | 言語条件の書き換え、中国語・韓国語の表示 |
+| `scripts/presetData/fetch_wikidata_labels.py` | 新規。Wikidata から中国語・韓国語の表記を取得 |
+| `scripts/presetData/build_presets.py`・`sources/sub_names.json` | 中国語・韓国語・副駅名の列 |
+| `public/csv/presetLines/stationDB.csv` | 再生成 |
+
+### 7.55 ページの表示時間の初期値
+
+各ページの表示時間（`dispTime`）の初期値を 15000ms にする。対象は、ページ一覧の初期値（`initDispConfigObject.pageDispList`）、「ページ・言語」でページを追加したときの値、LCD表示で `dispConfig` が無い旧データに使う既定値（`display.html` の `DEFAULT_PAGE_DISP_LIST`）。保存済みの設定の値は変えない。

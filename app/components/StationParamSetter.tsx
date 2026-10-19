@@ -1,6 +1,7 @@
 import React, { useState, useEffect, TextareaHTMLAttributes } from 'react'
 import "../type"
 import kanaToAlphabet from "../modules/KanaConverter"
+import kanaToHangul from "../modules/KanaToHangul"
 import { text } from 'stream/consumers'
 import { iconIndexes, numberIndexes } from '../modules/presetIndex'
 import GenericItemList, { ColumnDef } from './GenericItemList'
@@ -183,6 +184,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             //かなに変更があった場合、ローマ字も更新
             if(field === "kana"){
                 _setting.stationList[ind - 1].eng = kanaToAlphabet(e.target.value, 0)
+                // 韓国語も自動で上書きする（7.54節）
+                _setting.stationList[ind - 1].ko = kanaToHangul(e.target.value)
             }
         })
 
@@ -564,14 +567,30 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         value={targetStation?.name ?? ''}
                     ></input>
                     <br></br>
-                    <label>駅名かな</label>
+                    <label>かな</label>
                     <input type="text" id="kanaInput" onChange={(e) => formUpdated(e, 'kana')}
                         value={targetStation?.kana ?? ''}
                     ></input>
                     <br></br>
-                    <label>駅名英語</label>
+                    <label>英語</label>
                     <input type="text" id="engInput" onChange={(e) => formUpdated(e, 'eng')}
                         value={targetStation?.eng ?? ''}
+                    ></input>
+                    <br></br>
+                    {/* 中国語（簡体字）・韓国語・副駅名（7.54節）。韓国語はかなの入力で自動補完される */}
+                    <label>中国語</label>
+                    <input type="text" onChange={(e) => formUpdated(e, 'zh')}
+                        value={targetStation?.zh ?? ''}
+                    ></input>
+                    <br></br>
+                    <label>韓国語</label>
+                    <input type="text" onChange={(e) => formUpdated(e, 'ko')}
+                        value={targetStation?.ko ?? ''}
+                    ></input>
+                    <br></br>
+                    <label>副駅名</label>
+                    <input type="text" onChange={(e) => formUpdated(e, 'subName')}
+                        value={targetStation?.subName ?? ''}
                     ></input>
                     <br></br>
                 </fieldset>

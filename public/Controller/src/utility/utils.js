@@ -123,6 +123,13 @@ function applyOperationFallbacks(operation, lastStopStation) {
         });
     }
 
+    // 種別（日本語）が空で「普通」で補う場合は、中国語・韓国語も「普通」「보통」で補う（7.54節）。
+    // 日本語の種別が入力されていれば、中国語・韓国語が空でも空のままにする
+    if (!operation.trainType) {
+        if (!operation.trainTypeZh) operation.trainTypeZh = "普通";
+        if (!operation.trainTypeKo) operation.trainTypeKo = "보통";
+    }
+
     // その他パラメータが空の場合は固定デフォルト値で補完
     const fixedFallbackMap = [
         ["carNumber",      "1"],

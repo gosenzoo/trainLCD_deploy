@@ -28,11 +28,14 @@ const PAGE_STATE_LABELS = ['始発停車', '走行', '直前', '停車', '通過
 // pageTypeの表示名（0〜3）
 const PAGE_TYPE_LABELS = ['無条件', '乗換あり', '次運用あり', 'メッセージあり']
 
-// 言語IDに対応する表示名（0:日本語, 1:ひらがな, 2:英語）
+// 言語IDに対応する表示名（0:日本語, 1:ひらがな, 2:英語, 3:中国語, 4:韓国語）
 const LANG_NAMES: Record<number, string> = {
     0: '日本語',
     1: 'ひらがな',
-    2: '英語'
+    2: '英語',
+    // 中国語・韓国語（7.54節）
+    3: '中国語',
+    4: '韓国語'
 }
 
 const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
@@ -84,7 +87,8 @@ const DispConfig: React.FC<dispConfigProps> = ({ setting, setSetting }) => {
         const _setting = structuredClone(setting)
         const list: pageObjType[] = [...((_setting.dispConfig.pageDispList ?? {})[String(selectedPageStateTab)] ?? [])]
         const insertAt = selectedPageIndex !== null ? selectedPageIndex + 1 : list.length
-        list.splice(insertAt, 0, { pageName: AVAILABLE_PAGES[0], dispTime: 8000, type: 0 })
+        // 表示時間の初期値は15000ms（7.55節）
+        list.splice(insertAt, 0, { pageName: AVAILABLE_PAGES[0], dispTime: 15000, type: 0 })
         if (!_setting.dispConfig.pageDispList) _setting.dispConfig.pageDispList = {}
         _setting.dispConfig.pageDispList[String(selectedPageStateTab)] = list
         setSetting(_setting)

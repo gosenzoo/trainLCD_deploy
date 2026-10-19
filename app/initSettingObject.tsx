@@ -19,6 +19,8 @@ const initOperationObject: operationType = {
     direction: "",
     trainType: "",
     trainTypeEng: "",
+    trainTypeZh: "",
+    trainTypeKo: "",
     trainTypeSub: "",
     trainTypeSubEng: "",
     trainTypeColor: "",
@@ -42,6 +44,9 @@ const initStationObject: stationType = {
     name: "",
     kana: "",
     eng: "",
+    zh: "",
+    ko: "",
+    subName: "",
     numIcon: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "auto" },
     // 2つ目のナンバリングは任意項目のため、既定では自動補完しない（colorMode: manual）
     numIconNext: { symbol: "", number: "", presetKey: "N_tokyu", color: "", manualSymbol: "", manualPresetKey: "N_tokyu", manualColor: "", colorMode: "manual" },
@@ -89,42 +94,45 @@ const initDispConfigObject: dispConfigType = {
     isPageAuto: true,
     pageDispList: {
         '0': [ // 始発停車
-            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
-            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+            { pageName: "defaultLineSVG.svg", dispTime: 15000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 15000, type: 0 },
         ],
         '1': [ // 走行
-            { pageName: "defaultLineSVG.svg",   dispTime: 11000, type: 0 },
-            { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
-            { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
-            { pageName: "transfers.svg",         dispTime: 11000, type: 1 },
-            { pageName: "infoMessage.svg",       dispTime: 11000, type: 3 },
+            { pageName: "defaultLineSVG.svg",   dispTime: 15000, type: 0 },
+            { pageName: "trainTypeChange.svg",   dispTime: 15000, type: 2 },
+            { pageName: "overLineSVG.svg",       dispTime: 15000, type: 0 },
+            { pageName: "transfers.svg",         dispTime: 15000, type: 1 },
+            { pageName: "infoMessage.svg",       dispTime: 15000, type: 3 },
         ],
         '2': [ // 直前
-            { pageName: "platform.svg",        dispTime: 11000, type: 0 },
-            { pageName: "doorAnim.svg",        dispTime: 11000, type: 0 },
-            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
-            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
+            { pageName: "platform.svg",        dispTime: 15000, type: 0 },
+            { pageName: "doorAnim.svg",        dispTime: 15000, type: 0 },
+            { pageName: "defaultLineSVG.svg", dispTime: 15000, type: 0 },
+            { pageName: "transfers.svg",       dispTime: 15000, type: 1 },
         ],
         '3': [ // 停車
-            { pageName: "defaultLineSVG.svg",   dispTime: 11000, type: 0 },
-            { pageName: "overLineSVG.svg",       dispTime: 11000, type: 0 },
-            { pageName: "platform.svg",          dispTime: 11000, type: 0 },
-            { pageName: "trainTypeChange.svg",   dispTime: 11000, type: 2 },
-            { pageName: "infoMessage.svg",       dispTime: 11000, type: 3 },
+            { pageName: "defaultLineSVG.svg",   dispTime: 15000, type: 0 },
+            { pageName: "overLineSVG.svg",       dispTime: 15000, type: 0 },
+            { pageName: "platform.svg",          dispTime: 15000, type: 0 },
+            { pageName: "trainTypeChange.svg",   dispTime: 15000, type: 2 },
+            { pageName: "infoMessage.svg",       dispTime: 15000, type: 3 },
         ],
         '4': [ // 通過
-            { pageName: "transfers.svg",       dispTime: 11000, type: 1 },
-            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+            { pageName: "transfers.svg",       dispTime: 15000, type: 1 },
+            { pageName: "overLineSVG.svg",    dispTime: 15000, type: 0 },
         ],
         '5': [ // 終点停車
-            { pageName: "defaultLineSVG.svg", dispTime: 11000, type: 0 },
-            { pageName: "overLineSVG.svg",    dispTime: 11000, type: 0 },
+            { pageName: "defaultLineSVG.svg", dispTime: 15000, type: 0 },
+            { pageName: "overLineSVG.svg",    dispTime: 15000, type: 0 },
         ],
     },
     langIdList: [
         { langId: 0, displayTime: 4000, transTime: 400, gapTime: 100 },
         { langId: 1, displayTime: 1500, transTime: 400, gapTime: 100 },
-        { langId: 2, displayTime: 4000, transTime: 400, gapTime: 100 }
+        { langId: 2, displayTime: 4000, transTime: 400, gapTime: 100 },
+        // 中国語・韓国語（7.54節）。表示時間などはひらがなと同じ
+        { langId: 3, displayTime: 1500, transTime: 400, gapTime: 100 },
+        { langId: 4, displayTime: 1500, transTime: 400, gapTime: 100 }
     ]
 }
 
