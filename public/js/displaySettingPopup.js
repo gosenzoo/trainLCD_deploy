@@ -17,12 +17,13 @@ const DISPLAY_SETTING_MODES = [
 // ポップアップの見た目（エディタの表示設定に合わせる）。1回だけ <head> に追加する。
 // 縦長の狭い画面では、項目名とスイッチを折り返して並べる
 const DISPLAY_SETTING_STYLE = `
+/* 中身が画面の高さに入らないときは枠の中を縦スクロールする（7.69節）。dvh 非対応のブラウザは vh を使う */
 /* スマホ（is-phone）では2倍の大きさにする（7.66節）。display.html は画面幅に合わせる指定が無く、スマホでは縮小して表示されるため */
-.is-phone .dsp-dialog { zoom: 2; max-width: calc((100vw - 32px) / 2); min-width: min(320px, calc((100vw - 32px) / 2)); }
+.is-phone .dsp-dialog { zoom: 2; max-width: calc((100vw - 32px) / 2); min-width: min(320px, calc((100vw - 32px) / 2)); max-height: calc((100vh - 32px) / 2); max-height: calc((100dvh - 32px) / 2); }
 .is-phone .dsp-preview-img { max-height: 30vh !important; }
 .is-phone .lcd-camera-btn { zoom: 2; }
 .dsp-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.dsp-dialog { background: #161b22; color: #e6edf3; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; min-width: min(320px, calc(100vw - 32px)); box-sizing: border-box; max-width: calc(100vw - 32px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); font-family: 'BIZ UDGothic', sans-serif; font-size: 14px; }
+.dsp-dialog { background: #161b22; color: #e6edf3; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; min-width: min(320px, calc(100vw - 32px)); box-sizing: border-box; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); font-family: 'BIZ UDGothic', sans-serif; font-size: 14px; }
 .dsp-title-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #30363d; }
 .dsp-title { font-weight: bold; font-size: 16px; }
 .dsp-close-x { background: none; border: none; color: #8b949e; font-size: 18px; cursor: pointer; }

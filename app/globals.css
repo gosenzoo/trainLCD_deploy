@@ -689,16 +689,29 @@ tr:hover td {
   padding: 24px;
   width: min(600px, 90vw);
   max-height: 70vh;
+  /* iPhone では実際に見えている高さ（dvh）で計算する。dvh 非対応のブラウザは上の vh を使う（7.69節） */
+  max-height: 70dvh;
+  /* 中身が入らないときは枠の中を縦スクロールする（7.69節） */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
   box-shadow: var(--shadow);
 }
 
+/* 枠がスクロールするとき、中の要素（横スクロールの表など）が縮んで潰れないようにする（7.69節）。
+   縦いっぱいダイアログのタブ本体は下の指定で残り領域を埋める */
+.modal-dialog > * {
+  flex-shrink: 0;
+}
+
 /* 縦いっぱいに表示するモーダルダイアログ修飾子（上下に余白を設けた全高表示） */
 .modal-dialog--tall {
   height: calc(100vh - 80px);
   max-height: calc(100vh - 80px);
+  /* 見えている高さ（dvh）を基準にする（7.69節） */
+  height: calc(100dvh - 80px);
+  max-height: calc(100dvh - 80px);
 }
 
 /* 縦いっぱいダイアログ内のタブ本体エリアは残り領域をすべて埋める */
