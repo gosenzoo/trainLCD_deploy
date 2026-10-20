@@ -28,6 +28,12 @@ export type PresetLine = {
     iconPresetKey: string     // 路線アイコンのプリセット名（I_*）。iconDict の presetType に使う
     numIconPresetKey: string  // ナンバリングアイコンのプリセット名（N_*）
     operatorType: PresetOperatorType  // 事業者種別（路線図の表示切り替えに使う。7.43節）
+    // 事業者略称（例: 西鉄・地下鉄・JR）とそのかな・英語（7.62節）。他社線の乗換路線名の前に付ける
+    operatorShort: string
+    operatorShortKana: string
+    operatorShortEng: string
+    // 汎用記号のプリセット名（I_train_normal1 / I_train_subway1。7.63節）。「他社線を汎用記号にする」で使う
+    genericIconPresetKey: string
 }
 
 // 路線の事業者種別（7.43節）。路線図の表示切り替えボタンの並び順もこの順
@@ -113,7 +119,8 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
         .filter(line => line.trim() !== '')
         .map(line => {
             const cols = line.split(',')
-            // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン, 事業者種別
+            // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン, 事業者種別,
+            //       事業者略称, 事業者略称かな, 事業者略称英語, 汎用記号
             const operator = cols[1]?.trim() ?? ''
             return {
                 id: cols[0]?.trim() ?? '',
@@ -126,6 +133,11 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
                 iconPresetKey: cols[7]?.trim() ?? '',
                 numIconPresetKey: cols[8]?.trim() ?? '',
                 operatorType: toOperatorType(cols[9]?.trim() ?? '', operator),
+                operatorShort: cols[10]?.trim() ?? '',
+                operatorShortKana: cols[11]?.trim() ?? '',
+                operatorShortEng: cols[12]?.trim() ?? '',
+                // 列が無い古い CSV では地上路線汎用１とする
+                genericIconPresetKey: cols[13]?.trim() || 'I_train_normal1',
             }
         })
         .filter(l => l.id !== '')

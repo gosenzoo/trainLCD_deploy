@@ -1,0 +1,2468 @@
+{
+ "lines": [
+  {
+   "no": 330,
+   "name": "高浜線",
+   "kana": "たかはません",
+   "eng": "Takahama Line",
+   "color": "#9ACD32",
+   "symbol": "IY",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "高浜",
+     "kana": "たかはま",
+     "eng": "Takahama",
+     "lat": 33.8834,
+     "lon": 132.702,
+     "number": "IY 01"
+    },
+    {
+     "name": "梅津寺",
+     "kana": "ばいしんじ",
+     "eng": "Baishinji",
+     "lat": 33.875,
+     "lon": 132.7074,
+     "number": "IY 02"
+    },
+    {
+     "name": "港山",
+     "kana": "みなとやま",
+     "eng": "Minatoyama",
+     "lat": 33.8695,
+     "lon": 132.7134,
+     "number": "IY 03"
+    },
+    {
+     "name": "三津",
+     "kana": "みつ",
+     "eng": "Mitsu",
+     "lat": 33.8638,
+     "lon": 132.7197,
+     "number": "IY 04"
+    },
+    {
+     "name": "山西",
+     "kana": "やまにし",
+     "eng": "Yamanishi",
+     "lat": 33.8553,
+     "lon": 132.7243,
+     "number": "IY 05"
+    },
+    {
+     "name": "西衣山",
+     "kana": "にしきぬやま",
+     "eng": "Nishi-Kinuyama",
+     "lat": 33.8502,
+     "lon": 132.7342,
+     "number": "IY 06"
+    },
+    {
+     "name": "衣山",
+     "kana": "きぬやま",
+     "eng": "Kinuyama",
+     "lat": 33.8523,
+     "lon": 132.744,
+     "number": "IY 07"
+    },
+    {
+     "name": "古町",
+     "kana": "こまち",
+     "eng": "Komachi",
+     "lat": 33.8471,
+     "lon": 132.7553,
+     "number": "IY 08"
+    },
+    {
+     "name": "大手町",
+     "kana": "おおてまち",
+     "eng": "Otemachi",
+     "lat": 33.8397,
+     "lon": 132.7554,
+     "number": "IY 09"
+    },
+    {
+     "name": "松山市",
+     "kana": "まつやまし",
+     "eng": "Matsuyama-shi",
+     "lat": 33.8356,
+     "lon": 132.7623,
+     "number": "IY 10"
+    }
+   ]
+  },
+  {
+   "no": 331,
+   "name": "横河原線",
+   "kana": "よこがわらせん",
+   "eng": "Yokogawara Line",
+   "color": "#00BBEE",
+   "symbol": "IY",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松山市",
+     "kana": "まつやまし",
+     "eng": "Matsuyama-shi",
+     "lat": 33.8356,
+     "lon": 132.7623,
+     "number": "IY 10"
+    },
+    {
+     "name": "石手川公園",
+     "kana": "いしてがわこうえん",
+     "eng": "Ishitegawa Park",
+     "lat": 33.8311,
+     "lon": 132.7695,
+     "number": "IY 11"
+    },
+    {
+     "name": "いよ立花",
+     "kana": "いよたちばな",
+     "eng": "Iyo-Tachibana",
+     "lat": 33.8276,
+     "lon": 132.7733,
+     "number": "IY 12"
+    },
+    {
+     "name": "福音寺",
+     "kana": "ふくおんじ",
+     "eng": "Fukuonji",
+     "lat": 33.8226,
+     "lon": 132.7886,
+     "number": "IY 13"
+    },
+    {
+     "name": "北久米",
+     "kana": "きたくめ",
+     "eng": "Kita-Kume",
+     "lat": 33.8192,
+     "lon": 132.7989,
+     "number": "IY 14"
+    },
+    {
+     "name": "久米",
+     "kana": "くめ",
+     "eng": "Kume",
+     "lat": 33.816,
+     "lon": 132.8046,
+     "number": "IY 15"
+    },
+    {
+     "name": "鷹ノ子",
+     "kana": "たかのこ",
+     "eng": "Takanoko",
+     "lat": 33.8127,
+     "lon": 132.8147,
+     "number": "IY 16"
+    },
+    {
+     "name": "平井",
+     "kana": "ひらい",
+     "eng": "Hirai",
+     "lat": 33.8085,
+     "lon": 132.8289,
+     "number": "IY 17"
+    },
+    {
+     "name": "梅本",
+     "kana": "うめのもと",
+     "eng": "Umenomoto",
+     "lat": 33.8013,
+     "lon": 132.8388,
+     "number": "IY 18"
+    },
+    {
+     "name": "牛渕団地前",
+     "kana": "うしぶちだんちまえ",
+     "eng": "Ushibuchi-Danchi",
+     "lat": 33.7978,
+     "lon": 132.846,
+     "number": "IY 19"
+    },
+    {
+     "name": "牛渕",
+     "kana": "うしぶち",
+     "eng": "Ushibuchi",
+     "lat": 33.7952,
+     "lon": 132.8561,
+     "number": "IY 20"
+    },
+    {
+     "name": "田窪",
+     "kana": "たのくぼ",
+     "eng": "Tanokubo",
+     "lat": 33.793,
+     "lon": 132.8654,
+     "number": "IY 21"
+    },
+    {
+     "name": "見奈良",
+     "kana": "みなら",
+     "eng": "Minara",
+     "lat": 33.7927,
+     "lon": 132.8734,
+     "number": "IY 22"
+    },
+    {
+     "name": "愛大医学部南口",
+     "kana": "あいだいいがくぶみなみぐち",
+     "eng": "Ehime Univ. Hospital",
+     "lat": 33.7978,
+     "lon": 132.8787,
+     "number": "IY 23"
+    },
+    {
+     "name": "横河原",
+     "kana": "よこがわら",
+     "eng": "Yokogawara",
+     "lat": 33.8034,
+     "lon": 132.8842,
+     "number": "IY 24"
+    }
+   ]
+  },
+  {
+   "no": 332,
+   "name": "郡中線",
+   "kana": "ぐんちゅうせん",
+   "eng": "Gunchu Line",
+   "color": "#F15A22",
+   "symbol": "IY",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松山市",
+     "kana": "まつやまし",
+     "eng": "Matsuyama-shi",
+     "lat": 33.8356,
+     "lon": 132.7623,
+     "number": "IY 10"
+    },
+    {
+     "name": "土橋",
+     "kana": "どばし",
+     "eng": "Dobashi",
+     "lat": 33.8328,
+     "lon": 132.7564,
+     "number": "IY 25"
+    },
+    {
+     "name": "土居田",
+     "kana": "どいだ",
+     "eng": "Doida",
+     "lat": 33.8239,
+     "lon": 132.7438,
+     "number": "IY 26"
+    },
+    {
+     "name": "余戸",
+     "kana": "ようご",
+     "eng": "Yogo",
+     "lat": 33.816,
+     "lon": 132.7337,
+     "number": "IY 27"
+    },
+    {
+     "name": "鎌田",
+     "kana": "かまた",
+     "eng": "Kamata",
+     "lat": 33.8103,
+     "lon": 132.73,
+     "number": "IY 28"
+    },
+    {
+     "name": "岡田",
+     "kana": "おかだ",
+     "eng": "Okada",
+     "lat": 33.7991,
+     "lon": 132.7242,
+     "number": "IY 29"
+    },
+    {
+     "name": "古泉",
+     "kana": "こいずみ",
+     "eng": "Koizumi",
+     "lat": 33.7925,
+     "lon": 132.717,
+     "number": "IY 30"
+    },
+    {
+     "name": "松前",
+     "kana": "まさき",
+     "eng": "Masaki",
+     "lat": 33.7861,
+     "lon": 132.705,
+     "number": "IY 31"
+    },
+    {
+     "name": "地蔵町",
+     "kana": "じぞうまち",
+     "eng": "Jizomachi",
+     "lat": 33.7795,
+     "lon": 132.7042,
+     "number": "IY 32"
+    },
+    {
+     "name": "新川",
+     "kana": "しんかわ",
+     "eng": "Shinkawa",
+     "lat": 33.7719,
+     "lon": 132.7042,
+     "number": "IY 33"
+    },
+    {
+     "name": "郡中",
+     "kana": "ぐんちゅう",
+     "eng": "Gunchu",
+     "lat": 33.7606,
+     "lon": 132.7039,
+     "number": "IY 34"
+    },
+    {
+     "name": "郡中港",
+     "kana": "ぐんちゅうこう",
+     "eng": "Gunchu Port",
+     "lat": 33.7561,
+     "lon": 132.7021,
+     "number": "IY 35"
+    }
+   ]
+  },
+  {
+   "no": 333,
+   "name": "環状線",
+   "kana": "かんじょうせん",
+   "eng": "Loop Line",
+   "color": "#008000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松山市駅",
+     "kana": "まつやましえき",
+     "eng": "Matsuyama-shi Station",
+     "lat": 33.8364,
+     "lon": 132.7627,
+     "number": "01"
+    },
+    {
+     "name": "南堀端",
+     "kana": "みなみほりばた",
+     "eng": "Minami-Horibata",
+     "lat": 33.8394,
+     "lon": 132.7612,
+     "number": "02"
+    },
+    {
+     "name": "西堀端",
+     "kana": "にしほりばた",
+     "eng": "Nishi-Horibata",
+     "lat": 33.8401,
+     "lon": 132.7583,
+     "number": "03"
+    },
+    {
+     "name": "大手町駅前",
+     "kana": "おおてまちえきまえ",
+     "eng": "Otemachi-ekimae",
+     "lat": 33.84,
+     "lon": 132.7556,
+     "number": "04"
+    },
+    {
+     "name": "JR松山駅前",
+     "kana": "じぇいあーるまつやまえきまえ",
+     "eng": "JR Matsuyama Station",
+     "lat": 33.8408,
+     "lon": 132.7524,
+     "number": "05"
+    },
+    {
+     "name": "宮田町",
+     "kana": "みやたちょう",
+     "eng": "Miyatacho",
+     "lat": 33.8439,
+     "lon": 132.7526,
+     "number": "06"
+    },
+    {
+     "name": "古町",
+     "kana": "こまち",
+     "eng": "Komachi",
+     "lat": 33.8471,
+     "lon": 132.7553,
+     "number": "07"
+    },
+    {
+     "name": "萱町六丁目",
+     "kana": "かやまちろくちょうめ",
+     "eng": "Kayamachi 6-chome",
+     "lat": 33.8512,
+     "lon": 132.7563,
+     "number": "08"
+    },
+    {
+     "name": "本町六丁目",
+     "kana": "ほんまちろくちょうめ",
+     "eng": "Hommachi 6-chome",
+     "lat": 33.8533,
+     "lon": 132.7589,
+     "number": "09"
+    },
+    {
+     "name": "木屋町",
+     "kana": "きやちょう",
+     "eng": "Kiyacho",
+     "lat": 33.8535,
+     "lon": 132.7606,
+     "number": "10"
+    },
+    {
+     "name": "高砂町",
+     "kana": "たかさごちょう",
+     "eng": "Takasagocho",
+     "lat": 33.8514,
+     "lon": 132.7625,
+     "number": "11"
+    },
+    {
+     "name": "清水町",
+     "kana": "しみずまち",
+     "eng": "Shimizumachi",
+     "lat": 33.8491,
+     "lon": 132.7647,
+     "number": "12"
+    },
+    {
+     "name": "鉄砲町",
+     "kana": "てっぽうちょう",
+     "eng": "Teppocho",
+     "lat": 33.848,
+     "lon": 132.7692,
+     "number": "13"
+    },
+    {
+     "name": "赤十字病院前",
+     "kana": "せきじゅうじびょういんまえ",
+     "eng": "Red Cross Hospital",
+     "lat": 33.848,
+     "lon": 132.7725,
+     "number": "14"
+    },
+    {
+     "name": "平和通一丁目",
+     "kana": "へいわどおりいっちょうめ",
+     "eng": "Heiwadori 1-chome",
+     "lat": 33.8476,
+     "lon": 132.7745,
+     "number": "15"
+    },
+    {
+     "name": "上一万",
+     "kana": "かみいちまん",
+     "eng": "Kamiichiman",
+     "lat": 33.8466,
+     "lon": 132.7755,
+     "number": "16"
+    },
+    {
+     "name": "警察署前",
+     "kana": "けいさつしょまえ",
+     "eng": "Police Station",
+     "lat": 33.8443,
+     "lon": 132.7754,
+     "number": "17"
+    },
+    {
+     "name": "勝山町",
+     "kana": "かつやまちょう",
+     "eng": "Katsuyamacho",
+     "lat": 33.8417,
+     "lon": 132.7749,
+     "number": "18"
+    },
+    {
+     "name": "大街道",
+     "kana": "おおかいどう",
+     "eng": "Okaido",
+     "lat": 33.8412,
+     "lon": 132.7699,
+     "number": "19"
+    },
+    {
+     "name": "県庁前",
+     "kana": "けんちょうまえ",
+     "eng": "Ehime Pref. Office",
+     "lat": 33.8411,
+     "lon": 132.7665,
+     "number": "20"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Matsuyama City Hall",
+     "lat": 33.84,
+     "lon": 132.7649,
+     "number": "21"
+    },
+    {
+     "name": "南堀端",
+     "kana": "みなみほりばた",
+     "eng": "Minami-Horibata",
+     "lat": 33.8394,
+     "lon": 132.7612,
+     "number": "02"
+    },
+    {
+     "name": "松山市駅",
+     "kana": "まつやましえき",
+     "eng": "Matsuyama-shi Station",
+     "lat": 33.8364,
+     "lon": 132.7627,
+     "number": "01"
+    }
+   ]
+  },
+  {
+   "no": 334,
+   "name": "松山市駅線",
+   "kana": "まつやましえきせん",
+   "eng": "Matsuyamashi Station Line",
+   "color": "#FF0000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松山市駅",
+     "kana": "まつやましえき",
+     "eng": "Matsuyama-shi Station",
+     "lat": 33.8364,
+     "lon": 132.7627,
+     "number": "01"
+    },
+    {
+     "name": "南堀端",
+     "kana": "みなみほりばた",
+     "eng": "Minami-Horibata",
+     "lat": 33.8394,
+     "lon": 132.7612,
+     "number": "02"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Matsuyama City Hall",
+     "lat": 33.84,
+     "lon": 132.7649,
+     "number": "21"
+    },
+    {
+     "name": "県庁前",
+     "kana": "けんちょうまえ",
+     "eng": "Ehime Pref. Office",
+     "lat": 33.8411,
+     "lon": 132.7665,
+     "number": "20"
+    },
+    {
+     "name": "大街道",
+     "kana": "おおかいどう",
+     "eng": "Okaido",
+     "lat": 33.8412,
+     "lon": 132.7699,
+     "number": "19"
+    },
+    {
+     "name": "勝山町",
+     "kana": "かつやまちょう",
+     "eng": "Katsuyamacho",
+     "lat": 33.8417,
+     "lon": 132.7749,
+     "number": "18"
+    },
+    {
+     "name": "警察署前",
+     "kana": "けいさつしょまえ",
+     "eng": "Police Station",
+     "lat": 33.8443,
+     "lon": 132.7754,
+     "number": "17"
+    },
+    {
+     "name": "上一万",
+     "kana": "かみいちまん",
+     "eng": "Kamiichiman",
+     "lat": 33.8466,
+     "lon": 132.7755,
+     "number": "16"
+    },
+    {
+     "name": "南町",
+     "kana": "みなみまち",
+     "eng": "Minamimachi",
+     "lat": 33.8475,
+     "lon": 132.78,
+     "number": "22"
+    },
+    {
+     "name": "道後公園",
+     "kana": "どうごこうえん",
+     "eng": "Dogo Park",
+     "lat": 33.8483,
+     "lon": 132.7849,
+     "number": "23"
+    },
+    {
+     "name": "道後温泉",
+     "kana": "どうごおんせん",
+     "eng": "Dogo Onsen",
+     "lat": 33.8504,
+     "lon": 132.785,
+     "number": "24"
+    }
+   ]
+  },
+  {
+   "no": 335,
+   "name": "JR松山駅前線",
+   "kana": "じぇいあーるまつやまえきまえせん",
+   "eng": "JR Matsuyama Ekimae Line",
+   "color": "#0000FF",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "JR松山駅前",
+     "kana": "じぇいあーるまつやまえきまえ",
+     "eng": "JR Matsuyama Station",
+     "lat": 33.8408,
+     "lon": 132.7524,
+     "number": "05"
+    },
+    {
+     "name": "大手町駅前",
+     "kana": "おおてまちえきまえ",
+     "eng": "Otemachi-ekimae",
+     "lat": 33.84,
+     "lon": 132.7556,
+     "number": "04"
+    },
+    {
+     "name": "西堀端",
+     "kana": "にしほりばた",
+     "eng": "Nishi-Horibata",
+     "lat": 33.8401,
+     "lon": 132.7583,
+     "number": "03"
+    },
+    {
+     "name": "南堀端",
+     "kana": "みなみほりばた",
+     "eng": "Minami-Horibata",
+     "lat": 33.8394,
+     "lon": 132.7612,
+     "number": "02"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Matsuyama City Hall",
+     "lat": 33.84,
+     "lon": 132.7649,
+     "number": "21"
+    },
+    {
+     "name": "県庁前",
+     "kana": "けんちょうまえ",
+     "eng": "Ehime Pref. Office",
+     "lat": 33.8411,
+     "lon": 132.7665,
+     "number": "20"
+    },
+    {
+     "name": "大街道",
+     "kana": "おおかいどう",
+     "eng": "Okaido",
+     "lat": 33.8412,
+     "lon": 132.7699,
+     "number": "19"
+    },
+    {
+     "name": "勝山町",
+     "kana": "かつやまちょう",
+     "eng": "Katsuyamacho",
+     "lat": 33.8417,
+     "lon": 132.7749,
+     "number": "18"
+    },
+    {
+     "name": "警察署前",
+     "kana": "けいさつしょまえ",
+     "eng": "Police Station",
+     "lat": 33.8443,
+     "lon": 132.7754,
+     "number": "17"
+    },
+    {
+     "name": "上一万",
+     "kana": "かみいちまん",
+     "eng": "Kamiichiman",
+     "lat": 33.8466,
+     "lon": 132.7755,
+     "number": "16"
+    },
+    {
+     "name": "南町",
+     "kana": "みなみまち",
+     "eng": "Minamimachi",
+     "lat": 33.8475,
+     "lon": 132.78,
+     "number": "22"
+    },
+    {
+     "name": "道後公園",
+     "kana": "どうごこうえん",
+     "eng": "Dogo Park",
+     "lat": 33.8483,
+     "lon": 132.7849,
+     "number": "23"
+    },
+    {
+     "name": "道後温泉",
+     "kana": "どうごおんせん",
+     "eng": "Dogo Onsen",
+     "lat": 33.8504,
+     "lon": 132.785,
+     "number": "24"
+    }
+   ]
+  },
+  {
+   "no": 336,
+   "name": "本町線",
+   "kana": "ほんまちせん",
+   "eng": "Hommachi Line",
+   "color": "#000000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "伊予鉄道",
+   "operatorShort": "伊予鉄",
+   "operatorShortKana": "いよてつ",
+   "operatorShortEng": "Iyotetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松山市駅",
+     "kana": "まつやましえき",
+     "eng": "Matsuyama-shi Station",
+     "lat": 33.8364,
+     "lon": 132.7627,
+     "number": "01"
+    },
+    {
+     "name": "南堀端",
+     "kana": "みなみほりばた",
+     "eng": "Minami-Horibata",
+     "lat": 33.8394,
+     "lon": 132.7612,
+     "number": "02"
+    },
+    {
+     "name": "本町一丁目",
+     "kana": "ほんまちいっちょうめ",
+     "eng": "Hommachi 1-chome",
+     "lat": 33.8404,
+     "lon": 132.7588,
+     "number": "25"
+    },
+    {
+     "name": "本町三丁目",
+     "kana": "ほんまちさんちょうめ",
+     "eng": "Hommachi 3-chome",
+     "lat": 33.8452,
+     "lon": 132.7588,
+     "number": "26"
+    },
+    {
+     "name": "本町四丁目",
+     "kana": "ほんまちよんちょうめ",
+     "eng": "Hommachi 4-chome",
+     "lat": 33.848,
+     "lon": 132.7588,
+     "number": "27"
+    },
+    {
+     "name": "本町五丁目",
+     "kana": "ほんまちごちょうめ",
+     "eng": "Hommachi 5-chome",
+     "lat": 33.8507,
+     "lon": 132.7588,
+     "number": "28"
+    },
+    {
+     "name": "本町六丁目",
+     "kana": "ほんまちろくちょうめ",
+     "eng": "Hommachi 6-chome",
+     "lat": 33.8533,
+     "lon": 132.7589,
+     "number": "29"
+    }
+   ]
+  },
+  {
+   "no": 338,
+   "name": "琴平線",
+   "kana": "ことひらせん",
+   "eng": "Kotohira Line",
+   "color": "#FFD400",
+   "symbol": "K",
+   "operatorType": "私鉄",
+   "operator": "高松琴平電気鉄道",
+   "operatorShort": "ことでん",
+   "operatorShortKana": "ことでん",
+   "operatorShortEng": "Kotoden",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "高松築港",
+     "kana": "たかまつちっこう",
+     "eng": "Takamatsu-Chikko",
+     "lat": 34.3508,
+     "lon": 134.0495,
+     "number": "K 00"
+    },
+    {
+     "name": "片原町",
+     "kana": "かたはらまち",
+     "eng": "Kataharamachi",
+     "lat": 34.3458,
+     "lon": 134.0541,
+     "number": "K 01"
+    },
+    {
+     "name": "瓦町",
+     "kana": "かわらまち",
+     "eng": "Kawaramachi",
+     "lat": 34.3392,
+     "lon": 134.0526,
+     "number": "K 02"
+    },
+    {
+     "name": "栗林公園",
+     "kana": "りつりんこうえん",
+     "eng": "Ritsurin-Koen",
+     "lat": 34.3289,
+     "lon": 134.0511,
+     "number": "K 03"
+    },
+    {
+     "name": "三条",
+     "kana": "さんじょう",
+     "eng": "Sanjo",
+     "lat": 34.3197,
+     "lon": 134.0495,
+     "number": "K 04"
+    },
+    {
+     "name": "伏石",
+     "kana": "ふせいし",
+     "eng": "Fuseishi",
+     "lat": 34.3099,
+     "lon": 134.0478,
+     "number": "K 04A"
+    },
+    {
+     "name": "太田",
+     "kana": "おおた",
+     "eng": "Ota",
+     "lat": 34.2992,
+     "lon": 134.0459,
+     "number": "K 05"
+    },
+    {
+     "name": "仏生山",
+     "kana": "ぶっしょうざん",
+     "eng": "Busshozan",
+     "lat": 34.2833,
+     "lon": 134.0427,
+     "number": "K 06"
+    },
+    {
+     "name": "空港通り",
+     "kana": "くうこうどおり",
+     "eng": "Kukodori",
+     "lat": 34.281,
+     "lon": 134.0334,
+     "number": "K 07"
+    },
+    {
+     "name": "一宮",
+     "kana": "いちのみや",
+     "eng": "Ichinomiya",
+     "lat": 34.283,
+     "lon": 134.0226,
+     "number": "K 08"
+    },
+    {
+     "name": "円座",
+     "kana": "えんざ",
+     "eng": "Enza",
+     "lat": 34.2845,
+     "lon": 134.0094,
+     "number": "K 09"
+    },
+    {
+     "name": "岡本",
+     "kana": "おかもと",
+     "eng": "Okamoto",
+     "lat": 34.2702,
+     "lon": 133.9892,
+     "number": "K 10"
+    },
+    {
+     "name": "挿頭丘",
+     "kana": "かざしがおか",
+     "eng": "Kazashigaoka",
+     "lat": 34.2621,
+     "lon": 133.9796,
+     "number": "K 11"
+    },
+    {
+     "name": "畑田",
+     "kana": "はただ",
+     "eng": "Hatada",
+     "lat": 34.2593,
+     "lon": 133.9721,
+     "number": "K 12"
+    },
+    {
+     "name": "陶",
+     "kana": "すえ",
+     "eng": "Sue",
+     "lat": 34.2504,
+     "lon": 133.9476,
+     "number": "K 13"
+    },
+    {
+     "name": "綾川",
+     "kana": "あやがわ",
+     "eng": "Ayagawa",
+     "lat": 34.2495,
+     "lon": 133.9317,
+     "number": "K 14"
+    },
+    {
+     "name": "滝宮",
+     "kana": "たきのみや",
+     "eng": "Takinomiya",
+     "lat": 34.2481,
+     "lon": 133.9222,
+     "number": "K 15"
+    },
+    {
+     "name": "羽床",
+     "kana": "はゆか",
+     "eng": "Hayuka",
+     "lat": 34.2411,
+     "lon": 133.902,
+     "number": "K 16"
+    },
+    {
+     "name": "栗熊",
+     "kana": "くりくま",
+     "eng": "Kurikuma",
+     "lat": 34.2339,
+     "lon": 133.8841,
+     "number": "K 17"
+    },
+    {
+     "name": "岡田",
+     "kana": "おかだ",
+     "eng": "Okada",
+     "lat": 34.2208,
+     "lon": 133.8609,
+     "number": "K 18"
+    },
+    {
+     "name": "羽間",
+     "kana": "はざま",
+     "eng": "Hazama",
+     "lat": 34.2096,
+     "lon": 133.8472,
+     "number": "K 19"
+    },
+    {
+     "name": "榎井",
+     "kana": "えない",
+     "eng": "Enai",
+     "lat": 34.1943,
+     "lon": 133.8293,
+     "number": "K 20"
+    },
+    {
+     "name": "琴電琴平",
+     "kana": "ことでんことひら",
+     "eng": "Kotoden-Kotohira",
+     "lat": 34.1909,
+     "lon": 133.8192,
+     "number": "K 21"
+    }
+   ]
+  },
+  {
+   "no": 339,
+   "name": "長尾線",
+   "kana": "ながおせん",
+   "eng": "Nagao Line",
+   "color": "#009966",
+   "symbol": "N",
+   "operatorType": "私鉄",
+   "operator": "高松琴平電気鉄道",
+   "operatorShort": "ことでん",
+   "operatorShortKana": "ことでん",
+   "operatorShortEng": "Kotoden",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "高松築港",
+     "kana": "たかまつちっこう",
+     "eng": "Takamatsu-Chikko",
+     "lat": 34.3508,
+     "lon": 134.0495,
+     "number": "N 00"
+    },
+    {
+     "name": "片原町",
+     "kana": "かたはらまち",
+     "eng": "Kataharamachi",
+     "lat": 34.3458,
+     "lon": 134.0541,
+     "number": "N 01"
+    },
+    {
+     "name": "瓦町",
+     "kana": "かわらまち",
+     "eng": "Kawaramachi",
+     "lat": 34.3392,
+     "lon": 134.0526,
+     "number": "N 02"
+    },
+    {
+     "name": "花園",
+     "kana": "はなぞの",
+     "eng": "Hanazono",
+     "lat": 34.3342,
+     "lon": 134.0594,
+     "number": "N 03"
+    },
+    {
+     "name": "林道",
+     "kana": "はやしみち",
+     "eng": "Hayashimichi",
+     "lat": 34.3235,
+     "lon": 134.0731,
+     "number": "N 04"
+    },
+    {
+     "name": "木太東口",
+     "kana": "きたひがしぐち",
+     "eng": "Kita-Higashiguchi",
+     "lat": 34.3197,
+     "lon": 134.0796,
+     "number": "N 05"
+    },
+    {
+     "name": "元山",
+     "kana": "もとやま",
+     "eng": "Motoyama",
+     "lat": 34.3104,
+     "lon": 134.0838,
+     "number": "N 06"
+    },
+    {
+     "name": "水田",
+     "kana": "みずた",
+     "eng": "Mizuta",
+     "lat": 34.303,
+     "lon": 134.0926,
+     "number": "N 07"
+    },
+    {
+     "name": "西前田",
+     "kana": "にしまえだ",
+     "eng": "Nishi-Maeda",
+     "lat": 34.2961,
+     "lon": 134.1045,
+     "number": "N 08"
+    },
+    {
+     "name": "高田",
+     "kana": "たかた",
+     "eng": "Takata",
+     "lat": 34.2885,
+     "lon": 134.1122,
+     "number": "N 09"
+    },
+    {
+     "name": "池戸",
+     "kana": "いけのべ",
+     "eng": "Ikenobe",
+     "lat": 34.2786,
+     "lon": 134.1197,
+     "number": "N 10"
+    },
+    {
+     "name": "農学部前",
+     "kana": "のうがくぶまえ",
+     "eng": "Nogakubumae",
+     "lat": 34.2739,
+     "lon": 134.1255,
+     "number": "N 11"
+    },
+    {
+     "name": "平木",
+     "kana": "ひらぎ",
+     "eng": "Hiragi",
+     "lat": 34.2721,
+     "lon": 134.1312,
+     "number": "N 12"
+    },
+    {
+     "name": "学園通り",
+     "kana": "がくえんどおり",
+     "eng": "Gakuendori",
+     "lat": 34.2706,
+     "lon": 134.1369,
+     "number": "N 13"
+    },
+    {
+     "name": "白山",
+     "kana": "しらやま",
+     "eng": "Shirayama",
+     "lat": 34.2668,
+     "lon": 134.1502,
+     "number": "N 14"
+    },
+    {
+     "name": "井戸",
+     "kana": "いど",
+     "eng": "Ido",
+     "lat": 34.2667,
+     "lon": 134.1561,
+     "number": "N 15"
+    },
+    {
+     "name": "公文明",
+     "kana": "くもんみょう",
+     "eng": "Kumommyo",
+     "lat": 34.2667,
+     "lon": 134.1619,
+     "number": "N 16"
+    },
+    {
+     "name": "長尾",
+     "kana": "ながお",
+     "eng": "Nagao",
+     "lat": 34.2666,
+     "lon": 134.1694,
+     "number": "N 17"
+    }
+   ]
+  },
+  {
+   "no": 340,
+   "name": "志度線",
+   "kana": "しどせん",
+   "eng": "Shido Line",
+   "color": "#FF3366",
+   "symbol": "S",
+   "operatorType": "私鉄",
+   "operator": "高松琴平電気鉄道",
+   "operatorShort": "ことでん",
+   "operatorShortKana": "ことでん",
+   "operatorShortEng": "Kotoden",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "瓦町",
+     "kana": "かわらまち",
+     "eng": "Kawaramachi",
+     "lat": 34.3392,
+     "lon": 134.0526,
+     "number": "S 00"
+    },
+    {
+     "name": "今橋",
+     "kana": "いまばし",
+     "eng": "Imabashi",
+     "lat": 34.3416,
+     "lon": 134.0588,
+     "number": "S 01"
+    },
+    {
+     "name": "松島二丁目",
+     "kana": "まつしまにちょうめ",
+     "eng": "Matsushima-Nichome",
+     "lat": 34.34,
+     "lon": 134.0646,
+     "number": "S 02"
+    },
+    {
+     "name": "沖松島",
+     "kana": "おきまつしま",
+     "eng": "Oki-Matsushima",
+     "lat": 34.3412,
+     "lon": 134.0725,
+     "number": "S 03"
+    },
+    {
+     "name": "春日川",
+     "kana": "かすががわ",
+     "eng": "Kasugagawa",
+     "lat": 34.341,
+     "lon": 134.0836,
+     "number": "S 04"
+    },
+    {
+     "name": "潟元",
+     "kana": "かたもと",
+     "eng": "Katamoto",
+     "lat": 34.3412,
+     "lon": 134.0979,
+     "number": "S 05"
+    },
+    {
+     "name": "琴電屋島",
+     "kana": "ことでんやしま",
+     "eng": "Kotoden-Yashima",
+     "lat": 34.3415,
+     "lon": 134.1059,
+     "number": "S 06"
+    },
+    {
+     "name": "古高松",
+     "kana": "ふるたかまつ",
+     "eng": "Furu-Takamatsu",
+     "lat": 34.3408,
+     "lon": 134.1125,
+     "number": "S 07"
+    },
+    {
+     "name": "八栗",
+     "kana": "やくり",
+     "eng": "Yakuri",
+     "lat": 34.3446,
+     "lon": 134.122,
+     "number": "S 08"
+    },
+    {
+     "name": "六万寺",
+     "kana": "ろくまんじ",
+     "eng": "Rokumanji",
+     "lat": 34.3428,
+     "lon": 134.134,
+     "number": "S 09"
+    },
+    {
+     "name": "大町",
+     "kana": "おおまち",
+     "eng": "Omachi",
+     "lat": 34.3373,
+     "lon": 134.1412,
+     "number": "S 10"
+    },
+    {
+     "name": "八栗新道",
+     "kana": "やくりしんみち",
+     "eng": "Yakuri-Shimmichi",
+     "lat": 34.3367,
+     "lon": 134.1475,
+     "number": "S 11"
+    },
+    {
+     "name": "塩屋",
+     "kana": "しおや",
+     "eng": "Shioya",
+     "lat": 34.3356,
+     "lon": 134.1552,
+     "number": "S 12"
+    },
+    {
+     "name": "房前",
+     "kana": "ふさざき",
+     "eng": "Fusazaki",
+     "lat": 34.3323,
+     "lon": 134.1585,
+     "number": "S 13"
+    },
+    {
+     "name": "原",
+     "kana": "はら",
+     "eng": "Hara",
+     "lat": 34.3265,
+     "lon": 134.1636,
+     "number": "S 14"
+    },
+    {
+     "name": "琴電志度",
+     "kana": "ことでんしど",
+     "eng": "Kotoden-Shido",
+     "lat": 34.3225,
+     "lon": 134.1729,
+     "number": "S 15"
+    }
+   ]
+  },
+  {
+   "no": 341,
+   "name": "後免線",
+   "kana": "ごめんせん",
+   "eng": "Gomen Line",
+   "color": "#008000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "とさでん交通",
+   "operatorShort": "とさでん",
+   "operatorShortKana": "とさでん",
+   "operatorShortEng": "Tosaden",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "後免町",
+     "kana": "ごめんまち",
+     "eng": "Gomemmachi",
+     "lat": 33.5746,
+     "lon": 133.6514,
+     "number": ""
+    },
+    {
+     "name": "後免東町",
+     "kana": "ごめんひがしまち",
+     "eng": "Gomen-Higashimachi",
+     "lat": 33.5745,
+     "lon": 133.6479,
+     "number": ""
+    },
+    {
+     "name": "後免中町",
+     "kana": "ごめんなかまち",
+     "eng": "Gomen-Nakamachi",
+     "lat": 33.5755,
+     "lon": 133.6458,
+     "number": ""
+    },
+    {
+     "name": "後免西町",
+     "kana": "ごめんにしまち",
+     "eng": "Gomen-Nishimachi",
+     "lat": 33.5758,
+     "lon": 133.6427,
+     "number": ""
+    },
+    {
+     "name": "東工業前",
+     "kana": "ひがしこうぎょうまえ",
+     "eng": "Higashikogyo-mae",
+     "lat": 33.5764,
+     "lon": 133.638,
+     "number": ""
+    },
+    {
+     "name": "住吉通",
+     "kana": "すみよしどおり",
+     "eng": "Sumiyoshi-dori",
+     "lat": 33.5766,
+     "lon": 133.6361,
+     "number": ""
+    },
+    {
+     "name": "篠原",
+     "kana": "しのはら",
+     "eng": "Shinohara",
+     "lat": 33.577,
+     "lon": 133.6313,
+     "number": ""
+    },
+    {
+     "name": "小篭通",
+     "kana": "こごめどおり",
+     "eng": "Kogome-dori",
+     "lat": 33.5763,
+     "lon": 133.6257,
+     "number": ""
+    },
+    {
+     "name": "長崎",
+     "kana": "ながさき",
+     "eng": "Nagasaki",
+     "lat": 33.5751,
+     "lon": 133.6208,
+     "number": ""
+    },
+    {
+     "name": "明見橋",
+     "kana": "みょうけんばし",
+     "eng": "Myokenbashi",
+     "lat": 33.5746,
+     "lon": 133.6175,
+     "number": ""
+    },
+    {
+     "name": "一条橋",
+     "kana": "いちじょうばし",
+     "eng": "Ichijobashi",
+     "lat": 33.5748,
+     "lon": 133.6138,
+     "number": ""
+    },
+    {
+     "name": "清和学園前",
+     "kana": "せいわがくえんまえ",
+     "eng": "Seiwagakuen-mae",
+     "lat": 33.575,
+     "lon": 133.6124,
+     "number": ""
+    },
+    {
+     "name": "領石通",
+     "kana": "りょうせきどおり",
+     "eng": "Ryoseki-dori",
+     "lat": 33.5742,
+     "lon": 133.6077,
+     "number": ""
+    },
+    {
+     "name": "北浦",
+     "kana": "きたうら",
+     "eng": "Kitaura",
+     "lat": 33.5736,
+     "lon": 133.6038,
+     "number": ""
+    },
+    {
+     "name": "舟戸",
+     "kana": "ふなと",
+     "eng": "Funato",
+     "lat": 33.5703,
+     "lon": 133.5995,
+     "number": ""
+    },
+    {
+     "name": "鹿児",
+     "kana": "かこ",
+     "eng": "Kako",
+     "lat": 33.5671,
+     "lon": 133.5975,
+     "number": ""
+    },
+    {
+     "name": "田辺島通",
+     "kana": "たべしまどおり",
+     "eng": "Tabeshima-dori",
+     "lat": 33.5664,
+     "lon": 133.593,
+     "number": ""
+    },
+    {
+     "name": "東新木",
+     "kana": "ひがししんぎ",
+     "eng": "Higashi-Shingi",
+     "lat": 33.5645,
+     "lon": 133.5902,
+     "number": ""
+    },
+    {
+     "name": "新木",
+     "kana": "しんぎ",
+     "eng": "Shingi",
+     "lat": 33.5625,
+     "lon": 133.5869,
+     "number": ""
+    },
+    {
+     "name": "介良通",
+     "kana": "けらどおり",
+     "eng": "Kera-dori",
+     "lat": 33.5601,
+     "lon": 133.5833,
+     "number": ""
+    },
+    {
+     "name": "文珠通",
+     "kana": "もんじゅどおり",
+     "eng": "Monju-dori",
+     "lat": 33.5593,
+     "lon": 133.5794,
+     "number": ""
+    },
+    {
+     "name": "高須",
+     "kana": "たかす",
+     "eng": "Takasu",
+     "lat": 33.5594,
+     "lon": 133.577,
+     "number": ""
+    },
+    {
+     "name": "県立美術館通",
+     "kana": "けんりつびじゅつかんどおり",
+     "eng": "Kenritsu-Bijutsukan-dori",
+     "lat": 33.5589,
+     "lon": 133.5752,
+     "number": ""
+    },
+    {
+     "name": "西高須",
+     "kana": "にしたかす",
+     "eng": "Nishi-Takasu",
+     "lat": 33.5583,
+     "lon": 133.5732,
+     "number": ""
+    },
+    {
+     "name": "葛島橋東詰",
+     "kana": "かずらしまばしひがしづめ",
+     "eng": "Kazurashimabashi-Higashizume",
+     "lat": 33.557,
+     "lon": 133.5694,
+     "number": ""
+    },
+    {
+     "name": "知寄町三丁目",
+     "kana": "ちよりちょうさんちょうめ",
+     "eng": "Chiyoricho 3-chome",
+     "lat": 33.5575,
+     "lon": 133.5649,
+     "number": ""
+    },
+    {
+     "name": "知寄町",
+     "kana": "ちよりちょう",
+     "eng": "Chiyoricho",
+     "lat": 33.5579,
+     "lon": 133.5615,
+     "number": ""
+    },
+    {
+     "name": "知寄町二丁目",
+     "kana": "ちよりちょうにちょうめ",
+     "eng": "Chiyoricho 2-chome",
+     "lat": 33.5581,
+     "lon": 133.5601,
+     "number": ""
+    },
+    {
+     "name": "知寄町一丁目",
+     "kana": "ちよりちょういっちょうめ",
+     "eng": "Chiyoricho 1-chome",
+     "lat": 33.5585,
+     "lon": 133.5564,
+     "number": ""
+    },
+    {
+     "name": "宝永町",
+     "kana": "ほうえいちょう",
+     "eng": "Hoeicho",
+     "lat": 33.5587,
+     "lon": 133.5536,
+     "number": ""
+    },
+    {
+     "name": "菜園場町",
+     "kana": "さえんばちょう",
+     "eng": "Saembacho",
+     "lat": 33.5591,
+     "lon": 133.5483,
+     "number": ""
+    },
+    {
+     "name": "デンテツターミナルビル前",
+     "kana": "でんてつたーみなるびるまえ",
+     "eng": "Dentetsu Terminal Building-mae",
+     "lat": 33.5594,
+     "lon": 133.5441,
+     "number": ""
+    },
+    {
+     "name": "はりまや橋",
+     "kana": "はりまやばし",
+     "eng": "Harimayabashi",
+     "lat": 33.5596,
+     "lon": 133.5424,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 343,
+   "name": "伊野線",
+   "kana": "いのせん",
+   "eng": "Ino Line",
+   "color": "#008000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "とさでん交通",
+   "operatorShort": "とさでん",
+   "operatorShortKana": "とさでん",
+   "operatorShortEng": "Tosaden",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "はりまや橋",
+     "kana": "はりまやばし",
+     "eng": "Harimayabashi",
+     "lat": 33.5596,
+     "lon": 133.5424,
+     "number": ""
+    },
+    {
+     "name": "堀詰",
+     "kana": "ほりづめ",
+     "eng": "Horizume",
+     "lat": 33.5595,
+     "lon": 133.5392,
+     "number": ""
+    },
+    {
+     "name": "大橋通",
+     "kana": "おおはしどおり",
+     "eng": "Ohashidori",
+     "lat": 33.559,
+     "lon": 133.5367,
+     "number": ""
+    },
+    {
+     "name": "高知城前",
+     "kana": "こうちじょうまえ",
+     "eng": "Kochijo-mae",
+     "lat": 33.5585,
+     "lon": 133.5339,
+     "number": ""
+    },
+    {
+     "name": "県庁前",
+     "kana": "けんちょうまえ",
+     "eng": "Kencho-mae",
+     "lat": 33.558,
+     "lon": 133.5319,
+     "number": ""
+    },
+    {
+     "name": "グランド通",
+     "kana": "ぐらんどどおり",
+     "eng": "Gurando-dori",
+     "lat": 33.5577,
+     "lon": 133.5298,
+     "number": ""
+    },
+    {
+     "name": "枡形",
+     "kana": "ますがた",
+     "eng": "Masugata",
+     "lat": 33.5575,
+     "lon": 133.5276,
+     "number": ""
+    },
+    {
+     "name": "上町一丁目",
+     "kana": "かみまちいっちょうめ",
+     "eng": "Kamimachi 1-chome",
+     "lat": 33.5574,
+     "lon": 133.5255,
+     "number": ""
+    },
+    {
+     "name": "上町二丁目",
+     "kana": "かみまちにちょうめ",
+     "eng": "Kamimachi 2-chome",
+     "lat": 33.5574,
+     "lon": 133.5234,
+     "number": ""
+    },
+    {
+     "name": "上町四丁目",
+     "kana": "かみまちよんちょうめ",
+     "eng": "Kamimachi 4-chome",
+     "lat": 33.5574,
+     "lon": 133.5201,
+     "number": ""
+    },
+    {
+     "name": "上町五丁目",
+     "kana": "かみまちごちょうめ",
+     "eng": "Kamimachi 5-chome",
+     "lat": 33.5573,
+     "lon": 133.5171,
+     "number": ""
+    },
+    {
+     "name": "旭町一丁目",
+     "kana": "あさひまちいっちょうめ",
+     "eng": "Asahimachi 1-chome",
+     "lat": 33.5567,
+     "lon": 133.5138,
+     "number": ""
+    },
+    {
+     "name": "旭駅前通",
+     "kana": "あさひえきまえどおり",
+     "eng": "Asahiekimae-dori",
+     "lat": 33.556,
+     "lon": 133.5094,
+     "number": ""
+    },
+    {
+     "name": "旭町三丁目",
+     "kana": "あさひまちさんちょうめ",
+     "eng": "Asahimachi 3-chome",
+     "lat": 33.5557,
+     "lon": 133.5065,
+     "number": ""
+    },
+    {
+     "name": "蛍橋",
+     "kana": "ほたるばし",
+     "eng": "Hotarubashi",
+     "lat": 33.5554,
+     "lon": 133.5032,
+     "number": ""
+    },
+    {
+     "name": "鏡川橋",
+     "kana": "かがみがわばし",
+     "eng": "Kagamigawabashi",
+     "lat": 33.5557,
+     "lon": 133.4986,
+     "number": ""
+    },
+    {
+     "name": "鴨部",
+     "kana": "かもべ",
+     "eng": "Kamobe",
+     "lat": 33.5522,
+     "lon": 133.4968,
+     "number": ""
+    },
+    {
+     "name": "曙町東町",
+     "kana": "あけぼのちょうひがしまち",
+     "eng": "Akebonocho-Higashimachi",
+     "lat": 33.5516,
+     "lon": 133.4934,
+     "number": ""
+    },
+    {
+     "name": "曙町",
+     "kana": "あけぼのちょう",
+     "eng": "Akebonocho",
+     "lat": 33.5511,
+     "lon": 133.4908,
+     "number": ""
+    },
+    {
+     "name": "朝倉",
+     "kana": "あさくら",
+     "eng": "Asakura",
+     "lat": 33.5507,
+     "lon": 133.4882,
+     "number": ""
+    },
+    {
+     "name": "朝倉駅前",
+     "kana": "あさくらえきまえ",
+     "eng": "Asakura-ekimae",
+     "lat": 33.5509,
+     "lon": 133.4856,
+     "number": ""
+    },
+    {
+     "name": "朝倉神社前",
+     "kana": "あさくらじんじゃまえ",
+     "eng": "Asakurajinja-mae",
+     "lat": 33.5519,
+     "lon": 133.481,
+     "number": ""
+    },
+    {
+     "name": "宮の奥",
+     "kana": "みやのおく",
+     "eng": "Miyanooku",
+     "lat": 33.5524,
+     "lon": 133.476,
+     "number": ""
+    },
+    {
+     "name": "咥内",
+     "kana": "こうない",
+     "eng": "Konai",
+     "lat": 33.5523,
+     "lon": 133.4705,
+     "number": ""
+    },
+    {
+     "name": "宇治団地前",
+     "kana": "うじだんちまえ",
+     "eng": "Ujidanchi-mae",
+     "lat": 33.5519,
+     "lon": 133.4612,
+     "number": ""
+    },
+    {
+     "name": "八代通",
+     "kana": "やしろどおり",
+     "eng": "Yashiro-dori",
+     "lat": 33.5522,
+     "lon": 133.4567,
+     "number": ""
+    },
+    {
+     "name": "中山",
+     "kana": "なかやま",
+     "eng": "Nakayama",
+     "lat": 33.5517,
+     "lon": 133.4528,
+     "number": ""
+    },
+    {
+     "name": "枝川",
+     "kana": "えだがわ",
+     "eng": "Edagawa",
+     "lat": 33.5514,
+     "lon": 133.4496,
+     "number": ""
+    },
+    {
+     "name": "伊野商業前",
+     "kana": "いのしょうぎょうまえ",
+     "eng": "Inoshogyo-mae",
+     "lat": 33.5502,
+     "lon": 133.4443,
+     "number": ""
+    },
+    {
+     "name": "北内",
+     "kana": "きたうち",
+     "eng": "Kitauchi",
+     "lat": 33.5499,
+     "lon": 133.4422,
+     "number": ""
+    },
+    {
+     "name": "北山",
+     "kana": "きたやま",
+     "eng": "Kitayama",
+     "lat": 33.5491,
+     "lon": 133.4385,
+     "number": ""
+    },
+    {
+     "name": "鳴谷",
+     "kana": "なるたに",
+     "eng": "Narutani",
+     "lat": 33.5487,
+     "lon": 133.4333,
+     "number": ""
+    },
+    {
+     "name": "伊野駅前",
+     "kana": "いのえきまえ",
+     "eng": "Ino-ekimae",
+     "lat": 33.548,
+     "lon": 133.43,
+     "number": ""
+    },
+    {
+     "name": "伊野",
+     "kana": "いの",
+     "eng": "Ino",
+     "lat": 33.5485,
+     "lon": 133.4284,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 342,
+   "name": "桟橋線",
+   "kana": "さんばしせん",
+   "eng": "Sambashi Line",
+   "color": "#008000",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "とさでん交通",
+   "operatorShort": "とさでん",
+   "operatorShortKana": "とさでん",
+   "operatorShortEng": "Tosaden",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "高知駅前",
+     "kana": "こうちえきまえ",
+     "eng": "Kochi-ekimae",
+     "lat": 33.5661,
+     "lon": 133.5437,
+     "number": ""
+    },
+    {
+     "name": "高知橋",
+     "kana": "こうちばし",
+     "eng": "Kochibashi",
+     "lat": 33.5639,
+     "lon": 133.5434,
+     "number": ""
+    },
+    {
+     "name": "蓮池町通",
+     "kana": "はすいけまちどおり",
+     "eng": "Hasuikemachi-dori",
+     "lat": 33.5619,
+     "lon": 133.5432,
+     "number": ""
+    },
+    {
+     "name": "はりまや橋",
+     "kana": "はりまやばし",
+     "eng": "Harimayabashi",
+     "lat": 33.5596,
+     "lon": 133.5424,
+     "number": ""
+    },
+    {
+     "name": "梅の辻",
+     "kana": "うめのつじ",
+     "eng": "Umenotsuji",
+     "lat": 33.5544,
+     "lon": 133.5434,
+     "number": ""
+    },
+    {
+     "name": "桟橋通一丁目",
+     "kana": "さんばしどおりいっちょうめ",
+     "eng": "Sambashidori 1-chome",
+     "lat": 33.5506,
+     "lon": 133.546,
+     "number": ""
+    },
+    {
+     "name": "桟橋通二丁目",
+     "kana": "さんばしどおりにちょうめ",
+     "eng": "Sambashidori 2-chome",
+     "lat": 33.5491,
+     "lon": 133.5469,
+     "number": ""
+    },
+    {
+     "name": "桟橋通三丁目",
+     "kana": "さんばしどおりさんちょうめ",
+     "eng": "Sambashidori 3-chome",
+     "lat": 33.5469,
+     "lon": 133.5485,
+     "number": ""
+    },
+    {
+     "name": "桟橋通四丁目",
+     "kana": "さんばしどおりよんちょうめ",
+     "eng": "Sambashidori 4-chome",
+     "lat": 33.5449,
+     "lon": 133.5498,
+     "number": ""
+    },
+    {
+     "name": "桟橋車庫前",
+     "kana": "さんばししゃこまえ",
+     "eng": "Sambashishako-mae",
+     "lat": 33.5417,
+     "lon": 133.5519,
+     "number": ""
+    },
+    {
+     "name": "桟橋通五丁目",
+     "kana": "さんばしどおりごちょうめ",
+     "eng": "Sambashidori 5-chome",
+     "lat": 33.5405,
+     "lon": 133.5527,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 345,
+   "name": "ごめん・なはり線",
+   "kana": "ごめん・なはりせん",
+   "eng": "Gomen-Nahari Line",
+   "color": "#00BFFF",
+   "symbol": "GN",
+   "operatorType": "私鉄",
+   "operator": "土佐くろしお鉄道",
+   "operatorShort": "くろしお鉄道",
+   "operatorShortKana": "くろしおてつどう",
+   "operatorShortEng": "Tosa Kuroshio Railway",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "後免",
+     "kana": "ごめん",
+     "eng": "Gomen",
+     "lat": 33.5792,
+     "lon": 133.6454,
+     "number": "GN 40"
+    },
+    {
+     "name": "後免町",
+     "kana": "ごめんまち",
+     "eng": "Gomemmachi",
+     "lat": 33.5746,
+     "lon": 133.6514,
+     "number": "GN 39"
+    },
+    {
+     "name": "立田",
+     "kana": "たてだ",
+     "eng": "Tateda",
+     "lat": 33.5708,
+     "lon": 133.6705,
+     "number": "GN 38"
+    },
+    {
+     "name": "のいち",
+     "kana": "のいち",
+     "eng": "Noichi",
+     "lat": 33.5619,
+     "lon": 133.6981,
+     "number": "GN 37"
+    },
+    {
+     "name": "よしかわ",
+     "kana": "よしかわ",
+     "eng": "Yoshikawa",
+     "lat": 33.5461,
+     "lon": 133.7102,
+     "number": "GN 36"
+    },
+    {
+     "name": "あかおか",
+     "kana": "あかおか",
+     "eng": "Akaoka",
+     "lat": 33.5399,
+     "lon": 133.7222,
+     "number": "GN 35"
+    },
+    {
+     "name": "香我美",
+     "kana": "かがみ",
+     "eng": "Kagami",
+     "lat": 33.5393,
+     "lon": 133.7374,
+     "number": "GN 34"
+    },
+    {
+     "name": "夜須",
+     "kana": "やす",
+     "eng": "Yasu",
+     "lat": 33.5344,
+     "lon": 133.7543,
+     "number": "GN 33"
+    },
+    {
+     "name": "西分",
+     "kana": "にしぶん",
+     "eng": "Nishibun",
+     "lat": 33.518,
+     "lon": 133.7905,
+     "number": "GN 32"
+    },
+    {
+     "name": "和食",
+     "kana": "わじき",
+     "eng": "Wajiki",
+     "lat": 33.5178,
+     "lon": 133.8097,
+     "number": "GN 31"
+    },
+    {
+     "name": "赤野",
+     "kana": "あかの",
+     "eng": "Akano",
+     "lat": 33.516,
+     "lon": 133.8251,
+     "number": "GN 30"
+    },
+    {
+     "name": "穴内",
+     "kana": "あなない",
+     "eng": "Ananai",
+     "lat": 33.5062,
+     "lon": 133.8639,
+     "number": "GN 29"
+    },
+    {
+     "name": "球場前",
+     "kana": "きゅうじょうまえ",
+     "eng": "Kyujomae",
+     "lat": 33.5027,
+     "lon": 133.8913,
+     "number": "GN 28"
+    },
+    {
+     "name": "あき総合病院前",
+     "kana": "あきそうごうびょういんまえ",
+     "eng": "Aki-Sogobyoimmae",
+     "lat": 33.5044,
+     "lon": 133.8977,
+     "number": "GN 27-1"
+    },
+    {
+     "name": "安芸",
+     "kana": "あき",
+     "eng": "Aki",
+     "lat": 33.5045,
+     "lon": 133.9065,
+     "number": "GN 27"
+    },
+    {
+     "name": "伊尾木",
+     "kana": "いおき",
+     "eng": "Ioki",
+     "lat": 33.491,
+     "lon": 133.9291,
+     "number": "GN 26"
+    },
+    {
+     "name": "下山",
+     "kana": "しもやま",
+     "eng": "Shimoyama",
+     "lat": 33.4583,
+     "lon": 133.9484,
+     "number": "GN 25"
+    },
+    {
+     "name": "唐浜",
+     "kana": "とうのはま",
+     "eng": "Tonohama",
+     "lat": 33.4461,
+     "lon": 133.9661,
+     "number": "GN 24"
+    },
+    {
+     "name": "安田",
+     "kana": "やすだ",
+     "eng": "Yasuda",
+     "lat": 33.4434,
+     "lon": 133.9842,
+     "number": "GN 23"
+    },
+    {
+     "name": "田野",
+     "kana": "たの",
+     "eng": "Tano",
+     "lat": 33.4303,
+     "lon": 134.0082,
+     "number": "GN 22"
+    },
+    {
+     "name": "奈半利",
+     "kana": "なはり",
+     "eng": "Nahari",
+     "lat": 33.4252,
+     "lon": 134.0182,
+     "number": "GN 21"
+    }
+   ]
+  },
+  {
+   "no": 346,
+   "name": "中村線",
+   "kana": "なかむらせん",
+   "eng": "Nakamura Line",
+   "color": "#00BFFF",
+   "symbol": "TK",
+   "operatorType": "私鉄",
+   "operator": "土佐くろしお鉄道",
+   "operatorShort": "くろしお鉄道",
+   "operatorShortKana": "くろしおてつどう",
+   "operatorShortEng": "Tosa Kuroshio Railway",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "窪川",
+     "kana": "くぼかわ",
+     "eng": "Kubokawa",
+     "lat": 33.2124,
+     "lon": 133.1372,
+     "number": "TK 26"
+    },
+    {
+     "name": "若井",
+     "kana": "わかい",
+     "eng": "Wakai",
+     "lat": 33.188,
+     "lon": 133.1059,
+     "number": "TK 27"
+    },
+    {
+     "name": "荷稲",
+     "kana": "かいな",
+     "eng": "Kaina",
+     "lat": 33.1329,
+     "lon": 133.1162,
+     "number": "TK 28"
+    },
+    {
+     "name": "伊与喜",
+     "kana": "いよき",
+     "eng": "Iyoki",
+     "lat": 33.1051,
+     "lon": 133.0984,
+     "number": "TK 29"
+    },
+    {
+     "name": "土佐佐賀",
+     "kana": "とささが",
+     "eng": "Tosa-Saga",
+     "lat": 33.0809,
+     "lon": 133.1015,
+     "number": "TK 30"
+    },
+    {
+     "name": "佐賀公園",
+     "kana": "さがこうえん",
+     "eng": "Sagakoen",
+     "lat": 33.0641,
+     "lon": 133.1064,
+     "number": "TK 31"
+    },
+    {
+     "name": "土佐白浜",
+     "kana": "とさしらはま",
+     "eng": "Tosa-Shirahama",
+     "lat": 33.0564,
+     "lon": 133.0975,
+     "number": "TK 32"
+    },
+    {
+     "name": "有井川",
+     "kana": "ありいがわ",
+     "eng": "Ariigawa",
+     "lat": 33.0389,
+     "lon": 133.0712,
+     "number": "TK 33"
+    },
+    {
+     "name": "土佐上川口",
+     "kana": "とさかみかわぐち",
+     "eng": "Tosa-Kamikawaguchi",
+     "lat": 33.043,
+     "lon": 133.0562,
+     "number": "TK 34"
+    },
+    {
+     "name": "海の王迎",
+     "kana": "うみのおうむかえ",
+     "eng": "Uminoomukae",
+     "lat": 33.0404,
+     "lon": 133.0464,
+     "number": "TK 35"
+    },
+    {
+     "name": "浮鞭",
+     "kana": "うきぶち",
+     "eng": "Ukibuchi",
+     "lat": 33.0395,
+     "lon": 133.0299,
+     "number": "TK 36"
+    },
+    {
+     "name": "土佐入野",
+     "kana": "とさいりの",
+     "eng": "Tosa-Irino",
+     "lat": 33.0237,
+     "lon": 133.0116,
+     "number": "TK 37"
+    },
+    {
+     "name": "西大方",
+     "kana": "にしおおがた",
+     "eng": "Nishi-Ogata",
+     "lat": 33.0089,
+     "lon": 132.9871,
+     "number": "TK 38"
+    },
+    {
+     "name": "古津賀",
+     "kana": "こつか",
+     "eng": "Kotsuka",
+     "lat": 32.9861,
+     "lon": 132.9623,
+     "number": "TK 39"
+    },
+    {
+     "name": "中村",
+     "kana": "なかむら",
+     "eng": "Nakamura",
+     "lat": 32.9844,
+     "lon": 132.944,
+     "number": "TK 40"
+    }
+   ]
+  },
+  {
+   "no": 347,
+   "name": "宿毛線",
+   "kana": "すくもせん",
+   "eng": "Sukumo Line",
+   "color": "#00BFFF",
+   "symbol": "TK",
+   "operatorType": "私鉄",
+   "operator": "土佐くろしお鉄道",
+   "operatorShort": "くろしお鉄道",
+   "operatorShortKana": "くろしおてつどう",
+   "operatorShortEng": "Tosa Kuroshio Railway",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "宿毛",
+     "kana": "すくも",
+     "eng": "Sukumo",
+     "lat": 32.9326,
+     "lon": 132.7133,
+     "number": "TK 47"
+    },
+    {
+     "name": "東宿毛",
+     "kana": "ひがしすくも",
+     "eng": "Higashi-Sukumo",
+     "lat": 32.9337,
+     "lon": 132.7285,
+     "number": "TK 46"
+    },
+    {
+     "name": "平田",
+     "kana": "ひらた",
+     "eng": "Hirata",
+     "lat": 32.9556,
+     "lon": 132.7952,
+     "number": "TK 45"
+    },
+    {
+     "name": "工業団地",
+     "kana": "こうぎょうだんち",
+     "eng": "Kogyodanchi",
+     "lat": 32.9565,
+     "lon": 132.8017,
+     "number": "TK 44"
+    },
+    {
+     "name": "有岡",
+     "kana": "ありおか",
+     "eng": "Arioka",
+     "lat": 32.9614,
+     "lon": 132.8333,
+     "number": "TK 43"
+    },
+    {
+     "name": "国見",
+     "kana": "くにみ",
+     "eng": "Kunimi",
+     "lat": 32.979,
+     "lon": 132.8835,
+     "number": "TK 42"
+    },
+    {
+     "name": "具同",
+     "kana": "ぐどう",
+     "eng": "Gudo",
+     "lat": 32.9794,
+     "lon": 132.9152,
+     "number": "TK 41"
+    },
+    {
+     "name": "中村",
+     "kana": "なかむら",
+     "eng": "Nakamura",
+     "lat": 32.9844,
+     "lon": 132.944,
+     "number": "TK 40"
+    }
+   ]
+  },
+  {
+   "no": 348,
+   "name": "阿佐東線",
+   "kana": "あさとうせん",
+   "eng": "Asa East Line",
+   "color": "#A5AEB4",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "阿佐海岸鉄道",
+   "operatorShort": "阿佐海岸鉄道",
+   "operatorShortKana": "あさかいがんてつどう",
+   "operatorShortEng": "Asa Kaigan Railway",
+   "lineIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "阿波海南",
+     "kana": "あわかいなん",
+     "eng": "Awa-Kainan",
+     "lat": 33.6065,
+     "lon": 134.3509,
+     "number": ""
+    },
+    {
+     "name": "海部",
+     "kana": "かいふ",
+     "eng": "Kaifu",
+     "lat": 33.5935,
+     "lon": 134.3521,
+     "number": ""
+    },
+    {
+     "name": "宍喰",
+     "kana": "ししくい",
+     "eng": "Shishikui",
+     "lat": 33.5668,
+     "lon": 134.3007,
+     "number": ""
+    },
+    {
+     "name": "甲浦",
+     "kana": "かんのうら",
+     "eng": "Kannoura",
+     "lat": 33.5472,
+     "lon": 134.2883,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

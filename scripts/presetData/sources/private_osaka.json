@@ -1,0 +1,1404 @@
+{
+ "lines": [
+  {
+   "no": 490,
+   "name": "御堂筋線",
+   "kana": "みどうすじせん",
+   "eng": "Midosuji Line",
+   "color": "#E5171F",
+   "symbol": "M",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "江坂",
+     "kana": "えさか",
+     "eng": "Esaka",
+     "lat": 34.7579,
+     "lon": 135.497,
+     "number": "M 11"
+    },
+    {
+     "name": "東三国",
+     "kana": "ひがしみくに",
+     "eng": "Higashi-mikuni",
+     "lat": 34.741,
+     "lon": 135.4985,
+     "number": "M 12"
+    },
+    {
+     "name": "新大阪",
+     "kana": "しんおおさか",
+     "eng": "Shin-osaka",
+     "lat": 34.7335,
+     "lon": 135.5001,
+     "number": "M 13"
+    },
+    {
+     "name": "西中島南方",
+     "kana": "にしなかじまみなみがた",
+     "eng": "Nishinakajima-minamigata",
+     "lat": 34.7265,
+     "lon": 135.4986,
+     "number": "M 14"
+    },
+    {
+     "name": "中津",
+     "kana": "なかつ",
+     "eng": "Nakatsu",
+     "lat": 34.711,
+     "lon": 135.4969,
+     "number": "M 15"
+    },
+    {
+     "name": "梅田",
+     "kana": "うめだ",
+     "eng": "Umeda",
+     "lat": 34.7028,
+     "lon": 135.4977,
+     "number": "M 16"
+    },
+    {
+     "name": "淀屋橋",
+     "kana": "よどやばし",
+     "eng": "Yodoyabashi",
+     "lat": 34.6923,
+     "lon": 135.501,
+     "number": "M 17"
+    },
+    {
+     "name": "本町",
+     "kana": "ほんまち",
+     "eng": "Hommachi",
+     "lat": 34.6819,
+     "lon": 135.499,
+     "number": "M 18"
+    },
+    {
+     "name": "心斎橋",
+     "kana": "しんさいばし",
+     "eng": "Shinsaibashi",
+     "lat": 34.675,
+     "lon": 135.5003,
+     "number": "M 19"
+    },
+    {
+     "name": "なんば",
+     "kana": "なんば",
+     "eng": "Namba",
+     "lat": 34.6663,
+     "lon": 135.5003,
+     "number": "M 20"
+    },
+    {
+     "name": "大国町",
+     "kana": "だいこくちょう",
+     "eng": "Daikokucho",
+     "lat": 34.6561,
+     "lon": 135.4978,
+     "number": "M 21"
+    },
+    {
+     "name": "動物園前",
+     "kana": "どうぶつえんまえ",
+     "eng": "Dobutsuen-mae",
+     "lat": 34.6488,
+     "lon": 135.5044,
+     "number": "M 22"
+    },
+    {
+     "name": "天王寺",
+     "kana": "てんのうじ",
+     "eng": "Tennoji",
+     "lat": 34.6473,
+     "lon": 135.5139,
+     "number": "M 23"
+    },
+    {
+     "name": "昭和町",
+     "kana": "しょうわちょう",
+     "eng": "Showacho",
+     "lat": 34.6336,
+     "lon": 135.517,
+     "number": "M 24"
+    },
+    {
+     "name": "西田辺",
+     "kana": "にしたなべ",
+     "eng": "Nishitanabe",
+     "lat": 34.6216,
+     "lon": 135.5152,
+     "number": "M 25"
+    },
+    {
+     "name": "長居",
+     "kana": "ながい",
+     "eng": "Nagai",
+     "lat": 34.6111,
+     "lon": 135.5126,
+     "number": "M 26"
+    },
+    {
+     "name": "あびこ",
+     "kana": "あびこ",
+     "eng": "Abiko",
+     "lat": 34.5992,
+     "lon": 135.5128,
+     "number": "M 27"
+    },
+    {
+     "name": "北花田",
+     "kana": "きたはなだ",
+     "eng": "Kita-hanada",
+     "lat": 34.5825,
+     "lon": 135.5164,
+     "number": "M 28"
+    },
+    {
+     "name": "新金岡",
+     "kana": "しんかなおか",
+     "eng": "Shinkanaoka",
+     "lat": 34.5678,
+     "lon": 135.515,
+     "number": "M 29"
+    },
+    {
+     "name": "なかもず",
+     "kana": "なかもず",
+     "eng": "Nakamozu",
+     "lat": 34.5562,
+     "lon": 135.5045,
+     "number": "M 30"
+    }
+   ]
+  },
+  {
+   "no": 491,
+   "name": "谷町線",
+   "kana": "たにまちせん",
+   "eng": "Tanimachi Line",
+   "color": "#522886",
+   "symbol": "T",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "大日",
+     "kana": "だいにち",
+     "eng": "Dainichi",
+     "lat": 34.7494,
+     "lon": 135.5783,
+     "number": "T 11"
+    },
+    {
+     "name": "守口",
+     "kana": "もりぐち",
+     "eng": "Moriguchi",
+     "lat": 34.7381,
+     "lon": 135.5638,
+     "number": "T 12"
+    },
+    {
+     "name": "太子橋今市",
+     "kana": "たいしばしいまいち",
+     "eng": "Taishibashi-imaichi",
+     "lat": 34.7314,
+     "lon": 135.5549,
+     "number": "T 13"
+    },
+    {
+     "name": "千林大宮",
+     "kana": "せんばやしおおみや",
+     "eng": "Sembayashi-omiya",
+     "lat": 34.7238,
+     "lon": 135.5491,
+     "number": "T 14"
+    },
+    {
+     "name": "関目高殿",
+     "kana": "せきめたかどの",
+     "eng": "Sekime-takadono",
+     "lat": 34.7152,
+     "lon": 135.5458,
+     "number": "T 15"
+    },
+    {
+     "name": "野江内代",
+     "kana": "のえうちんだい",
+     "eng": "Noe-uchindai",
+     "lat": 34.709,
+     "lon": 135.5381,
+     "number": "T 16"
+    },
+    {
+     "name": "都島",
+     "kana": "みやこじま",
+     "eng": "Miyakojima",
+     "lat": 34.709,
+     "lon": 135.526,
+     "number": "T 17"
+    },
+    {
+     "name": "天神橋筋六丁目",
+     "kana": "てんじんばしすじろくちょうめ",
+     "eng": "Tenjimbashisuji 6-chome",
+     "lat": 34.7106,
+     "lon": 135.5108,
+     "number": "T 18"
+    },
+    {
+     "name": "中崎町",
+     "kana": "なかざきちょう",
+     "eng": "Nakazakicho",
+     "lat": 34.7069,
+     "lon": 135.5052,
+     "number": "T 19"
+    },
+    {
+     "name": "東梅田",
+     "kana": "ひがしうめだ",
+     "eng": "Higashi-umeda",
+     "lat": 34.701,
+     "lon": 135.4996,
+     "number": "T 20"
+    },
+    {
+     "name": "南森町",
+     "kana": "みなみもりまち",
+     "eng": "Minami-morimachi",
+     "lat": 34.6977,
+     "lon": 135.511,
+     "number": "T 21"
+    },
+    {
+     "name": "天満橋",
+     "kana": "てんまばし",
+     "eng": "Temmabashi",
+     "lat": 34.6902,
+     "lon": 135.5166,
+     "number": "T 22"
+    },
+    {
+     "name": "谷町四丁目",
+     "kana": "たにまちよんちょうめ",
+     "eng": "Tanimachi 4-chome",
+     "lat": 34.6819,
+     "lon": 135.5173,
+     "number": "T 23"
+    },
+    {
+     "name": "谷町六丁目",
+     "kana": "たにまちろくちょうめ",
+     "eng": "Tanimachi 6-chome",
+     "lat": 34.6749,
+     "lon": 135.517,
+     "number": "T 24"
+    },
+    {
+     "name": "谷町九丁目",
+     "kana": "たにまちきゅうちょうめ",
+     "eng": "Tanimachi 9-chome",
+     "lat": 34.6671,
+     "lon": 135.5158,
+     "number": "T 25"
+    },
+    {
+     "name": "四天王寺前夕陽ヶ丘",
+     "kana": "してんのうじまえゆうひがおか",
+     "eng": "Shitennoji-mae Yuhigaoka",
+     "lat": 34.6585,
+     "lon": 135.5141,
+     "number": "T 26"
+    },
+    {
+     "name": "天王寺",
+     "kana": "てんのうじ",
+     "eng": "Tennoji",
+     "lat": 34.6473,
+     "lon": 135.5139,
+     "number": "T 27"
+    },
+    {
+     "name": "阿倍野",
+     "kana": "あべの",
+     "eng": "Abeno",
+     "lat": 34.643,
+     "lon": 135.5122,
+     "number": "T 28"
+    },
+    {
+     "name": "文の里",
+     "kana": "ふみのさと",
+     "eng": "Fuminosato",
+     "lat": 34.636,
+     "lon": 135.518,
+     "number": "T 29"
+    },
+    {
+     "name": "田辺",
+     "kana": "たなべ",
+     "eng": "Tanabe",
+     "lat": 34.6282,
+     "lon": 135.5255,
+     "number": "T 30"
+    },
+    {
+     "name": "駒川中野",
+     "kana": "こまがわなかの",
+     "eng": "Komagawa-nakano",
+     "lat": 34.6215,
+     "lon": 135.533,
+     "number": "T 31"
+    },
+    {
+     "name": "平野",
+     "kana": "ひらの",
+     "eng": "Hirano",
+     "lat": 34.621,
+     "lon": 135.5489,
+     "number": "T 32"
+    },
+    {
+     "name": "喜連瓜破",
+     "kana": "きれうりわり",
+     "eng": "Kire-uriwari",
+     "lat": 34.6093,
+     "lon": 135.5509,
+     "number": "T 33"
+    },
+    {
+     "name": "出戸",
+     "kana": "でと",
+     "eng": "Deto",
+     "lat": 34.6089,
+     "lon": 135.5662,
+     "number": "T 34"
+    },
+    {
+     "name": "長原",
+     "kana": "ながはら",
+     "eng": "Nagahara",
+     "lat": 34.6025,
+     "lon": 135.5738,
+     "number": "T 35"
+    },
+    {
+     "name": "八尾南",
+     "kana": "やおみなみ",
+     "eng": "Yao-minami",
+     "lat": 34.5974,
+     "lon": 135.5826,
+     "number": "T 36"
+    }
+   ]
+  },
+  {
+   "no": 492,
+   "name": "四つ橋線",
+   "kana": "よつばしせん",
+   "eng": "Yotsubashi Line",
+   "color": "#0078BA",
+   "symbol": "Y",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "西梅田",
+     "kana": "にしうめだ",
+     "eng": "Nishi-umeda",
+     "lat": 34.6996,
+     "lon": 135.4957,
+     "number": "Y 11"
+    },
+    {
+     "name": "肥後橋",
+     "kana": "ひごばし",
+     "eng": "Higobashi",
+     "lat": 34.6914,
+     "lon": 135.4964,
+     "number": "Y 12"
+    },
+    {
+     "name": "本町",
+     "kana": "ほんまち",
+     "eng": "Hommachi",
+     "lat": 34.6819,
+     "lon": 135.499,
+     "number": "Y 13"
+    },
+    {
+     "name": "四ツ橋",
+     "kana": "よつばし",
+     "eng": "Yotsubashi",
+     "lat": 34.6741,
+     "lon": 135.4968,
+     "number": "Y 14"
+    },
+    {
+     "name": "なんば",
+     "kana": "なんば",
+     "eng": "Namba",
+     "lat": 34.6663,
+     "lon": 135.5003,
+     "number": "Y 15"
+    },
+    {
+     "name": "大国町",
+     "kana": "だいこくちょう",
+     "eng": "Daikokucho",
+     "lat": 34.6561,
+     "lon": 135.4978,
+     "number": "Y 16"
+    },
+    {
+     "name": "花園町",
+     "kana": "はなぞのちょう",
+     "eng": "Hanazonocho",
+     "lat": 34.6444,
+     "lon": 135.4966,
+     "number": "Y 17"
+    },
+    {
+     "name": "岸里",
+     "kana": "きしのさと",
+     "eng": "Kishinosato",
+     "lat": 34.6344,
+     "lon": 135.4939,
+     "number": "Y 18"
+    },
+    {
+     "name": "玉出",
+     "kana": "たまで",
+     "eng": "Tamade",
+     "lat": 34.6236,
+     "lon": 135.4904,
+     "number": "Y 19"
+    },
+    {
+     "name": "北加賀屋",
+     "kana": "きたかがや",
+     "eng": "Kitakagaya",
+     "lat": 34.6214,
+     "lon": 135.4795,
+     "number": "Y 20"
+    },
+    {
+     "name": "住之江公園",
+     "kana": "すみのえこうえん",
+     "eng": "Suminoekoen",
+     "lat": 34.6092,
+     "lon": 135.4731,
+     "number": "Y 21"
+    }
+   ]
+  },
+  {
+   "no": 493,
+   "name": "中央線",
+   "kana": "ちゅうおうせん",
+   "eng": "Chuo Line",
+   "color": "#019A66",
+   "symbol": "C",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "夢洲",
+     "kana": "ゆめしま",
+     "eng": "Yumeshima",
+     "lat": 34.6524,
+     "lon": 135.3899,
+     "number": "C 09"
+    },
+    {
+     "name": "コスモスクエア",
+     "kana": "こすもすくえあ",
+     "eng": "Cosmosquare",
+     "lat": 34.6426,
+     "lon": 135.4122,
+     "number": "C 10"
+    },
+    {
+     "name": "大阪港",
+     "kana": "おおさかこう",
+     "eng": "Osakako",
+     "lat": 34.6539,
+     "lon": 135.4344,
+     "number": "C 11"
+    },
+    {
+     "name": "朝潮橋",
+     "kana": "あさしおばし",
+     "eng": "Asashiobashi",
+     "lat": 34.6609,
+     "lon": 135.4488,
+     "number": "C 12"
+    },
+    {
+     "name": "弁天町",
+     "kana": "べんてんちょう",
+     "eng": "Bentencho",
+     "lat": 34.6697,
+     "lon": 135.4622,
+     "number": "C 13"
+    },
+    {
+     "name": "九条",
+     "kana": "くじょう",
+     "eng": "Kujo",
+     "lat": 34.6737,
+     "lon": 135.4738,
+     "number": "C 14"
+    },
+    {
+     "name": "阿波座",
+     "kana": "あわざ",
+     "eng": "Awaza",
+     "lat": 34.6814,
+     "lon": 135.4864,
+     "number": "C 15"
+    },
+    {
+     "name": "本町",
+     "kana": "ほんまち",
+     "eng": "Hommachi",
+     "lat": 34.6819,
+     "lon": 135.499,
+     "number": "C 16"
+    },
+    {
+     "name": "堺筋本町",
+     "kana": "さかいすじほんまち",
+     "eng": "Sakaisuji-hommachi",
+     "lat": 34.6818,
+     "lon": 135.5065,
+     "number": "C 17"
+    },
+    {
+     "name": "谷町四丁目",
+     "kana": "たにまちよんちょうめ",
+     "eng": "Tanimachi 4-chome",
+     "lat": 34.6819,
+     "lon": 135.5173,
+     "number": "C 18"
+    },
+    {
+     "name": "森ノ宮",
+     "kana": "もりのみや",
+     "eng": "Morinomiya",
+     "lat": 34.6811,
+     "lon": 135.5338,
+     "number": "C 19"
+    },
+    {
+     "name": "緑橋",
+     "kana": "みどりばし",
+     "eng": "Midoribashi",
+     "lat": 34.6808,
+     "lon": 135.5446,
+     "number": "C 20"
+    },
+    {
+     "name": "深江橋",
+     "kana": "ふかえばし",
+     "eng": "Fukaebashi",
+     "lat": 34.6791,
+     "lon": 135.5572,
+     "number": "C 21"
+    },
+    {
+     "name": "高井田",
+     "kana": "たかいだ",
+     "eng": "Takaida",
+     "lat": 34.6786,
+     "lon": 135.573,
+     "number": "C 22"
+    },
+    {
+     "name": "長田",
+     "kana": "ながた",
+     "eng": "Nagata",
+     "lat": 34.6788,
+     "lon": 135.5919,
+     "number": "C 23"
+    }
+   ]
+  },
+  {
+   "no": 494,
+   "name": "千日前線",
+   "kana": "せんにちまえせん",
+   "eng": "Sennichimae Line",
+   "color": "#E44D93",
+   "symbol": "S",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "野田阪神",
+     "kana": "のだはんしん",
+     "eng": "Nodahanshin",
+     "lat": 34.6946,
+     "lon": 135.4748,
+     "number": "S 11"
+    },
+    {
+     "name": "玉川",
+     "kana": "たまがわ",
+     "eng": "Tamagawa",
+     "lat": 34.6896,
+     "lon": 135.4762,
+     "number": "S 12"
+    },
+    {
+     "name": "阿波座",
+     "kana": "あわざ",
+     "eng": "Awaza",
+     "lat": 34.6814,
+     "lon": 135.4864,
+     "number": "S 13"
+    },
+    {
+     "name": "西長堀",
+     "kana": "にしながほり",
+     "eng": "Nishi-nagahori",
+     "lat": 34.6753,
+     "lon": 135.4872,
+     "number": "S 14"
+    },
+    {
+     "name": "桜川",
+     "kana": "さくらがわ",
+     "eng": "Sakuragawa",
+     "lat": 34.6684,
+     "lon": 135.4888,
+     "number": "S 15"
+    },
+    {
+     "name": "なんば",
+     "kana": "なんば",
+     "eng": "Namba",
+     "lat": 34.6663,
+     "lon": 135.5003,
+     "number": "S 16"
+    },
+    {
+     "name": "日本橋",
+     "kana": "にっぽんばし",
+     "eng": "Nippombashi",
+     "lat": 34.667,
+     "lon": 135.5061,
+     "number": "S 17"
+    },
+    {
+     "name": "谷町九丁目",
+     "kana": "たにまちきゅうちょうめ",
+     "eng": "Tanimachi 9-chome",
+     "lat": 34.6671,
+     "lon": 135.5158,
+     "number": "S 18"
+    },
+    {
+     "name": "鶴橋",
+     "kana": "つるはし",
+     "eng": "Tsuruhashi",
+     "lat": 34.6653,
+     "lon": 135.5313,
+     "number": "S 19"
+    },
+    {
+     "name": "今里",
+     "kana": "いまざと",
+     "eng": "Imazato",
+     "lat": 34.6687,
+     "lon": 135.5443,
+     "number": "S 20"
+    },
+    {
+     "name": "新深江",
+     "kana": "しんふかえ",
+     "eng": "Shin-fukae",
+     "lat": 34.6682,
+     "lon": 135.5538,
+     "number": "S 21"
+    },
+    {
+     "name": "小路",
+     "kana": "しょうじ",
+     "eng": "Shoji",
+     "lat": 34.6615,
+     "lon": 135.5562,
+     "number": "S 22"
+    },
+    {
+     "name": "北巽",
+     "kana": "きたたつみ",
+     "eng": "Kita-tatsumi",
+     "lat": 34.653,
+     "lon": 135.555,
+     "number": "S 23"
+    },
+    {
+     "name": "南巽",
+     "kana": "みなみたつみ",
+     "eng": "Minami-tatsumi",
+     "lat": 34.6433,
+     "lon": 135.5533,
+     "number": "S 24"
+    }
+   ]
+  },
+  {
+   "no": 495,
+   "name": "堺筋線",
+   "kana": "さかいすじせん",
+   "eng": "Sakaisuji Line",
+   "color": "#814721",
+   "symbol": "K",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "天神橋筋六丁目",
+     "kana": "てんじんばしすじろくちょうめ",
+     "eng": "Tenjimbashisuji 6-chome",
+     "lat": 34.7106,
+     "lon": 135.5108,
+     "number": "K 11"
+    },
+    {
+     "name": "扇町",
+     "kana": "おうぎまち",
+     "eng": "Ogimachi",
+     "lat": 34.7038,
+     "lon": 135.5108,
+     "number": "K 12"
+    },
+    {
+     "name": "南森町",
+     "kana": "みなみもりまち",
+     "eng": "Minami-morimachi",
+     "lat": 34.6977,
+     "lon": 135.511,
+     "number": "K 13"
+    },
+    {
+     "name": "北浜",
+     "kana": "きたはま",
+     "eng": "Kitahama",
+     "lat": 34.6916,
+     "lon": 135.5066,
+     "number": "K 14"
+    },
+    {
+     "name": "堺筋本町",
+     "kana": "さかいすじほんまち",
+     "eng": "Sakaisuji-hommachi",
+     "lat": 34.6818,
+     "lon": 135.5065,
+     "number": "K 15"
+    },
+    {
+     "name": "長堀橋",
+     "kana": "ながほりばし",
+     "eng": "Nagahoribashi",
+     "lat": 34.6746,
+     "lon": 135.5063,
+     "number": "K 16"
+    },
+    {
+     "name": "日本橋",
+     "kana": "にっぽんばし",
+     "eng": "Nippombashi",
+     "lat": 34.667,
+     "lon": 135.5061,
+     "number": "K 17"
+    },
+    {
+     "name": "恵美須町",
+     "kana": "えびすちょう",
+     "eng": "Ebisucho",
+     "lat": 34.6539,
+     "lon": 135.5049,
+     "number": "K 18"
+    },
+    {
+     "name": "動物園前",
+     "kana": "どうぶつえんまえ",
+     "eng": "Dobutsuen-mae",
+     "lat": 34.6488,
+     "lon": 135.5044,
+     "number": "K 19"
+    },
+    {
+     "name": "天下茶屋",
+     "kana": "てんがちゃや",
+     "eng": "Tengachaya",
+     "lat": 34.6372,
+     "lon": 135.4967,
+     "number": "K 20"
+    }
+   ]
+  },
+  {
+   "no": 496,
+   "name": "長堀鶴見緑地線",
+   "kana": "ながほりつるみりょくちせん",
+   "eng": "Nagahori Tsurumi-ryokuchi Line",
+   "color": "#A9CC51",
+   "symbol": "N",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "大正",
+     "kana": "たいしょう",
+     "eng": "Taisho",
+     "lat": 34.6655,
+     "lon": 135.48,
+     "number": "N 11"
+    },
+    {
+     "name": "ドーム前千代崎",
+     "kana": "どーむまえちよざき",
+     "eng": "Dome-mae Chiyozaki",
+     "lat": 34.6708,
+     "lon": 135.4794,
+     "number": "N 12"
+    },
+    {
+     "name": "西長堀",
+     "kana": "にしながほり",
+     "eng": "Nishi-nagahori",
+     "lat": 34.6753,
+     "lon": 135.4872,
+     "number": "N 13"
+    },
+    {
+     "name": "西大橋",
+     "kana": "にしおおはし",
+     "eng": "Nishi-ohashi",
+     "lat": 34.6754,
+     "lon": 135.4936,
+     "number": "N 14"
+    },
+    {
+     "name": "心斎橋",
+     "kana": "しんさいばし",
+     "eng": "Shinsaibashi",
+     "lat": 34.675,
+     "lon": 135.5003,
+     "number": "N 15"
+    },
+    {
+     "name": "長堀橋",
+     "kana": "ながほりばし",
+     "eng": "Nagahoribashi",
+     "lat": 34.6746,
+     "lon": 135.5063,
+     "number": "N 16"
+    },
+    {
+     "name": "松屋町",
+     "kana": "まっちゃまち",
+     "eng": "Matsuyamachi",
+     "lat": 34.6755,
+     "lon": 135.5125,
+     "number": "N 17"
+    },
+    {
+     "name": "谷町六丁目",
+     "kana": "たにまちろくちょうめ",
+     "eng": "Tanimachi 6-chome",
+     "lat": 34.6749,
+     "lon": 135.517,
+     "number": "N 18"
+    },
+    {
+     "name": "玉造",
+     "kana": "たまつくり",
+     "eng": "Tamatsukuri",
+     "lat": 34.6746,
+     "lon": 135.5302,
+     "number": "N 19"
+    },
+    {
+     "name": "森ノ宮",
+     "kana": "もりのみや",
+     "eng": "Morinomiya",
+     "lat": 34.6811,
+     "lon": 135.5338,
+     "number": "N 20"
+    },
+    {
+     "name": "大阪ビジネスパーク",
+     "kana": "おおさかびじねすぱーく",
+     "eng": "Osaka Business Park",
+     "lat": 34.6921,
+     "lon": 135.5297,
+     "number": "N 21"
+    },
+    {
+     "name": "京橋",
+     "kana": "きょうばし",
+     "eng": "Kyobashi",
+     "lat": 34.696,
+     "lon": 135.5347,
+     "number": "N 22"
+    },
+    {
+     "name": "蒲生四丁目",
+     "kana": "がもうよんちょうめ",
+     "eng": "Gamo 4-chome",
+     "lat": 34.7004,
+     "lon": 135.5477,
+     "number": "N 23"
+    },
+    {
+     "name": "今福鶴見",
+     "kana": "いまふくつるみ",
+     "eng": "Imafuku-tsurumi",
+     "lat": 34.7019,
+     "lon": 135.56,
+     "number": "N 24"
+    },
+    {
+     "name": "横堤",
+     "kana": "よこづつみ",
+     "eng": "Yokozutsumi",
+     "lat": 34.7036,
+     "lon": 135.5728,
+     "number": "N 25"
+    },
+    {
+     "name": "鶴見緑地",
+     "kana": "つるみりょくち",
+     "eng": "Tsurumi-ryokuchi",
+     "lat": 34.7108,
+     "lon": 135.5802,
+     "number": "N 26"
+    },
+    {
+     "name": "門真南",
+     "kana": "かどまみなみ",
+     "eng": "Kadoma-minami",
+     "lat": 34.7169,
+     "lon": 135.5925,
+     "number": "N 27"
+    }
+   ]
+  },
+  {
+   "no": 497,
+   "name": "今里筋線",
+   "kana": "いまざとすじせん",
+   "eng": "Imazatosuji Line",
+   "color": "#EE7B1A",
+   "symbol": "I",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "井高野",
+     "kana": "いたかの",
+     "eng": "Itakano",
+     "lat": 34.7602,
+     "lon": 135.5474,
+     "number": "I 11"
+    },
+    {
+     "name": "瑞光四丁目",
+     "kana": "ずいこうよんちょうめ",
+     "eng": "Zuiko 4-chome",
+     "lat": 34.7523,
+     "lon": 135.5446,
+     "number": "I 12"
+    },
+    {
+     "name": "だいどう豊里",
+     "kana": "だいどうとよさと",
+     "eng": "Daido-toyosato",
+     "lat": 34.7438,
+     "lon": 135.5446,
+     "number": "I 13"
+    },
+    {
+     "name": "太子橋今市",
+     "kana": "たいしばしいまいち",
+     "eng": "Taishibashi-imaichi",
+     "lat": 34.7314,
+     "lon": 135.5549,
+     "number": "I 14"
+    },
+    {
+     "name": "清水",
+     "kana": "しみず",
+     "eng": "Shimizu",
+     "lat": 34.7216,
+     "lon": 135.5608,
+     "number": "I 15"
+    },
+    {
+     "name": "新森古市",
+     "kana": "しんもりふるいち",
+     "eng": "Shinmori-furuichi",
+     "lat": 34.7152,
+     "lon": 135.5583,
+     "number": "I 16"
+    },
+    {
+     "name": "関目成育",
+     "kana": "せきめせいいく",
+     "eng": "Sekime-seiiku",
+     "lat": 34.7128,
+     "lon": 135.5465,
+     "number": "I 17"
+    },
+    {
+     "name": "蒲生四丁目",
+     "kana": "がもうよんちょうめ",
+     "eng": "Gamo 4-chome",
+     "lat": 34.7004,
+     "lon": 135.5477,
+     "number": "I 18"
+    },
+    {
+     "name": "鴫野",
+     "kana": "しぎの",
+     "eng": "Shigino",
+     "lat": 34.6927,
+     "lon": 135.5452,
+     "number": "I 19"
+    },
+    {
+     "name": "緑橋",
+     "kana": "みどりばし",
+     "eng": "Midoribashi",
+     "lat": 34.6808,
+     "lon": 135.5446,
+     "number": "I 20"
+    },
+    {
+     "name": "今里",
+     "kana": "いまざと",
+     "eng": "Imazato",
+     "lat": 34.6687,
+     "lon": 135.5443,
+     "number": "I 21"
+    }
+   ]
+  },
+  {
+   "no": 498,
+   "name": "南港ポートタウン線",
+   "kana": "なんこうぽーとたうんせん",
+   "eng": "Nanko Port Town Line",
+   "color": "#00A0DE",
+   "symbol": "P",
+   "operatorType": "私鉄",
+   "operator": "大阪市高速電気軌道",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Osaka Metro",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "コスモスクエア",
+     "kana": "こすもすくえあ",
+     "eng": "Cosmosquare",
+     "lat": 34.6426,
+     "lon": 135.4122,
+     "number": "P 09"
+    },
+    {
+     "name": "トレードセンター前",
+     "kana": "とれーどせんたーまえ",
+     "eng": "Trade Center-mae",
+     "lat": 34.6388,
+     "lon": 135.4121,
+     "number": "P 10"
+    },
+    {
+     "name": "中ふ頭",
+     "kana": "なかふとう",
+     "eng": "Nakafuto",
+     "lat": 34.634,
+     "lon": 135.4175,
+     "number": "P 11"
+    },
+    {
+     "name": "ポートタウン西",
+     "kana": "ぽーとたうんにし",
+     "eng": "Port Town-nishi",
+     "lat": 34.6309,
+     "lon": 135.4228,
+     "number": "P 12"
+    },
+    {
+     "name": "ポートタウン東",
+     "kana": "ぽーとたうんひがし",
+     "eng": "Port Town-higashi",
+     "lat": 34.6309,
+     "lon": 135.4292,
+     "number": "P 13"
+    },
+    {
+     "name": "フェリーターミナル",
+     "kana": "ふぇりーたーみなる",
+     "eng": "Ferry Terminal",
+     "lat": 34.6194,
+     "lon": 135.4349,
+     "number": "P 14"
+    },
+    {
+     "name": "南港東",
+     "kana": "なんこうひがし",
+     "eng": "Nanko-higashi",
+     "lat": 34.6138,
+     "lon": 135.4387,
+     "number": "P 15"
+    },
+    {
+     "name": "南港口",
+     "kana": "なんこうぐち",
+     "eng": "Nanko-guchi",
+     "lat": 34.6138,
+     "lon": 135.446,
+     "number": "P 16"
+    },
+    {
+     "name": "平林",
+     "kana": "ひらばやし",
+     "eng": "Hirabayashi",
+     "lat": 34.6107,
+     "lon": 135.4587,
+     "number": "P 17"
+    },
+    {
+     "name": "住之江公園",
+     "kana": "すみのえこうえん",
+     "eng": "Suminoekoen",
+     "lat": 34.6092,
+     "lon": 135.4731,
+     "number": "P 18"
+    }
+   ]
+  },
+  {
+   "no": 499,
+   "name": "大阪モノレール線",
+   "kana": "おおさかものれーるせん",
+   "eng": "Osaka Monorail Line",
+   "color": "#111986",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "大阪モノレール",
+   "operatorShort": "モノレール",
+   "operatorShortKana": "ものれーる",
+   "operatorShortEng": "Osaka Monorail",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "大阪空港",
+     "kana": "おおさかくうこう",
+     "eng": "Osaka Airport",
+     "lat": 34.7914,
+     "lon": 135.442,
+     "number": "11"
+    },
+    {
+     "name": "蛍池",
+     "kana": "ほたるがいけ",
+     "eng": "Hotarugaike",
+     "lat": 34.7946,
+     "lon": 135.4493,
+     "number": "12"
+    },
+    {
+     "name": "柴原阪大前",
+     "kana": "しばはらはんだいまえ",
+     "eng": "Shibahara-handaimae",
+     "lat": 34.8004,
+     "lon": 135.4586,
+     "number": "13"
+    },
+    {
+     "name": "少路",
+     "kana": "しょうじ",
+     "eng": "Shoji",
+     "lat": 34.8043,
+     "lon": 135.4754,
+     "number": "14"
+    },
+    {
+     "name": "千里中央",
+     "kana": "せんりちゅうおう",
+     "eng": "Senri-chuo",
+     "lat": 34.8103,
+     "lon": 135.4952,
+     "number": "15"
+    },
+    {
+     "name": "山田",
+     "kana": "やまだ",
+     "eng": "Yamada",
+     "lat": 34.8045,
+     "lon": 135.5157,
+     "number": "16"
+    },
+    {
+     "name": "万博記念公園",
+     "kana": "ばんぱくきねんこうえん",
+     "eng": "Banpaku-kinen-koen",
+     "lat": 34.8068,
+     "lon": 135.5301,
+     "number": "17"
+    },
+    {
+     "name": "宇野辺",
+     "kana": "うのべ",
+     "eng": "Unobe",
+     "lat": 34.808,
+     "lon": 135.5546,
+     "number": "18"
+    },
+    {
+     "name": "南茨木",
+     "kana": "みなみいばらき",
+     "eng": "Minami-ibaraki",
+     "lat": 34.8024,
+     "lon": 135.5651,
+     "number": "19"
+    },
+    {
+     "name": "沢良宜",
+     "kana": "さわらぎ",
+     "eng": "Sawaragi",
+     "lat": 34.7931,
+     "lon": 135.5657,
+     "number": "20"
+    },
+    {
+     "name": "摂津",
+     "kana": "せっつ",
+     "eng": "Settsu",
+     "lat": 34.7802,
+     "lon": 135.5614,
+     "number": "21"
+    },
+    {
+     "name": "南摂津",
+     "kana": "みなみせっつ",
+     "eng": "Minami-settsu",
+     "lat": 34.7654,
+     "lon": 135.5686,
+     "number": "22"
+    },
+    {
+     "name": "大日",
+     "kana": "だいにち",
+     "eng": "Dainichi",
+     "lat": 34.7494,
+     "lon": 135.5783,
+     "number": "23"
+    },
+    {
+     "name": "門真市",
+     "kana": "かどまし",
+     "eng": "Kadomashi",
+     "lat": 34.7382,
+     "lon": 135.5833,
+     "number": "24"
+    }
+   ]
+  },
+  {
+   "no": 500,
+   "name": "彩都線",
+   "kana": "さいとせん",
+   "eng": "Saito Line",
+   "color": "#111986",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "大阪モノレール",
+   "operatorShort": "モノレール",
+   "operatorShortKana": "ものれーる",
+   "operatorShortEng": "Osaka Monorail",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "万博記念公園",
+     "kana": "ばんぱくきねんこうえん",
+     "eng": "Banpaku-kinen-koen",
+     "lat": 34.8068,
+     "lon": 135.5301,
+     "number": "17"
+    },
+    {
+     "name": "公園東口",
+     "kana": "こうえんひがしぐち",
+     "eng": "Koen-higashiguchi",
+     "lat": 34.8109,
+     "lon": 135.5397,
+     "number": "51"
+    },
+    {
+     "name": "阪大病院前",
+     "kana": "はんだいびょういんまえ",
+     "eng": "Handai-byoin-mae",
+     "lat": 34.8186,
+     "lon": 135.5297,
+     "number": "52"
+    },
+    {
+     "name": "豊川",
+     "kana": "とよかわ",
+     "eng": "Toyokawa",
+     "lat": 34.8347,
+     "lon": 135.5268,
+     "number": "53"
+    },
+    {
+     "name": "彩都西",
+     "kana": "さいとにし",
+     "eng": "Saito-nishi",
+     "lat": 34.8555,
+     "lon": 135.5229,
+     "number": "54"
+    }
+   ]
+  }
+ ]
+}

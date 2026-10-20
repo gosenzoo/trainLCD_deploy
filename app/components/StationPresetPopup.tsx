@@ -8,6 +8,23 @@ import {
     StationSection, StagedRoute, PRESET_OPERATOR_TYPES, PresetOperatorType
 } from '../modules/loadStationPresets'
 import StationPresetMap from './StationPresetMap'
+import ToggleSwitch from './ToggleSwitch'
+
+// 「追加設定」（7.63節）の保存先（ブラウザの localStorage のキー）。設定データには含めない
+const PRESET_ADD_OPTIONS_KEY = 'presetAddOptions'
+type PresetAddOptions = { useGenericIconForOtherOperators: boolean }
+const loadPresetAddOptions = (): PresetAddOptions => {
+    try {
+        const saved = JSON.parse(localStorage.getItem(PRESET_ADD_OPTIONS_KEY) ?? '{}')
+        return { useGenericIconForOtherOperators: saved?.useGenericIconForOtherOperators === true }
+    } catch {
+        // 保存・読み込みできない場合（プライベートウィンドウなど）はオフとして扱う
+        return { useGenericIconForOtherOperators: false }
+    }
+}
+const savePresetAddOptions = (options: PresetAddOptions) => {
+    try { localStorage.setItem(PRESET_ADD_OPTIONS_KEY, JSON.stringify(options)) } catch { /* 保存できなくても動作は続ける */ }
+}
 
 type Props = {
     setting: settingType  // lineDict・iconDict の既存エントリを参照するために使用（読み取り専用）
@@ -166,6 +183,20 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     // 追加一覧ウィンドウの開閉（7.42節）。画面を開くたびに「開いた状態」から始める
     const [isStagingOpen, setIsStagingOpen] = useState<boolean>(true)
+    // 追加設定（7.63節）。「他社線を汎用記号にする」はブラウザに保存した値から始める
+    const [addOptions, setAddOptions] = useState<PresetAddOptions>(() => loadPresetAddOptions())
+    const [isAddOptionsOpen, setIsAddOptionsOpen] = useState<boolean>(false)
+    const updateAddOptions = (options: PresetAddOptions) => {
+        setAddOptions(options)
+        savePresetAddOptions(options)
+    }
+    // 追加設定のポップアップは Esc でも閉じる
+    useEffect(() => {
+        if (!isAddOptionsOpen) return
+        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsAddOptionsOpen(false) }
+        document.addEventListener('keydown', onKeyDown)
+        return () => document.removeEventListener('keydown', onKeyDown)
+    }, [isAddOptionsOpen])
     // 路線図に表示する事業者種別（7.43節）。画面を開くたびに全種別を表示した状態から始める
     const [visibleOperatorTypes, setVisibleOperatorTypes] = useState<ReadonlySet<PresetOperatorType>>(() => new Set(PRESET_OPERATOR_TYPES))
 
@@ -225,15 +256,17 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         // プリセット路線の路線記号アイコンを iconDict のキーに解決する（未登録の場合は iconDict に新規追加する）。
         // 路線アイコンが空の路線は空文字を返す。路線記号が空でも路線アイコンがあれば作成する
         // （路線記号のない路線は lineDB で I_mono_color〔路線カラーの四角〕が指定されている）。乗換路線のアイコンにも使う
-        const resolveIconKey = (presetLine: PresetLine): string => {
+        // presetType を渡すと、そのプリセットで作る（他社線の汎用記号。7.63節）
+        const resolveIconKey = (presetLine: PresetLine, presetType?: string): string => {
             // 路線記号アイコンの解決: 既存iconDict → 今回新規作成分の順に完全一致するものを探す
             // presetType には lineDB の「路線アイコン」列（I_*）を使う
-            if (!presetLine.iconPresetKey) return ''
-            const iconParams: iconParamsType = { presetType: presetLine.iconPresetKey, symbol: presetLine.symbol, color: presetLine.color }
+            const type = presetType ?? presetLine.iconPresetKey
+            if (!type) return ''
+            const iconParams: iconParamsType = { presetType: type, symbol: presetLine.symbol, color: presetLine.color }
             const allIconsSoFar = { ...setting.iconDict, ...newIcons }
             const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
             if (existingIconKey) return existingIconKey
-            const newKey = generateUniqueIconKey(allIconsSoFar, `line_${presetLine.id}`)
+            const newKey = generateUniqueIconKey(allIconsSoFar, presetType ? `line_${presetLine.id}_generic` : `line_${presetLine.id}`)
             newIcons[newKey] = iconParams
             return newKey
         }
@@ -355,7 +388,7 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     // - その駅（と乗換エッジでつながった駅）を通る路線のうち、この駅でルートが使っていない路線
     // - ルートが使っている路線の、この駅からルートが進まない方向（「○○線（××方面）」）
     // 並び順: 自社（この駅でルートが使う路線の事業者）→ 他社（lineDB に初めて現れる順）、同じ事業者内は路線IDの順
-    const buildTransfers = (usage: RowUsage, resolveIconKey: (line: PresetLine) => string): transferItemType[] => {
+    const buildTransfers = (usage: RowUsage, resolveIconKey: (line: PresetLine, presetType?: string) => string): transferItemType[] => {
         const lineIndexById = new Map(lines.map((l, i) => [l.id, i]))
         const lineById = new Map(lines.map(l => [l.id, l]))
         const stationById = new Map(allStations.map(s => [s.id, s]))
@@ -442,13 +475,24 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             const number = spaceIdx !== -1 ? numberStr.slice(spaceIdx + 1) : numberStr
             // 方面の場合は「路線名（隣駅名方面）」とする
             const toward = c.towardId !== null ? stationById.get(c.towardId) : undefined
-            const iconKey = resolveIconKey(line)
+            // 他社線（この駅でルートが使っている事業者以外の路線）は路線名の前に事業者略称を付ける（7.62節。例: 西鉄天神大牟田線）
+            // 路線名が既に略称で始まる場合（都営浅草線・近鉄名古屋線・Toei Asakusa Line など）は付けない（7.63節）
+            const isOtherOperator = !ownOperators.includes(line.operator)
+            // 「他社線を汎用記号にする」がオンなら、他社線の路線記号はその路線の汎用記号にする（7.63節）
+            const iconKey = addOptions.useGenericIconForOtherOperators && isOtherOperator
+                ? resolveIconKey(line, line.genericIconPresetKey)
+                : resolveIconKey(line)
+            const withShort = (short: string, name: string, sep: string) =>
+                isOtherOperator && short && !name.startsWith(short) ? `${short}${sep}${name}` : name
+            const lineName = withShort(line.operatorShort, line.name, '')
+            const lineKana = withShort(line.operatorShortKana, line.kana, '')
+            const lineEng = withShort(line.operatorShortEng, line.eng, ' ')
             const item: transferItemType = {
                 line: {
                     lineIconKey: iconKey ? [iconKey] : [],
-                    name: toward ? `${line.name}（${toward.name}方面）` : line.name,
-                    kana: toward ? `${line.kana}（${toward.kana}ほうめん）` : line.kana,
-                    eng: toward ? `${line.eng} (for ${toward.eng})` : line.eng,
+                    name: toward ? `${lineName}（${toward.name}方面）` : lineName,
+                    kana: toward ? `${lineKana}（${toward.kana}ほうめん）` : lineKana,
+                    eng: toward ? `${lineEng} (for ${toward.eng})` : lineEng,
                 },
                 station: {
                     isDraw: false,
@@ -605,6 +649,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                         <span className="preset-staging-title">{isStagingOpen ? '▼' : '▲'} 追加一覧</span>
                         {/* ボタンのクリックでは開閉しない */}
                         <div className="btn-group" style={{ margin: 0 }} onClick={e => e.stopPropagation()}>
+                            {/* 追加設定（7.63節） */}
+                            <button onClick={() => setIsAddOptionsOpen(true)} className="btn-secondary">追加設定</button>
                             <button onClick={handleBack} className="btn-secondary" disabled={prevStation === null}>1つ戻る</button>
                             <button onClick={handleAdd} className="btn-primary" disabled={stagingList.length === 0}>この区間を追加</button>
                         </div>
@@ -632,6 +678,27 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                     )}
                 </div>
             </div>
+            {/* 「追加設定」ポップアップ（7.63節）。全画面の上に出すため最前面用の背景を使う */}
+            {isAddOptionsOpen && (
+                <div className="modal-backdrop-top" onClick={() => setIsAddOptionsOpen(false)}>
+                    <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+                        <div className="modal-title-row">
+                            <p className="modal-title">追加設定</p>
+                            <button className="modal-close-btn" onClick={() => setIsAddOptionsOpen(false)} title="閉じる">×</button>
+                        </div>
+                        <div className="form-row">
+                            <label>他社線を汎用記号にする</label>
+                            <ToggleSwitch
+                                checked={addOptions.useGenericIconForOtherOperators}
+                                onChange={(v) => updateAddOptions({ ...addOptions, useGenericIconForOtherOperators: v })}
+                            />
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={() => setIsAddOptionsOpen(false)}>閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

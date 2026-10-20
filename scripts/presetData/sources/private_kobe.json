@@ -1,0 +1,1484 @@
+{
+ "lines": [
+  {
+   "no": 510,
+   "name": "西神・山手線",
+   "kana": "せいしん・やまてせん",
+   "eng": "Seishin-Yamate Line",
+   "color": "#00AE8E",
+   "symbol": "S",
+   "operatorType": "私鉄",
+   "operator": "神戸市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Kobe Municipal Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "新神戸",
+     "kana": "しんこうべ",
+     "eng": "Shin-Kobe",
+     "lat": 34.7067,
+     "lon": 135.1962,
+     "number": "S 02"
+    },
+    {
+     "name": "三宮",
+     "kana": "さんのみや",
+     "eng": "Sannomiya",
+     "lat": 34.6946,
+     "lon": 135.1938,
+     "number": "S 03"
+    },
+    {
+     "name": "県庁前",
+     "kana": "けんちょうまえ",
+     "eng": "Kencho-mae",
+     "lat": 34.6909,
+     "lon": 135.1839,
+     "number": "S 04"
+    },
+    {
+     "name": "大倉山",
+     "kana": "おおくらやま",
+     "eng": "Okurayama",
+     "lat": 34.6846,
+     "lon": 135.1745,
+     "number": "S 05"
+    },
+    {
+     "name": "湊川公園",
+     "kana": "みなとがわこうえん",
+     "eng": "Minatogawa-koen",
+     "lat": 34.6794,
+     "lon": 135.1672,
+     "number": "S 06"
+    },
+    {
+     "name": "上沢",
+     "kana": "かみさわ",
+     "eng": "Kamisawa",
+     "lat": 34.6733,
+     "lon": 135.1583,
+     "number": "S 07"
+    },
+    {
+     "name": "長田",
+     "kana": "ながた",
+     "eng": "Nagata",
+     "lat": 34.6685,
+     "lon": 135.1515,
+     "number": "S 08"
+    },
+    {
+     "name": "新長田",
+     "kana": "しんながた",
+     "eng": "Shin-Nagata",
+     "lat": 34.6576,
+     "lon": 135.1451,
+     "number": "S 09"
+    },
+    {
+     "name": "板宿",
+     "kana": "いたやど",
+     "eng": "Itayado",
+     "lat": 34.6601,
+     "lon": 135.1334,
+     "number": "S 10"
+    },
+    {
+     "name": "妙法寺",
+     "kana": "みょうほうじ",
+     "eng": "Myohoji",
+     "lat": 34.675,
+     "lon": 135.1101,
+     "number": "S 11"
+    },
+    {
+     "name": "名谷",
+     "kana": "みょうだに",
+     "eng": "Myodani",
+     "lat": 34.6793,
+     "lon": 135.0942,
+     "number": "S 12"
+    },
+    {
+     "name": "総合運動公園",
+     "kana": "そうごううんどうこうえん",
+     "eng": "Sogo Undo Koen",
+     "lat": 34.6817,
+     "lon": 135.0758,
+     "number": "S 13"
+    },
+    {
+     "name": "学園都市",
+     "kana": "がくえんとし",
+     "eng": "Gakuen Toshi",
+     "lat": 34.6815,
+     "lon": 135.0575,
+     "number": "S 14"
+    },
+    {
+     "name": "伊川谷",
+     "kana": "いかわだに",
+     "eng": "Ikawadani",
+     "lat": 34.6879,
+     "lon": 135.0414,
+     "number": "S 15"
+    },
+    {
+     "name": "西神南",
+     "kana": "せいしんみなみ",
+     "eng": "Seishin-minami",
+     "lat": 34.6994,
+     "lon": 135.0302,
+     "number": "S 16"
+    },
+    {
+     "name": "西神中央",
+     "kana": "せいしんちゅうおう",
+     "eng": "Seishin-chuo",
+     "lat": 34.7195,
+     "lon": 135.0174,
+     "number": "S 17"
+    }
+   ]
+  },
+  {
+   "no": 511,
+   "name": "北神線",
+   "kana": "ほくしんせん",
+   "eng": "Hokushin Line",
+   "color": "#CB8A07",
+   "symbol": "S",
+   "operatorType": "私鉄",
+   "operator": "神戸市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Kobe Municipal Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "新神戸",
+     "kana": "しんこうべ",
+     "eng": "Shin-Kobe",
+     "lat": 34.7067,
+     "lon": 135.1962,
+     "number": "S 02"
+    },
+    {
+     "name": "谷上",
+     "kana": "たにがみ",
+     "eng": "Tanigami",
+     "lat": 34.7618,
+     "lon": 135.1713,
+     "number": "S 01"
+    }
+   ]
+  },
+  {
+   "no": 512,
+   "name": "海岸線",
+   "kana": "かいがんせん",
+   "eng": "Kaigan Line",
+   "color": "#267DCE",
+   "symbol": "K",
+   "operatorType": "私鉄",
+   "operator": "神戸市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Kobe Municipal Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "三宮・花時計前",
+     "kana": "さんのみや・はなどけいまえ",
+     "eng": "Sannomiya-Hanadokeimae",
+     "lat": 34.6916,
+     "lon": 135.1955,
+     "number": "K 01"
+    },
+    {
+     "name": "旧居留地・大丸前",
+     "kana": "きゅうきょりゅうち・だいまるまえ",
+     "eng": "Kyukyoryuchi-Daimarumae",
+     "lat": 34.6896,
+     "lon": 135.1907,
+     "number": "K 02"
+    },
+    {
+     "name": "みなと元町",
+     "kana": "みなともとまち",
+     "eng": "Minato Motomachi",
+     "lat": 34.6859,
+     "lon": 135.184,
+     "number": "K 03"
+    },
+    {
+     "name": "ハーバーランド",
+     "kana": "はーばーらんど",
+     "eng": "Harborland",
+     "lat": 34.6785,
+     "lon": 135.1787,
+     "number": "K 04"
+    },
+    {
+     "name": "中央市場前",
+     "kana": "ちゅうおういちばまえ",
+     "eng": "Chuo Ichiba-mae",
+     "lat": 34.6662,
+     "lon": 135.1759,
+     "number": "K 05"
+    },
+    {
+     "name": "和田岬",
+     "kana": "わだみさき",
+     "eng": "Wadamisaki",
+     "lat": 34.6569,
+     "lon": 135.1747,
+     "number": "K 06"
+    },
+    {
+     "name": "御崎公園",
+     "kana": "みさきこうえん",
+     "eng": "Misaki-koen",
+     "lat": 34.6546,
+     "lon": 135.165,
+     "number": "K 07"
+    },
+    {
+     "name": "苅藻",
+     "kana": "かるも",
+     "eng": "Karumo",
+     "lat": 34.6536,
+     "lon": 135.1566,
+     "number": "K 08"
+    },
+    {
+     "name": "駒ヶ林",
+     "kana": "こまがばやし",
+     "eng": "Komagabayashi",
+     "lat": 34.6521,
+     "lon": 135.1496,
+     "number": "K 09"
+    },
+    {
+     "name": "新長田",
+     "kana": "しんながた",
+     "eng": "Shin-Nagata",
+     "lat": 34.6576,
+     "lon": 135.1451,
+     "number": "K 10"
+    }
+   ]
+  },
+  {
+   "no": 513,
+   "name": "本線",
+   "kana": "ほんせん",
+   "eng": "Sanyo Line",
+   "color": "#E60012",
+   "symbol": "SY",
+   "operatorType": "私鉄",
+   "operator": "山陽電気鉄道",
+   "operatorShort": "山陽",
+   "operatorShortKana": "さんよう",
+   "operatorShortEng": "Sanyo",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "西代",
+     "kana": "にしだい",
+     "eng": "Nishidai",
+     "lat": 34.6622,
+     "lon": 135.1439,
+     "number": "SY 01"
+    },
+    {
+     "name": "板宿",
+     "kana": "いたやど",
+     "eng": "Itayado",
+     "lat": 34.6601,
+     "lon": 135.1334,
+     "number": "SY 02"
+    },
+    {
+     "name": "東須磨",
+     "kana": "ひがしすま",
+     "eng": "Higashi-Suma",
+     "lat": 34.6551,
+     "lon": 135.1275,
+     "number": "SY 03"
+    },
+    {
+     "name": "月見山",
+     "kana": "つきみやま",
+     "eng": "Tsukimiyama",
+     "lat": 34.6498,
+     "lon": 135.1216,
+     "number": "SY 04"
+    },
+    {
+     "name": "須磨寺",
+     "kana": "すまでら",
+     "eng": "Sumadera",
+     "lat": 34.6464,
+     "lon": 135.1162,
+     "number": "SY 05"
+    },
+    {
+     "name": "山陽須磨",
+     "kana": "さんようすま",
+     "eng": "Sanyo Suma",
+     "lat": 34.6434,
+     "lon": 135.1121,
+     "number": "SY 06"
+    },
+    {
+     "name": "須磨浦公園",
+     "kana": "すまうらこうえん",
+     "eng": "Sumaura-koen",
+     "lat": 34.6378,
+     "lon": 135.1004,
+     "number": "SY 07"
+    },
+    {
+     "name": "山陽塩屋",
+     "kana": "さんようしおや",
+     "eng": "Sanyo Shioya",
+     "lat": 34.6337,
+     "lon": 135.0825,
+     "number": "SY 08"
+    },
+    {
+     "name": "滝の茶屋",
+     "kana": "たきのちゃや",
+     "eng": "Takinochaya",
+     "lat": 34.6309,
+     "lon": 135.072,
+     "number": "SY 09"
+    },
+    {
+     "name": "東垂水",
+     "kana": "ひがしたるみ",
+     "eng": "Higashi-Tarumi",
+     "lat": 34.6292,
+     "lon": 135.0629,
+     "number": "SY 10"
+    },
+    {
+     "name": "山陽垂水",
+     "kana": "さんようたるみ",
+     "eng": "Sanyo Tarumi",
+     "lat": 34.6295,
+     "lon": 135.0536,
+     "number": "SY 11"
+    },
+    {
+     "name": "霞ヶ丘",
+     "kana": "かすみがおか",
+     "eng": "Kasumigaoka",
+     "lat": 34.6308,
+     "lon": 135.0423,
+     "number": "SY 12"
+    },
+    {
+     "name": "舞子公園",
+     "kana": "まいここうえん",
+     "eng": "Maiko-koen",
+     "lat": 34.6341,
+     "lon": 135.0343,
+     "number": "SY 13"
+    },
+    {
+     "name": "西舞子",
+     "kana": "にしまいこ",
+     "eng": "Nishi-Maiko",
+     "lat": 34.6385,
+     "lon": 135.0283,
+     "number": "SY 14"
+    },
+    {
+     "name": "大蔵谷",
+     "kana": "おおくらだに",
+     "eng": "Okuradani",
+     "lat": 34.6465,
+     "lon": 135.008,
+     "number": "SY 15"
+    },
+    {
+     "name": "人丸前",
+     "kana": "ひとまるまえ",
+     "eng": "Hitomaru-mae",
+     "lat": 34.6475,
+     "lon": 135.0021,
+     "number": "SY 16"
+    },
+    {
+     "name": "山陽明石",
+     "kana": "さんようあかし",
+     "eng": "Sanyo Akashi",
+     "lat": 34.6491,
+     "lon": 134.9928,
+     "number": "SY 17"
+    },
+    {
+     "name": "西新町",
+     "kana": "にししんまち",
+     "eng": "Nishi-Shinmachi",
+     "lat": 34.6497,
+     "lon": 134.9811,
+     "number": "SY 18"
+    },
+    {
+     "name": "林崎松江海岸",
+     "kana": "はやしさきまつえかいがん",
+     "eng": "Hayashisaki-Matsuekaigan",
+     "lat": 34.652,
+     "lon": 134.9652,
+     "number": "SY 19"
+    },
+    {
+     "name": "藤江",
+     "kana": "ふじえ",
+     "eng": "Fujie",
+     "lat": 34.6637,
+     "lon": 134.9473,
+     "number": "SY 20"
+    },
+    {
+     "name": "中八木",
+     "kana": "なかやぎ",
+     "eng": "Nakayagi",
+     "lat": 34.6707,
+     "lon": 134.9361,
+     "number": "SY 21"
+    },
+    {
+     "name": "江井ヶ島",
+     "kana": "えいがしま",
+     "eng": "Eigashima",
+     "lat": 34.6792,
+     "lon": 134.9193,
+     "number": "SY 22"
+    },
+    {
+     "name": "西江井ヶ島",
+     "kana": "にしえいがしま",
+     "eng": "Nishi-Eigashima",
+     "lat": 34.6858,
+     "lon": 134.9078,
+     "number": "SY 23"
+    },
+    {
+     "name": "山陽魚住",
+     "kana": "さんよううおずみ",
+     "eng": "Sanyo Uozumi",
+     "lat": 34.6893,
+     "lon": 134.9017,
+     "number": "SY 24"
+    },
+    {
+     "name": "東二見",
+     "kana": "ひがしふたみ",
+     "eng": "Higashi-Futami",
+     "lat": 34.7,
+     "lon": 134.8884,
+     "number": "SY 25"
+    },
+    {
+     "name": "西二見",
+     "kana": "にしふたみ",
+     "eng": "Nishi-Futami",
+     "lat": 34.7072,
+     "lon": 134.8769,
+     "number": "SY 26"
+    },
+    {
+     "name": "播磨町",
+     "kana": "はりまちょう",
+     "eng": "Harimacho",
+     "lat": 34.7166,
+     "lon": 134.8681,
+     "number": "SY 27"
+    },
+    {
+     "name": "別府",
+     "kana": "べふ",
+     "eng": "Befu",
+     "lat": 34.7302,
+     "lon": 134.8506,
+     "number": "SY 28"
+    },
+    {
+     "name": "浜の宮",
+     "kana": "はまのみや",
+     "eng": "Hamanomiya",
+     "lat": 34.7409,
+     "lon": 134.8338,
+     "number": "SY 29"
+    },
+    {
+     "name": "尾上の松",
+     "kana": "おのえのまつ",
+     "eng": "Onoenomatsu",
+     "lat": 34.7506,
+     "lon": 134.8206,
+     "number": "SY 30"
+    },
+    {
+     "name": "高砂",
+     "kana": "たかさご",
+     "eng": "Takasago",
+     "lat": 34.7519,
+     "lon": 134.8032,
+     "number": "SY 31"
+    },
+    {
+     "name": "荒井",
+     "kana": "あらい",
+     "eng": "Arai",
+     "lat": 34.7579,
+     "lon": 134.7938,
+     "number": "SY 32"
+    },
+    {
+     "name": "伊保",
+     "kana": "いほ",
+     "eng": "Iho",
+     "lat": 34.7671,
+     "lon": 134.7833,
+     "number": "SY 33"
+    },
+    {
+     "name": "山陽曽根",
+     "kana": "さんようそね",
+     "eng": "Sanyo Sone",
+     "lat": 34.7755,
+     "lon": 134.7729,
+     "number": "SY 34"
+    },
+    {
+     "name": "大塩",
+     "kana": "おおしお",
+     "eng": "Oshio",
+     "lat": 34.7793,
+     "lon": 134.7579,
+     "number": "SY 35"
+    },
+    {
+     "name": "的形",
+     "kana": "まとがた",
+     "eng": "Matogata",
+     "lat": 34.7799,
+     "lon": 134.7421,
+     "number": "SY 36"
+    },
+    {
+     "name": "八家",
+     "kana": "やか",
+     "eng": "Yaka",
+     "lat": 34.7841,
+     "lon": 134.7219,
+     "number": "SY 37"
+    },
+    {
+     "name": "白浜の宮",
+     "kana": "しらはまのみや",
+     "eng": "Shirahamanomiya",
+     "lat": 34.7868,
+     "lon": 134.7073,
+     "number": "SY 38"
+    },
+    {
+     "name": "妻鹿",
+     "kana": "めが",
+     "eng": "Mega",
+     "lat": 34.7923,
+     "lon": 134.693,
+     "number": "SY 39"
+    },
+    {
+     "name": "飾磨",
+     "kana": "しかま",
+     "eng": "Shikama",
+     "lat": 34.7974,
+     "lon": 134.6697,
+     "number": "SY 40"
+    },
+    {
+     "name": "亀山",
+     "kana": "かめやま",
+     "eng": "Kameyama",
+     "lat": 34.8109,
+     "lon": 134.6769,
+     "number": "SY 41"
+    },
+    {
+     "name": "手柄",
+     "kana": "てがら",
+     "eng": "Tegara",
+     "lat": 34.82,
+     "lon": 134.6814,
+     "number": "SY 42"
+    },
+    {
+     "name": "山陽姫路",
+     "kana": "さんようひめじ",
+     "eng": "Sanyo Himeji",
+     "lat": 34.8288,
+     "lon": 134.6898,
+     "number": "SY 43"
+    }
+   ]
+  },
+  {
+   "no": 514,
+   "name": "網干線",
+   "kana": "あぼしせん",
+   "eng": "Aboshi Line",
+   "color": "#E60012",
+   "symbol": "SY",
+   "operatorType": "私鉄",
+   "operator": "山陽電気鉄道",
+   "operatorShort": "山陽",
+   "operatorShortKana": "さんよう",
+   "operatorShortEng": "Sanyo",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "飾磨",
+     "kana": "しかま",
+     "eng": "Shikama",
+     "lat": 34.7974,
+     "lon": 134.6697,
+     "number": "SY 40"
+    },
+    {
+     "name": "西飾磨",
+     "kana": "にししかま",
+     "eng": "Nishi-Shikama",
+     "lat": 34.8031,
+     "lon": 134.6512,
+     "number": "SY 51"
+    },
+    {
+     "name": "夢前川",
+     "kana": "ゆめさきがわ",
+     "eng": "Yumesakigawa",
+     "lat": 34.7987,
+     "lon": 134.6395,
+     "number": "SY 52"
+    },
+    {
+     "name": "広畑",
+     "kana": "ひろはた",
+     "eng": "Hirohata",
+     "lat": 34.7978,
+     "lon": 134.6281,
+     "number": "SY 53"
+    },
+    {
+     "name": "山陽天満",
+     "kana": "さんようてんま",
+     "eng": "Sanyo Temma",
+     "lat": 34.7964,
+     "lon": 134.6174,
+     "number": "SY 54"
+    },
+    {
+     "name": "平松",
+     "kana": "ひらまつ",
+     "eng": "Hiramatsu",
+     "lat": 34.7904,
+     "lon": 134.6002,
+     "number": "SY 55"
+    },
+    {
+     "name": "山陽網干",
+     "kana": "さんようあぼし",
+     "eng": "Sanyo Aboshi",
+     "lat": 34.787,
+     "lon": 134.5879,
+     "number": "SY 56"
+    }
+   ]
+  },
+  {
+   "no": 515,
+   "name": "神戸高速線（神鉄）",
+   "kana": "こうべこうそくせん（しんてつ）",
+   "eng": "Kobe Kosoku Line",
+   "color": "#DD0033",
+   "symbol": "KB",
+   "operatorType": "私鉄",
+   "operator": "神戸電鉄",
+   "operatorShort": "神鉄",
+   "operatorShortKana": "しんてつ",
+   "operatorShortEng": "Shintetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "新開地",
+     "kana": "しんかいち",
+     "eng": "Shinkaichi",
+     "lat": 34.676,
+     "lon": 135.1693,
+     "number": "KB 01"
+    },
+    {
+     "name": "湊川",
+     "kana": "みなとがわ",
+     "eng": "Minatogawa",
+     "lat": 34.6793,
+     "lon": 135.1663,
+     "number": "KB 02"
+    }
+   ]
+  },
+  {
+   "no": 516,
+   "name": "有馬線",
+   "kana": "ありません",
+   "eng": "Arima Line",
+   "color": "#DD0033",
+   "symbol": "KB",
+   "operatorType": "私鉄",
+   "operator": "神戸電鉄",
+   "operatorShort": "神鉄",
+   "operatorShortKana": "しんてつ",
+   "operatorShortEng": "Shintetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "湊川",
+     "kana": "みなとがわ",
+     "eng": "Minatogawa",
+     "lat": 34.6793,
+     "lon": 135.1663,
+     "number": "KB 02"
+    },
+    {
+     "name": "長田",
+     "kana": "ながた",
+     "eng": "Nagata",
+     "lat": 34.6817,
+     "lon": 135.1495,
+     "number": "KB 03"
+    },
+    {
+     "name": "丸山",
+     "kana": "まるやま",
+     "eng": "Maruyama",
+     "lat": 34.6858,
+     "lon": 135.144,
+     "number": "KB 04"
+    },
+    {
+     "name": "鵯越",
+     "kana": "ひよどりごえ",
+     "eng": "Hiyodorigoe",
+     "lat": 34.6926,
+     "lon": 135.1421,
+     "number": "KB 05"
+    },
+    {
+     "name": "鈴蘭台",
+     "kana": "すずらんだい",
+     "eng": "Suzurandai",
+     "lat": 34.7237,
+     "lon": 135.1461,
+     "number": "KB 06"
+    },
+    {
+     "name": "北鈴蘭台",
+     "kana": "きたすずらんだい",
+     "eng": "Kita-Suzurandai",
+     "lat": 34.7395,
+     "lon": 135.152,
+     "number": "KB 07"
+    },
+    {
+     "name": "山の街",
+     "kana": "やまのまち",
+     "eng": "Yamanomachi",
+     "lat": 34.7467,
+     "lon": 135.1529,
+     "number": "KB 08"
+    },
+    {
+     "name": "箕谷",
+     "kana": "みのたに",
+     "eng": "Minotani",
+     "lat": 34.7569,
+     "lon": 135.1558,
+     "number": "KB 09"
+    },
+    {
+     "name": "谷上",
+     "kana": "たにがみ",
+     "eng": "Tanigami",
+     "lat": 34.7618,
+     "lon": 135.1713,
+     "number": "KB 10"
+    },
+    {
+     "name": "花山",
+     "kana": "はなやま",
+     "eng": "Hanayama",
+     "lat": 34.7695,
+     "lon": 135.1869,
+     "number": "KB 11"
+    },
+    {
+     "name": "大池",
+     "kana": "おおいけ",
+     "eng": "Oike",
+     "lat": 34.7807,
+     "lon": 135.1984,
+     "number": "KB 12"
+    },
+    {
+     "name": "神鉄六甲",
+     "kana": "しんてつろっこう",
+     "eng": "Shintetsu Rokko",
+     "lat": 34.7856,
+     "lon": 135.2066,
+     "number": "KB 13"
+    },
+    {
+     "name": "唐櫃台",
+     "kana": "からとだい",
+     "eng": "Karatodai",
+     "lat": 34.7907,
+     "lon": 135.2117,
+     "number": "KB 14"
+    },
+    {
+     "name": "有馬口",
+     "kana": "ありまぐち",
+     "eng": "Arimaguchi",
+     "lat": 34.7967,
+     "lon": 135.2209,
+     "number": "KB 15"
+    },
+    {
+     "name": "有馬温泉",
+     "kana": "ありまおんせん",
+     "eng": "Arima Onsen",
+     "lat": 34.7993,
+     "lon": 135.246,
+     "number": "KB 16"
+    }
+   ]
+  },
+  {
+   "no": 517,
+   "name": "三田線",
+   "kana": "さんだせん",
+   "eng": "Sanda Line",
+   "color": "#DD0033",
+   "symbol": "KB",
+   "operatorType": "私鉄",
+   "operator": "神戸電鉄",
+   "operatorShort": "神鉄",
+   "operatorShortKana": "しんてつ",
+   "operatorShortEng": "Shintetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "有馬口",
+     "kana": "ありまぐち",
+     "eng": "Arimaguchi",
+     "lat": 34.7967,
+     "lon": 135.2209,
+     "number": "KB 15"
+    },
+    {
+     "name": "五社",
+     "kana": "ごしゃ",
+     "eng": "Gosha",
+     "lat": 34.8061,
+     "lon": 135.2162,
+     "number": "KB 21"
+    },
+    {
+     "name": "岡場",
+     "kana": "おかば",
+     "eng": "Okaba",
+     "lat": 34.8215,
+     "lon": 135.2224,
+     "number": "KB 22"
+    },
+    {
+     "name": "田尾寺",
+     "kana": "たおじ",
+     "eng": "Taoji",
+     "lat": 34.8355,
+     "lon": 135.226,
+     "number": "KB 23"
+    },
+    {
+     "name": "二郎",
+     "kana": "にろう",
+     "eng": "Niro",
+     "lat": 34.849,
+     "lon": 135.227,
+     "number": "KB 24"
+    },
+    {
+     "name": "道場南口",
+     "kana": "どうじょうみなみぐち",
+     "eng": "Dojo-minamiguchi",
+     "lat": 34.8563,
+     "lon": 135.223,
+     "number": "KB 25"
+    },
+    {
+     "name": "神鉄道場",
+     "kana": "しんてつどうじょう",
+     "eng": "Shintetsu Dojo",
+     "lat": 34.8666,
+     "lon": 135.2261,
+     "number": "KB 26"
+    },
+    {
+     "name": "横山",
+     "kana": "よこやま",
+     "eng": "Yokoyama",
+     "lat": 34.8769,
+     "lon": 135.22,
+     "number": "KB 27"
+    },
+    {
+     "name": "三田本町",
+     "kana": "さんだほんまち",
+     "eng": "Sanda-Hommachi",
+     "lat": 34.8818,
+     "lon": 135.2295,
+     "number": "KB 28"
+    },
+    {
+     "name": "三田",
+     "kana": "さんだ",
+     "eng": "Sanda",
+     "lat": 34.889,
+     "lon": 135.2298,
+     "number": "KB 29"
+    }
+   ]
+  },
+  {
+   "no": 518,
+   "name": "公園都市線",
+   "kana": "こうえんとしせん",
+   "eng": "Koen-Toshi Line",
+   "color": "#DD0033",
+   "symbol": "KB",
+   "operatorType": "私鉄",
+   "operator": "神戸電鉄",
+   "operatorShort": "神鉄",
+   "operatorShortKana": "しんてつ",
+   "operatorShortEng": "Shintetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "横山",
+     "kana": "よこやま",
+     "eng": "Yokoyama",
+     "lat": 34.8769,
+     "lon": 135.22,
+     "number": "KB 27"
+    },
+    {
+     "name": "フラワータウン",
+     "kana": "ふらわーたうん",
+     "eng": "Flower Town",
+     "lat": 34.8855,
+     "lon": 135.2023,
+     "number": "KB 31"
+    },
+    {
+     "name": "南ウッディタウン",
+     "kana": "みなみうっでぃたうん",
+     "eng": "Minami-Woody Town",
+     "lat": 34.9016,
+     "lon": 135.1897,
+     "number": "KB 32"
+    },
+    {
+     "name": "ウッディタウン中央",
+     "kana": "うっでぃたうんちゅうおう",
+     "eng": "Woody Town Chuo",
+     "lat": 34.9098,
+     "lon": 135.1836,
+     "number": "KB 33"
+    }
+   ]
+  },
+  {
+   "no": 519,
+   "name": "粟生線",
+   "kana": "あおせん",
+   "eng": "Ao Line",
+   "color": "#DD0033",
+   "symbol": "KB",
+   "operatorType": "私鉄",
+   "operator": "神戸電鉄",
+   "operatorShort": "神鉄",
+   "operatorShortKana": "しんてつ",
+   "operatorShortEng": "Shintetsu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "鈴蘭台",
+     "kana": "すずらんだい",
+     "eng": "Suzurandai",
+     "lat": 34.7237,
+     "lon": 135.1461,
+     "number": "KB 06"
+    },
+    {
+     "name": "鈴蘭台西口",
+     "kana": "すずらんだいにしぐち",
+     "eng": "Suzurandai-nishiguchi",
+     "lat": 34.7264,
+     "lon": 135.1407,
+     "number": "KB 41"
+    },
+    {
+     "name": "西鈴蘭台",
+     "kana": "にしすずらんだい",
+     "eng": "Nishi-Suzurandai",
+     "lat": 34.7257,
+     "lon": 135.1354,
+     "number": "KB 42"
+    },
+    {
+     "name": "藍那",
+     "kana": "あいな",
+     "eng": "Aina",
+     "lat": 34.7325,
+     "lon": 135.118,
+     "number": "KB 43"
+    },
+    {
+     "name": "木津",
+     "kana": "きつ",
+     "eng": "Kitsu",
+     "lat": 34.7442,
+     "lon": 135.0882,
+     "number": "KB 44"
+    },
+    {
+     "name": "木幡",
+     "kana": "こば",
+     "eng": "Koba",
+     "lat": 34.7484,
+     "lon": 135.071,
+     "number": "KB 45"
+    },
+    {
+     "name": "栄",
+     "kana": "さかえ",
+     "eng": "Sakae",
+     "lat": 34.7552,
+     "lon": 135.0566,
+     "number": "KB 46"
+    },
+    {
+     "name": "押部谷",
+     "kana": "おしべだに",
+     "eng": "Oshibedani",
+     "lat": 34.7566,
+     "lon": 135.0392,
+     "number": "KB 47"
+    },
+    {
+     "name": "緑が丘",
+     "kana": "みどりがおか",
+     "eng": "Midorigaoka",
+     "lat": 34.765,
+     "lon": 135.0258,
+     "number": "KB 48"
+    },
+    {
+     "name": "広野ゴルフ場前",
+     "kana": "ひろのごるふじょうまえ",
+     "eng": "Hirono Golf-jo-mae",
+     "lat": 34.7703,
+     "lon": 135.023,
+     "number": "KB 49"
+    },
+    {
+     "name": "志染",
+     "kana": "しじみ",
+     "eng": "Shijimi",
+     "lat": 34.7823,
+     "lon": 135.0077,
+     "number": "KB 50"
+    },
+    {
+     "name": "恵比須",
+     "kana": "えびす",
+     "eng": "Ebisu",
+     "lat": 34.7979,
+     "lon": 134.9984,
+     "number": "KB 51"
+    },
+    {
+     "name": "三木上の丸",
+     "kana": "みきうえのまる",
+     "eng": "Miki-Uenomaru",
+     "lat": 34.8001,
+     "lon": 134.9887,
+     "number": "KB 52"
+    },
+    {
+     "name": "三木",
+     "kana": "みき",
+     "eng": "Miki",
+     "lat": 34.7997,
+     "lon": 134.9815,
+     "number": "KB 53"
+    },
+    {
+     "name": "大村",
+     "kana": "おおむら",
+     "eng": "Omura",
+     "lat": 34.8087,
+     "lon": 134.9714,
+     "number": "KB 54"
+    },
+    {
+     "name": "樫山",
+     "kana": "かしやま",
+     "eng": "Kashiyama",
+     "lat": 34.8205,
+     "lon": 134.9498,
+     "number": "KB 55"
+    },
+    {
+     "name": "市場",
+     "kana": "いちば",
+     "eng": "Ichiba",
+     "lat": 34.8243,
+     "lon": 134.9445,
+     "number": "KB 56"
+    },
+    {
+     "name": "小野",
+     "kana": "おの",
+     "eng": "Ono",
+     "lat": 34.8432,
+     "lon": 134.9342,
+     "number": "KB 57"
+    },
+    {
+     "name": "葉多",
+     "kana": "はた",
+     "eng": "Hata",
+     "lat": 34.8502,
+     "lon": 134.92,
+     "number": "KB 58"
+    },
+    {
+     "name": "粟生",
+     "kana": "あお",
+     "eng": "Ao",
+     "lat": 34.8569,
+     "lon": 134.91,
+     "number": "KB 59"
+    }
+   ]
+  },
+  {
+   "no": 520,
+   "name": "ポートアイランド線",
+   "kana": "ぽーとあいらんどせん",
+   "eng": "Port Island Line",
+   "color": "#056637",
+   "symbol": "P",
+   "operatorType": "私鉄",
+   "operator": "神戸新交通",
+   "operatorShort": "ポートライナー",
+   "operatorShortKana": "ぽーとらいなー",
+   "operatorShortEng": "Port Liner",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "三宮",
+     "kana": "さんのみや",
+     "eng": "Sannomiya",
+     "lat": 34.6945,
+     "lon": 135.1953,
+     "number": "P 01"
+    },
+    {
+     "name": "貿易センター",
+     "kana": "ぼうえきせんたー",
+     "eng": "Boeki Center",
+     "lat": 34.6894,
+     "lon": 135.1995,
+     "number": "P 02"
+    },
+    {
+     "name": "ポートターミナル",
+     "kana": "ぽーとたーみなる",
+     "eng": "Port Terminal",
+     "lat": 34.6814,
+     "lon": 135.2023,
+     "number": "P 03"
+    },
+    {
+     "name": "中公園",
+     "kana": "なかこうえん",
+     "eng": "Naka Koen",
+     "lat": 34.6733,
+     "lon": 135.2074,
+     "number": "P 04"
+    },
+    {
+     "name": "みなとじま",
+     "kana": "みなとじま",
+     "eng": "Minatojima",
+     "lat": 34.6691,
+     "lon": 135.21,
+     "number": "P 05"
+    },
+    {
+     "name": "市民広場",
+     "kana": "しみんひろば",
+     "eng": "Shimin Hiroba",
+     "lat": 34.6649,
+     "lon": 135.2125,
+     "number": "P 06"
+    },
+    {
+     "name": "医療センター",
+     "kana": "いりょうせんたー",
+     "eng": "Iryo Center",
+     "lat": 34.6586,
+     "lon": 135.2164,
+     "number": "P 07"
+    },
+    {
+     "name": "計算科学センター",
+     "kana": "けいさんかがくせんたー",
+     "eng": "Keisan Kagaku Center",
+     "lat": 34.6548,
+     "lon": 135.2217,
+     "number": "P 08"
+    },
+    {
+     "name": "神戸空港",
+     "kana": "こうべくうこう",
+     "eng": "Kobe Airport",
+     "lat": 34.6372,
+     "lon": 135.229,
+     "number": "P 09"
+    }
+   ]
+  },
+  {
+   "no": 521,
+   "name": "ポートアイランド線（ループ線）",
+   "kana": "ぽーとあいらんどせん（るーぷせん）",
+   "eng": "Port Island Line (Loop Line)",
+   "color": "#056637",
+   "symbol": "PL",
+   "operatorType": "私鉄",
+   "operator": "神戸新交通",
+   "operatorShort": "ポートライナー",
+   "operatorShortKana": "ぽーとらいなー",
+   "operatorShortEng": "Port Liner",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "市民広場",
+     "kana": "しみんひろば",
+     "eng": "Shimin Hiroba",
+     "lat": 34.6649,
+     "lon": 135.2125,
+     "number": "P 06"
+    },
+    {
+     "name": "南公園",
+     "kana": "みなみこうえん",
+     "eng": "Minami Koen",
+     "lat": 34.6646,
+     "lon": 135.217,
+     "number": "PL 07"
+    },
+    {
+     "name": "中埠頭",
+     "kana": "なかふとう",
+     "eng": "Naka Futo",
+     "lat": 34.6694,
+     "lon": 135.2172,
+     "number": "PL 08"
+    },
+    {
+     "name": "北埠頭",
+     "kana": "きたふとう",
+     "eng": "Kita Futo",
+     "lat": 34.6736,
+     "lon": 135.2147,
+     "number": "PL 09"
+    },
+    {
+     "name": "中公園",
+     "kana": "なかこうえん",
+     "eng": "Naka Koen",
+     "lat": 34.6733,
+     "lon": 135.2074,
+     "number": "P 04"
+    }
+   ]
+  },
+  {
+   "no": 522,
+   "name": "六甲アイランド線",
+   "kana": "ろっこうあいらんどせん",
+   "eng": "Rokko Island Line",
+   "color": "#9686BD",
+   "symbol": "R",
+   "operatorType": "私鉄",
+   "operator": "神戸新交通",
+   "operatorShort": "六甲ライナー",
+   "operatorShortKana": "ろっこうらいなー",
+   "operatorShortEng": "Rokko Liner",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "住吉",
+     "kana": "すみよし",
+     "eng": "Sumiyoshi",
+     "lat": 34.7196,
+     "lon": 135.2619,
+     "number": "R 01"
+    },
+    {
+     "name": "魚崎",
+     "kana": "うおざき",
+     "eng": "Uozaki",
+     "lat": 34.7126,
+     "lon": 135.2693,
+     "number": "R 02"
+    },
+    {
+     "name": "南魚崎",
+     "kana": "みなみうおざき",
+     "eng": "Minami-Uozaki",
+     "lat": 34.7068,
+     "lon": 135.2677,
+     "number": "R 03"
+    },
+    {
+     "name": "アイランド北口",
+     "kana": "あいらんどきたぐち",
+     "eng": "Island Kitaguchi",
+     "lat": 34.6933,
+     "lon": 135.2687,
+     "number": "R 04"
+    },
+    {
+     "name": "アイランドセンター",
+     "kana": "あいらんどせんたー",
+     "eng": "Island Center",
+     "lat": 34.6892,
+     "lon": 135.2693,
+     "number": "R 05"
+    },
+    {
+     "name": "マリンパーク",
+     "kana": "まりんぱーく",
+     "eng": "Marine Park",
+     "lat": 34.6842,
+     "lon": 135.2701,
+     "number": "R 06"
+    }
+   ]
+  },
+  {
+   "no": 523,
+   "name": "北条線",
+   "kana": "ほうじょうせん",
+   "eng": "Hojo Line",
+   "color": "#0068B7",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "北条鉄道",
+   "operatorShort": "北条鉄道",
+   "operatorShortKana": "ほうじょうてつどう",
+   "operatorShortEng": "Hojo Railway",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "粟生",
+     "kana": "あお",
+     "eng": "Ao",
+     "lat": 34.8569,
+     "lon": 134.91,
+     "number": ""
+    },
+    {
+     "name": "網引",
+     "kana": "あびき",
+     "eng": "Abiki",
+     "lat": 34.8621,
+     "lon": 134.8779,
+     "number": ""
+    },
+    {
+     "name": "田原",
+     "kana": "たはら",
+     "eng": "Tahara",
+     "lat": 34.8656,
+     "lon": 134.8667,
+     "number": ""
+    },
+    {
+     "name": "法華口",
+     "kana": "ほっけぐち",
+     "eng": "Hokkeguchi",
+     "lat": 34.8754,
+     "lon": 134.8562,
+     "number": ""
+    },
+    {
+     "name": "播磨下里",
+     "kana": "はりましもさと",
+     "eng": "Harima-Shimosato",
+     "lat": 34.8866,
+     "lon": 134.84,
+     "number": ""
+    },
+    {
+     "name": "長",
+     "kana": "おさ",
+     "eng": "Osa",
+     "lat": 34.8966,
+     "lon": 134.8256,
+     "number": ""
+    },
+    {
+     "name": "播磨横田",
+     "kana": "はりまよこた",
+     "eng": "Harima-Yokota",
+     "lat": 34.9104,
+     "lon": 134.8252,
+     "number": ""
+    },
+    {
+     "name": "北条町",
+     "kana": "ほうじょうまち",
+     "eng": "Hojomachi",
+     "lat": 34.9295,
+     "lon": 134.8323,
+     "number": ""
+    }
+   ]
+  }
+ ]
+}

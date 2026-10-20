@@ -17,7 +17,7 @@ const iconIndexes: presetIndexType[] = [
     {key: "I_train_subway1", name: "地下路線汎用" },
 ]
 
-// 選択の一覧に出る順（7.41節）。JR各社 → 札幌駅 → 東京地下鉄 → 東急
+// 選択の一覧に出る順（7.41節）。JR各社 → 札幌駅 → 東京地下鉄 → 東急 → 汎用（丸形汎用。7.62節）
 const numberIndexes: presetIndexType[] = [
     {key: "N_JR_east", name: "JR東日本" },
     {key: "N_JR_west", name: "JR西日本" },
@@ -29,6 +29,8 @@ const numberIndexes: presetIndexType[] = [
     {key: "N_sapporo", name: "札幌駅" },
     {key: "N_tokyo_subway", name: "東京地下鉄" },
     {key: "N_tokyu", name: "東急" },
+    // 以下は事業者によらない汎用のプリセット（7.62節。私鉄の駅プリセットで使う）
+    {key: "N_round_normal", name: "丸形汎用" },
 ]
 
 export { iconIndexes, numberIndexes }

@@ -37,11 +37,25 @@ COMPANIES = [
 STATION_NUM_ICON = {
     'JR北海道:札幌': 'N_sapporo',  # 札幌駅は記号なしの「01」
 }
+# 私鉄（7.62節）は元データの路線に事業者（operator）・路線アイコン（lineIcon）を書く。路線番号 → (事業者, 路線アイコン, ナンバリングアイコン)
+LINE_OPERATOR = {}
+PRIVATE_NUM_ICON = 'N_round_normal'  # 私鉄のナンバリングアイコン（丸形汎用）
 def company(no):
+    if no in LINE_OPERATOR: return LINE_OPERATOR[no]
     for rg, op, icon, num in COMPANIES:
         if no in rg: return op, icon, num
     raise KeyError(no)
 ALL_NOS = [n for rg, *_ in COMPANIES for n in rg]
+
+# 事業者略称（7.62節）: (略称, かな, 英語)。元データの路線に operatorShort があればその値。
+# 無ければ JR各社は「JR」、東京メトロ（133〜143）は「地下鉄」、都営地下鉄（144〜147）は「都営」
+def operator_short(l):
+    if l.get('operatorShort'):
+        return l['operatorShort'], l.get('operatorShortKana', ''), l.get('operatorShortEng', '')
+    if company(l['no'])[0].startswith('JR'): return 'JR', 'じぇいあーる', 'JR'
+    if 133 <= l['no'] <= 143: return '地下鉄', 'ちかてつ', 'Tokyo Metro'
+    if 144 <= l['no'] <= 147: return '都営', 'とえい', 'Toei'
+    raise ValueError(f'路線 {l["no"]} の事業者略称が決められない')
 
 # 路線の事業者種別（新幹線・JR在来線・私鉄。7.43節）。
 # 元データの路線に "operatorType" があればその値、なければ事業者名が JR で始まれば JR在来線、それ以外は私鉄
@@ -64,6 +78,19 @@ for f in sorted(glob.glob(os.path.join(HERE, 'sources', '*.json'))):
         # 路線データ以外の設定ファイル（共同使用駅・乗換グループ）は読み飛ばす
         lines += json.load(fp).get('lines', [])
 lines.sort(key=lambda l: l['no'])
+# 元データに事業者を書いた路線（私鉄。7.62節）は、その事業者を使う。
+# 私鉄の路線アイコンは単色（I_mono_color）にする（7.63節。汎用記号は「汎用記号」列で別に持つ）
+for l in lines:
+    if l.get('operator'):
+        LINE_OPERATOR[l['no']] = (l['operator'], 'I_mono_color', PRIVATE_NUM_ICON)
+
+# 汎用記号（7.63節）: 「他社線を汎用記号にする」で使うプリセット名。地下鉄の路線は地下路線汎用、それ以外は地上路線汎用１。
+# 元データの路線に genericIcon（無ければ汎用記号の lineIcon）があればその値、無ければ東京の地下鉄（133〜147）は地下路線汎用
+GENERIC_ICONS = ('I_train_normal1', 'I_train_subway1')
+def generic_icon(l):
+    if l.get('genericIcon') in GENERIC_ICONS: return l['genericIcon']
+    if l.get('lineIcon') in GENERIC_ICONS: return l['lineIcon']
+    return 'I_train_subway1' if 133 <= l['no'] <= 147 else 'I_train_normal1'
 
 # ---- 手動の補正（ユーザー指定・グループ間の不一致の解消） ----
 by_name = {l['name']: l for l in lines}
@@ -159,6 +186,14 @@ def base_key(l, s):
 # 近接する同名駅（事業者が違い、駅名が同じで、互いに 1km 以内）も共同使用駅として自動的にまとめる（7.35節・7.37節）。
 # 先に登録された駅（路線ID の小さい路線の駅）を代表にするため、既存の駅ID は変わらない
 SAME_NAME_MERGE_KM = 1.0
+# 近くにある同名駅でも、読みが違う別の駅として扱う駅（自動でまとめない。7.63節）。乗換は transfer_groups.json で結ぶ
+SAME_NAME_NO_MERGE = {
+    '京福電気鉄道:西院',  # 嵐電は「さい」、阪急は「さいいん」
+    # 以下は数百m〜1km 離れた別の駅（公式の乗換駅ではない）
+    '阪神電気鉄道:住吉', '阪神電気鉄道:芦屋', '阪神電気鉄道:尼崎', '阪神電気鉄道:西宮', '阪神電気鉄道:野田',
+    '阪急電鉄:塚口', '阪急電鉄:伊丹', '阪急電鉄:吹田', '阪急電鉄:中津', '阪急電鉄:嵐山',
+    '広島電鉄:白島', '京都市交通局:十条', '京阪電気鉄道:宇治', '大阪市高速電気軌道:今里', '大阪市高速電気軌道:平野',
+}
 def _normalize(name):
     return name.replace('ヶ', 'ケ')
 _first = {}   # 読み替え前のキー → (駅名, 座標, 事業者)（路線ID 順で最初に現れた値）
@@ -172,8 +207,9 @@ for k, (name, pos, op) in _first.items():
 far_same_name = []   # まとめなかった同名駅（1km 超・3km 以内）の報告用
 for name, keys in _by_name.items():
     for i, k in enumerate(keys):
-        if k in SHARED_ALIAS: continue
+        if k in SHARED_ALIAS or k in SAME_NAME_NO_MERGE: continue
         for rep in keys[:i]:
+            if rep in SAME_NAME_NO_MERGE: continue
             rep_root = SHARED_ALIAS.get(rep, rep)
             if _first[rep][2] == _first[k][2]: continue   # 同じ事業者の同名駅は DISTINCT で扱う
             d = dist_km(_first[rep][1], _first[k][1])
@@ -498,9 +534,9 @@ def write(name, header, rows):
 write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度,ナンバリングアイコン,中国語,韓国語,副駅名',
       [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}', STATION_NUM_ICON.get(n, ''),
         stations[n]['zh'], stations[n]['ko'], stations[n]['subName']) for n in order])
-write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別',
+write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別,事業者略称,事業者略称かな,事業者略称英語,汎用記号',
       # 路線記号のない路線は、路線アイコンを路線カラーの四角（I_mono_color）にする（7.32節）
-      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l)) for l in lines])
+      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l), *operator_short(l), generic_icon(l)) for l in lines])
 write('lineConnectDB.csv', '路線ID,駅ID,駅ナンバリング',
       [(l['no'], stations[skey(l, s)]['id'], s.get('number', '')) for l in lines for s in l['stations']])
 write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)

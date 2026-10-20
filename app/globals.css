@@ -873,6 +873,14 @@ tr:hover td {
 .preset-staging-title {
   flex: 1;
   font-weight: 600;
+  /* ボタンが3つ並んでもタイトルを折り返さない（7.63節） */
+  white-space: nowrap;
+}
+
+/* ヘッダーのボタン（追加設定・1つ戻る・この区間を追加）は小さめにして1行に収める（7.63節） */
+.preset-staging-header button {
+  padding: 5px 8px;
+  font-size: 0.8rem;
 }
 
 /* 無効なボタン（「1つ戻る」「この区間を追加」）はグレーアウトする（7.44節。.form-disabled と同じ濃さ） */
