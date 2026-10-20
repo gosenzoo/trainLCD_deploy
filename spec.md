@@ -6308,3 +6308,35 @@ LCD の路線図（詳細路線図 `defaultLine`・全体路線図 `overLine`）
 |---|---|
 | `app/globals.css` | `.modal-dialog` に縦スクロールと `dvh` の最大の高さを追加。`.modal-dialog--tall` を `dvh` に |
 | `public/js/displaySettingPopup.js` | `.dsp-dialog` に最大の高さと縦スクロールを追加（is-phone は半分） |
+
+### 7.70 三角形の表示をSVGアイコンにする
+
+iOSでは「▶」などの三角形の文字が絵文字（色付きの四角いボタン）で表示される。エディタの三角形の文字を、文字ではなくSVGの三角形アイコンにする（形は塗りつぶしの三角形。色は周りの文字と同じ。大きさは文字1文字分）。
+
+`SvgIcons.tsx` に右・左・上・下向きの三角形アイコン（`IconTriangleRight` / `IconTriangleLeft` / `IconTriangleUp` / `IconTriangleDown`）を追加し、次の場所の文字を置き換える。
+
+| 場所 | 今の文字 | 変更後 |
+|---|---|---|
+| 駅一覧などの表で、折りたたんだ列の縦書き見出し（`GenericItemList`） | ▶ | 右向きの三角形アイコン。3文字ごとの改行では、今までどおりアイコンを1文字として数える |
+| 駅の「路線記号２」の見出し（閉じているとき） | ▶ | 右向きの三角形アイコン |
+| 路線の「路線記号」の並べ替えボタン | ◀ ▶ | 左向き・右向きの三角形アイコン |
+| 「路線図から追加」の「追加一覧」の見出し | ▼ ▲ | 下向き・上向きの三角形アイコン |
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/SvgIcons.tsx` | 三角形アイコン4種を追加 |
+| `app/components/GenericItemList.tsx` | 折りたたみ見出しの ▶ をアイコンに |
+| `app/components/StationParamSetter.tsx` | 路線記号２の ▶、路線記号の ◀ ▶ をアイコンに |
+| `app/components/StationPresetPopup.tsx` | 追加一覧の ▼ ▲ をアイコンに |
+
+### 7.71 iOSで入れ子ヘッダーを開いたときの上段の幅
+
+**不具合**: iOS（Safari・WebKit）で、駅一覧の折りたたんだグループ（駅名多言語・副駅名・時間・座標）を開くと、上段のグループ見出しのセルが閉じていたときの幅（約48px）のままになり、下段の列の幅の合計まで広がらない。
+
+**原因**: WebKitは、すでにあるセルの `colSpan` / `rowSpan` を後から変えても、表の列の幅を計算し直さない。`GenericItemList` は開閉のときに同じ `<th>` を使い回し、`rowSpan={2}`（閉じている）と `colSpan={子の列の数}`（開いている）を書き換えていた。WebKit（Playwright の WebKit 26.0、iPhone 13 相当）で、開いた後のセルを新しい要素に置き換えると正しい幅になることを確認した。
+
+**修正**: ヘッダー上段の各セルの React の `key` に開閉の状態を含める（例: 閉じているとき `${i}-collapsed`、開いているとき `${i}-expanded`）。開閉のたびにセルが新しい要素として作られるため、WebKitでも列の幅が計算し直される。グループではない折りたためる列も、同じく `rowSpan` が変わるため同じ扱いにする。
+
+| ファイル | 変更内容 |
+|---|---|
+| `app/components/GenericItemList.tsx` | ヘッダー上段のセルの `key` に開閉の状態を含める |

@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import React, { useState } from 'react'
+import { IconTriangleRight } from './SvgIcons'
 
 // カラム定義型。各コンポーネントがテーブルの列構成をこの型で宣言する。
 export type ColumnDef<T> = {
@@ -115,12 +116,13 @@ const collapsedHeaderStyle: React.CSSProperties = {
 
 // 折りたたみ時の縦書き見出しラベルを描画する。▶を含めて3文字ごとに改行（<br/>）を入れることで、
 // 見出しの文字数に関わらず常に「3文字分の高さ」に収まるようにする（自動折り返しに頼らない）。
-// labelが文字列でない場合は改行できないため、▶を先頭に付けてそのまま表示する
+// labelが文字列でない場合は改行できないため、▶を先頭に付けてそのまま表示する。
+// ▶は文字ではなくSVGの三角形アイコンで描き、1文字として数える（7.70節。iOSで絵文字になるため）
 function renderCollapsedLabel(label: React.ReactNode): React.ReactNode {
-    if (typeof label !== 'string') return <>▶ {label}</>
-    const text = '▶' + label
-    const chunks: string[] = []
-    for (let i = 0; i < text.length; i += 3) chunks.push(text.slice(i, i + 3))
+    if (typeof label !== 'string') return <><IconTriangleRight/> {label}</>
+    const parts: React.ReactNode[] = [<IconTriangleRight key="icon"/>, ...Array.from(label)]
+    const chunks: React.ReactNode[][] = []
+    for (let i = 0; i < parts.length; i += 3) chunks.push(parts.slice(i, i + 3))
     return chunks.map((chunk, i) => (
         <React.Fragment key={i}>
             {i > 0 && <br/>}
@@ -190,13 +192,16 @@ function GenericItemList<T,>({
                     <tr>
                         {columns.map((col, i) => {
                             const isCollapsed = collapsedCols.has(i)
+                            // keyに開閉状態を含め、開閉のたびにセルを新しい要素として作り直す（7.71節）。
+                            // WebKit（iOS Safari）は既存セルのcolSpan/rowSpanを書き換えても列の幅を計算し直さないため
+                            const headKey = `${i}-${col.collapsible && isCollapsed ? 'collapsed' : 'expanded'}`
                             if (isColumnGroup(col)) {
                                 // グループが折りたたまれている場合: 単一列の折りたたみと同じ縦書き表示にする（入れ子構造のため、
                                 // 下記の通常列とは異なり分割線が入ることがある）。rowSpanで2行分の高さをまるごと占める
                                 if (col.collapsible && isCollapsed) {
                                     return (
                                         <th
-                                            key={i}
+                                            key={headKey}
                                             rowSpan={hasGroups ? 2 : undefined}
                                             onClick={() => expandCol(i)}
                                             title="クリックして展開"
@@ -212,7 +217,7 @@ function GenericItemList<T,>({
                                 // position: absoluteの中央揃えdivに文字を入れて自然な高さへの影響をなくす
                                 return (
                                     <th
-                                        key={i}
+                                        key={headKey}
                                         colSpan={col.columns.length}
                                         onClick={col.collapsible ? () => collapseCol(i) : undefined}
                                         title={col.collapsible ? '列を折りたたむ' : undefined}
@@ -247,7 +252,7 @@ function GenericItemList<T,>({
                             if (col.collapsible && isCollapsed) {
                                 return (
                                     <th
-                                        key={i}
+                                        key={headKey}
                                         rowSpan={hasGroups ? 2 : undefined}
                                         onClick={() => expandCol(i)}
                                         title="クリックして展開"
@@ -261,7 +266,7 @@ function GenericItemList<T,>({
                                 // グループを含まないテーブル: 従来通り1行のみのヘッダー
                                 return (
                                     <th
-                                        key={i}
+                                        key={headKey}
                                         onClick={col.collapsible ? () => collapseCol(i) : undefined}
                                         title={col.collapsible ? '列を折りたたむ' : undefined}
                                         style={{ ...headerBottomBorderStyle, ...(col.collapsible ? { cursor: 'pointer', userSelect: 'none' } : {}) }}
@@ -280,7 +285,7 @@ function GenericItemList<T,>({
                             // テキストを配置する（border-bottomは2行目との間の分割線を消すためnoneにする）
                             return (
                                 <th
-                                    key={i}
+                                    key={headKey}
                                     onClick={col.collapsible ? () => collapseCol(i) : undefined}
                                     title={col.collapsible ? '列を折りたたむ' : undefined}
                                     style={{

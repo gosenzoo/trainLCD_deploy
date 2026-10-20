@@ -11,7 +11,7 @@ import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
 import ToggleSwitch from './ToggleSwitch'
-import { IconArrowUp, IconArrowDown, IconTrash, IconPlus } from './SvgIcons'
+import { IconArrowUp, IconArrowDown, IconTrash, IconPlus, IconTriangleRight, IconTriangleLeft } from './SvgIcons'
 
 type stationParamsSetterProps = {
     setting: settingType,
@@ -554,7 +554,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         style={{cursor: 'pointer', userSelect: 'none'}}
                         title={isNumIconNextOpen ? '折りたたむ' : '展開する'}
                     >
-                        路線記号２ {isNumIconNextOpen ? '×' : '▶'}
+                        {/* 三角形は文字ではなくSVGアイコン（7.70節） */}
+                        路線記号２ {isNumIconNextOpen ? '×' : <IconTriangleRight/>}
                     </legend>
                     {isNumIconNextOpen && renderNumIconFields('numIconNext', true)}
                 </fieldset>
@@ -662,8 +663,8 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                     <button onClick={() => setLineFormIconPickerMode('new')} className="btn-primary">新規追加</button>
                                     <button onClick={() => setLineFormIconPickerMode('list')} className="btn-primary">リストから追加</button>
                                     <button onClick={deleteLineIcon} disabled={selectedLineIconIndex === null} className="btn-icon btn-danger" title="削除"><IconTrash/></button>
-                                    <button onClick={() => moveLineIcon(-1)} disabled={selectedLineIconIndex === null}>◀</button>
-                                    <button onClick={() => moveLineIcon(1)} disabled={selectedLineIconIndex === null}>▶</button>
+                                    <button onClick={() => moveLineIcon(-1)} disabled={selectedLineIconIndex === null}><IconTriangleLeft/></button>
+                                    <button onClick={() => moveLineIcon(1)} disabled={selectedLineIconIndex === null}><IconTriangleRight/></button>
                                 </div>
                             </div>
                             <div className="form-row">

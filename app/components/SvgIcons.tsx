@@ -98,3 +98,31 @@ export const IconDisplay: React.FC<SvgIconProps> = ({ className }) => (
         <rect x="4" y="13.3" width="8" height="1.3" rx="0.5"/>
     </svg>
 )
+
+/** 右向きの三角形（7.70節。iOSで「▶」などの文字が絵文字になるのを避けるためSVGで描く） */
+export const IconTriangleRight: React.FC<SvgIconProps> = ({ className }) => (
+    <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true" className={className} style={{ verticalAlign: '-0.125em' }}>
+        <polygon points="4,2 14,8 4,14"/>
+    </svg>
+)
+
+/** 左向きの三角形（7.70節。iOSで「▶」などの文字が絵文字になるのを避けるためSVGで描く） */
+export const IconTriangleLeft: React.FC<SvgIconProps> = ({ className }) => (
+    <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true" className={className} style={{ verticalAlign: '-0.125em' }}>
+        <polygon points="12,2 2,8 12,14"/>
+    </svg>
+)
+
+/** 上向きの三角形（7.70節。iOSで「▶」などの文字が絵文字になるのを避けるためSVGで描く） */
+export const IconTriangleUp: React.FC<SvgIconProps> = ({ className }) => (
+    <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true" className={className} style={{ verticalAlign: '-0.125em' }}>
+        <polygon points="8,3 14,13 2,13"/>
+    </svg>
+)
+
+/** 下向きの三角形（7.70節。iOSで「▶」などの文字が絵文字になるのを避けるためSVGで描く） */
+export const IconTriangleDown: React.FC<SvgIconProps> = ({ className }) => (
+    <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true" className={className} style={{ verticalAlign: '-0.125em' }}>
+        <polygon points="2,3 14,3 8,13"/>
+    </svg>
+)

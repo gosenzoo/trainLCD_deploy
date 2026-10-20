@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { IconTriangleUp, IconTriangleDown } from './SvgIcons'
 import "../type"
 import {
     loadLineDB, loadStationDB, loadLineConnectDB, loadTransferDB,
@@ -646,7 +647,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                    ヘッダーのボタン以外の部分をクリックすると開閉する。閉じるとヘッダーだけが残る */}
                 <div className={`preset-staging-window${isStagingOpen ? '' : ' is-closed'}`}>
                     <div className="preset-staging-header" onClick={() => setIsStagingOpen(open => !open)}>
-                        <span className="preset-staging-title">{isStagingOpen ? '▼' : '▲'} 追加一覧</span>
+                        <span className="preset-staging-title">{/* 三角形は文字ではなくSVGアイコン（7.70節） */}
+                        {isStagingOpen ? <IconTriangleDown/> : <IconTriangleUp/>} 追加一覧</span>
                         {/* ボタンのクリックでは開閉しない */}
                         <div className="btn-group" style={{ margin: 0 }} onClick={e => e.stopPropagation()}>
                             {/* 追加設定（7.63節） */}
