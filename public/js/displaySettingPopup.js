@@ -4,6 +4,7 @@
 //   - 画面送り（手動・自動(時間)・自動(座標)）
 //   - 手動操作を許可（画面送りが手動のときはグレーアウト）
 //   - 環状運転(準備中)（常にグレーアウト）
+//   - UI表示（オンで画面下部にカメラボタンを出す。7.65節）
 // 変更はその場でコールバックに通知する。設定データ（localStorage）には保存しない。
 // ============================================================
 
@@ -45,11 +46,13 @@ class DisplaySettingPopup {
      * @param {object}   callbacks
      * @param {Function} callbacks.onModeChange        - 画面送りを変えたとき。引数: (mode)
      * @param {Function} callbacks.onAllowManualChange - 手動操作を許可を変えたとき。引数: (allowManual)
+     * @param {Function} [callbacks.onUiVisibleChange] - UI表示を変えたとき。引数: (uiVisible)（7.65節）
      */
     constructor(initial, callbacks) {
         this._mode        = initial.mode ?? 'manual';
         this._allowManual = initial.allowManual ?? true;
         this._isLoop      = !!initial.isLoop;
+        this._uiVisible   = !!initial.uiVisible;  // UI表示（7.65節）。初期値はオフ
         this._callbacks   = callbacks;
         this._el          = null;
 
@@ -146,6 +149,14 @@ class DisplaySettingPopup {
         // 環状運転(準備中)（常にグレーアウト）
         const loopRow = this._row('環状運転(準備中)', true);
         loopRow.appendChild(this._toggle(this._isLoop, () => {}));
+
+        // UI表示（7.65節）。オンで画面下部にカメラボタンを出す。一番下に置く
+        const uiRow = this._row('UI表示', false);
+        uiRow.appendChild(this._toggle(this._uiVisible, () => {
+            this._uiVisible = !this._uiVisible;
+            if (this._callbacks.onUiVisibleChange) this._callbacks.onUiVisibleChange(this._uiVisible);
+            this._render();
+        }));
 
         // 閉じる
         const footer = document.createElement('div');

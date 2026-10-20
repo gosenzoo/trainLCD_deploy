@@ -55,6 +55,8 @@
     <script src="./LcdSimulator/src/LcdSimulator.js"></script>
     <!-- LCD表示中の「表示設定」ポップアップ（7.56節） -->
     <script src="./js/displaySettingPopup.js"></script>
+    <!-- LCD表示の画像保存（7.65節） -->
+    <script src="./js/lcdCapture.js"></script>
 
     <script>
         // ============================================================
@@ -118,6 +120,11 @@
         let isManualControlAllowed = true;
         // 「表示設定」ポップアップ（7.56節）と、今の画面送り・手動操作を許可（ポップアップで変えられる。保存はしない）
         let settingPopup = null;
+        // 画像保存（7.65節）。画像の解像度は実際の画面の大きさによらず、レイアウト（表示タイプ）ごとに決める
+        const LAYOUT_IMAGE_SIZE = { tokyu: { width: 1920, height: 1080 } };
+        let lcdCapture = null;
+        let captureSize = LAYOUT_IMAGE_SIZE.tokyu;
+        const captureLcd = () => { if (lcdCapture) lcdCapture.captureAndPreview(displaySVG, captureSize); };
         let pageAdvanceModeNow = 'manual';
         let allowManualNow = true;
         const updateManualControlAllowed = () => {
@@ -133,12 +140,19 @@
         // P: ページ送り / ArrowLeft・ArrowRight: 状態移動 / A・D: 駅移動
         function keyDown(e) {
             if (!sim) return;
+            // 画像保存のプレビュー・作成中は LCD の操作を受け付けない（Esc でプレビューを閉じる）
+            if (lcdCapture && lcdCapture.isOpen) {
+                if (e.key === 'Escape') lcdCapture.closePreview();
+                return;
+            }
             // c: 「表示設定」ポップアップの開閉（手動操作を許可がオフでも開ける）。Esc でも閉じる
             if (settingPopup && (e.key === 'c' || e.key === 'C')) { settingPopup.toggle(); return; }
             if (settingPopup && settingPopup.isOpen) {
                 if (e.key === 'Escape') settingPopup.close();
                 return;  // ポップアップ表示中は LCD の操作を受け付けない
             }
+            // s: 表示中の LCD を画像にする（UI表示のオン・オフによらず使える。7.65節）
+            if (e.key === 's' || e.key === 'S') { captureLcd(); return; }
             if (!isManualControlAllowed) return;
             if      (e.key === 'p' || e.key === 'P') { sim.pageRotate();     }
             else if (e.key === 'ArrowLeft')           { sim.moveState(-1);   }
@@ -155,6 +169,7 @@
             if (!sim) return;
             // ポップアップ表示中は LCD の操作を受け付けない（閉じる操作はポップアップ側で受ける）
             if (settingPopup && settingPopup.isOpen) return;
+            if (lcdCapture && lcdCapture.isOpen) return;
             const touch = e.changedTouches[0];
             const w = window.innerWidth;
             const h = window.innerHeight;
@@ -299,6 +314,8 @@
             const activeDisplayType = toDisplayType(firstOperation?.displayType);
             // 読み込んでいない表示タイプになった場合は、読み込んだ最初のレイアウトを使う
             const { headerSVG, bodySVGMap } = layoutResources[activeDisplayType] ?? layoutList[0];
+            // 画像保存の解像度（7.65節）。定義の無いレイアウトは東急の大きさにする
+            captureSize = LAYOUT_IMAGE_SIZE[activeDisplayType] ?? LAYOUT_IMAGE_SIZE.tokyu;
 
             // LcdAnimatorをグローバルシングルトンとして初期化
             window.lcdAnimator = new LcdAnimator();
@@ -333,8 +350,15 @@
                         allowManualNow = allow;
                         updateManualControlAllowed();
                     },
+                    // UI表示（7.65節）: オンのときだけカメラボタンを出す
+                    onUiVisibleChange: (visible) => {
+                        cameraButton.style.display = visible ? 'block' : 'none';
+                    },
                 }
             );
+            // 画像保存（7.65節）。カメラボタンは「UI表示」がオンのときだけ表示する
+            lcdCapture = new LcdCapture();
+            const cameraButton = lcdCapture.createCameraButton(captureLcd);
             sim.onGeoError = (message) => {
                 const el = document.getElementById('geoError');
                 el.textContent = message;
@@ -346,6 +370,8 @@
             // 幅を測定してしまい、テキストのセンタリング位置がずれる。
             await document.fonts.ready;
             sim.start();
+            // 画像保存用のフォントを裏で取得して手元に置いておく（表示の後に行い、待たない。7.65節）
+            lcdCapture.preloadFonts();
 
             // イベントリスナーを設定
             window.addEventListener('keydown',    keyDown);
