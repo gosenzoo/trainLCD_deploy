@@ -534,8 +534,10 @@ class ProgressController {
         // Math.floor(hereDrawPos) が整数・小数いずれでも正しく機能する
         const nonGrayStartSection = Math.floor(hereDrawPos);
 
-        // 非グレー範囲の表示駅（始端セクションの root 側駅 〜 末端駅）
-        const nonGrayStations = dispStationList.slice(nonGrayStartSection);
+        // 非グレー範囲の表示駅（始端セクションの root 側駅 〜 末端駅）。
+        // 末尾の表示駅が終点（駅一覧の最後の駅）のときは、その駅の lineId（存在しない終点側端の区間）を見ない（7.67節）
+        const lastDispIsTerminal = dispStationList[dispStationList.length - 1]?._id === this.stationList.length - 1;
+        const nonGrayStations = dispStationList.slice(nonGrayStartSection, lastDispIsTerminal ? -1 : undefined);
 
         // 非グレー範囲内の路線を root 側から順に収集する（連続同一路線は1エントリにまとめる）
         const nonGrayOrderedLineIds = [];
@@ -749,8 +751,8 @@ class ProgressController {
     _calcColorList(dispStationList, hereDrawPos, stationFrameNum) {
         const colorList = [];
 
-        // 後方端は常にグレー（通過済み）
-        colorList.push("rgb(221, 221, 221)");
+        // 後方端（7.67節）: 始発駅に停車中だけ最初の区間（先頭の表示駅の次区間）の路線色、それ以外はグレー（通過済み）
+        colorList.push(this._rootEndColor(dispStationList) || "rgb(221, 221, 221)");
 
         for (let i = 0; i < (stationFrameNum - 1) * 2; i++) {
             // 現在位置より後方はグレー
@@ -775,11 +777,31 @@ class ProgressController {
             }
         }
 
-        // 前方端: 末尾表示駅の次区間路線色
-        const lastDisp = dispStationList[dispStationList.length - 1];
-        colorList.push(this._getLineField(lastDisp.lineId, "color") || "rgb(200,200,200)");
+        // 前方端（7.67節）: 末尾表示駅の次区間路線色（末尾表示駅が終点なら最後の区間の路線色）
+        colorList.push(this._arrowEndColor(dispStationList) || "rgb(200,200,200)");
 
         return colorList;
+    }
+
+    /**
+     * 路線図の後方端の色（7.67節）。始発駅に停車中だけ、最初の区間（先頭の表示駅の次区間）の路線色を返す。
+     * それ以外は空文字（呼び出し側でグレーにする）
+     */
+    _rootEndColor(dispStationList) {
+        if (!this.isStart) return "";
+        return this._getLineField(dispStationList[0]?.lineId, "color") || "";
+    }
+
+    /**
+     * 路線図の前方端の色（7.67節）。末尾の表示駅の次区間の路線色。
+     * 末尾の表示駅が終点（駅一覧の最後の駅）なら、その駅には次区間が無いため最後の区間（ひとつ前の駅の次区間）の路線色
+     */
+    _arrowEndColor(dispStationList) {
+        const lastDisp = dispStationList[dispStationList.length - 1];
+        if (!lastDisp) return "";
+        const isLastOfList = lastDisp._id === this.stationList.length - 1;
+        const lineId = isLastOfList ? this.stationList[lastDisp._id - 1]?.lineId : lastDisp.lineId;
+        return this._getLineField(lineId, "color") || "";
     }
 
     /**
@@ -897,7 +919,8 @@ class ProgressController {
         const firstStation = dispStationList[0];
         const hasStopBeforeFirst = this.stationList.slice(0, firstStation._id).some(s => !s.isPass);
         const rootSection = {
-            color:         grayColor,
+            // 始発駅に停車中だけ最初の区間の路線色、それ以外はグレー（7.67節。詳細路線図と同じ）
+            color:         this._rootEndColor(dispStationList) || grayColor,
             type:          hasStopBeforeFirst ? 1 : 0,
             lineName:      this._getLineField(firstStation.lineId, "name"),
             lineNameEng:   this._getLineField(firstStation.lineId, "eng"),
@@ -909,12 +932,17 @@ class ProgressController {
         // dispStation[最後]より後に停車駅があればtype=1、なければtype=0（defaultLineと同じ処理）
         const lastStation = dispStationList[actualCount - 1];
         const hasStopAfterLast = this.stationList.slice(lastStation._id + 1).some(s => !s.isPass);
+        // 末尾表示駅が終点なら、路線名も最後の区間（ひとつ前の駅の次区間）の路線にする（7.67節）
+        const arrowLineId = lastStation._id === this.stationList.length - 1
+            ? this.stationList[lastStation._id - 1]?.lineId
+            : lastStation.lineId;
         const arrowSection = {
-            color:         this._getLineField(lastStation.lineId, "color") || "rgb(200,200,200)",
+            // 末尾表示駅の次区間路線色（終点なら最後の区間の路線色。7.67節。詳細路線図と同じ）
+            color:         this._arrowEndColor(dispStationList) || "rgb(200,200,200)",
             type:          hasStopAfterLast ? 1 : 0,
-            lineName:      this._getLineField(lastStation.lineId, "name"),
-            lineNameEng:   this._getLineField(lastStation.lineId, "eng"),
-            lineNameColor: this._getLineField(lastStation.lineId, "color"),
+            lineName:      this._getLineField(arrowLineId, "name"),
+            lineNameEng:   this._getLineField(arrowLineId, "eng"),
+            lineNameColor: this._getLineField(arrowLineId, "color"),
             isConnect:     false
         };
 
