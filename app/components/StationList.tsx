@@ -315,8 +315,9 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 // 先頭駅の上半分・最終駅の下半分には線を引かない（両端は〇／横棒で止める）
                 const upperOn = prev !== undefined && !!prev.operationId
                 const lowerOn = !isLast && !!station.operationId
-                // 運用が切り替わる駅にのみ横棒を描画する（先頭駅は「ひとつ前の駅」が無いため対象外）
-                const isChange = prev !== undefined && prev.operationId !== station.operationId
+                // 運用が切り替わる駅にのみ横棒を描画する（先頭駅は「ひとつ前の駅」が無いため対象外）。
+                // 最下部の駅は次の区間が無いため、運用の切り替えとはみなさない（7.68節）
+                const isChange = prev !== undefined && !isLast && prev.operationId !== station.operationId
                 return (
                     <div style={{ position: 'absolute', inset: 0 }}>
                         {upperOn && <div style={{ ...railLineStyle, top: 0, height: '50%' }} />}
@@ -357,9 +358,10 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 const isLast = index === setting.stationList.length - 1
                 const prevColor = prev ? setting.lineDict[prev.lineId]?.color : undefined
                 const thisColor = setting.lineDict[station.lineId]?.color
-                // 路線が切り替わる駅は〇の輪を黒にする（先頭駅は「ひとつ前の駅」が無いため対象外）
-                const isChange = prev !== undefined && prev.lineId !== station.lineId
-                const markerColor = isChange ? '#000' : (thisColor || 'var(--text-muted)')
+                // 路線が切り替わる駅は〇の輪を黒にする（先頭駅は「ひとつ前の駅」が無いため対象外）。
+                // 最下部の駅は次の区間が無いため常に通常の駅として、ひとつ前の区間の路線色で描く（7.68節）
+                const isChange = prev !== undefined && !isLast && prev.lineId !== station.lineId
+                const markerColor = isChange ? '#000' : ((isLast ? prevColor : thisColor) || thisColor || 'var(--text-muted)')
                 return (
                     <div style={{ position: 'absolute', inset: 0 }}>
                         {prevColor && <div style={{ ...railLineStyle, top: 0, height: '50%', background: prevColor }} />}
