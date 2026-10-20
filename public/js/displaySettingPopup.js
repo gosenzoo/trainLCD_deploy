@@ -17,6 +17,10 @@ const DISPLAY_SETTING_MODES = [
 // ポップアップの見た目（エディタの表示設定に合わせる）。1回だけ <head> に追加する。
 // 縦長の狭い画面では、項目名とスイッチを折り返して並べる
 const DISPLAY_SETTING_STYLE = `
+/* スマホ（is-phone）では2倍の大きさにする（7.66節）。display.html は画面幅に合わせる指定が無く、スマホでは縮小して表示されるため */
+.is-phone .dsp-dialog { zoom: 2; max-width: calc((100vw - 32px) / 2); min-width: min(320px, calc((100vw - 32px) / 2)); }
+.is-phone .dsp-preview-img { max-height: 30vh !important; }
+.is-phone .lcd-camera-btn { zoom: 2; }
 .dsp-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .dsp-dialog { background: #161b22; color: #e6edf3; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; min-width: min(320px, calc(100vw - 32px)); box-sizing: border-box; max-width: calc(100vw - 32px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); font-family: 'BIZ UDGothic', sans-serif; font-size: 14px; }
 .dsp-title-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #30363d; }
@@ -36,6 +40,12 @@ const DISPLAY_SETTING_STYLE = `
 .dsp-footer { display: flex; justify-content: flex-end; margin-top: 14px; }
 .dsp-footer button { background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-family: inherit; }
 `;
+
+// スマホ（指で操作し、画面の長辺が 1000px 未満の端末）かどうかを html 要素の is-phone クラスで表す（7.66節）。
+// タブレットやパソコンは対象外にする
+if (window.matchMedia('(pointer: coarse)').matches && Math.max(screen.width, screen.height) < 1000) {
+    document.documentElement.classList.add('is-phone');
+}
 
 class DisplaySettingPopup {
     /**

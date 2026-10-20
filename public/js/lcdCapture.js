@@ -235,7 +235,7 @@ class LcdCapture {
         dialog.className = 'dsp-dialog';
         dialog.innerHTML = `
             <div class="dsp-title-row"><span class="dsp-title">画像の保存</span></div>
-            <img alt="LCDの画像" style="display:block; max-width:min(80vw, 960px); max-height:60vh; width:100%; object-fit:contain; background:#000;">
+            <img alt="LCDの画像" class="dsp-preview-img" style="display:block; max-width:min(80vw, 960px); max-height:60vh; width:100%; object-fit:contain; background:#000;">
             <div class="dsp-footer" style="gap:8px"></div>`;
         dialog.querySelector('img').src = this._previewUrl;
         const footer = dialog.querySelector('.dsp-footer');
@@ -284,6 +284,7 @@ class LcdCapture {
     createCameraButton(onPress) {
         const btn = document.createElement('button');
         btn.title = '画像を保存';
+        btn.className = 'lcd-camera-btn';  // スマホでは2倍の大きさにする（7.66節）
         btn.style.cssText = 'display:none; position:fixed; left:50%; bottom:12px; transform:translateX(-50%); z-index:900;' +
             'width:52px; height:52px; border-radius:50%; border:2px solid #fff; background:rgba(0,0,0,0.55); color:#fff; cursor:pointer; padding:0;';
         // カメラマーク
