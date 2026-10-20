@@ -80,9 +80,11 @@ for f in sorted(glob.glob(os.path.join(HERE, 'sources', '*.json'))):
 lines.sort(key=lambda l: l['no'])
 # 元データに事業者を書いた路線（私鉄。7.62節）は、その事業者を使う。
 # 私鉄の路線アイコンは単色（I_mono_color）にする（7.63節。汎用記号は「汎用記号」列で別に持つ）
+# ただし元データの路線に汎用記号以外の lineIcon・numIcon があれば、その路線アイコン・ナンバリングアイコンを使う（7.72節。東急）
 for l in lines:
     if l.get('operator'):
-        LINE_OPERATOR[l['no']] = (l['operator'], 'I_mono_color', PRIVATE_NUM_ICON)
+        icon = l['lineIcon'] if l.get('lineIcon') and l['lineIcon'] not in ('I_train_normal1', 'I_train_subway1') else 'I_mono_color'
+        LINE_OPERATOR[l['no']] = (l['operator'], icon, l.get('numIcon') or PRIVATE_NUM_ICON)
 
 # 汎用記号（7.63節）: 「他社線を汎用記号にする」で使うプリセット名。地下鉄の路線は地下路線汎用、それ以外は地上路線汎用１。
 # 元データの路線に genericIcon（無ければ汎用記号の lineIcon）があればその値、無ければ東京の地下鉄（133〜147）は地下路線汎用
@@ -194,6 +196,7 @@ SAME_NAME_NO_MERGE = {
     '阪急電鉄:塚口', '阪急電鉄:伊丹', '阪急電鉄:吹田', '阪急電鉄:中津', '阪急電鉄:嵐山',
     '広島電鉄:白島', '京都市交通局:十条', '京阪電気鉄道:宇治', '大阪市高速電気軌道:今里', '大阪市高速電気軌道:平野',
     '札幌市交通局:琴似', '東海交通事業:味美', '名古屋鉄道:堀田', '弘南鉄道:石川', '静岡鉄道:草薙',  # 7.64節
+    '横浜市交通局:弘明寺', '東京都交通局:早稲田', '首都圏新都市鉄道:浅草',  # 7.72節
 }
 def _normalize(name):
     return name.replace('ヶ', 'ケ')

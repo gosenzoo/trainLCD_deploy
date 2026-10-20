@@ -525,3 +525,101 @@
 854,函館市企業局,2系統,にけいとう,Route 2,#E60012,Y,I_mono_color,N_round_normal,私鉄,市電,しでん,Hakodate City Tram,I_train_normal1
 855,函館市企業局,5系統,ごけいとう,Route 5,#009944,D,I_mono_color,N_round_normal,私鉄,市電,しでん,Hakodate City Tram,I_train_normal1
 856,道南いさりび鉄道,道南いさりび鉄道線,どうなんいさりびてつどうせん,Donan Isaribi Railway Line,#246DAC,sh,I_mono_color,N_round_normal,私鉄,道南いさりび鉄道,どうなんいさりびてつどう,South Hokkaido Railway,I_train_normal1
+870,東急電鉄,東横線,とうよこせん,Toyoko Line,#DA0442,TY,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+871,東急電鉄,目黒線,めぐろせん,Meguro Line,#009CD2,MG,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+872,東急電鉄,田園都市線,でんえんとしせん,Den-en-toshi Line,#20A288,DT,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+873,東急電鉄,大井町線,おおいまちせん,Oimachi Line,#F18C43,OM,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+874,東急電鉄,池上線,いけがみせん,Ikegami Line,#EE86A7,IK,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+875,東急電鉄,東急多摩川線,とうきゅうたまがわせん,Tokyu Tamagawa Line,#AE0378,TM,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+876,東急電鉄,世田谷線,せたがやせん,Setagaya Line,#FCC70D,SG,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+877,東急電鉄,こどもの国線,こどものくにせん,Kodomonokuni Line,#0068B7,KD,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+878,東急電鉄,東急新横浜線,とうきゅうしんよこはません,Tokyu Shin-yokohama Line,#8A1186,SH,I_tokyu,N_tokyu,私鉄,東急,とうきゅう,Tokyu,I_train_normal1
+879,横浜高速鉄道,みなとみらい線,みなとみらいせん,Minatomirai Line,#0067C0,MM,I_mono_color,N_round_normal,私鉄,横浜高速,よこはまこうそく,Yokohama Minatomirai Railway,I_train_normal1
+890,小田急電鉄,小田原線,おだわらせん,Odawara Line,#2288CC,OH,I_mono_color,N_round_normal,私鉄,小田急,おだきゅう,Odakyu,I_train_normal1
+891,小田急電鉄,江ノ島線,えのしません,Enoshima Line,#2288CC,OE,I_mono_color,N_round_normal,私鉄,小田急,おだきゅう,Odakyu,I_train_normal1
+892,小田急電鉄,多摩線,たません,Tama Line,#2288CC,OT,I_mono_color,N_round_normal,私鉄,小田急,おだきゅう,Odakyu,I_train_normal1
+893,京王電鉄,京王線,けいおうせん,Keio Line,#DD0077,KO,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+894,京王電鉄,相模原線,さがみはらせん,Sagamihara Line,#DD0077,KO,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+895,京王電鉄,高尾線,たかおせん,Takao Line,#DD0077,KO,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+896,京王電鉄,競馬場線,けいばじょうせん,Keibajo Line,#DD0077,KO,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+897,京王電鉄,動物園線,どうぶつえんせん,Dobutsuen Line,#DD0077,KO,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+898,京王電鉄,井の頭線,いのかしらせん,Inokashira Line,#000088,IN,I_mono_color,N_round_normal,私鉄,京王,けいおう,Keio,I_train_normal1
+899,小田急箱根,箱根登山鉄道線,はこねとざんてつどうせん,Hakone Tozan Line,#F04A00,OH,I_mono_color,N_round_normal,私鉄,箱根登山,はこねとざん,Hakone Tozan,I_train_normal1
+900,江ノ島電鉄,江ノ島電鉄線,えのしまでんてつせん,Enoshima Electric Railway Line,#F6BE18,EN,I_mono_color,N_round_normal,私鉄,江ノ電,えのでん,Enoden,I_train_normal1
+901,湘南モノレール,江の島線,えのしません,Enoshima Line,#E60012,SMR,I_mono_color,N_round_normal,私鉄,湘南モノレール,しょうなんものれーる,Shonan Monorail,I_train_normal1
+902,伊豆箱根鉄道,大雄山線,だいゆうざんせん,Daiyuzan Line,#0000FF,ID,I_mono_color,N_round_normal,私鉄,伊豆箱根,いずはこね,Izuhakone,I_train_normal1
+910,京浜急行電鉄,本線,ほんせん,Keikyu Line,#00BFFF,KK,I_mono_color,N_round_normal,私鉄,京急,けいきゅう,Keikyu,I_train_normal1
+911,京浜急行電鉄,空港線,くうこうせん,Airport Line,#00BFFF,KK,I_mono_color,N_round_normal,私鉄,京急,けいきゅう,Keikyu,I_train_normal1
+912,京浜急行電鉄,大師線,だいしせん,Daishi Line,#00BFFF,KK,I_mono_color,N_round_normal,私鉄,京急,けいきゅう,Keikyu,I_train_normal1
+913,京浜急行電鉄,逗子線,ずしせん,Zushi Line,#00BFFF,KK,I_mono_color,N_round_normal,私鉄,京急,けいきゅう,Keikyu,I_train_normal1
+914,京浜急行電鉄,久里浜線,くりはません,Kurihama Line,#00BFFF,KK,I_mono_color,N_round_normal,私鉄,京急,けいきゅう,Keikyu,I_train_normal1
+915,相模鉄道,相鉄本線,そうてつほんせん,Sotetsu Line,#041452,SO,I_mono_color,N_round_normal,私鉄,相鉄,そうてつ,Sotetsu,I_train_normal1
+916,相模鉄道,相鉄いずみ野線,そうてついずみのせん,Sotetsu Izumino Line,#041452,SO,I_mono_color,N_round_normal,私鉄,相鉄,そうてつ,Sotetsu,I_train_normal1
+917,相模鉄道,相鉄新横浜線,そうてつしんよこはません,Sotetsu Shin-yokohama Line,#041452,SO,I_mono_color,N_round_normal,私鉄,相鉄,そうてつ,Sotetsu,I_train_normal1
+918,横浜市交通局,ブルーライン,ぶるーらいん,Blue Line,#005BA5,B,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Yokohama Municipal Subway,I_train_subway1
+919,横浜市交通局,グリーンライン,ぐりーんらいん,Green Line,#048D58,G,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Yokohama Municipal Subway,I_train_subway1
+920,横浜シーサイドライン,金沢シーサイドライン,かなざわしーさいどらいん,Kanazawa Seaside Line,#F68B1E,,I_mono_color,N_round_normal,私鉄,シーサイドライン,しーさいどらいん,Kanazawa Seaside Line,I_train_normal1
+930,西武鉄道,池袋線,いけぶくろせん,Ikebukuro Line,#EF810F,SI,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+931,西武鉄道,西武秩父線,せいぶちちぶせん,Seibu Chichibu Line,#EF810F,SI,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+932,西武鉄道,西武有楽町線,せいぶゆうらくちょうせん,Seibu Yurakucho Line,#EF810F,SI,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+933,西武鉄道,豊島線,としません,Toshima Line,#EF810F,SI,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+934,西武鉄道,狭山線,さやません,Sayama Line,#EF810F,SI,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+935,西武鉄道,山口線,やまぐちせん,Yamaguchi Line,#FF3333,SY,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+936,西武鉄道,新宿線,しんじゅくせん,Shinjuku Line,#00A6BF,SS,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+937,西武鉄道,西武園線,せいぶえんせん,Seibuen Line,#00CC66,SK,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+938,西武鉄道,拝島線,はいじません,Haijima Line,#00A6BF,SS,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+939,西武鉄道,国分寺線,こくぶんじせん,Kokubunji Line,#00CC66,SK,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+940,西武鉄道,多摩湖線,たまこせん,Tamako Line,#FDBC00,ST,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+941,西武鉄道,多摩川線,たまがわせん,Tamagawa Line,#EF810F,SW,I_mono_color,N_round_normal,私鉄,西武,せいぶ,Seibu,I_train_normal1
+942,秩父鉄道,秩父本線,ちちぶほんせん,Chichibu Line,#0A8A47,CR,I_mono_color,N_round_normal,私鉄,秩父鉄道,ちちぶてつどう,Chichibu Railway,I_train_normal1
+943,埼玉高速鉄道,埼玉高速鉄道線,さいたまこうそくてつどうせん,Saitama Railway Line,#345CAA,SR,I_mono_color,N_round_normal,私鉄,埼玉高速鉄道,さいたまこうそくてつどう,Saitama Railway,I_train_subway1
+944,埼玉新都市交通,伊奈線,いなせん,Ina Line,#339999,NS,I_mono_color,N_round_normal,私鉄,ニューシャトル,にゅーしゃとる,New Shuttle,I_train_normal1
+960,東武鉄道,伊勢崎線,いせさきせん,Isesaki Line,#0067C0,TS,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+961,東武鉄道,伊勢崎線（押上〜曳舟）,いせさきせん（おしあげ〜ひきふね）,Isesaki Line (Oshiage-Hikifune),#0067C0,TS,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+962,東武鉄道,亀戸線,かめいどせん,Kameido Line,#0067C0,TS,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+963,東武鉄道,大師線,だいしせん,Daishi Line,#0067C0,TS,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+964,東武鉄道,佐野線,さのせん,Sano Line,#ED1A3D,TI,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+965,東武鉄道,桐生線,きりゅうせん,Kiryu Line,#ED1A3D,TI,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+966,東武鉄道,小泉線,こいずみせん,Koizumi Line,#ED1A3D,TI,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+967,東武鉄道,小泉線（東小泉〜太田）,こいずみせん（ひがしこいずみ〜おおた）,Koizumi Line (Higashi-Koizumi-Ota),#ED1A3D,TI,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+968,東武鉄道,日光線,にっこうせん,Nikko Line,#FFA500,TN,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+969,東武鉄道,宇都宮線,うつのみやせん,Utsunomiya Line,#FFA500,TN,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+970,東武鉄道,鬼怒川線,きぬがわせん,Kinugawa Line,#FFA500,TN,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+971,東武鉄道,野田線,のだせん,Noda Line,#00BFFF,TD,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+972,東武鉄道,東上本線,とうじょうほんせん,Tojo Line,#004098,TJ,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+973,東武鉄道,越生線,おごせせん,Ogose Line,#004098,TJ,I_mono_color,N_round_normal,私鉄,東武,とうぶ,Tobu,I_train_normal1
+974,野岩鉄道,会津鬼怒川線,あいづきぬがわせん,Aizu Kinugawa Line,#009933,,I_mono_color,N_round_normal,私鉄,野岩鉄道,やがんてつどう,Yagan Railway,I_train_normal1
+975,上信電鉄,上信線,じょうしんせん,Joshin Line,#ED1A3D,,I_mono_color,N_round_normal,私鉄,上信電鉄,じょうしんでんてつ,Joshin Electric Railway,I_train_normal1
+976,上毛電気鉄道,上毛線,じょうもうせん,Jomo Line,#40E0D0,,I_mono_color,N_round_normal,私鉄,上毛電鉄,じょうもうでんてつ,Jomo Electric Railway,I_train_normal1
+977,わたらせ渓谷鐵道,わたらせ渓谷線,わたらせけいこくせん,Watarase Keikoku Line,#666666,WK,I_mono_color,N_round_normal,私鉄,わたらせ渓谷鐵道,わたらせけいこくてつどう,Watarase Keikoku Railway,I_train_normal1
+978,真岡鐵道,真岡線,もおかせん,Moka Line,#E4007F,,I_mono_color,N_round_normal,私鉄,真岡鐵道,もおかてつどう,Moka Railway,I_train_normal1
+1000,京成電鉄,本線,ほんせん,Keisei Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1001,京成電鉄,押上線,おしあげせん,Oshiage Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1002,京成電鉄,金町線,かなまちせん,Kanamachi Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1003,京成電鉄,千葉線,ちばせん,Chiba Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1004,京成電鉄,千原線,ちはらせん,Chihara Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1005,京成電鉄,成田空港線,なりたくうこうせん,Narita Airport Line,#FF8620,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1006,京成電鉄,東成田線,ひがしなりたせん,Higashi-Narita Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1007,京成電鉄,松戸線,まつどせん,Matsudo Line,#005AAA,KS,I_mono_color,N_round_normal,私鉄,京成,けいせい,Keisei,I_train_normal1
+1008,北総鉄道,北総線,ほくそうせん,Hokuso Line,#00BFFF,HS,I_mono_color,N_round_normal,私鉄,北総,ほくそう,Hokuso,I_train_normal1
+1009,芝山鉄道,芝山鉄道線,しばやまてつどうせん,Shibayama Railway Line,#00A650,SR,I_mono_color,N_round_normal,私鉄,芝山鉄道,しばやまてつどう,Shibayama Railway,I_train_normal1
+1010,東葉高速鉄道,東葉高速線,とうようこうそくせん,Toyo Rapid Line,#00B16B,TR,I_mono_color,N_round_normal,私鉄,東葉高速,とうようこうそく,Toyo Rapid,I_train_normal1
+1011,千葉都市モノレール,1号線,いちごうせん,Line 1,#2843BA,CM,I_mono_color,N_round_normal,私鉄,千葉モノレール,ちばものれーる,Chiba Monorail,I_train_normal1
+1012,千葉都市モノレール,2号線,にごうせん,Line 2,#2843BA,CM,I_mono_color,N_round_normal,私鉄,千葉モノレール,ちばものれーる,Chiba Monorail,I_train_normal1
+1013,小湊鐵道,小湊鉄道線,こみなとてつどうせん,Kominato Railway Line,#DB4028,,I_mono_color,N_round_normal,私鉄,小湊鐵道,こみなとてつどう,Kominato Railway,I_train_normal1
+1014,いすみ鉄道,いすみ線,いすみせん,Isumi Line,#FFD400,,I_mono_color,N_round_normal,私鉄,いすみ鉄道,いすみてつどう,Isumi Railway,I_train_normal1
+1015,銚子電気鉄道,銚子電気鉄道線,ちょうしでんきてつどうせん,Choshi Electric Railway Line,#A52A2A,CD,I_mono_color,N_round_normal,私鉄,銚子電鉄,ちょうしでんてつ,Choshi Electric Railway,I_train_normal1
+1016,流鉄,流山線,ながれやません,Nagareyama Line,#F39800,RN,I_mono_color,N_round_normal,私鉄,流鉄,りゅうてつ,Ryutetsu,I_train_normal1
+1017,山万,ユーカリが丘線,ゆーかりがおかせん,Yukarigaoka Line,#2F9D66,,I_mono_color,N_round_normal,私鉄,山万,やままん,Yamaman,I_train_normal1
+1018,舞浜リゾートライン,ディズニーリゾートライン,でぃずにーりぞーとらいん,Disney Resort Line,#00A0E9,,I_mono_color,N_round_normal,私鉄,ディズニーリゾートライン,でぃずにーりぞーとらいん,Disney Resort Line,I_train_normal1
+1030,首都圏新都市鉄道,つくばエクスプレス,つくばえくすぷれす,Tsukuba Express,#000084,TX,I_mono_color,N_round_normal,私鉄,つくばエクスプレス,つくばえくすぷれす,Tsukuba Express,I_train_normal1
+1031,東京臨海高速鉄道,りんかい線,りんかいせん,Rinkai Line,#00B19D,R,I_mono_color,N_round_normal,私鉄,りんかい線,りんかいせん,Rinkai Line,I_train_normal1
+1032,ゆりかもめ,東京臨海新交通臨海線,とうきょうりんかいしんこうつうりんかいせん,Yurikamome,#0067C0,U,I_mono_color,N_round_normal,私鉄,ゆりかもめ,ゆりかもめ,Yurikamome,I_train_normal1
+1033,東京モノレール,東京モノレール羽田空港線,とうきょうものれーるはねだくうこうせん,Tokyo Monorail Haneda Airport Line,#003686,MO,I_mono_color,N_round_normal,私鉄,東京モノレール,とうきょうものれーる,Tokyo Monorail,I_train_normal1
+1034,多摩都市モノレール,多摩都市モノレール線,たまとしものれーるせん,Tama Toshi Monorail Line,#FF8C00,TT,I_mono_color,N_round_normal,私鉄,多摩モノレール,たまものれーる,Tama Monorail,I_train_normal1
+1035,東京都交通局,都電荒川線,とでんあらかわせん,Toden Arakawa Line,#EE86A7,SA,I_mono_color,N_round_normal,私鉄,都営,とえい,Toei,I_train_normal1
+1036,東京都交通局,日暮里・舎人ライナー,にっぽり・とねりらいなー,Nippori-Toneri Liner,#D53A77,NT,I_mono_color,N_round_normal,私鉄,都営,とえい,Toei,I_train_normal1
+1037,関東鉄道,常総線,じょうそうせん,Joso Line,#0000FF,,I_mono_color,N_round_normal,私鉄,関東鉄道,かんとうてつどう,Kanto Railway,I_train_normal1
+1038,関東鉄道,竜ヶ崎線,りゅうがさきせん,Ryugasaki Line,#0000FF,,I_mono_color,N_round_normal,私鉄,関東鉄道,かんとうてつどう,Kanto Railway,I_train_normal1
+1039,ひたちなか海浜鉄道,湊線,みなとせん,Minato Line,#F39800,,I_mono_color,N_round_normal,私鉄,ひたちなか海浜鉄道,ひたちなかかいひんてつどう,Hitachinaka Seaside Railway,I_train_normal1
+1040,鹿島臨海鉄道,大洗鹿島線,おおあらいかしません,Oarai Kashima Line,#FF0000,,I_mono_color,N_round_normal,私鉄,鹿島臨海鉄道,かしまりんかいてつどう,Kashima Rinkai Railway,I_train_normal1
