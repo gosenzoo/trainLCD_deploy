@@ -1,0 +1,1172 @@
+{
+ "lines": [
+  {
+   "no": 850,
+   "name": "南北線",
+   "kana": "なんぼくせん",
+   "eng": "Namboku Line",
+   "color": "#008000",
+   "symbol": "N",
+   "operatorType": "私鉄",
+   "operator": "札幌市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Sapporo City Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "麻生",
+     "kana": "あさぶ",
+     "eng": "Asabu",
+     "lat": 43.1091,
+     "lon": 141.3381,
+     "number": "N 01"
+    },
+    {
+     "name": "北34条",
+     "kana": "きたさんじゅうよじょう",
+     "eng": "Kita-34-jo",
+     "lat": 43.0999,
+     "lon": 141.3421,
+     "number": "N 02"
+    },
+    {
+     "name": "北24条",
+     "kana": "きたにじゅうよじょう",
+     "eng": "Kita-24-jo",
+     "lat": 43.0899,
+     "lon": 141.3446,
+     "number": "N 03"
+    },
+    {
+     "name": "北18条",
+     "kana": "きたじゅうはちじょう",
+     "eng": "Kita-18-jo",
+     "lat": 43.0816,
+     "lon": 141.3467,
+     "number": "N 04"
+    },
+    {
+     "name": "北12条",
+     "kana": "きたじゅうにじょう",
+     "eng": "Kita-12-jo",
+     "lat": 43.0748,
+     "lon": 141.3484,
+     "number": "N 05"
+    },
+    {
+     "name": "さっぽろ",
+     "kana": "さっぽろ",
+     "eng": "Sapporo",
+     "lat": 43.0664,
+     "lon": 141.3506,
+     "number": "N 06"
+    },
+    {
+     "name": "大通",
+     "kana": "おおどおり",
+     "eng": "Odori",
+     "lat": 43.0604,
+     "lon": 141.3545,
+     "number": "N 07"
+    },
+    {
+     "name": "すすきの",
+     "kana": "すすきの",
+     "eng": "Susukino",
+     "lat": 43.0557,
+     "lon": 141.3533,
+     "number": "N 08"
+    },
+    {
+     "name": "中島公園",
+     "kana": "なかじまこうえん",
+     "eng": "Nakajima-koen",
+     "lat": 43.0489,
+     "lon": 141.355,
+     "number": "N 09"
+    },
+    {
+     "name": "幌平橋",
+     "kana": "ほろひらばし",
+     "eng": "Horohira-bashi",
+     "lat": 43.0402,
+     "lon": 141.356,
+     "number": "N 10"
+    },
+    {
+     "name": "中の島",
+     "kana": "なかのしま",
+     "eng": "Nakanoshima",
+     "lat": 43.0378,
+     "lon": 141.3607,
+     "number": "N 11"
+    },
+    {
+     "name": "平岸",
+     "kana": "ひらぎし",
+     "eng": "Hiragishi",
+     "lat": 43.0346,
+     "lon": 141.368,
+     "number": "N 12"
+    },
+    {
+     "name": "南平岸",
+     "kana": "みなみひらぎし",
+     "eng": "Minami-Hiragishi",
+     "lat": 43.0268,
+     "lon": 141.3713,
+     "number": "N 13"
+    },
+    {
+     "name": "澄川",
+     "kana": "すみかわ",
+     "eng": "Sumikawa",
+     "lat": 43.0168,
+     "lon": 141.3673,
+     "number": "N 14"
+    },
+    {
+     "name": "自衛隊前",
+     "kana": "じえいたいまえ",
+     "eng": "Jieitai-mae",
+     "lat": 43.0062,
+     "lon": 141.3648,
+     "number": "N 15"
+    },
+    {
+     "name": "真駒内",
+     "kana": "まこまない",
+     "eng": "Makomanai",
+     "lat": 42.9912,
+     "lon": 141.3584,
+     "number": "N 16"
+    }
+   ]
+  },
+  {
+   "no": 851,
+   "name": "東西線",
+   "kana": "とうざいせん",
+   "eng": "Tozai Line",
+   "color": "#FFA500",
+   "symbol": "T",
+   "operatorType": "私鉄",
+   "operator": "札幌市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Sapporo City Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "宮の沢",
+     "kana": "みやのさわ",
+     "eng": "Miyanosawa",
+     "lat": 43.09,
+     "lon": 141.2772,
+     "number": "T 01"
+    },
+    {
+     "name": "発寒南",
+     "kana": "はっさむみなみ",
+     "eng": "Hassamu-minami",
+     "lat": 43.0817,
+     "lon": 141.2893,
+     "number": "T 02"
+    },
+    {
+     "name": "琴似",
+     "kana": "ことに",
+     "eng": "Kotoni",
+     "lat": 43.0758,
+     "lon": 141.3039,
+     "number": "T 03"
+    },
+    {
+     "name": "二十四軒",
+     "kana": "にじゅうよんけん",
+     "eng": "Nijuyon-ken",
+     "lat": 43.0702,
+     "lon": 141.3141,
+     "number": "T 04"
+    },
+    {
+     "name": "西28丁目",
+     "kana": "にしにじゅうはっちょうめ",
+     "eng": "Nishi-28-chome",
+     "lat": 43.0603,
+     "lon": 141.3145,
+     "number": "T 05"
+    },
+    {
+     "name": "円山公園",
+     "kana": "まるやまこうえん",
+     "eng": "Maruyama-koen",
+     "lat": 43.0556,
+     "lon": 141.3188,
+     "number": "T 06"
+    },
+    {
+     "name": "西18丁目",
+     "kana": "にしじゅうはっちょうめ",
+     "eng": "Nishi-18-chome",
+     "lat": 43.0572,
+     "lon": 141.3302,
+     "number": "T 07"
+    },
+    {
+     "name": "西11丁目",
+     "kana": "にしじゅういっちょうめ",
+     "eng": "Nishi-11-chome",
+     "lat": 43.0586,
+     "lon": 141.341,
+     "number": "T 08"
+    },
+    {
+     "name": "大通",
+     "kana": "おおどおり",
+     "eng": "Odori",
+     "lat": 43.0604,
+     "lon": 141.3545,
+     "number": "T 09"
+    },
+    {
+     "name": "バスセンター前",
+     "kana": "ばすせんたーまえ",
+     "eng": "Bus Center-mae",
+     "lat": 43.0613,
+     "lon": 141.3605,
+     "number": "T 10"
+    },
+    {
+     "name": "菊水",
+     "kana": "きくすい",
+     "eng": "Kikusui",
+     "lat": 43.0572,
+     "lon": 141.3728,
+     "number": "T 11"
+    },
+    {
+     "name": "東札幌",
+     "kana": "ひがしさっぽろ",
+     "eng": "Higashi-Sapporo",
+     "lat": 43.0516,
+     "lon": 141.3846,
+     "number": "T 12"
+    },
+    {
+     "name": "白石",
+     "kana": "しろいし",
+     "eng": "Shiroishi",
+     "lat": 43.0462,
+     "lon": 141.3963,
+     "number": "T 13"
+    },
+    {
+     "name": "南郷7丁目",
+     "kana": "なんごうななちょうめ",
+     "eng": "Nango-7-chome",
+     "lat": 43.0402,
+     "lon": 141.4111,
+     "number": "T 14"
+    },
+    {
+     "name": "南郷13丁目",
+     "kana": "なんごうじゅうさんちょうめ",
+     "eng": "Nango-13-chome",
+     "lat": 43.0359,
+     "lon": 141.4224,
+     "number": "T 15"
+    },
+    {
+     "name": "南郷18丁目",
+     "kana": "なんごうじゅうはっちょうめ",
+     "eng": "Nango-18-chome",
+     "lat": 43.0304,
+     "lon": 141.435,
+     "number": "T 16"
+    },
+    {
+     "name": "大谷地",
+     "kana": "おおやち",
+     "eng": "Oyachi",
+     "lat": 43.0279,
+     "lon": 141.4531,
+     "number": "T 17"
+    },
+    {
+     "name": "ひばりが丘",
+     "kana": "ひばりがおか",
+     "eng": "Hibarigaoka",
+     "lat": 43.0322,
+     "lon": 141.4646,
+     "number": "T 18"
+    },
+    {
+     "name": "新さっぽろ",
+     "kana": "しんさっぽろ",
+     "eng": "Shin-Sapporo",
+     "lat": 43.0389,
+     "lon": 141.4739,
+     "number": "T 19"
+    }
+   ]
+  },
+  {
+   "no": 852,
+   "name": "東豊線",
+   "kana": "とうほうせん",
+   "eng": "Toho Line",
+   "color": "#0080FF",
+   "symbol": "H",
+   "operatorType": "私鉄",
+   "operator": "札幌市交通局",
+   "operatorShort": "地下鉄",
+   "operatorShortKana": "ちかてつ",
+   "operatorShortEng": "Sapporo City Subway",
+   "genericIcon": "I_train_subway1",
+   "stations": [
+    {
+     "name": "栄町",
+     "kana": "さかえまち",
+     "eng": "Sakaemachi",
+     "lat": 43.113,
+     "lon": 141.3671,
+     "number": "H 01"
+    },
+    {
+     "name": "新道東",
+     "kana": "しんどうひがし",
+     "eng": "Shindo-higashi",
+     "lat": 43.1047,
+     "lon": 141.3691,
+     "number": "H 02"
+    },
+    {
+     "name": "元町",
+     "kana": "もとまち",
+     "eng": "Motomachi",
+     "lat": 43.0944,
+     "lon": 141.3716,
+     "number": "H 03"
+    },
+    {
+     "name": "環状通東",
+     "kana": "かんじょうどおりひがし",
+     "eng": "Kanjo-dori-higashi",
+     "lat": 43.0822,
+     "lon": 141.3746,
+     "number": "H 04"
+    },
+    {
+     "name": "東区役所前",
+     "kana": "ひがしくやくしょまえ",
+     "eng": "Higashi-kuyakusho-mae",
+     "lat": 43.0782,
+     "lon": 141.3648,
+     "number": "H 05"
+    },
+    {
+     "name": "北13条東",
+     "kana": "きたじゅうさんじょうひがし",
+     "eng": "Kita-13-jo-higashi",
+     "lat": 43.0769,
+     "lon": 141.3548,
+     "number": "H 06"
+    },
+    {
+     "name": "さっぽろ",
+     "kana": "さっぽろ",
+     "eng": "Sapporo",
+     "lat": 43.0664,
+     "lon": 141.3506,
+     "number": "H 07"
+    },
+    {
+     "name": "大通",
+     "kana": "おおどおり",
+     "eng": "Odori",
+     "lat": 43.0604,
+     "lon": 141.3545,
+     "number": "H 08"
+    },
+    {
+     "name": "豊水すすきの",
+     "kana": "ほうすいすすきの",
+     "eng": "Hosui-susukino",
+     "lat": 43.055,
+     "lon": 141.3568,
+     "number": "H 09"
+    },
+    {
+     "name": "学園前",
+     "kana": "がくえんまえ",
+     "eng": "Gakuen-mae",
+     "lat": 43.0474,
+     "lon": 141.3691,
+     "number": "H 10"
+    },
+    {
+     "name": "豊平公園",
+     "kana": "とよひらこうえん",
+     "eng": "Toyohira-koen",
+     "lat": 43.0419,
+     "lon": 141.3766,
+     "number": "H 11"
+    },
+    {
+     "name": "美園",
+     "kana": "みその",
+     "eng": "Misono",
+     "lat": 43.0363,
+     "lon": 141.3858,
+     "number": "H 12"
+    },
+    {
+     "name": "月寒中央",
+     "kana": "つきさむちゅうおう",
+     "eng": "Tsukisamu-chuo",
+     "lat": 43.0306,
+     "lon": 141.3963,
+     "number": "H 13"
+    },
+    {
+     "name": "福住",
+     "kana": "ふくずみ",
+     "eng": "Fukuzumi",
+     "lat": 43.0216,
+     "lon": 141.4031,
+     "number": "H 14"
+    }
+   ]
+  },
+  {
+   "no": 853,
+   "name": "循環線",
+   "kana": "じゅんかんせん",
+   "eng": "Loop Line",
+   "color": "#009B63",
+   "symbol": "SC",
+   "operatorType": "私鉄",
+   "operator": "札幌市交通局",
+   "operatorShort": "市電",
+   "operatorShortKana": "しでん",
+   "operatorShortEng": "Sapporo Streetcar",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "西4丁目",
+     "kana": "にしよんちょうめ",
+     "eng": "Nishi-4-chome",
+     "lat": 43.0589,
+     "lon": 141.3519,
+     "number": "SC 01"
+    },
+    {
+     "name": "西8丁目",
+     "kana": "にしはっちょうめ",
+     "eng": "Nishi-8-chome",
+     "lat": 43.0582,
+     "lon": 141.3466,
+     "number": "SC 02"
+    },
+    {
+     "name": "中央区役所前",
+     "kana": "ちゅうおうくやくしょまえ",
+     "eng": "Chuo-kuyakusho-mae",
+     "lat": 43.0575,
+     "lon": 141.3409,
+     "number": "SC 03"
+    },
+    {
+     "name": "西15丁目",
+     "kana": "にしじゅうごちょうめ",
+     "eng": "Nishi-15-chome",
+     "lat": 43.0564,
+     "lon": 141.3352,
+     "number": "SC 04"
+    },
+    {
+     "name": "西線6条",
+     "kana": "にしせんろくじょう",
+     "eng": "Nishisen-6-jo",
+     "lat": 43.0515,
+     "lon": 141.3351,
+     "number": "SC 05"
+    },
+    {
+     "name": "西線9条旭山公園通",
+     "kana": "にしせんくじょうあさひやまこうえんどおり",
+     "eng": "Nishisen-9-jo Asahiyama-koen-dori",
+     "lat": 43.0477,
+     "lon": 141.3355,
+     "number": "SC 06"
+    },
+    {
+     "name": "西線11条",
+     "kana": "にしせんじゅういちじょう",
+     "eng": "Nishisen-11-jo",
+     "lat": 43.0444,
+     "lon": 141.3359,
+     "number": "SC 07"
+    },
+    {
+     "name": "西線14条",
+     "kana": "にしせんじゅうよじょう",
+     "eng": "Nishisen-14-jo",
+     "lat": 43.0406,
+     "lon": 141.3364,
+     "number": "SC 08"
+    },
+    {
+     "name": "西線16条",
+     "kana": "にしせんじゅうろくじょう",
+     "eng": "Nishisen-16-jo",
+     "lat": 43.0372,
+     "lon": 141.3369,
+     "number": "SC 09"
+    },
+    {
+     "name": "ロープウェイ入口",
+     "kana": "ろーぷうぇいいりぐち",
+     "eng": "Ropeway-iriguchi",
+     "lat": 43.0339,
+     "lon": 141.3373,
+     "number": "SC 10"
+    },
+    {
+     "name": "電車事業所前",
+     "kana": "でんしゃじぎょうしょまえ",
+     "eng": "Densha-jigyosho-mae",
+     "lat": 43.0306,
+     "lon": 141.3377,
+     "number": "SC 11"
+    },
+    {
+     "name": "中央図書館前",
+     "kana": "ちゅうおうとしょかんまえ",
+     "eng": "Chuo-toshokan-mae",
+     "lat": 43.0304,
+     "lon": 141.3401,
+     "number": "SC 12"
+    },
+    {
+     "name": "石山通",
+     "kana": "いしやまどおり",
+     "eng": "Ishiyama-dori",
+     "lat": 43.0307,
+     "lon": 141.3442,
+     "number": "SC 13"
+    },
+    {
+     "name": "東屯田通",
+     "kana": "ひがしとんでんどおり",
+     "eng": "Higashi-tonden-dori",
+     "lat": 43.031,
+     "lon": 141.3486,
+     "number": "SC 14"
+    },
+    {
+     "name": "幌南小学校前",
+     "kana": "こうなんしょうがっこうまえ",
+     "eng": "Konan-shogakko-mae",
+     "lat": 43.0323,
+     "lon": 141.3519,
+     "number": "SC 15"
+    },
+    {
+     "name": "山鼻19条",
+     "kana": "やまはなじゅうくじょう",
+     "eng": "Yamahana-19-jo",
+     "lat": 43.0351,
+     "lon": 141.3516,
+     "number": "SC 16"
+    },
+    {
+     "name": "静修学園前",
+     "kana": "せいしゅうがくえんまえ",
+     "eng": "Seishu-gakuen-mae",
+     "lat": 43.0384,
+     "lon": 141.3512,
+     "number": "SC 17"
+    },
+    {
+     "name": "行啓通",
+     "kana": "ぎょうけいどおり",
+     "eng": "Gyokei-dori",
+     "lat": 43.0416,
+     "lon": 141.3508,
+     "number": "SC 18"
+    },
+    {
+     "name": "中島公園通",
+     "kana": "なかじまこうえんどおり",
+     "eng": "Nakajima-koen-dori",
+     "lat": 43.0457,
+     "lon": 141.3502,
+     "number": "SC 19"
+    },
+    {
+     "name": "山鼻9条",
+     "kana": "やまはなくじょう",
+     "eng": "Yamahana-9-jo",
+     "lat": 43.0489,
+     "lon": 141.3498,
+     "number": "SC 20"
+    },
+    {
+     "name": "東本願寺前",
+     "kana": "ひがしほんがんじまえ",
+     "eng": "Higashi-honganji-mae",
+     "lat": 43.0517,
+     "lon": 141.3495,
+     "number": "SC 21"
+    },
+    {
+     "name": "資生館小学校前",
+     "kana": "しせいかんしょうがっこうまえ",
+     "eng": "Shiseikan-shogakko-mae",
+     "lat": 43.0551,
+     "lon": 141.3491,
+     "number": "SC 22"
+    },
+    {
+     "name": "すすきの",
+     "kana": "すすきの",
+     "eng": "Susukino",
+     "lat": 43.0557,
+     "lon": 141.3533,
+     "number": "SC 23"
+    },
+    {
+     "name": "狸小路",
+     "kana": "たぬきこうじ",
+     "eng": "Tanukikoji",
+     "lat": 43.0573,
+     "lon": 141.3529,
+     "number": "SC 24"
+    },
+    {
+     "name": "西4丁目",
+     "kana": "にしよんちょうめ",
+     "eng": "Nishi-4-chome",
+     "lat": 43.0589,
+     "lon": 141.3519,
+     "number": "SC 01"
+    }
+   ]
+  },
+  {
+   "no": 854,
+   "name": "2系統",
+   "kana": "にけいとう",
+   "eng": "Route 2",
+   "color": "#E60012",
+   "symbol": "Y",
+   "operatorType": "私鉄",
+   "operator": "函館市企業局",
+   "operatorShort": "市電",
+   "operatorShortKana": "しでん",
+   "operatorShortEng": "Hakodate City Tram",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "湯の川",
+     "kana": "ゆのかわ",
+     "eng": "Yunokawa",
+     "lat": 41.7811,
+     "lon": 140.7901,
+     "number": "DY 01"
+    },
+    {
+     "name": "湯の川温泉",
+     "kana": "ゆのかわおんせん",
+     "eng": "Yunokawa-onsen",
+     "lat": 41.78,
+     "lon": 140.7852,
+     "number": "DY 02"
+    },
+    {
+     "name": "函館アリーナ前",
+     "kana": "はこだてありーなまえ",
+     "eng": "Hakodate Arena-mae",
+     "lat": 41.7819,
+     "lon": 140.7823,
+     "number": "DY 03"
+    },
+    {
+     "name": "駒場車庫前",
+     "kana": "こまばしゃこまえ",
+     "eng": "Komaba-shako-mae",
+     "lat": 41.7832,
+     "lon": 140.7794,
+     "number": "DY 04"
+    },
+    {
+     "name": "競馬場前",
+     "kana": "けいばじょうまえ",
+     "eng": "Keibajo-mae",
+     "lat": 41.7844,
+     "lon": 140.7759,
+     "number": "DY 05"
+    },
+    {
+     "name": "深堀町",
+     "kana": "ふかぼりちょう",
+     "eng": "Fukabori-cho",
+     "lat": 41.7872,
+     "lon": 140.77,
+     "number": "DY 06"
+    },
+    {
+     "name": "柏木町",
+     "kana": "かしわぎちょう",
+     "eng": "Kashiwagi-cho",
+     "lat": 41.7879,
+     "lon": 140.7652,
+     "number": "DY 07"
+    },
+    {
+     "name": "杉並町",
+     "kana": "すぎなみちょう",
+     "eng": "Suginami-cho",
+     "lat": 41.7886,
+     "lon": 140.7592,
+     "number": "DY 08"
+    },
+    {
+     "name": "五稜郭公園前",
+     "kana": "ごりょうかくこうえんまえ",
+     "eng": "Goryokaku-koen-mae",
+     "lat": 41.7892,
+     "lon": 140.7522,
+     "number": "DY 09"
+    },
+    {
+     "name": "中央病院前",
+     "kana": "ちゅうおうびょういんまえ",
+     "eng": "Chuo-byoin-mae",
+     "lat": 41.7866,
+     "lon": 140.7509,
+     "number": "DY 10"
+    },
+    {
+     "name": "千代台",
+     "kana": "ちよがだい",
+     "eng": "Chiyogadai",
+     "lat": 41.784,
+     "lon": 140.7485,
+     "number": "DY 11"
+    },
+    {
+     "name": "堀川町",
+     "kana": "ほりかわちょう",
+     "eng": "Horikawa-cho",
+     "lat": 41.7805,
+     "lon": 140.744,
+     "number": "DY 12"
+    },
+    {
+     "name": "昭和橋",
+     "kana": "しょうわばし",
+     "eng": "Showabashi",
+     "lat": 41.7779,
+     "lon": 140.7407,
+     "number": "DY 13"
+    },
+    {
+     "name": "千歳町",
+     "kana": "ちとせちょう",
+     "eng": "Chitose-cho",
+     "lat": 41.7758,
+     "lon": 140.7381,
+     "number": "DY 14"
+    },
+    {
+     "name": "新川町",
+     "kana": "しんかわちょう",
+     "eng": "Shinkawa-cho",
+     "lat": 41.7736,
+     "lon": 140.7353,
+     "number": "DY 15"
+    },
+    {
+     "name": "松風町",
+     "kana": "まつかぜちょう",
+     "eng": "Matsukaze-cho",
+     "lat": 41.7714,
+     "lon": 140.7331,
+     "number": "DY 16"
+    },
+    {
+     "name": "函館駅前",
+     "kana": "はこだてえきまえ",
+     "eng": "Hakodate-ekimae",
+     "lat": 41.7728,
+     "lon": 140.7275,
+     "number": "DY 17"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Shiyakusho-mae",
+     "lat": 41.7693,
+     "lon": 140.7254,
+     "number": "DY 18"
+    },
+    {
+     "name": "魚市場通",
+     "kana": "うおいちばどおり",
+     "eng": "Uoichiba-dori",
+     "lat": 41.7667,
+     "lon": 140.7228,
+     "number": "DY 19"
+    },
+    {
+     "name": "十字街",
+     "kana": "じゅうじがい",
+     "eng": "Jujigai",
+     "lat": 41.7641,
+     "lon": 140.7186,
+     "number": "DY 20"
+    },
+    {
+     "name": "宝来町",
+     "kana": "ほうらいちょう",
+     "eng": "Horai-cho",
+     "lat": 41.7611,
+     "lon": 140.7199,
+     "number": "Y 24"
+    },
+    {
+     "name": "青柳町",
+     "kana": "あおやぎちょう",
+     "eng": "Aoyagi-cho",
+     "lat": 41.7565,
+     "lon": 140.7184,
+     "number": "Y 25"
+    },
+    {
+     "name": "谷地頭",
+     "kana": "やちがしら",
+     "eng": "Yachigashira",
+     "lat": 41.7532,
+     "lon": 140.7163,
+     "number": "Y 26"
+    }
+   ]
+  },
+  {
+   "no": 855,
+   "name": "5系統",
+   "kana": "ごけいとう",
+   "eng": "Route 5",
+   "color": "#009944",
+   "symbol": "D",
+   "operatorType": "私鉄",
+   "operator": "函館市企業局",
+   "operatorShort": "市電",
+   "operatorShortKana": "しでん",
+   "operatorShortEng": "Hakodate City Tram",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "湯の川",
+     "kana": "ゆのかわ",
+     "eng": "Yunokawa",
+     "lat": 41.7811,
+     "lon": 140.7901,
+     "number": "DY 01"
+    },
+    {
+     "name": "湯の川温泉",
+     "kana": "ゆのかわおんせん",
+     "eng": "Yunokawa-onsen",
+     "lat": 41.78,
+     "lon": 140.7852,
+     "number": "DY 02"
+    },
+    {
+     "name": "函館アリーナ前",
+     "kana": "はこだてありーなまえ",
+     "eng": "Hakodate Arena-mae",
+     "lat": 41.7819,
+     "lon": 140.7823,
+     "number": "DY 03"
+    },
+    {
+     "name": "駒場車庫前",
+     "kana": "こまばしゃこまえ",
+     "eng": "Komaba-shako-mae",
+     "lat": 41.7832,
+     "lon": 140.7794,
+     "number": "DY 04"
+    },
+    {
+     "name": "競馬場前",
+     "kana": "けいばじょうまえ",
+     "eng": "Keibajo-mae",
+     "lat": 41.7844,
+     "lon": 140.7759,
+     "number": "DY 05"
+    },
+    {
+     "name": "深堀町",
+     "kana": "ふかぼりちょう",
+     "eng": "Fukabori-cho",
+     "lat": 41.7872,
+     "lon": 140.77,
+     "number": "DY 06"
+    },
+    {
+     "name": "柏木町",
+     "kana": "かしわぎちょう",
+     "eng": "Kashiwagi-cho",
+     "lat": 41.7879,
+     "lon": 140.7652,
+     "number": "DY 07"
+    },
+    {
+     "name": "杉並町",
+     "kana": "すぎなみちょう",
+     "eng": "Suginami-cho",
+     "lat": 41.7886,
+     "lon": 140.7592,
+     "number": "DY 08"
+    },
+    {
+     "name": "五稜郭公園前",
+     "kana": "ごりょうかくこうえんまえ",
+     "eng": "Goryokaku-koen-mae",
+     "lat": 41.7892,
+     "lon": 140.7522,
+     "number": "DY 09"
+    },
+    {
+     "name": "中央病院前",
+     "kana": "ちゅうおうびょういんまえ",
+     "eng": "Chuo-byoin-mae",
+     "lat": 41.7866,
+     "lon": 140.7509,
+     "number": "DY 10"
+    },
+    {
+     "name": "千代台",
+     "kana": "ちよがだい",
+     "eng": "Chiyogadai",
+     "lat": 41.784,
+     "lon": 140.7485,
+     "number": "DY 11"
+    },
+    {
+     "name": "堀川町",
+     "kana": "ほりかわちょう",
+     "eng": "Horikawa-cho",
+     "lat": 41.7805,
+     "lon": 140.744,
+     "number": "DY 12"
+    },
+    {
+     "name": "昭和橋",
+     "kana": "しょうわばし",
+     "eng": "Showabashi",
+     "lat": 41.7779,
+     "lon": 140.7407,
+     "number": "DY 13"
+    },
+    {
+     "name": "千歳町",
+     "kana": "ちとせちょう",
+     "eng": "Chitose-cho",
+     "lat": 41.7758,
+     "lon": 140.7381,
+     "number": "DY 14"
+    },
+    {
+     "name": "新川町",
+     "kana": "しんかわちょう",
+     "eng": "Shinkawa-cho",
+     "lat": 41.7736,
+     "lon": 140.7353,
+     "number": "DY 15"
+    },
+    {
+     "name": "松風町",
+     "kana": "まつかぜちょう",
+     "eng": "Matsukaze-cho",
+     "lat": 41.7714,
+     "lon": 140.7331,
+     "number": "DY 16"
+    },
+    {
+     "name": "函館駅前",
+     "kana": "はこだてえきまえ",
+     "eng": "Hakodate-ekimae",
+     "lat": 41.7728,
+     "lon": 140.7275,
+     "number": "DY 17"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Shiyakusho-mae",
+     "lat": 41.7693,
+     "lon": 140.7254,
+     "number": "DY 18"
+    },
+    {
+     "name": "魚市場通",
+     "kana": "うおいちばどおり",
+     "eng": "Uoichiba-dori",
+     "lat": 41.7667,
+     "lon": 140.7228,
+     "number": "DY 19"
+    },
+    {
+     "name": "十字街",
+     "kana": "じゅうじがい",
+     "eng": "Jujigai",
+     "lat": 41.7641,
+     "lon": 140.7186,
+     "number": "DY 20"
+    },
+    {
+     "name": "末広町",
+     "kana": "すえひろちょう",
+     "eng": "Suehiro-cho",
+     "lat": 41.7665,
+     "lon": 140.7124,
+     "number": "D 21"
+    },
+    {
+     "name": "大町",
+     "kana": "おおまち",
+     "eng": "Omachi",
+     "lat": 41.7701,
+     "lon": 140.7092,
+     "number": "D 22"
+    },
+    {
+     "name": "函館どつく前",
+     "kana": "はこだてどつくまえ",
+     "eng": "Hakodate-dokku-mae",
+     "lat": 41.7731,
+     "lon": 140.7043,
+     "number": "D 23"
+    }
+   ]
+  },
+  {
+   "no": 856,
+   "name": "道南いさりび鉄道線",
+   "kana": "どうなんいさりびてつどうせん",
+   "eng": "Donan Isaribi Railway Line",
+   "color": "#246DAC",
+   "symbol": "sh",
+   "operatorType": "私鉄",
+   "operator": "道南いさりび鉄道",
+   "operatorShort": "道南いさりび鉄道",
+   "operatorShortKana": "どうなんいさりびてつどう",
+   "operatorShortEng": "South Hokkaido Railway",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "五稜郭",
+     "kana": "ごりょうかく",
+     "eng": "Goryokaku",
+     "lat": 41.8034,
+     "lon": 140.7338,
+     "number": "H 74"
+    },
+    {
+     "name": "七重浜",
+     "kana": "ななえはま",
+     "eng": "Nanaehama",
+     "lat": 41.8172,
+     "lon": 140.709,
+     "number": "sh 11"
+    },
+    {
+     "name": "東久根別",
+     "kana": "ひがしくねべつ",
+     "eng": "Higashi-Kunebetsu",
+     "lat": 41.8261,
+     "lon": 140.68,
+     "number": "sh 10"
+    },
+    {
+     "name": "久根別",
+     "kana": "くねべつ",
+     "eng": "Kunebetsu",
+     "lat": 41.8265,
+     "lon": 140.666,
+     "number": "sh 09"
+    },
+    {
+     "name": "清川口",
+     "kana": "きよかわぐち",
+     "eng": "Kiyokawaguchi",
+     "lat": 41.8245,
+     "lon": 140.6526,
+     "number": "sh 08"
+    },
+    {
+     "name": "上磯",
+     "kana": "かみいそ",
+     "eng": "Kamiiso",
+     "lat": 41.8199,
+     "lon": 140.6416,
+     "number": "sh 07"
+    },
+    {
+     "name": "茂辺地",
+     "kana": "もへじ",
+     "eng": "Moheji",
+     "lat": 41.7665,
+     "lon": 140.6008,
+     "number": "sh 06"
+    },
+    {
+     "name": "渡島当別",
+     "kana": "おしまとうべつ",
+     "eng": "Oshima-Tobetsu",
+     "lat": 41.7375,
+     "lon": 140.5795,
+     "number": "sh 05"
+    },
+    {
+     "name": "釜谷",
+     "kana": "かまや",
+     "eng": "Kamaya",
+     "lat": 41.7121,
+     "lon": 140.5371,
+     "number": "sh 04"
+    },
+    {
+     "name": "泉沢",
+     "kana": "いずみさわ",
+     "eng": "Izumisawa",
+     "lat": 41.7008,
+     "lon": 140.5067,
+     "number": "sh 03"
+    },
+    {
+     "name": "札苅",
+     "kana": "さつかり",
+     "eng": "Satsukari",
+     "lat": 41.6992,
+     "lon": 140.4681,
+     "number": "sh 02"
+    },
+    {
+     "name": "木古内",
+     "kana": "きこない",
+     "eng": "Kikonai",
+     "lat": 41.6777,
+     "lon": 140.4341,
+     "number": "sh 01"
+    }
+   ]
+  }
+ ]
+}

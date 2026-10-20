@@ -1,0 +1,908 @@
+{
+ "lines": [
+  {
+   "no": 750,
+   "name": "大月線",
+   "kana": "おおつきせん",
+   "eng": "Otsuki Line",
+   "color": "#0033DD",
+   "symbol": "FJ",
+   "operatorType": "私鉄",
+   "operator": "富士山麓電気鉄道",
+   "operatorShort": "富士急",
+   "operatorShortKana": "ふじきゅう",
+   "operatorShortEng": "Fujikyu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "大月",
+     "kana": "おおつき",
+     "eng": "Otsuki",
+     "lat": 35.6132,
+     "lon": 138.9427,
+     "number": "FJ 01"
+    },
+    {
+     "name": "上大月",
+     "kana": "かみおおつき",
+     "eng": "Kami-Otsuki",
+     "lat": 35.6093,
+     "lon": 138.938,
+     "number": "FJ 02"
+    },
+    {
+     "name": "田野倉",
+     "kana": "たのくら",
+     "eng": "Tanokura",
+     "lat": 35.5932,
+     "lon": 138.9312,
+     "number": "FJ 03"
+    },
+    {
+     "name": "禾生",
+     "kana": "かせい",
+     "eng": "Kasei",
+     "lat": 35.575,
+     "lon": 138.929,
+     "number": "FJ 04"
+    },
+    {
+     "name": "赤坂",
+     "kana": "あかさか",
+     "eng": "Akasaka",
+     "lat": 35.5662,
+     "lon": 138.9162,
+     "number": "FJ 05"
+    },
+    {
+     "name": "都留市",
+     "kana": "つるし",
+     "eng": "Tsurushi",
+     "lat": 35.5569,
+     "lon": 138.9077,
+     "number": "FJ 06"
+    },
+    {
+     "name": "谷村町",
+     "kana": "やむらまち",
+     "eng": "Yamuramachi",
+     "lat": 35.5506,
+     "lon": 138.9047,
+     "number": "FJ 07"
+    },
+    {
+     "name": "都留文科大学前",
+     "kana": "つるぶんかだいがくまえ",
+     "eng": "Tsurubunkadaigaku-mae",
+     "lat": 35.5425,
+     "lon": 138.8965,
+     "number": "FJ 08"
+    },
+    {
+     "name": "十日市場",
+     "kana": "とおかいちば",
+     "eng": "Tokaichiba",
+     "lat": 35.5389,
+     "lon": 138.8875,
+     "number": "FJ 09"
+    },
+    {
+     "name": "東桂",
+     "kana": "ひがしかつら",
+     "eng": "Higashi-Katsura",
+     "lat": 35.5365,
+     "lon": 138.871,
+     "number": "FJ 10"
+    },
+    {
+     "name": "三つ峠",
+     "kana": "みつとうげ",
+     "eng": "Mitsutoge",
+     "lat": 35.524,
+     "lon": 138.8453,
+     "number": "FJ 11"
+    },
+    {
+     "name": "寿",
+     "kana": "ことぶき",
+     "eng": "Kotobuki",
+     "lat": 35.5083,
+     "lon": 138.8254,
+     "number": "FJ 12"
+    },
+    {
+     "name": "葭池温泉前",
+     "kana": "よしいけおんせんまえ",
+     "eng": "Yoshiike-Onsen-mae",
+     "lat": 35.5019,
+     "lon": 138.812,
+     "number": "FJ 13"
+    },
+    {
+     "name": "下吉田",
+     "kana": "しもよしだ",
+     "eng": "Shimo-Yoshida",
+     "lat": 35.4977,
+     "lon": 138.8033,
+     "number": "FJ 14"
+    },
+    {
+     "name": "月江寺",
+     "kana": "げっこうじ",
+     "eng": "Gekkoji",
+     "lat": 35.4932,
+     "lon": 138.7981,
+     "number": "FJ 15"
+    },
+    {
+     "name": "富士山",
+     "kana": "ふじさん",
+     "eng": "Mt.Fuji",
+     "lat": 35.4835,
+     "lon": 138.7957,
+     "number": "FJ 16"
+    }
+   ]
+  },
+  {
+   "no": 751,
+   "name": "河口湖線",
+   "kana": "かわぐちこせん",
+   "eng": "Kawaguchiko Line",
+   "color": "#0033DD",
+   "symbol": "FJ",
+   "operatorType": "私鉄",
+   "operator": "富士山麓電気鉄道",
+   "operatorShort": "富士急",
+   "operatorShortKana": "ふじきゅう",
+   "operatorShortEng": "Fujikyu",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "富士山",
+     "kana": "ふじさん",
+     "eng": "Mt.Fuji",
+     "lat": 35.4835,
+     "lon": 138.7957,
+     "number": "FJ 16"
+    },
+    {
+     "name": "富士急ハイランド",
+     "kana": "ふじきゅうはいらんど",
+     "eng": "Fuji-Q Highland",
+     "lat": 35.4893,
+     "lon": 138.782,
+     "number": "FJ 17"
+    },
+    {
+     "name": "河口湖",
+     "kana": "かわぐちこ",
+     "eng": "Kawaguchiko",
+     "lat": 35.4982,
+     "lon": 138.7686,
+     "number": "FJ 18"
+    }
+   ]
+  },
+  {
+   "no": 752,
+   "name": "上高地線",
+   "kana": "かみこうちせん",
+   "eng": "Kamikochi Line",
+   "color": "#465DAA",
+   "symbol": "AK",
+   "operatorType": "私鉄",
+   "operator": "アルピコ交通",
+   "operatorShort": "アルピコ",
+   "operatorShortKana": "あるぴこ",
+   "operatorShortEng": "Alpico",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "松本",
+     "kana": "まつもと",
+     "eng": "Matsumoto",
+     "lat": 36.2307,
+     "lon": 137.9639,
+     "number": "AK 01"
+    },
+    {
+     "name": "西松本",
+     "kana": "にしまつもと",
+     "eng": "Nishi-Matsumoto",
+     "lat": 36.2271,
+     "lon": 137.9634,
+     "number": "AK 02"
+    },
+    {
+     "name": "渚",
+     "kana": "なぎさ",
+     "eng": "Nagisa",
+     "lat": 36.2271,
+     "lon": 137.9563,
+     "number": "AK 03"
+    },
+    {
+     "name": "信濃荒井",
+     "kana": "しなのあらい",
+     "eng": "Shinano-Arai",
+     "lat": 36.2289,
+     "lon": 137.949,
+     "number": "AK 04"
+    },
+    {
+     "name": "大庭",
+     "kana": "おおにわ",
+     "eng": "Oniwa",
+     "lat": 36.2271,
+     "lon": 137.9417,
+     "number": "AK 05"
+    },
+    {
+     "name": "下新",
+     "kana": "しもにい",
+     "eng": "Shimonii",
+     "lat": 36.2251,
+     "lon": 137.9222,
+     "number": "AK 06"
+    },
+    {
+     "name": "北新・松本大学前",
+     "kana": "きたにい・まつもとだいがくまえ",
+     "eng": "Kitanii-Matsumotodaigaku-mae",
+     "lat": 36.2198,
+     "lon": 137.9139,
+     "number": "AK 07"
+    },
+    {
+     "name": "新村",
+     "kana": "にいむら",
+     "eng": "Niimura",
+     "lat": 36.2163,
+     "lon": 137.9051,
+     "number": "AK 08"
+    },
+    {
+     "name": "三溝",
+     "kana": "さみぞ",
+     "eng": "Samizo",
+     "lat": 36.2129,
+     "lon": 137.8915,
+     "number": "AK 09"
+    },
+    {
+     "name": "森口",
+     "kana": "もりぐち",
+     "eng": "Moriguchi",
+     "lat": 36.2081,
+     "lon": 137.8813,
+     "number": "AK 10"
+    },
+    {
+     "name": "下島",
+     "kana": "しもじま",
+     "eng": "Shimojima",
+     "lat": 36.2063,
+     "lon": 137.872,
+     "number": "AK 11"
+    },
+    {
+     "name": "波田",
+     "kana": "はた",
+     "eng": "Hata",
+     "lat": 36.2004,
+     "lon": 137.8564,
+     "number": "AK 12"
+    },
+    {
+     "name": "渕東",
+     "kana": "えんどう",
+     "eng": "Endo",
+     "lat": 36.1952,
+     "lon": 137.8399,
+     "number": "AK 13"
+    },
+    {
+     "name": "新島々",
+     "kana": "しんしましま",
+     "eng": "Shin-Shimashima",
+     "lat": 36.1898,
+     "lon": 137.8218,
+     "number": "AK 14"
+    }
+   ]
+  },
+  {
+   "no": 753,
+   "name": "長野線",
+   "kana": "ながのせん",
+   "eng": "Nagano Line",
+   "color": "#FF0000",
+   "symbol": "N",
+   "operatorType": "私鉄",
+   "operator": "長野電鉄",
+   "operatorShort": "長電",
+   "operatorShortKana": "ながでん",
+   "operatorShortEng": "Nagaden",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "長野",
+     "kana": "ながの",
+     "eng": "Nagano",
+     "lat": 36.6431,
+     "lon": 138.1887,
+     "number": "N 1"
+    },
+    {
+     "name": "市役所前",
+     "kana": "しやくしょまえ",
+     "eng": "Shiyakusho-mae",
+     "lat": 36.6491,
+     "lon": 138.1915,
+     "number": "N 2"
+    },
+    {
+     "name": "権堂",
+     "kana": "ごんどう",
+     "eng": "Gondo",
+     "lat": 36.6531,
+     "lon": 138.1919,
+     "number": "N 3"
+    },
+    {
+     "name": "善光寺下",
+     "kana": "ぜんこうじした",
+     "eng": "Zenkojishita",
+     "lat": 36.6586,
+     "lon": 138.1935,
+     "number": "N 4"
+    },
+    {
+     "name": "本郷",
+     "kana": "ほんごう",
+     "eng": "Hongo",
+     "lat": 36.6625,
+     "lon": 138.2039,
+     "number": "N 5"
+    },
+    {
+     "name": "桐原",
+     "kana": "きりはら",
+     "eng": "Kirihara",
+     "lat": 36.6657,
+     "lon": 138.2131,
+     "number": "N 6"
+    },
+    {
+     "name": "信濃吉田",
+     "kana": "しなのよしだ",
+     "eng": "Shinano-Yoshida",
+     "lat": 36.6674,
+     "lon": 138.221,
+     "number": "N 7"
+    },
+    {
+     "name": "朝陽",
+     "kana": "あさひ",
+     "eng": "Asahi",
+     "lat": 36.6662,
+     "lon": 138.2414,
+     "number": "N 8"
+    },
+    {
+     "name": "附属中学前",
+     "kana": "ふぞくちゅうがくまえ",
+     "eng": "Fuzokuchugaku-mae",
+     "lat": 36.6625,
+     "lon": 138.2483,
+     "number": "N 9"
+    },
+    {
+     "name": "柳原",
+     "kana": "やなぎはら",
+     "eng": "Yanagihara",
+     "lat": 36.6635,
+     "lon": 138.2587,
+     "number": "N 10"
+    },
+    {
+     "name": "村山",
+     "kana": "むらやま",
+     "eng": "Murayama",
+     "lat": 36.6593,
+     "lon": 138.2796,
+     "number": "N 11"
+    },
+    {
+     "name": "日野",
+     "kana": "ひの",
+     "eng": "Hino",
+     "lat": 36.6559,
+     "lon": 138.2884,
+     "number": "N 12"
+    },
+    {
+     "name": "須坂",
+     "kana": "すざか",
+     "eng": "Suzaka",
+     "lat": 36.6569,
+     "lon": 138.3042,
+     "number": "N 13"
+    },
+    {
+     "name": "北須坂",
+     "kana": "きたすざか",
+     "eng": "Kita-Suzaka",
+     "lat": 36.6785,
+     "lon": 138.3086,
+     "number": "N 14"
+    },
+    {
+     "name": "小布施",
+     "kana": "おぶせ",
+     "eng": "Obuse",
+     "lat": 36.6989,
+     "lon": 138.3127,
+     "number": "N 15"
+    },
+    {
+     "name": "都住",
+     "kana": "つすみ",
+     "eng": "Tsusumi",
+     "lat": 36.704,
+     "lon": 138.3221,
+     "number": "N 16"
+    },
+    {
+     "name": "桜沢",
+     "kana": "さくらさわ",
+     "eng": "Sakurasawa",
+     "lat": 36.7126,
+     "lon": 138.3498,
+     "number": "N 17"
+    },
+    {
+     "name": "延徳",
+     "kana": "えんとく",
+     "eng": "Entoku",
+     "lat": 36.7267,
+     "lon": 138.3624,
+     "number": "N 18"
+    },
+    {
+     "name": "信州中野",
+     "kana": "しんしゅうなかの",
+     "eng": "Shinshu-Nakano",
+     "lat": 36.7444,
+     "lon": 138.3649,
+     "number": "N 19"
+    },
+    {
+     "name": "中野松川",
+     "kana": "なかのまつかわ",
+     "eng": "Nakano-Matsukawa",
+     "lat": 36.7506,
+     "lon": 138.3742,
+     "number": "N 20"
+    },
+    {
+     "name": "信濃竹原",
+     "kana": "しなのたけはら",
+     "eng": "Shinano-Takehara",
+     "lat": 36.761,
+     "lon": 138.3937,
+     "number": "N 21"
+    },
+    {
+     "name": "夜間瀬",
+     "kana": "よませ",
+     "eng": "Yomase",
+     "lat": 36.7599,
+     "lon": 138.4034,
+     "number": "N 22"
+    },
+    {
+     "name": "上条",
+     "kana": "かみじょう",
+     "eng": "Kamijo",
+     "lat": 36.7495,
+     "lon": 138.4075,
+     "number": "N 23"
+    },
+    {
+     "name": "湯田中",
+     "kana": "ゆだなか",
+     "eng": "Yudanaka",
+     "lat": 36.7417,
+     "lon": 138.4147,
+     "number": "N 24"
+    }
+   ]
+  },
+  {
+   "no": 754,
+   "name": "しなの鉄道線",
+   "kana": "しなのてつどうせん",
+   "eng": "Shinano Railway Line",
+   "color": "#F0A401",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "しなの鉄道",
+   "operatorShort": "しなの鉄道",
+   "operatorShortKana": "しなのてつどう",
+   "operatorShortEng": "Shinano Railway",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "軽井沢",
+     "kana": "かるいざわ",
+     "eng": "Karuizawa",
+     "lat": 36.3426,
+     "lon": 138.6352,
+     "number": ""
+    },
+    {
+     "name": "中軽井沢",
+     "kana": "なかかるいざわ",
+     "eng": "Naka-Karuizawa",
+     "lat": 36.3477,
+     "lon": 138.5919,
+     "number": ""
+    },
+    {
+     "name": "信濃追分",
+     "kana": "しなのおいわけ",
+     "eng": "Shinano-Oiwake",
+     "lat": 36.3362,
+     "lon": 138.5597,
+     "number": ""
+    },
+    {
+     "name": "御代田",
+     "kana": "みよた",
+     "eng": "Miyota",
+     "lat": 36.3189,
+     "lon": 138.5065,
+     "number": ""
+    },
+    {
+     "name": "平原",
+     "kana": "ひらはら",
+     "eng": "Hirahara",
+     "lat": 36.3087,
+     "lon": 138.4538,
+     "number": ""
+    },
+    {
+     "name": "小諸",
+     "kana": "こもろ",
+     "eng": "Komoro",
+     "lat": 36.3269,
+     "lon": 138.4218,
+     "number": ""
+    },
+    {
+     "name": "滋野",
+     "kana": "しげの",
+     "eng": "Shigeno",
+     "lat": 36.3426,
+     "lon": 138.3635,
+     "number": ""
+    },
+    {
+     "name": "田中",
+     "kana": "たなか",
+     "eng": "Tanaka",
+     "lat": 36.3545,
+     "lon": 138.3294,
+     "number": ""
+    },
+    {
+     "name": "大屋",
+     "kana": "おおや",
+     "eng": "Oya",
+     "lat": 36.3696,
+     "lon": 138.2968,
+     "number": ""
+    },
+    {
+     "name": "信濃国分寺",
+     "kana": "しなのこくぶんじ",
+     "eng": "Shinano-Kokubunji",
+     "lat": 36.3788,
+     "lon": 138.2732,
+     "number": ""
+    },
+    {
+     "name": "上田",
+     "kana": "うえだ",
+     "eng": "Ueda",
+     "lat": 36.3966,
+     "lon": 138.2497,
+     "number": ""
+    },
+    {
+     "name": "西上田",
+     "kana": "にしうえだ",
+     "eng": "Nishi-Ueda",
+     "lat": 36.4172,
+     "lon": 138.2086,
+     "number": ""
+    },
+    {
+     "name": "テクノさかき",
+     "kana": "てくのさかき",
+     "eng": "Techno-Sakaki",
+     "lat": 36.4412,
+     "lon": 138.188,
+     "number": ""
+    },
+    {
+     "name": "坂城",
+     "kana": "さかき",
+     "eng": "Sakaki",
+     "lat": 36.4624,
+     "lon": 138.1812,
+     "number": ""
+    },
+    {
+     "name": "戸倉",
+     "kana": "とぐら",
+     "eng": "Togura",
+     "lat": 36.4921,
+     "lon": 138.1531,
+     "number": ""
+    },
+    {
+     "name": "千曲",
+     "kana": "ちくま",
+     "eng": "Chikuma",
+     "lat": 36.5091,
+     "lon": 138.1414,
+     "number": ""
+    },
+    {
+     "name": "屋代",
+     "kana": "やしろ",
+     "eng": "Yashiro",
+     "lat": 36.532,
+     "lon": 138.1281,
+     "number": ""
+    },
+    {
+     "name": "屋代高校前",
+     "kana": "やしろこうこうまえ",
+     "eng": "Yashiro-Koko-mae",
+     "lat": 36.5478,
+     "lon": 138.1325,
+     "number": ""
+    },
+    {
+     "name": "篠ノ井",
+     "kana": "しののい",
+     "eng": "Shinonoi",
+     "lat": 36.5774,
+     "lon": 138.1383,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 755,
+   "name": "北しなの線",
+   "kana": "きたしなのせん",
+   "eng": "Kita-Shinano Line",
+   "color": "#999966",
+   "symbol": "",
+   "operatorType": "私鉄",
+   "operator": "しなの鉄道",
+   "operatorShort": "しなの鉄道",
+   "operatorShortKana": "しなのてつどう",
+   "operatorShortEng": "Shinano Railway",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "長野",
+     "kana": "ながの",
+     "eng": "Nagano",
+     "lat": 36.6431,
+     "lon": 138.1887,
+     "number": ""
+    },
+    {
+     "name": "北長野",
+     "kana": "きたながの",
+     "eng": "Kita-Nagano",
+     "lat": 36.6655,
+     "lon": 138.2227,
+     "number": ""
+    },
+    {
+     "name": "三才",
+     "kana": "さんさい",
+     "eng": "Sansai",
+     "lat": 36.6857,
+     "lon": 138.243,
+     "number": ""
+    },
+    {
+     "name": "豊野",
+     "kana": "とよの",
+     "eng": "Toyono",
+     "lat": 36.7108,
+     "lon": 138.2751,
+     "number": ""
+    },
+    {
+     "name": "牟礼",
+     "kana": "むれ",
+     "eng": "Mure",
+     "lat": 36.7531,
+     "lon": 138.247,
+     "number": ""
+    },
+    {
+     "name": "古間",
+     "kana": "ふるま",
+     "eng": "Furuma",
+     "lat": 36.7922,
+     "lon": 138.2304,
+     "number": ""
+    },
+    {
+     "name": "黒姫",
+     "kana": "くろひめ",
+     "eng": "Kurohime",
+     "lat": 36.8075,
+     "lon": 138.1969,
+     "number": ""
+    },
+    {
+     "name": "妙高高原",
+     "kana": "みょうこうこうげん",
+     "eng": "Myoko-Kogen",
+     "lat": 36.8722,
+     "lon": 138.212,
+     "number": ""
+    }
+   ]
+  },
+  {
+   "no": 756,
+   "name": "別所線",
+   "kana": "べっしょせん",
+   "eng": "Bessho Line",
+   "color": "#000080",
+   "symbol": "BE",
+   "operatorType": "私鉄",
+   "operator": "上田電鉄",
+   "operatorShort": "上田電鉄",
+   "operatorShortKana": "うえだでんてつ",
+   "operatorShortEng": "Ueda Electric Railway",
+   "genericIcon": "I_train_normal1",
+   "stations": [
+    {
+     "name": "上田",
+     "kana": "うえだ",
+     "eng": "Ueda",
+     "lat": 36.3966,
+     "lon": 138.2497,
+     "number": "BE 01"
+    },
+    {
+     "name": "城下",
+     "kana": "しろした",
+     "eng": "Shiroshita",
+     "lat": 36.3925,
+     "lon": 138.2426,
+     "number": "BE 02"
+    },
+    {
+     "name": "三好町",
+     "kana": "みよしちょう",
+     "eng": "Miyoshicho",
+     "lat": 36.3917,
+     "lon": 138.2354,
+     "number": "BE 03"
+    },
+    {
+     "name": "赤坂上",
+     "kana": "あかさかうえ",
+     "eng": "Akasaka-ue",
+     "lat": 36.3914,
+     "lon": 138.2275,
+     "number": "BE 04"
+    },
+    {
+     "name": "上田原",
+     "kana": "うえだはら",
+     "eng": "Uedahara",
+     "lat": 36.3905,
+     "lon": 138.2216,
+     "number": "BE 05"
+    },
+    {
+     "name": "寺下",
+     "kana": "てらした",
+     "eng": "Terashita",
+     "lat": 36.3836,
+     "lon": 138.2164,
+     "number": "BE 06"
+    },
+    {
+     "name": "神畑",
+     "kana": "かばたけ",
+     "eng": "Kabatake",
+     "lat": 36.3777,
+     "lon": 138.2168,
+     "number": "BE 07"
+    },
+    {
+     "name": "大学前",
+     "kana": "だいがくまえ",
+     "eng": "Daigaku-mae",
+     "lat": 36.3709,
+     "lon": 138.2152,
+     "number": "BE 08"
+    },
+    {
+     "name": "下之郷",
+     "kana": "しものごう",
+     "eng": "Shimonogo",
+     "lat": 36.3632,
+     "lon": 138.2172,
+     "number": "BE 09"
+    },
+    {
+     "name": "中塩田",
+     "kana": "なかしおだ",
+     "eng": "Naka-Shioda",
+     "lat": 36.3631,
+     "lon": 138.2047,
+     "number": "BE 10"
+    },
+    {
+     "name": "塩田町",
+     "kana": "しおだまち",
+     "eng": "Shioda-machi",
+     "lat": 36.361,
+     "lon": 138.1987,
+     "number": "BE 11"
+    },
+    {
+     "name": "中野",
+     "kana": "なかの",
+     "eng": "Nakano",
+     "lat": 36.3607,
+     "lon": 138.1934,
+     "number": "BE 12"
+    },
+    {
+     "name": "舞田",
+     "kana": "まいた",
+     "eng": "Maita",
+     "lat": 36.3597,
+     "lon": 138.1832,
+     "number": "BE 13"
+    },
+    {
+     "name": "八木沢",
+     "kana": "やぎさわ",
+     "eng": "Yagisawa",
+     "lat": 36.3585,
+     "lon": 138.1754,
+     "number": "BE 14"
+    },
+    {
+     "name": "別所温泉",
+     "kana": "べっしょおんせん",
+     "eng": "Bessho-Onsen",
+     "lat": 36.353,
+     "lon": 138.1618,
+     "number": "BE 15"
+    }
+   ]
+  }
+ ]
+}

@@ -427,3 +427,101 @@
 567,養老鉄道,養老線,ようろうせん,Yoro Line,#E3007F,I,I_mono_color,N_round_normal,私鉄,養老鉄道,ようろうてつどう,Yoro Railway,I_train_normal1
 600,広島電鉄,9号線,きゅうごうせん,Line 9,#75787B,W,I_mono_color,N_round_normal,私鉄,広電,ひろでん,Hiroden,I_train_normal1
 601,広島電鉄,循環線,じゅんかんせん,Circular Line,#763F8C,U,I_mono_color,N_round_normal,私鉄,広電,ひろでん,Hiroden,I_train_normal1
+640,名古屋鉄道,名古屋本線,なごやほんせん,Nagoya Line,#CE1929,NH,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+641,名古屋鉄道,豊川線,とよかわせん,Toyokawa Line,#CE1929,TK,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+642,名古屋鉄道,西尾線,にしおせん,Nishio Line,#6558A5,GN,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+643,名古屋鉄道,蒲郡線,がまごおりせん,Gamagori Line,#6558A5,GN,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+644,名古屋鉄道,三河線,みかわせん,Mikawa Line,#9AAB43,MY,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+645,名古屋鉄道,豊田線,とよたせん,Toyota Line,#9AAB43,TT,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+646,名古屋鉄道,常滑線,とこなめせん,Tokoname Line,#0072BC,TA,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+647,名古屋鉄道,空港線,くうこうせん,Airport Line,#0072BC,TA,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+648,名古屋鉄道,築港線,ちっこうせん,Chikko Line,#6C6D70,CH,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+649,名古屋鉄道,河和線,こうわせん,Kowa Line,#00AEEF,KC,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+650,名古屋鉄道,知多新線,ちたしんせん,Chita New Line,#00AEEF,KC,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+651,名古屋鉄道,瀬戸線,せとせん,Seto Line,#802990,ST,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+652,名古屋鉄道,津島線,つしません,Tsushima Line,#F15921,TB,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+653,名古屋鉄道,尾西線,びさいせん,Bisai Line,#F15921,BS,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+654,名古屋鉄道,竹鼻線,たけはなせん,Takehana Line,#D09927,TH,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+655,名古屋鉄道,羽島線,はしません,Hashima Line,#D09927,TH,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+656,名古屋鉄道,犬山線,いぬやません,Inuyama Line,#07914B,IY,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+657,名古屋鉄道,各務原線,かかみがはらせん,Kakamigahara Line,#07914B,KG,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+658,名古屋鉄道,広見線,ひろみせん,Hiromi Line,#07914B,HM,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+659,名古屋鉄道,小牧線,こまきせん,Komaki Line,#EF59A1,KM,I_mono_color,N_round_normal,私鉄,名鉄,めいてつ,Meitetsu,I_train_normal1
+690,名古屋市交通局,東山線,ひがしやません,Higashiyama Line,#FAB123,H,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+691,名古屋市交通局,名城線,めいじょうせん,Meijo Line,#B074D6,M,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+692,名古屋市交通局,名港線,めいこうせん,Meiko Line,#B074D6,E,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+693,名古屋市交通局,鶴舞線,つるまいせん,Tsurumai Line,#009BBF,T,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+694,名古屋市交通局,桜通線,さくらどおりせん,Sakura-dori Line,#C92F44,S,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+695,名古屋市交通局,上飯田線,かみいいだせん,Kamiiida Line,#EC78B4,K,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Nagoya Municipal Subway,I_train_subway1
+696,名古屋臨海高速鉄道,あおなみ線,あおなみせん,Aonami Line,#334FA0,AN,I_mono_color,N_round_normal,私鉄,あおなみ線,あおなみせん,Aonami Line,I_train_normal1
+697,愛知高速交通,リニモ,りにも,Linimo,#0067C0,L,I_mono_color,N_round_normal,私鉄,リニモ,りにも,Linimo,I_train_normal1
+698,東海交通事業,城北線,じょうほくせん,Johoku Line,#F77321,,I_mono_color,N_round_normal,私鉄,城北線,じょうほくせん,Johoku Line,I_train_normal1
+699,愛知環状鉄道,愛知環状鉄道線,あいちかんじょうてつどうせん,Aichi Loop Line,#2536A1,,I_mono_color,N_round_normal,私鉄,愛環,あいかん,Aichi Loop Railway,I_train_normal1
+700,豊橋鉄道,渥美線,あつみせん,Atsumi Line,#008085,,I_mono_color,N_round_normal,私鉄,豊鉄,とよてつ,Toyotetsu,I_train_normal1
+701,豊橋鉄道,赤岩口系統,あかいわぐちけいとう,Akaiwaguchi Route,#008085,,I_mono_color,N_round_normal,私鉄,豊鉄,とよてつ,Toyotetsu,I_train_normal1
+702,豊橋鉄道,運動公園前系統,うんどうこうえんまえけいとう,Undo Koen-mae Route,#008085,,I_mono_color,N_round_normal,私鉄,豊鉄,とよてつ,Toyotetsu,I_train_normal1
+720,樽見鉄道,樽見線,たるみせん,Tarumi Line,#00B0F0,TR,I_mono_color,N_round_normal,私鉄,樽見鉄道,たるみてつどう,Tarumi Railway,I_train_normal1
+721,長良川鉄道,越美南線,えつみなんせん,Etsumi-Nan Line,#FF1493,,I_mono_color,N_round_normal,私鉄,長良川鉄道,ながらがわてつどう,Nagaragawa Railway,I_train_normal1
+722,明知鉄道,明知線,あけちせん,Akechi Line,#D7003A,,I_mono_color,N_round_normal,私鉄,明知鉄道,あけちてつどう,Akechi Railway,I_train_normal1
+723,天竜浜名湖鉄道,天竜浜名湖線,てんりゅうはまなこせん,Tenryu Hamanako Line,#1884CD,,I_mono_color,N_round_normal,私鉄,天浜線,てんはません,Tenryu Hamanako Railroad,I_train_normal1
+724,遠州鉄道,鉄道線,てつどうせん,Railway Line,#C32829,ET,I_mono_color,N_round_normal,私鉄,遠鉄,えんてつ,Entetsu,I_train_normal1
+725,静岡鉄道,静岡清水線,しずおかしみずせん,Shizuoka-Shimizu Line,#000099,S,I_mono_color,N_round_normal,私鉄,静鉄,しずてつ,Shizutetsu,I_train_normal1
+726,岳南電車,岳南鉄道線,がくなんてつどうせん,Gakunan Railway Line,#FF4F00,GD,I_mono_color,N_round_normal,私鉄,岳南電車,がくなんでんしゃ,Gakunan Railway,I_train_normal1
+727,伊豆箱根鉄道,駿豆線,すんずせん,Sunzu Line,#0000FF,IS,I_mono_color,N_round_normal,私鉄,伊豆箱根,いずはこね,Izuhakone Railway,I_train_normal1
+728,伊豆急行,伊豆急行線,いずきゅうこうせん,Izukyu Line,#00BFFF,IZ,I_mono_color,N_round_normal,私鉄,伊豆急,いずきゅう,Izukyu,I_train_normal1
+729,大井川鐵道,大井川本線,おおいがわほんせん,Oigawa Line,#FF0000,,I_mono_color,N_round_normal,私鉄,大井川鐵道,おおいがわてつどう,Oigawa Railway,I_train_normal1
+730,大井川鐵道,井川線,いかわせん,Ikawa Line,#FF0000,,I_mono_color,N_round_normal,私鉄,大井川鐵道,おおいがわてつどう,Oigawa Railway,I_train_normal1
+750,富士山麓電気鉄道,大月線,おおつきせん,Otsuki Line,#0033DD,FJ,I_mono_color,N_round_normal,私鉄,富士急,ふじきゅう,Fujikyu,I_train_normal1
+751,富士山麓電気鉄道,河口湖線,かわぐちこせん,Kawaguchiko Line,#0033DD,FJ,I_mono_color,N_round_normal,私鉄,富士急,ふじきゅう,Fujikyu,I_train_normal1
+752,アルピコ交通,上高地線,かみこうちせん,Kamikochi Line,#465DAA,AK,I_mono_color,N_round_normal,私鉄,アルピコ,あるぴこ,Alpico,I_train_normal1
+753,長野電鉄,長野線,ながのせん,Nagano Line,#FF0000,N,I_mono_color,N_round_normal,私鉄,長電,ながでん,Nagaden,I_train_normal1
+754,しなの鉄道,しなの鉄道線,しなのてつどうせん,Shinano Railway Line,#F0A401,,I_mono_color,N_round_normal,私鉄,しなの鉄道,しなのてつどう,Shinano Railway,I_train_normal1
+755,しなの鉄道,北しなの線,きたしなのせん,Kita-Shinano Line,#999966,,I_mono_color,N_round_normal,私鉄,しなの鉄道,しなのてつどう,Shinano Railway,I_train_normal1
+756,上田電鉄,別所線,べっしょせん,Bessho Line,#000080,BE,I_mono_color,N_round_normal,私鉄,上田電鉄,うえだでんてつ,Ueda Electric Railway,I_train_normal1
+770,えちごトキめき鉄道,妙高はねうまライン,みょうこうはねうまらいん,Myoko Haneuma Line,#35C98E,,I_mono_color,N_round_normal,私鉄,トキ鉄,ときてつ,Echigo TOKImeki Railway,I_train_normal1
+771,えちごトキめき鉄道,日本海ひすいライン,にほんかいひすいらいん,Nihonkai Hisui Line,#3782BD,,I_mono_color,N_round_normal,私鉄,トキ鉄,ときてつ,Echigo TOKImeki Railway,I_train_normal1
+772,北越急行,ほくほく線,ほくほくせん,Hokuhoku Line,#E8204E,,I_mono_color,N_round_normal,私鉄,北越急行,ほくえつきゅうこう,Hokuetsu Express,I_train_normal1
+773,あいの風とやま鉄道,あいの風とやま鉄道線,あいのかぜとやまてつどうせん,Ainokaze Toyama Railway Line,#00A556,,I_mono_color,N_round_normal,私鉄,あいの風とやま鉄道,あいのかぜとやまてつどう,Ainokaze Toyama Railway,I_train_normal1
+774,富山地方鉄道,本線,ほんせん,Toyama Chiho Railway Line,#E60012,T,I_mono_color,N_round_normal,私鉄,富山地鉄,とやまちてつ,Toyama Chiho Railway,I_train_normal1
+775,富山地方鉄道,立山線,たてやません,Tateyama Line,#009944,T,I_mono_color,N_round_normal,私鉄,富山地鉄,とやまちてつ,Toyama Chiho Railway,I_train_normal1
+776,富山地方鉄道,不二越線,ふじこしせん,Fujikoshi Line,#F39800,T,I_mono_color,N_round_normal,私鉄,富山地鉄,とやまちてつ,Toyama Chiho Railway,I_train_normal1
+777,富山地方鉄道,上滝線,かみだきせん,Kamidaki Line,#0068B7,T,I_mono_color,N_round_normal,私鉄,富山地鉄,とやまちてつ,Toyama Chiho Railway,I_train_normal1
+778,富山地方鉄道,1系統,いちけいとう,Route 1,#00AB84,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+779,富山地方鉄道,2系統,にけいとう,Route 2,#ED8E24,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+780,富山地方鉄道,環状線,かんじょうせん,Loop Line,#333333,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+781,富山地方鉄道,4系統,よんけいとう,Route 4,#00008B,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+782,富山地方鉄道,5系統,ごけいとう,Route 5,#4169E1,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+783,富山地方鉄道,6系統,ろくけいとう,Route 6,#7B68EE,C,I_mono_color,N_round_normal,私鉄,市内電車,しないでんしゃ,Toyama City Tram,I_train_normal1
+784,万葉線,万葉線,まんようせん,Manyo Line,#FF0000,,I_mono_color,N_round_normal,私鉄,万葉線,まんようせん,Manyosen,I_train_normal1
+785,黒部峡谷鉄道,本線,ほんせん,Kurobe Gorge Railway Line,#DD793D,,I_mono_color,N_round_normal,私鉄,黒部峡谷鉄道,くろべきょうこくてつどう,Kurobe Gorge Railway,I_train_normal1
+786,IRいしかわ鉄道,IRいしかわ鉄道線,あいあーるいしかわてつどうせん,IR Ishikawa Railway Line,#00A7E3,,I_mono_color,N_round_normal,私鉄,IRいしかわ鉄道,あいあーるいしかわてつどう,IR Ishikawa Railway,I_train_normal1
+787,北陸鉄道,石川線,いしかわせん,Ishikawa Line,#008000,I,I_mono_color,N_round_normal,私鉄,北鉄,ほくてつ,Hokutetsu,I_train_normal1
+788,北陸鉄道,浅野川線,あさのがわせん,Asanogawa Line,#0067C0,A,I_mono_color,N_round_normal,私鉄,北鉄,ほくてつ,Hokutetsu,I_train_normal1
+789,のと鉄道,七尾線,ななおせん,Nanao Line,#0033BB,,I_mono_color,N_round_normal,私鉄,のと鉄道,のとてつどう,Noto Railway,I_train_normal1
+790,ハピラインふくい,ハピラインふくい線,はぴらいんふくいせん,Hapi-Line Fukui Line,#EC1C9C,,I_mono_color,N_round_normal,私鉄,ハピラインふくい,はぴらいんふくい,Hapi-Line Fukui,I_train_normal1
+791,えちぜん鉄道,勝山永平寺線,かつやまえいへいじせん,Katsuyama Eiheiji Line,#FF6600,E,I_mono_color,N_round_normal,私鉄,えちぜん鉄道,えちぜんてつどう,Echizen Railway,I_train_normal1
+792,えちぜん鉄道,三国芦原線,みくにあわらせん,Mikuni Awara Line,#0066FF,E,I_mono_color,N_round_normal,私鉄,えちぜん鉄道,えちぜんてつどう,Echizen Railway,I_train_normal1
+793,福井鉄道,福武線,ふくぶせん,Fukubu Line,#008000,F,I_mono_color,N_round_normal,私鉄,福鉄,ふくてつ,Fukutetsu,I_train_normal1
+794,福井鉄道,福井駅前線,ふくいえきまえせん,Fukui Ekimae Line,#008000,F,I_mono_color,N_round_normal,私鉄,福鉄,ふくてつ,Fukutetsu,I_train_normal1
+810,青い森鉄道,青い森鉄道線,あおいもりてつどうせん,Aoimori Railway Line,#33CBF4,,I_mono_color,N_round_normal,私鉄,青い森鉄道,あおいもりてつどう,Aoimori Railway,I_train_normal1
+811,IGRいわて銀河鉄道,いわて銀河鉄道線,いわてぎんがてつどうせん,Iwate Galaxy Railway Line,#03459A,,I_mono_color,N_round_normal,私鉄,IGR,あいじーあーる,IGR Iwate Galaxy Railway,I_train_normal1
+812,三陸鉄道,リアス線,りあすせん,Rias Line,#FF0000,,I_mono_color,N_round_normal,私鉄,三鉄,さんてつ,Sanriku Railway,I_train_normal1
+813,仙台市交通局,南北線,なんぼくせん,Namboku Line,#317C66,N,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Sendai City Subway,I_train_subway1
+814,仙台市交通局,東西線,とうざいせん,Tozai Line,#00B1DD,T,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Sendai City Subway,I_train_subway1
+815,仙台空港鉄道,仙台空港線,せんだいくうこうせん,Sendai Airport Line,#2A5CAA,,I_mono_color,N_round_normal,私鉄,仙台空港アクセス線,せんだいくうこうあくせすせん,Sendai Airport Line,I_train_normal1
+816,阿武隈急行,阿武隈急行線,あぶくまきゅうこうせん,Abukuma Express Line,#00A040,,I_mono_color,N_round_normal,私鉄,阿武急,あぶきゅう,Abukuma Express,I_train_normal1
+817,福島交通,飯坂線,いいざかせん,Iizaka Line,#87CEEB,,I_mono_color,N_round_normal,私鉄,福島交通,ふくしまこうつう,Fukushima Transportation,I_train_normal1
+818,会津鉄道,会津線,あいづせん,Aizu Line,#FFA500,,I_mono_color,N_round_normal,私鉄,会津鉄道,あいづてつどう,Aizu Railway,I_train_normal1
+819,山形鉄道,フラワー長井線,ふらわーながいせん,Flower Nagai Line,#FF69B4,,I_mono_color,N_round_normal,私鉄,山形鉄道,やまがたてつどう,Yamagata Railway,I_train_normal1
+820,秋田内陸縦貫鉄道,秋田内陸線,あきたないりくせん,Akita Nairiku Line,#E95513,,I_mono_color,N_round_normal,私鉄,秋田内陸線,あきたないりくせん,Akita Nairiku Line,I_train_normal1
+821,由利高原鉄道,鳥海山ろく線,ちょうかいさんろくせん,Chokai Sanroku Line,#FF0000,,I_mono_color,N_round_normal,私鉄,由利高原鉄道,ゆりこうげんてつどう,Yuri Kogen Railway,I_train_normal1
+822,弘南鉄道,弘南線,こうなんせん,Konan Line,#FFA500,KK,I_mono_color,N_round_normal,私鉄,弘南鉄道,こうなんてつどう,Konan Railway,I_train_normal1
+823,弘南鉄道,大鰐線,おおわにせん,Owani Line,#FFA500,KW,I_mono_color,N_round_normal,私鉄,弘南鉄道,こうなんてつどう,Konan Railway,I_train_normal1
+824,津軽鉄道,津軽鉄道線,つがるてつどうせん,Tsugaru Railway Line,#FFA500,,I_mono_color,N_round_normal,私鉄,津軽鉄道,つがるてつどう,Tsugaru Railway,I_train_normal1
+850,札幌市交通局,南北線,なんぼくせん,Namboku Line,#008000,N,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Sapporo City Subway,I_train_subway1
+851,札幌市交通局,東西線,とうざいせん,Tozai Line,#FFA500,T,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Sapporo City Subway,I_train_subway1
+852,札幌市交通局,東豊線,とうほうせん,Toho Line,#0080FF,H,I_mono_color,N_round_normal,私鉄,地下鉄,ちかてつ,Sapporo City Subway,I_train_subway1
+853,札幌市交通局,循環線,じゅんかんせん,Loop Line,#009B63,SC,I_mono_color,N_round_normal,私鉄,市電,しでん,Sapporo Streetcar,I_train_normal1
+854,函館市企業局,2系統,にけいとう,Route 2,#E60012,Y,I_mono_color,N_round_normal,私鉄,市電,しでん,Hakodate City Tram,I_train_normal1
+855,函館市企業局,5系統,ごけいとう,Route 5,#009944,D,I_mono_color,N_round_normal,私鉄,市電,しでん,Hakodate City Tram,I_train_normal1
+856,道南いさりび鉄道,道南いさりび鉄道線,どうなんいさりびてつどうせん,Donan Isaribi Railway Line,#246DAC,sh,I_mono_color,N_round_normal,私鉄,道南いさりび鉄道,どうなんいさりびてつどう,South Hokkaido Railway,I_train_normal1
