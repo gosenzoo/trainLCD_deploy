@@ -6,21 +6,34 @@ import "../type"
 import {
     loadLineDB, loadStationDB, loadLineConnectDB, loadTransferDB,
     PresetLine, PresetStation, PresetLineConnect, PresetTransfer,
-    StationSection, StagedRoute, PRESET_OPERATOR_TYPES, PresetOperatorType
+    StationSection, StagedRoute, PRESET_DISPLAY_TYPES, PresetDisplayType, PresetOperatorShortRule, loadOperatorShortRuleDB
 } from '../modules/loadStationPresets'
 import StationPresetMap from './StationPresetMap'
 import ToggleSwitch from './ToggleSwitch'
 
 // 「追加設定」（7.63節）の保存先（ブラウザの localStorage のキー）。設定データには含めない
 const PRESET_ADD_OPTIONS_KEY = 'presetAddOptions'
-type PresetAddOptions = { useGenericIconForOtherOperators: boolean }
+type PresetAddOptions = {
+    useGenericIconForOtherOperators: boolean
+    // 他社線を社名でまとめる・まとめる最小路線数（7.73節）
+    groupOtherOperators: boolean
+    groupOtherOperatorsMinCount: number
+}
+const DEFAULT_PRESET_ADD_OPTIONS: PresetAddOptions = { useGenericIconForOtherOperators: false, groupOtherOperators: false, groupOtherOperatorsMinCount: 1 }
+// 最小路線数は1以上の整数だけ有効（それ以外は初期値の1）
+const toMinCount = (value: unknown): number =>
+    typeof value === 'number' && Number.isInteger(value) && value >= 1 ? value : DEFAULT_PRESET_ADD_OPTIONS.groupOtherOperatorsMinCount
 const loadPresetAddOptions = (): PresetAddOptions => {
     try {
         const saved = JSON.parse(localStorage.getItem(PRESET_ADD_OPTIONS_KEY) ?? '{}')
-        return { useGenericIconForOtherOperators: saved?.useGenericIconForOtherOperators === true }
+        return {
+            useGenericIconForOtherOperators: saved?.useGenericIconForOtherOperators === true,
+            groupOtherOperators: saved?.groupOtherOperators === true,
+            groupOtherOperatorsMinCount: toMinCount(saved?.groupOtherOperatorsMinCount),
+        }
     } catch {
-        // 保存・読み込みできない場合（プライベートウィンドウなど）はオフとして扱う
-        return { useGenericIconForOtherOperators: false }
+        // 保存・読み込みできない場合（プライベートウィンドウなど）は初期値（オフ）として扱う
+        return { ...DEFAULT_PRESET_ADD_OPTIONS }
     }
 }
 const savePresetAddOptions = (options: PresetAddOptions) => {
@@ -35,8 +48,8 @@ type Props = {
     onClose: () => void
 }
 
-// 事業者種別の切替ボタンのアイコン（7.43節）。車両の正面を簡略化した線画（24×24、色は文字色に従う）
-const OPERATOR_TYPE_ICONS: Record<PresetOperatorType, React.ReactNode> = {
+// 表示種別の切替ボタンのアイコン（7.43節）。車両の正面を簡略化した線画（24×24、色は文字色に従う）
+const OPERATOR_TYPE_ICONS: Record<PresetDisplayType, React.ReactNode> = {
     // 新幹線: 丸みのある先頭形状と流線形の窓
     '新幹線': (
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
@@ -175,6 +188,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
     const [lineConnects, setLineConnects] = useState<PresetLineConnect[]>([])
     // 乗換エッジ（路線図の描画にのみ使う。区間選択には使わない）
     const [transfers, setTransfers] = useState<PresetTransfer[]>([])
+    // 事業者略称の表（7.73節）。この組み合わせの乗換路線には事業者略称を付けない
+    const [shortRules, setShortRules] = useState<PresetOperatorShortRule[]>([])
     // 区間の開始駅（前駅）: null = firstStation 状態、値あり = continuing 状態
     const [prevStation, setPrevStation] = useState<PrevStationRef | null>(null)
     // 追加一覧（ルートの配列。ルートは1つ以上の区間のまとまり）
@@ -198,11 +213,11 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         document.addEventListener('keydown', onKeyDown)
         return () => document.removeEventListener('keydown', onKeyDown)
     }, [isAddOptionsOpen])
-    // 路線図に表示する事業者種別（7.43節）。画面を開くたびに全種別を表示した状態から始める
-    const [visibleOperatorTypes, setVisibleOperatorTypes] = useState<ReadonlySet<PresetOperatorType>>(() => new Set(PRESET_OPERATOR_TYPES))
+    // 路線図に表示する表示種別（7.43節・7.73節）。画面を開くたびに全種別を表示した状態から始める
+    const [visibleOperatorTypes, setVisibleOperatorTypes] = useState<ReadonlySet<PresetDisplayType>>(() => new Set(PRESET_DISPLAY_TYPES))
 
-    // 事業者種別の表示・非表示を切り替える
-    const toggleOperatorType = (type: PresetOperatorType) => {
+    // 表示種別の表示・非表示を切り替える
+    const toggleOperatorType = (type: PresetDisplayType) => {
         setVisibleOperatorTypes(prev => {
             const next = new Set(prev)
             if (next.has(type)) next.delete(type)
@@ -220,13 +235,14 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
 
     // マウント時に CSV を読み込む
     useEffect(() => {
-        // transferDB は読み込めなくても空配列を返すため、読み込みエラーの原因にはならない
-        Promise.all([loadLineDB(), loadStationDB(), loadLineConnectDB(), loadTransferDB()])
-            .then(([lineData, stationData, connectData, transferData]) => {
+        // transferDB・事業者略称の表は読み込めなくても空配列を返すため、読み込みエラーの原因にはならない
+        Promise.all([loadLineDB(), loadStationDB(), loadLineConnectDB(), loadTransferDB(), loadOperatorShortRuleDB()])
+            .then(([lineData, stationData, connectData, transferData, shortRuleData]) => {
                 setLines(lineData)
                 setAllStations(stationData)
                 setLineConnects(connectData)
                 setTransfers(transferData)
+                setShortRules(shortRuleData)
             })
             .catch(() => setLoadError('CSVファイルの読み込みに失敗しました'))
             // 成功・失敗のどちらでも読み込み中の表示を消す
@@ -268,6 +284,18 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
             if (existingIconKey) return existingIconKey
             const newKey = generateUniqueIconKey(allIconsSoFar, presetType ? `line_${presetLine.id}_generic` : `line_${presetLine.id}`)
+            newIcons[newKey] = iconParams
+            return newKey
+        }
+
+        // 社名でまとめた他社線（7.73節）のアイコンを iconDict のキーに解決する。
+        // プリセットだけを使い、路線記号・色は空にする。既存の iconDict に同じものがあればそれを使う
+        const resolvePlainIconKey = (presetType: string): string => {
+            const iconParams: iconParamsType = { presetType, symbol: '', color: '' }
+            const allIconsSoFar = { ...setting.iconDict, ...newIcons }
+            const existingIconKey = findMatchingIconKey(allIconsSoFar, iconParams)
+            if (existingIconKey) return existingIconKey
+            const newKey = generateUniqueIconKey(allIconsSoFar, `group_${presetType}`)
             newIcons[newKey] = iconParams
             return newKey
         }
@@ -359,8 +387,10 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             }
         }
 
-        // 各駅に乗換路線を設定する（7.31節）
-        result.forEach((row, i) => { row.transfers = buildTransfers(rowUsages[i], resolveIconKey) })
+        // 各駅に乗換路線を設定する（7.31節）。並走区間の途中の駅では並走路線を外す（7.73節）
+        const rowCandidates = rowUsages.map(collectTransferCandidates)
+        removeParallelCandidates(rowCandidates)
+        result.forEach((row, i) => { row.transfers = buildTransfers(rowUsages[i], rowCandidates[i], resolveIconKey, resolvePlainIconKey) })
         // ナンバリングは所属路線の設定を使う（自動）で入れる（7.59節）。
         // 路線記号・プリセット・色が所属路線（lineId の路線）とすべて一致する場合だけ自動にし、
         // 一致しない場合（路線をまたぐ駅の1つ目、駅ごとのプリセット、記号の違う駅など）は表示が変わらないよう手動のままにする
@@ -385,35 +415,20 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
         neighbors.forEach(n => usage.lines.get(lineId)!.add(n))
     }
 
-    // 1駅分の乗換路線を生成する（7.31節）。
+    // 乗換路線の候補: 路線ID・ナンバリングを引く駅ID（乗換先の路線の駅）・方面の隣駅ID（方面でない場合は null）
+    type TransferCandidate = { lineId: string, stationId: string, towardId: string | null }
+
+    // 1駅分の乗換路線の候補を集める（7.31節）。
     // - その駅（と乗換エッジでつながった駅）を通る路線のうち、この駅でルートが使っていない路線
     // - ルートが使っている路線の、この駅からルートが進まない方向（「○○線（××方面）」）
-    // 並び順: 自社（この駅でルートが使う路線の事業者）→ 他社（lineDB に初めて現れる順）、同じ事業者内は路線IDの順
-    const buildTransfers = (usage: RowUsage, resolveIconKey: (line: PresetLine, presetType?: string) => string): transferItemType[] => {
-        const lineIndexById = new Map(lines.map((l, i) => [l.id, i]))
-        const lineById = new Map(lines.map(l => [l.id, l]))
-        const stationById = new Map(allStations.map(s => [s.id, s]))
-        // 事業者の並び順（lineDB に初めて現れる順）
-        const operatorOrder: string[] = []
-        for (const l of lines) if (!operatorOrder.includes(l.operator)) operatorOrder.push(l.operator)
-        // 自社: この駅でルートが使っている路線の事業者（到着・出発の順）
-        const ownOperators: string[] = []
-        for (const lineId of usage.lines.keys()) {
-            const op = lineById.get(lineId)?.operator
-            if (op !== undefined && !ownOperators.includes(op)) ownOperators.push(op)
-        }
-        const operatorRank = (op: string) => {
-            const own = ownOperators.indexOf(op)
-            return own !== -1 ? own : ownOperators.length + operatorOrder.indexOf(op)
-        }
+    const collectTransferCandidates = (usage: RowUsage): TransferCandidate[] => {
         // 駅を通る路線ID（路線の登録順）
         const linesAtStation = (stationId: string): string[] => {
             const ids = new Set(lineConnects.filter(c => c.stationId === stationId).map(c => c.lineId))
             return lines.filter(l => ids.has(l.id)).map(l => l.id)
         }
 
-        // 候補: 路線ID・ナンバリングを引く駅ID・方面の隣駅ID（方面でない場合は null）
-        const candidates: { lineId: string, stationId: string, towardId: string | null }[] = []
+        const candidates: TransferCandidate[] = []
         // その駅を通る、ルートで使っていない路線
         for (const lineId of linesAtStation(usage.stationId)) {
             if (!usage.lines.has(lineId)) candidates.push({ lineId, stationId: usage.stationId, towardId: null })
@@ -439,7 +454,8 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 candidates.push({ lineId, stationId: other, towardId: null })
             }
         }
-        // ルートで使っている路線の、ルートが進まない方向（その路線上でこの駅の隣にある駅ごと）
+        // ルートで使っている路線の、ルートが進まない方向（その路線上でこの駅の隣にある駅ごと）。
+        // ルートで使っている路線は自社の路線のため、他社線に「○○方面」は付かない（7.73節）
         for (const [lineId, used] of usage.lines) {
             const order = lineConnects.filter(c => c.lineId === lineId).map(c => c.stationId)
             const neighbors: string[] = []
@@ -453,22 +469,141 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                 if (!used.has(n)) candidates.push({ lineId, stationId: usage.stationId, towardId: n })
             }
         }
+        return candidates
+    }
+
+    // 並走区間（7.73節）の途中の駅から、並走路線の候補を外す（rowCandidates を直接書き換える）。
+    // 隣り合う2駅がどちらも同じ路線 M に乗り換えられ、乗換先の M の駅どうしも M の上で隣り合うとき、その2駅は M と並走している。
+    // 前後の両方で M と並走している駅は並走区間の途中なので M を外す（ルートの始点・終点は前後の片方しかないため常に残る）
+    const removeParallelCandidates = (rowCandidates: TransferCandidate[][]) => {
+        // 路線 M の上で2駅が隣り合うか（同じ路線が同じ駅を2回通る環状線・6の字の路線も、どこかで隣り合えばよい）
+        const orderCache = new Map<string, string[]>()
+        const isAdjacentOnLine = (lineId: string, a: string, b: string): boolean => {
+            if (a === b) return false
+            let order = orderCache.get(lineId)
+            if (!order) {
+                order = lineConnects.filter(c => c.lineId === lineId).map(c => c.stationId)
+                orderCache.set(lineId, order)
+            }
+            const o = order
+            return o.some((sid, i) => sid === a && (o[i - 1] === b || o[i + 1] === b))
+        }
+        // 方面でない候補の、乗換先の駅ID
+        const transferStation = (candidates: TransferCandidate[], lineId: string): string | undefined =>
+            candidates.find(c => c.lineId === lineId && c.towardId === null)?.stationId
+        // i 番目と i+1 番目の駅が路線 M と並走しているか
+        const isParallel = (i: number, lineId: string): boolean => {
+            if (i < 0 || i + 1 >= rowCandidates.length) return false
+            const a = transferStation(rowCandidates[i], lineId)
+            const b = transferStation(rowCandidates[i + 1], lineId)
+            return a !== undefined && b !== undefined && isAdjacentOnLine(lineId, a, b)
+        }
+        // 判定は外す前の候補で行う（外した結果で隣の駅の判定が変わらないよう、先に外す路線を決めておく）
+        const removals = rowCandidates.map((candidates, i) => new Set(
+            candidates.filter(c => c.towardId === null && isParallel(i - 1, c.lineId) && isParallel(i, c.lineId)).map(c => c.lineId)))
+        rowCandidates.forEach((candidates, i) => {
+            if (removals[i].size === 0) return
+            rowCandidates[i] = candidates.filter(c => c.towardId !== null || !removals[i].has(c.lineId))
+        })
+    }
+
+    // 1駅分の乗換路線を生成する（7.31節・7.73節）。
+    // 並び順: 自路線の種別ごとに決める（自路線が JR なら 新幹線→JR在来線→私鉄→地下鉄、
+    //   私鉄なら 自社の路線→新幹線→JR在来線→私鉄→地下鉄、地下鉄なら 地下鉄→新幹線→JR在来線→私鉄）。
+    //   同じ種別の中は 自社（この駅でルートが使う路線の事業者）→ 他社（lineDB に初めて現れる順）、同じ事業者内は路線IDの順
+    // 「他社線を社名でまとめる」がオンなら、他社線を事業者略称（新幹線は別）ごとにまとめる
+    const buildTransfers = (
+        usage: RowUsage,
+        candidates: TransferCandidate[],
+        resolveIconKey: (line: PresetLine, presetType?: string) => string,
+        resolvePlainIconKey: (presetType: string) => string,
+    ): transferItemType[] => {
+        const lineIndexById = new Map(lines.map((l, i) => [l.id, i]))
+        const lineById = new Map(lines.map(l => [l.id, l]))
+        const stationById = new Map(allStations.map(s => [s.id, s]))
+        // 事業者の並び順（lineDB に初めて現れる順）
+        const operatorOrder: string[] = []
+        for (const l of lines) if (!operatorOrder.includes(l.operator)) operatorOrder.push(l.operator)
+        // 自社: この駅でルートが使っている路線の事業者（到着・出発の順）
+        const ownOperators: string[] = []
+        for (const lineId of usage.lines.keys()) {
+            const op = lineById.get(lineId)?.operator
+            if (op !== undefined && !ownOperators.includes(op)) ownOperators.push(op)
+        }
+        const operatorRank = (op: string) => {
+            const own = ownOperators.indexOf(op)
+            return own !== -1 ? own : ownOperators.length + operatorOrder.indexOf(op)
+        }
+        const isOwn = (line: PresetLine) => ownOperators.includes(line.operator)
+        // この駅でルートが使っている路線（到着・出発の順）
+        const usedLines = [...usage.lines.keys()].map(id => lineById.get(id)).filter((l): l is PresetLine => l !== undefined)
+        // 自路線: 到着する区間の路線（始点の駅では出発する区間の路線）＝ Map の挿入順の先頭
+        const ownType = usedLines[0]?.operatorType ?? '私鉄'
+        // 自路線の種別ごとの、種別の並び順（7.73節）
+        const typeOrder: string[] = ownType === '地下鉄'
+            ? ['地下鉄', '新幹線', 'JR在来線', '私鉄']
+            : ['新幹線', 'JR在来線', '私鉄', '地下鉄']
+        // 自路線が私鉄なら、自社の路線を種別より先に並べる（自社の路線の中は種別で分けない）
+        const ownFirst = ownType === '私鉄'
+        const rankOf = (line: PresetLine) => ownFirst && isOwn(line) ? -1 : typeOrder.indexOf(line.operatorType)
 
         // 並び替え（同順位の方面は、隣駅を見つけた順のまま）
         const sorted = candidates
-            .map((c, i) => ({ c, i }))
-            .sort((a, b) => {
-                const la = lineById.get(a.c.lineId), lb = lineById.get(b.c.lineId)
-                return operatorRank(la?.operator ?? '') - operatorRank(lb?.operator ?? '')
-                    || (lineIndexById.get(a.c.lineId) ?? 0) - (lineIndexById.get(b.c.lineId) ?? 0)
-                    || a.i - b.i
-            })
-            .map(x => x.c)
+            .map((c, i) => ({ c, i, line: lineById.get(c.lineId) }))
+            .filter((x): x is { c: TransferCandidate, i: number, line: PresetLine } => x.line !== undefined)
+            .sort((a, b) => rankOf(a.line) - rankOf(b.line)
+                || operatorRank(a.line.operator) - operatorRank(b.line.operator)
+                || (lineIndexById.get(a.c.lineId) ?? 0) - (lineIndexById.get(b.c.lineId) ?? 0)
+                || a.i - b.i)
 
-        return sorted.flatMap(c => {
-            const line = lineById.get(c.lineId)
+        // 事業者略称の表（7.73節）: 表にある組み合わせなら事業者略称を付けない。
+        // 自路線の側は、この駅でルートが使っている路線（到着・出発）のどれかが当てはまればよい
+        const matchesShort = (value: string, line: PresetLine) =>
+            value === '全ての事業者' || (value === '全ての地下鉄' ? line.operatorType === '地下鉄' : line.operatorShort === value)
+        const isShortSuppressed = (line: PresetLine) =>
+            shortRules.some(r => usedLines.some(own => matchesShort(r.ownShort, own)) && matchesShort(r.otherShort, line))
+
+        // 他社線を社名でまとめる（7.73節）: まとめる単位（事業者略称と、新幹線かどうか）ごとに路線数を数える。
+        // 自社の路線・方面・地下鉄・事業者略称が空の路線はまとめない
+        const groupKey = (c: TransferCandidate, line: PresetLine): string | null => {
+            if (!addOptions.groupOtherOperators) return null
+            if (c.towardId !== null || isOwn(line) || line.operatorType === '地下鉄' || !line.operatorShort) return null
+            return `${line.operatorShort}::${line.operatorType === '新幹線' ? '新幹線' : '在来線'}`
+        }
+        const groupCounts = new Map<string, number>()
+        for (const { c, line } of sorted) {
+            const key = groupKey(c, line)
+            if (key !== null) groupCounts.set(key, (groupCounts.get(key) ?? 0) + 1)
+        }
+        // まとめた乗換路線は、まとめた路線のうち並び順で先頭の路線の位置に1つだけ出す
+        const emittedGroups = new Set<string>()
+
+        return sorted.flatMap(({ c, line }) => {
             const st = stationById.get(c.stationId)
-            if (!line || !st) return []
+            if (!st) return []
+
+            // 最小路線数以上ならまとめる
+            const key = groupKey(c, line)
+            if (key !== null && (groupCounts.get(key) ?? 0) >= addOptions.groupOtherOperatorsMinCount) {
+                if (emittedGroups.has(key)) return []
+                emittedGroups.add(key)
+                // 名前: 新幹線は「新幹線」、それ以外は「事業者略称 + 線」（略称が既に「線」〔英語は Line〕で終わる場合は付けない）
+                const isShinkansen = line.operatorType === '新幹線'
+                const endsWithSen = line.operatorShort.endsWith('線')
+                const grouped: transferItemType = {
+                    line: {
+                        // 路線記号は地上路線汎用１（路線記号・色なし）
+                        lineIconKey: [resolvePlainIconKey('I_train_normal1')],
+                        name: isShinkansen ? '新幹線' : endsWithSen ? line.operatorShort : `${line.operatorShort}線`,
+                        kana: isShinkansen ? 'しんかんせん' : endsWithSen ? line.operatorShortKana : `${line.operatorShortKana}せん`,
+                        eng: isShinkansen ? 'Shinkansen' : line.operatorShortEng.endsWith('Line') ? line.operatorShortEng : `${line.operatorShortEng} Line`,
+                    },
+                    // ナンバリング・色はなし。駅名は先頭の路線の駅名
+                    station: { isDraw: false, type: '', symbol: '', color: '', number: '', name: st.name, eng: st.eng },
+                }
+                return [grouped]
+            }
+
             // 乗換先の路線での、この駅のナンバリング（"JY 01" → 記号 "JY"・番号 "01"）
             const numberStr = lineConnects.find(x => x.lineId === c.lineId && x.stationId === c.stationId && x.number !== '')?.number ?? ''
             const spaceIdx = numberStr.indexOf(' ')
@@ -478,13 +613,15 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             const toward = c.towardId !== null ? stationById.get(c.towardId) : undefined
             // 他社線（この駅でルートが使っている事業者以外の路線）は路線名の前に事業者略称を付ける（7.62節。例: 西鉄天神大牟田線）
             // 路線名が既に略称で始まる場合（都営浅草線・近鉄名古屋線・Toei Asakusa Line など）は付けない（7.63節）
-            const isOtherOperator = !ownOperators.includes(line.operator)
+            // 事業者略称の表にある組み合わせ（例: 全ての事業者 → 全ての地下鉄）も付けない（7.73節）
+            const isOtherOperator = !isOwn(line)
+            const addShort = isOtherOperator && !isShortSuppressed(line)
             // 「他社線を汎用記号にする」がオンなら、他社線の路線記号はその路線の汎用記号にする（7.63節）
             const iconKey = addOptions.useGenericIconForOtherOperators && isOtherOperator
                 ? resolveIconKey(line, line.genericIconPresetKey)
                 : resolveIconKey(line)
             const withShort = (short: string, name: string, sep: string) =>
-                isOtherOperator && short && !name.startsWith(short) ? `${short}${sep}${name}` : name
+                addShort && short && !name.startsWith(short) ? `${short}${sep}${name}` : name
             const lineName = withShort(line.operatorShort, line.name, '')
             const lineKana = withShort(line.operatorShortKana, line.kana, '')
             const lineEng = withShort(line.operatorShortEng, line.eng, ' ')
@@ -595,9 +732,9 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
             <div className="app-header preset-screen-header">
                 <h1>ポケットLCD</h1>
                 <span className="preset-screen-title">路線図から追加</span>
-                {/* 事業者種別の切替ボタン（アイコン＋名前の正方形）。表示中の種別はハイライトする（7.43節） */}
+                {/* 表示種別の切替ボタン（アイコン＋名前の正方形）。表示中の種別はハイライトする（7.43節） */}
                 <div className="preset-type-toggles">
-                    {PRESET_OPERATOR_TYPES.map(type => {
+                    {PRESET_DISPLAY_TYPES.map(type => {
                         const isVisible = visibleOperatorTypes.has(type)
                         return (
                             <button
@@ -693,6 +830,32 @@ const StationPresetPopup: React.FC<Props> = ({ setting, onAdd, onClose }) => {
                             <ToggleSwitch
                                 checked={addOptions.useGenericIconForOtherOperators}
                                 onChange={(v) => updateAddOptions({ ...addOptions, useGenericIconForOtherOperators: v })}
+                            />
+                        </div>
+                        {/* 他社線を社名でまとめる（7.73節） */}
+                        <div className="form-row">
+                            <label>他社線を社名でまとめる</label>
+                            <ToggleSwitch
+                                checked={addOptions.groupOtherOperators}
+                                onChange={(v) => updateAddOptions({ ...addOptions, groupOtherOperators: v })}
+                            />
+                        </div>
+                        {/* 最小路線数は「他社線を社名でまとめる」がオンのときだけ操作できる（オフのときはグレー表示） */}
+                        <div className={`form-row${addOptions.groupOtherOperators ? '' : ' disp-config-disabled'}`}>
+                            <label>他社線をまとめる最小路線数</label>
+                            <input
+                                type="number"
+                                min={1}
+                                step={1}
+                                value={addOptions.groupOtherOperatorsMinCount}
+                                disabled={!addOptions.groupOtherOperators}
+                                onChange={e => {
+                                    // 1以上の整数のときだけ反映する（空欄・小数・0以下は無視）
+                                    const n = Number(e.target.value)
+                                    if (e.target.value !== '' && Number.isInteger(n) && n >= 1) {
+                                        updateAddOptions({ ...addOptions, groupOtherOperatorsMinCount: n })
+                                    }
+                                }}
                             />
                         </div>
                         <div className="modal-footer">

@@ -27,7 +27,8 @@ export type PresetLine = {
     symbol: string        // 路線記号
     iconPresetKey: string     // 路線アイコンのプリセット名（I_*）。iconDict の presetType に使う
     numIconPresetKey: string  // ナンバリングアイコンのプリセット名（N_*）
-    operatorType: PresetOperatorType  // 事業者種別（路線図の表示切り替えに使う。7.43節）
+    operatorType: PresetOperatorType  // 事業者種別（乗換路線の並び順・事業者略称の表・他社線のまとめに使う。7.73節）
+    displayType: PresetDisplayType    // 表示種別（路線図の表示切り替えに使う。7.43節・7.73節）
     // 事業者略称（例: 西鉄・地下鉄・JR）とそのかな・英語（7.62節）。他社線の乗換路線名の前に付ける
     operatorShort: string
     operatorShortKana: string
@@ -36,15 +37,25 @@ export type PresetLine = {
     genericIconPresetKey: string
 }
 
-// 路線の事業者種別（7.43節）。路線図の表示切り替えボタンの並び順もこの順
-export const PRESET_OPERATOR_TYPES = ['新幹線', 'JR在来線', '私鉄'] as const
+// 路線の事業者種別（7.73節）。地下鉄を含む4つ
+export const PRESET_OPERATOR_TYPES = ['新幹線', 'JR在来線', '私鉄', '地下鉄'] as const
 export type PresetOperatorType = typeof PRESET_OPERATOR_TYPES[number]
+
+// 路線の表示種別（7.43節・7.73節）。路線図の表示切り替えボタンの並び順もこの順。地下鉄は私鉄として切り替える
+export const PRESET_DISPLAY_TYPES = ['新幹線', 'JR在来線', '私鉄'] as const
+export type PresetDisplayType = typeof PRESET_DISPLAY_TYPES[number]
 
 // lineDB.csv の「事業者種別」列の値を種別に変換する。
 // 列が空・未知の値のときは、事業者名が JR で始まれば JR在来線、それ以外は私鉄とする（生成スクリプトと同じ規則）
 const toOperatorType = (value: string, operator: string): PresetOperatorType => {
     if ((PRESET_OPERATOR_TYPES as readonly string[]).includes(value)) return value as PresetOperatorType
     return operator.startsWith('JR') ? 'JR在来線' : '私鉄'
+}
+
+// lineDB.csv の「表示種別」列の値を種別に変換する。列が空・未知の値のときは事業者種別から決める（地下鉄は私鉄）
+const toDisplayType = (value: string, operatorType: PresetOperatorType): PresetDisplayType => {
+    if ((PRESET_DISPLAY_TYPES as readonly string[]).includes(value)) return value as PresetDisplayType
+    return operatorType === '地下鉄' ? '私鉄' : operatorType
 }
 
 // 路線接続データ: 同一路線IDの行を上から順に並べると路線上の駅順序になる
@@ -120,8 +131,9 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
         .map(line => {
             const cols = line.split(',')
             // 列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン, 事業者種別,
-            //       事業者略称, 事業者略称かな, 事業者略称英語, 汎用記号
+            //       事業者略称, 事業者略称かな, 事業者略称英語, 汎用記号, 表示種別
             const operator = cols[1]?.trim() ?? ''
+            const operatorType = toOperatorType(cols[9]?.trim() ?? '', operator)
             return {
                 id: cols[0]?.trim() ?? '',
                 operator: cols[1]?.trim() ?? '',
@@ -132,7 +144,8 @@ export const loadLineDB = async (): Promise<PresetLine[]> => {
                 symbol: cols[6]?.trim() ?? '',
                 iconPresetKey: cols[7]?.trim() ?? '',
                 numIconPresetKey: cols[8]?.trim() ?? '',
-                operatorType: toOperatorType(cols[9]?.trim() ?? '', operator),
+                operatorType,
+                displayType: toDisplayType(cols[14]?.trim() ?? '', operatorType),
                 operatorShort: cols[10]?.trim() ?? '',
                 operatorShortKana: cols[11]?.trim() ?? '',
                 operatorShortEng: cols[12]?.trim() ?? '',
@@ -182,6 +195,34 @@ export const loadTransferDB = async (): Promise<PresetTransfer[]> => {
             })
             // 空欄や同じ駅IDどうしの行は無効として除く
             .filter(t => t.stationId1 !== '' && t.stationId2 !== '' && t.stationId1 !== t.stationId2)
+    } catch {
+        return []
+    }
+}
+
+// 事業者略称の表（7.73節）の1行: この組み合わせの乗換路線には事業者略称を付けない。
+// 値は事業者略称、または特別な値「全ての事業者」「全ての地下鉄」
+export type PresetOperatorShortRule = {
+    ownShort: string    // 自路線の事業者略称
+    otherShort: string  // 乗換路線の事業者略称
+}
+
+// operatorShortRuleDB.csv を fetch してパースし、事業者略称の表を返す。
+// 読み込めない場合は空の表（すべて付ける）として扱う
+export const loadOperatorShortRuleDB = async (): Promise<PresetOperatorShortRule[]> => {
+    try {
+        const res = await fetch('/csv/presetLines/operatorShortRuleDB.csv')
+        if (!res.ok) return []
+        const text = await res.text()
+        return text
+            .split('\n')
+            .slice(1)  // ヘッダー行をスキップ
+            .filter(line => line.trim() !== '')
+            .map(line => {
+                const cols = line.split(',')
+                return { ownShort: cols[0]?.trim() ?? '', otherShort: cols[1]?.trim() ?? '' }
+            })
+            .filter(r => r.ownShort !== '' && r.otherShort !== '')
     } catch {
         return []
     }

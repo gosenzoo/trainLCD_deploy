@@ -57,13 +57,19 @@ def operator_short(l):
     if 144 <= l['no'] <= 147: return '都営', 'とえい', 'Toei'
     raise ValueError(f'路線 {l["no"]} の事業者略称が決められない')
 
-# 路線の事業者種別（新幹線・JR在来線・私鉄。7.43節）。
-# 元データの路線に "operatorType" があればその値、なければ事業者名が JR で始まれば JR在来線、それ以外は私鉄
-OPERATOR_TYPES = ('新幹線', 'JR在来線', '私鉄')
+# 路線の事業者種別（新幹線・JR在来線・私鉄・地下鉄。7.43節・7.73節）。
+# 元データの路線に "operatorType" があればその値、なければ東京の地下鉄（133〜147）は地下鉄、
+# 事業者名が JR で始まれば JR在来線、それ以外は私鉄
+OPERATOR_TYPES = ('新幹線', 'JR在来線', '私鉄', '地下鉄')
 def operator_type(l):
-    t = l.get('operatorType') or ('JR在来線' if company(l['no'])[0].startswith('JR') else '私鉄')
+    t = l.get('operatorType') or ('地下鉄' if 133 <= l['no'] <= 147 else 'JR在来線' if company(l['no'])[0].startswith('JR') else '私鉄')
     if t not in OPERATOR_TYPES: raise ValueError(f'路線 {l["no"]} の operatorType が不正: {t}')
     return t
+
+# 路線図の表示切り替えに使う表示種別（新幹線・JR在来線・私鉄。7.73節）。地下鉄は私鉄として表示を切り替える
+def display_type(l):
+    t = operator_type(l)
+    return '私鉄' if t == '地下鉄' else t
 
 def dist_km(a, b):
     # 簡易な距離（km）。駅間距離のチェック用
@@ -538,9 +544,9 @@ def write(name, header, rows):
 write('stationDB.csv', '駅ID,駅名,駅名かな,駅名英語,緯度,経度,ナンバリングアイコン,中国語,韓国語,副駅名',
       [(stations[n]['id'], stations[n]['name'], stations[n]['kana'], stations[n]['eng'], f'{stations[n]["lat"]:.4f}', f'{stations[n]["lon"]:.4f}', STATION_NUM_ICON.get(n, ''),
         stations[n]['zh'], stations[n]['ko'], stations[n]['subName']) for n in order])
-write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別,事業者略称,事業者略称かな,事業者略称英語,汎用記号',
+write('lineDB.csv', '路線ID,事業者,路線名,路線名かな,路線名英語,路線カラー,路線記号,路線アイコン,ナンバリングアイコン,事業者種別,事業者略称,事業者略称かな,事業者略称英語,汎用記号,表示種別',
       # 路線記号のない路線は、路線アイコンを路線カラーの四角（I_mono_color）にする（7.32節）
-      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l), *operator_short(l), generic_icon(l)) for l in lines])
+      [(l['no'], company(l['no'])[0], l['name'], l['kana'], l['eng'], l['color'], l.get('symbol', ''), company(l['no'])[1] if l.get('symbol', '') else 'I_mono_color', company(l['no'])[2], operator_type(l), *operator_short(l), generic_icon(l), display_type(l)) for l in lines])
 write('lineConnectDB.csv', '路線ID,駅ID,駅ナンバリング',
       [(l['no'], stations[skey(l, s)]['id'], s.get('number', '')) for l in lines for s in l['stations']])
 write('transferDB.csv', '駅ID1,駅ID2', transfer_edges)

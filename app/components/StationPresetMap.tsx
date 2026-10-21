@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer, StationSection, PresetOperatorType } from '../modules/loadStationPresets'
+import { PresetLine, PresetStation, PresetLineConnect, PresetTransfer, StationSection, PresetDisplayType } from '../modules/loadStationPresets'
 
 type Props = {
     lines: PresetLine[]
@@ -16,8 +16,8 @@ type Props = {
     onSelect: (sections: StationSection[], station: PresetStation, nextStationName?: string) => void
     // 操作ボタンの右に並べて表示する内容（操作ガイダンス・読み込みエラーなど。7.42節）
     toolbarExtra?: React.ReactNode
-    // 表示中の事業者種別（7.43節）。含まれない種別の路線は線を描かず、ハイライト・ルート候補からも外す
-    visibleOperatorTypes: ReadonlySet<PresetOperatorType>
+    // 表示中の表示種別（7.43節・7.73節）。含まれない種別の路線は線を描かず、ハイライト・ルート候補からも外す
+    visibleOperatorTypes: ReadonlySet<PresetDisplayType>
 }
 
 // 始点駅から対象駅までのルート候補
@@ -242,10 +242,10 @@ const StationPresetMap: React.FC<Props> = ({ lines, allStations, lineConnects, t
         return { linePaths: paths, nodeShapes: shapes }
     }, [lines, orderByLine, worldById])
 
-    // 表示中の路線のID集合（事業者種別で絞り込む。7.43節）。
+    // 表示中の路線のID集合（表示種別で絞り込む。7.43節）。
     // 配置・形（平行線のずらし量・ノード形状・全体表示の範囲）は全路線で計算済みのものを使い、ここでは描画と選択だけを絞る
     const visibleLineIds = useMemo(
-        () => new Set(lines.filter(l => visibleOperatorTypes.has(l.operatorType)).map(l => l.id)),
+        () => new Set(lines.filter(l => visibleOperatorTypes.has(l.displayType)).map(l => l.id)),
         [lines, visibleOperatorTypes])
 
     // 表示する駅のID集合: 表示中の路線が1本でも通る駅。始点駅は線がすべて非表示でも常に表示する
