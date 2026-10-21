@@ -51,6 +51,52 @@
     <!-- 背景 -->
     <rect lcdParts="static" id="background" x="0" y="0" width="1920" height="1080" fill="#FFFFFF" />
 
+    <!-- 線路・ホーム・車両（生成部品。7.74節）。昔の PlatformDrawer.createStationSet と同じ座標・形の値 -->
+    <!-- 自列車が手前: 手前の線路 → 向かいの線路と列車 → ホーム → 自列車 -->
+    <g lcdParts="group" isDraw="!platform.isFar">
+        <g lcdParts="generate" genfunc="rail" genfunc-params='{"anchorY": 837}' />
+        <g lcdParts="generate" genfunc="rail" isDraw="platform.isDrawOther" genfunc-params='{"anchorY": 483}' />
+        <g lcdParts="generate" genfunc="train" isDraw="platform.isDrawOther" genfunc-params='{
+            "cars": "#{platform.otherTrain.cars}", "carLength": "#{platform.otherTrain.carLength}", "gap": "#{platform.otherTrain.gap}",
+            "baseX": "#{platform.otherTrain.baseX}", "baseY": 463, "baseMode": "#{platform.otherTrain.baseMode}", "wholeLength": "#{platform.otherTrain.wholeLength}",
+            "colorSideFace": "#989898ff", "colorMainFace": "#929292ff", "colorTopFace": "#bababaff", "colorEdges": "#e2e2e2ff",
+            "carLabels": null, "highlightCarId": null, "drawLine": false,
+            "lineLabel": "#{platform.otherLine}"}' />
+        <!-- ホーム（向かいの列車が無いときは上側を消す） -->
+        <g lcdParts="generate" genfunc="platform" isDraw="platform.isDrawOther" genfunc-params='{"referencePos": "front", "hideTop": false, "hideBottom": false, "anchorX": 46, "anchorY": 737}' />
+        <g lcdParts="generate" genfunc="platform" isDraw="!platform.isDrawOther" genfunc-params='{"referencePos": "front", "hideTop": true, "hideBottom": false, "anchorX": 46, "anchorY": 737}' />
+        <g lcdParts="generate" genfunc="train" genfunc-params='{
+            "cars": "#{platform.train.cars}", "carLength": "#{platform.train.carLength}", "gap": "#{platform.train.gap}",
+            "baseX": "#{platform.train.baseX}", "baseY": 818, "baseMode": "#{platform.train.baseMode}",
+            "highlightCarId": "#{platform.train.highlightCarId}", "carLabels": "#{platform.train.carLabels}", "labelWidth": "#{platform.train.labelWidth}",
+            "drawLine": "#{platform.train.drawLine}", "lineColor": "#{platform.train.lineColor}",
+            "highlight": {"height": 90, "depth": 30, "colorSideFace": "#313131ff", "colorMainFace": "#3c3c3cff", "colorTopFace": "#8b8b8bff", "colorEdges": "#cbcbcbff"},
+            "highlightMixColor": "#{platform.train.lineColor}",
+            "approach": true}' />
+    </g>
+    <!-- 自列車が奥: 奥の線路 → 自列車 → ホーム → 手前の線路と向かいの列車 -->
+    <g lcdParts="group" isDraw="platform.isFar">
+        <g lcdParts="generate" genfunc="rail" genfunc-params='{"anchorY": 496}' />
+        <g lcdParts="generate" genfunc="train" genfunc-params='{
+            "cars": "#{platform.train.cars}", "carLength": "#{platform.train.carLength}", "gap": "#{platform.train.gap}",
+            "baseX": "#{platform.train.baseX}", "baseY": 480, "baseMode": "#{platform.train.baseMode}",
+            "highlightCarId": "#{platform.train.highlightCarId}", "carLabels": "#{platform.train.carLabels}", "labelWidth": "#{platform.train.labelWidth}",
+            "drawLine": "#{platform.train.drawLine}", "lineColor": "#{platform.train.lineColor}",
+            "highlight": {"height": 90, "depth": 30, "colorSideFace": "#313131ff", "colorMainFace": "#3c3c3cff", "colorTopFace": "#8b8b8bff", "colorEdges": "#cbcbcbff"},
+            "highlightMixColor": "#{platform.train.lineColor}",
+            "approach": true}' />
+        <!-- ホーム（向かいの列車が無いときは下側を消す） -->
+        <g lcdParts="generate" genfunc="platform" isDraw="platform.isDrawOther" genfunc-params='{"referencePos": "back", "hideTop": false, "hideBottom": false, "anchorX": 66, "anchorY": 480, "width": 1788, "baseBodyHeight": 23, "baseShadowHeight": 9}' />
+        <g lcdParts="generate" genfunc="platform" isDraw="!platform.isDrawOther" genfunc-params='{"referencePos": "back", "hideTop": false, "hideBottom": true, "anchorX": 66, "anchorY": 480, "width": 1788, "baseBodyHeight": 23, "baseShadowHeight": 9}' />
+        <g lcdParts="generate" genfunc="rail" isDraw="platform.isDrawOther" genfunc-params='{"anchorY": 824}' />
+        <g lcdParts="generate" genfunc="train" isDraw="platform.isDrawOther" genfunc-params='{
+            "cars": "#{platform.otherTrain.cars}", "carLength": "#{platform.otherTrain.carLength}", "gap": "#{platform.otherTrain.gap}",
+            "baseX": "#{platform.otherTrain.baseX}", "baseY": 804, "baseMode": "#{platform.otherTrain.baseMode}", "wholeLength": "#{platform.otherTrain.wholeLength}",
+            "colorSideFace": "#989898ff", "colorMainFace": "#929292ff", "colorTopFace": "#bababaff", "colorEdges": "#e2e2e2ff",
+            "carLabels": null, "highlightCarId": null, "drawLine": false,
+            "lineLabel": "#{platform.otherLine}"}' />
+    </g>
+
 
     <!-- 乗換欄背景 -->
     <g lcdParts="group" isDraw="platform.transfers.length >= 1">

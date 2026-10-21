@@ -6488,3 +6488,99 @@ iOSでは「▶」などの三角形の文字が絵文字（色付きの四角�
 | `scripts/presetData/sources/private_*.json` | 地下鉄の路線の `"operatorType"` を `"地下鉄"` に |
 | `public/csv/presetLines/lineDB.csv` | 再生成（地下鉄の路線の「事業者種別」列、「表示種別」列の追加） |
 | `public/csv/presetLines/operatorShortRuleDB.csv` | 新規 |
+
+### 7.74 ホーム上案内 — 生成部品（線路・ホーム・車両）
+
+LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platform.svg`）に、昔の表示（`jsMojules/body/PlatformDrawer.js`）にあった線路・ホーム・車両（自列車・向かいの列車）を描く。「LCDテンプレートに要素を置いて表示を作る」方針は変えず、遠近法で形が変わる線路・ホーム・車両だけを、JS の関数で形を作る**生成部品**としてテンプレートに置く。置く位置・表示条件・形の値（色・高さ・消失点など）はテンプレートに書く。
+
+#### 1. 生成部品（`lcdParts="generate"`）
+
+テンプレートの `<g>` に次の属性を書く。子要素は持たない（あっても無視する）。
+
+| 属性 | 内容 |
+|---|---|
+| `lcdParts` | `generate` |
+| `genfunc` | 生成関数の名前。`rail`（線路）・`platform`（ホーム）・`train`（車両） |
+| `genfunc-params` | 生成関数の引数（JSON）。キーが引数名、値が引数の値 |
+| `isDraw` / `visible` | これまでの部品と同じ（`isDraw` が false なら作らない） |
+
+`genfunc-params` の値の扱い:
+
+- 値全体が `"#{変数名}"` 1つの文字列なら、描画パラメータのその値を**型を変えずに**渡す（数値・真偽値・配列・オブジェクト。例: `"#{platform.train.carLabels}"` は配列のまま）。参照先が無ければ引数を渡さない（関数の初期値を使う）
+- それ以外の文字列に `#{変数名}` が含まれる場合は、文字列として埋め込む（`lcdText` と同じ）
+- 数値・真偽値・オブジェクト（入れ子の `#{}` も同じ規則で展開する）・配列はそのまま渡す
+- JSON として読めない場合は、その部品を描かずにコンソールに警告を出す
+
+生成関数は、昔の関数と同じく画面の座標（1920×1080）で描いた `<g>` を返す。生成部品はそれをそのまま出力に入れる（拡大縮小・移動はしない）。テンプレートでの書いた順が重なり順になる。
+
+#### 2. 生成関数（昔の関数を写す）
+
+昔の関数を `Drawer/src/generators/` に写して使う（`jsMojules` の元のファイルは変えない）。生成関数の名前と関数の対応表（`GENERATORS`）もここに置く。
+
+| `genfunc` | 元の関数 | 内容 |
+|---|---|---|
+| `rail` | `createRail`（`utilClass/createRail.js`）。昔の `createOneRail` の初期値を引数の初期値にする | 遠近法の線路1本（枕木・レール） |
+| `platform` | `createPlatform`（`utilClass/createPlatform.js`）。昔の `createPlatformObj` の初期値を引数の初期値にする | 遠近法のホーム（上面・側面・黄色い線・影） |
+| `train` | `createTrain`（`utilClass/createTrain.js`）と、昔の `createTrainObj`・`createTrainApproach`・`createOtherTrainObj` | 車両の編成。下記 |
+
+`train` の追加の引数（昔の `PlatformDrawer` が `createTrain` の外でしていた処理をまとめる）:
+
+| 引数 | 内容 |
+|---|---|
+| `approach` | true なら入線のアニメーション（画面外から入線 → 停車表示、を繰り返す。昔の `createTrainApproach`）。引数 `stopDuration`・`slideOffset`・`slideSpeed`・`easing` も昔と同じ |
+| `highlightMixColor` | 強調号車の色（`highlight.colorSideFace` など4色）に混ぜる色（昔の `combineByOKLCH(carLineColor, 色)`）。空なら混ぜない |
+| `lineLabel` | 向かいの列車の上に出す路線名（`{ lineIcon, name, eng }`）。指定があれば昔の `createOtherTrainObj` と同じ位置・大きさ・縁取りで描く。路線名の描画は昔の `TransferWidget` を写したものを使う |
+
+- 号車番号の文字は Drawer の `TextDrawer` で描く（生成部品が `textDrawer` を渡す）
+- 色を混ぜる関数（`combineByOKLCH`。`utilClass/colorChanger.js`）も写す
+- 入線のアニメーションのタイマー: 生成関数が返す要素の後始末（`__cleanup`）を、次の `draw()` の始めにまとめて呼ぶ（ページが変わったあともタイマーが動き続けないようにする）。言語の切り替え（`langChange`）では作り直さず、アニメーションは続ける
+
+#### 3. 描画パラメータ（`drawParams.platform`）
+
+`Controller` の `ProgressController._buildPlatform` で、昔の `PlatformController.extractDrawParams` と同じ計算をして `drawParams.platform` に入れる。表示する駅はこれまでどおり次に停車する駅。使う値はエディタの今の項目（駅: `slotNum`・`leftSlotInd`・`otherCarNum`・`otherLeftSlotInd`・`otherLineInd`・`doorSide`、行先表示: `carNumberList`・`headOffset`・`backOffset`・`leftOrRight`・`isDrawLine`・`carLineColor`）。
+
+| キー | 内容 |
+|---|---|
+| `transfers` | 乗換欄（変更なし） |
+| `isFar` | 自列車が奥にいる（`leftOrRight` と `doorSide` が同じ）なら true |
+| `isDrawOther` | 向かいの列車を描くか（`otherLineInd` が路線一覧にある） |
+| `train` | 自列車: `cars`（両数）・`carLength`（1両の長さ）・`gap`（5）・`highlightCarId`（`carNumberList` の `*` の号車。無ければ -1）・`carLabels`（`*` を除いた号車番号の配列）・`labelWidth`・`baseX`（先頭の座標）・`baseMode`（`leftOrRight`）・`drawLine`（`isDrawLine`）・`lineColor`（`carLineColor`） |
+| `otherTrain` | 向かいの列車: `cars`・`carLength`・`gap`・`baseX`・`wholeLength`・`baseMode`（自列車の位置からの縮小率をかけた値。昔と同じ計算） |
+| `otherLine` | 向かいの列車の路線: `lineIcon`（`:アイコンキー:`）・`name`・`eng`（無ければ空） |
+| `otherLineInd`・`slotNum`・`leftSlotInd`・`otherCarNum`・`otherLeftSlotInd` | 駅の値をそのまま入れる（これまでは仮の値） |
+
+- `slotNum`・`otherCarNum` が 0 以下のときは自列車の両数とする（昔と同じ）
+- 計算に使う画面の幅（1920）・消失点（-2000）・自列車と向かいの列車の高さ（奥 480／手前 818、向かいの列車は奥 463／手前 804）は昔と同じ値
+
+#### 4. テンプレート（`platform.svg`）
+
+昔の `createStationSet` の4通り（手前右向き・手前左向き・奥右向き・奥左向き）は、向き（`baseMode`）以外が同じため、`isFar` で2通りに分けて書く。座標と形の値は昔と同じにする。
+
+| 配置 | 書く順（重なり順） |
+|---|---|
+| 自列車が手前（`!platform.isFar`） | 手前の線路（y=837）→ 向かいの線路（y=483）と向かいの列車（baseY=463。`isDrawOther` のとき）→ ホーム（`referencePos: front`、anchor (46, 737)。向かいの列車が無いときは上側を消す）→ 自列車（baseY=818、入線アニメーションあり） |
+| 自列車が奥（`platform.isFar`） | 奥の線路（y=496）→ 自列車（baseY=480）→ ホーム（`referencePos: back`、anchor (66, 480)、幅 1788、`baseBodyHeight` 23、`baseShadowHeight` 9。向かいの列車が無いときは下側を消す）→ 手前の線路（y=824）と向かいの列車（baseY=804。`isDrawOther` のとき） |
+
+- 自列車の強調号車の色は、昔と同じ4色（`#313131ff`・`#3c3c3cff`・`#8b8b8bff`・`#cbcbcbff`）に `carLineColor` を混ぜる（`highlightMixColor`）
+- 「ホームの上側・下側を消す」は真偽値の否定が書けないため、ホームの生成部品を `isDrawOther` の有無で2つ書き分ける
+- 乗換欄・次の停車駅の表示はこれまでどおり（線路・ホーム・車両より後に書いて上に重ねる）
+
+#### 5. 文字の書式を書き換えない（`TextDrawer.createByArea`）
+
+`TextDrawer.createByArea` は、渡された書式（`styleJson`）を直接書き換えていた（文字揃えを `start` にする・縁取りの設定を消す・文字数ごとの文字間隔を1つの値にする）。同じ書式のオブジェクトを何度も渡すと、2回目以降は中央揃え・縁取りなどが効かなくなる（例: 号車番号が2両目以降左寄せになる、向かいの列車の路線名の縁取りが消える）。
+
+- `createByArea` の始めで書式を浅くコピーし、コピーの方を書き換える。呼び出し元のオブジェクトは変えない
+- 描画結果は、1回目の呼び出しの結果と同じ（書式の値の使い方は変えない）
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `public/Drawer/src/main/Drawer.js` | `lcdParts="generate"` の組み立て、前回の生成部品の後始末 |
+| `public/Drawer/src/utility/TextDrawer.js` | `createByArea` で書式をコピーして使う |
+| `public/Drawer/src/objects/GenerateObj.js` | 新規。生成部品（`genfunc-params` の展開、生成関数の呼び出し） |
+| `public/Drawer/src/generators/` | 新規。`createRail.js`・`createPlatform.js`・`createTrain.js`・`colorChanger.js`・`TransferWidget.js`（昔のものを写す）、生成関数の対応表 |
+| `public/Drawer/pageInput/tokyu/body/platform.svg` | 線路・ホーム・車両の生成部品を追加 |
+| `public/Controller/src/obj/ProgressController.js` | `_buildPlatform` で `drawParams.platform` の値を計算 |
+| `public/display.html`・`public/Drawer/index.html` | 新しいファイルの読み込み |
+| `public/Drawer/doc/lcdParts.md` | 生成部品の説明 |

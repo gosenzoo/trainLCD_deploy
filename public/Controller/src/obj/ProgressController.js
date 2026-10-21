@@ -1032,11 +1032,104 @@ class ProgressController {
 
         return {
             transfers,
-            otherLineInd:    "",
-            slotNum:         "0",
-            leftSlotInd:     "0",
-            otherCarNum:     "0",
-            otherLeftSlotInd: "0"
+            // 線路・ホーム・車両の生成部品に渡す値（7.74節）
+            ...this._buildPlatformTrains(displayStation, this._resolveOperation()),
+            // 駅の値をそのまま入れる
+            otherLineInd:     displayStation.otherLineInd     ?? "",
+            slotNum:          displayStation.slotNum          ?? "0",
+            leftSlotInd:      displayStation.leftSlotInd      ?? "0",
+            otherCarNum:      displayStation.otherCarNum      ?? "0",
+            otherLeftSlotInd: displayStation.otherLeftSlotInd ?? "0"
+        };
+    }
+
+    /**
+     * ホーム案内の自列車・向かいの列車の値を計算する（7.74節）。
+     * 昔の jsMojules/body/PlatformControler.js の extractDrawParams と同じ計算。
+     * @returns {{ isFar, isDrawOther, train, otherTrain, otherLine }}
+     */
+    _buildPlatformTrains(displayStation, operation) {
+        // 値が空・数値でないときは 0 とする
+        const toInt = (v) => { const n = parseInt(v); return isNaN(n) ? 0 : n; };
+        let slotNum          = toInt(displayStation.slotNum);          // スロット数
+        const leftSlotInd    = toInt(displayStation.leftSlotInd);      // 自列車の左端スロット
+        let otherCarNum      = toInt(displayStation.otherCarNum);      // 向かいの列車の両数
+        const otherLeftSlotInd = toInt(displayStation.otherLeftSlotInd); // 向かいの列車の左端スロット
+
+        const displayWidth = 1920;
+        const headOffset = toInt(operation.headOffset); // 自列車スロットの左端オフセット
+        const backOffset = toInt(operation.backOffset); // 自列車スロットの右端オフセット
+        const gap = 5; // 車両同士の間隔
+        const wholeLength = displayWidth - headOffset - backOffset; // 自列車スロットの全長
+        const leftOrRight = operation.leftOrRight === "right" ? "right" : "left";
+
+        // 号車番号（"*" の付いた号車を強調する）
+        const carLabels = String(operation.carNumberList ?? "").split(",");
+        const highlightCarId = carLabels.findIndex(label => label.includes("*"));
+        const cars = carLabels.length;
+        if (highlightCarId !== -1) carLabels[highlightCarId] = carLabels[highlightCarId].replace("*", "");
+
+        // 初期値（0以下）のときは自列車の両数にする
+        if (slotNum <= 0) slotNum = cars;
+        if (otherCarNum <= 0) otherCarNum = cars;
+
+        const slotLength = (wholeLength - (slotNum - 1) * gap) / slotNum; // 1スロットの長さ
+        const labelWidth = slotLength - 10;
+        const baseX0 = headOffset; // セクションの左端
+        // 左端スロットの番号から左端の座標を求める（負の番号は左へずらす）
+        const slotLeft = (slotInd) => slotInd !== 0
+            ? baseX0 + (Math.abs(slotInd) * slotLength + (Math.abs(slotInd) - 1) * gap) * Math.sign(slotInd)
+            : baseX0;
+
+        // 自列車: 先頭の座標は、右向きなら右端、左向きなら左端
+        const myLeft = slotLeft(leftSlotInd);
+        const myWholeLength = slotLength * cars + gap * (slotNum - 1);
+        const baseX = leftOrRight === "right" ? myLeft + myWholeLength : myLeft;
+
+        // 自列車が奥か（向きとドアの側が同じなら奥）。向かいの列車は消失点を基準に縮小する
+        const isFar = leftOrRight === displayStation.doorSide;
+        const vanishY = -2000;
+        const centerX = displayWidth / 2;
+        const myY    = isFar ? 480 : 818;
+        const otherY = isFar ? 804 : 463;
+        const ratio = (otherY - vanishY) / (myY - vanishY);
+
+        // 向かいの列車
+        const otherLeft = slotLeft(otherLeftSlotInd);
+        const otherWholeLength = slotLength * otherCarNum + gap * (slotNum - 1);
+        const otherBaseX = leftOrRight === "right" ? otherLeft + otherWholeLength : otherLeft;
+
+        // 向かいの列車の路線（路線一覧にあるときだけ描く）
+        const otherLineData = this.lineDict ? this.lineDict[displayStation.otherLineInd] : undefined;
+
+        return {
+            isFar,
+            isDrawOther: !!otherLineData,
+            train: {
+                cars,
+                carLength: slotLength,
+                gap,
+                highlightCarId,
+                carLabels,
+                labelWidth,
+                baseX,
+                baseMode: leftOrRight,
+                drawLine: !!operation.isDrawLine,
+                lineColor: operation.carLineColor || "",
+            },
+            otherTrain: {
+                cars: otherCarNum,
+                carLength: slotLength * ratio,
+                gap: gap * ratio,
+                baseX: (otherBaseX - centerX) * ratio + centerX,
+                wholeLength: otherWholeLength * ratio,
+                baseMode: leftOrRight,
+            },
+            otherLine: {
+                lineIcon: otherLineData && otherLineData.lineIconKey ? `:${otherLineData.lineIconKey}:` : "",
+                name: otherLineData ? (otherLineData.name || "") : "",
+                eng:  otherLineData ? (otherLineData.eng  || "") : "",
+            },
         };
     }
 

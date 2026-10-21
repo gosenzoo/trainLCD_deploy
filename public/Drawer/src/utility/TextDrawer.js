@@ -74,6 +74,8 @@ class TextDrawer{
     createByArea(text, x, y, maxWidth, height, styleJson, lang='ja', transform=null){
         //return { element: document.createElementNS("http://www.w3.org/2000/svg", "text"), width: 100 }; //ダミー
         if(lang === null){ lang = "ja"; }
+        // 以下で文字間隔・縁取り・文字揃えを書き換えるため、呼び出し元の書式を変えないよう浅いコピーを使う（7.74節）
+        styleJson = { ...styleJson };
 
         let strokeWidth = 0;
         let stroke;

@@ -16,6 +16,7 @@
 | `group` | `<g>` | 子要素を再帰的にオブジェクト化してグループとして出力する。`visible` 属性で表示制御可能。 |
 | `arrange` | `<g>` | `<g>` 直下の `arrangeArea` 矩形の範囲内に、その他の子要素を整列・収納する。入れ子可能。 |
 | `arrangeArea` | `<rect>`（`arrange` の `<g>` 直下） | `arrange` の描画領域を定義する矩形。出力には含まない。 |
+| `generate` | `<g>` | 生成関数（`genfunc`）で作った要素を出力に追加する（生成部品）。線路・ホーム・車両など、遠近法で形が変わるものに使う。 |
 | （なし） | — | `lcdParts` を持たない要素はその子孫ごとスキップする。必要な場合は `lcdParts="group"` を付与すること。 |
 
 ### static
@@ -114,6 +115,41 @@ fitX/Y を持つ子要素のサイズ決定は3パスで行われる。
 
 - **対象要素**: `<rect>`（`lcdParts="arrange"` の `<g>` 直下）
 - **動作**: 親 `arrange` の描画領域を定義する。`x`, `y`, `width`, `height` を領域として使用する。rect 自体は出力に含まない。
+
+### generate（生成部品）
+
+- **対象要素**: `<g>`（子要素は持たない。あっても無視する）
+- **動作**: `genfunc` の生成関数を `genfunc-params` の引数で呼び、返ってきた `<g>` をそのまま出力に追加する。生成関数は画面の座標（1920×1080）で描くため、拡大縮小・移動はしない。重なり順はテンプレートに書いた順。`isDraw` / `visible` はほかの部品と同じ。`svg` 直下と `group` の中で使える（`arrange` / `slot` の中では使えない）。
+- **言語の切り替え**: 作り直さない（入線のアニメーションを続ける）。`visible` の変化だけ反映する。
+- **後始末**: 生成関数が返した要素に `__cleanup` があれば、次の `draw()` の始めに呼ぶ（アニメーションのタイマーを止める）。
+
+| 属性 | 説明 |
+|---|---|
+| `genfunc` | 生成関数の名前（下表） |
+| `genfunc-params` | 生成関数の引数（JSON）。キーが引数名。書かなかった引数は生成関数の初期値を使う |
+
+**`genfunc-params` の値**
+
+| 値 | 渡すもの |
+|---|---|
+| 値全体が `"#{変数名}"` 1つの文字列 | drawParams の値を型を変えずに（数値・真偽値・配列・オブジェクト）。参照先が無ければその引数を渡さない |
+| `#{変数名}` を含むそれ以外の文字列 | 展開した文字列（`lcdText` と同じ） |
+| 数値・真偽値・null・配列・オブジェクト | そのまま（配列・オブジェクトの中も同じ規則で展開する） |
+
+JSON として読めない場合・生成関数が無い場合・生成関数でエラーが起きた場合は、その部品を描かずにコンソールに警告を出す。
+
+**生成関数**（`src/generators/generators.js` の `GENERATORS`）
+
+| `genfunc` | 内容 | 主な引数 |
+|---|---|---|
+| `rail` | 遠近法の線路1本（枕木・レール） | `anchorY`（線路の位置）、`vanishY`、色など（`RAIL_DEFAULTS`） |
+| `platform` | 遠近法のホーム（上面・側面・黄色い線・影） | `referencePos`（`front` / `back`）、`anchorX`・`anchorY`、`width`、`hideTop`・`hideBottom`、`colors` など（`PLATFORM_DEFAULTS`） |
+| `train` | 車両の編成 | `cars`・`carLength`・`gap`・`baseX`・`baseY`・`baseMode`、`highlightCarId`・`highlight`・`carLabels`、`drawLine`・`lineColor` など（`TRAIN_DEFAULTS`）。追加の引数: `approach`（入線のアニメーション）、`highlightMixColor`（強調号車の4色に混ぜる色）、`lineLabel`（`{ lineIcon, name, eng }`。列車の上に路線名を描く。`wholeLength` も渡す） |
+
+```xml
+<g lcdParts="generate" genfunc="rail" genfunc-params='{"anchorY": 837}' />
+<g lcdParts="generate" genfunc="train" genfunc-params='{"cars": "#{platform.train.cars}", "baseY": 818, "approach": true}' />
+```
 
 ---
 

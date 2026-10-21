@@ -322,6 +322,10 @@ class Drawer {
         // header+bodyのdefsを収集（buildTree内でthis._defsElを参照するため先に設定）
         this._defsEl = this._collectDefs();
 
+        // 前回の描画で作った生成部品の後始末（入線アニメーションのタイマーを止める。7.74節）
+        if (this._generateObjs) this._generateObjs.forEach(obj => obj.cleanup());
+        this._generateObjs = [];
+
         // オブジェクトツリーを構築してgetElementで描画
         this.buildTree();
         const resolveValue = name => this._resolveValue(name);
@@ -499,6 +503,12 @@ class Drawer {
                 rootShadowMap,
             };
             return new SlotObj(element, slotCtx);
+        } else if (lcdParts === 'generate') {
+            // 生成部品（7.74節）: 生成関数で作った要素をそのまま出す。後始末のため作ったものを覚えておく
+            const obj = new GenerateObj(element, this._drawParams, this.textDrawer);
+            if (!this._generateObjs) this._generateObjs = [];
+            this._generateObjs.push(obj);
+            return obj;
         }
         // lcdPartsなし（またはunknown値）: 子孫ごとスキップ
         return null;
