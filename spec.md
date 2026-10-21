@@ -6572,12 +6572,25 @@ LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platfo
 - `createByArea` の始めで書式を浅くコピーし、コピーの方を書き換える。呼び出し元のオブジェクトは変えない
 - 描画結果は、1回目の呼び出しの結果と同じ（書式の値の使い方は変えない）
 
+#### 6. 点滅アニメーションの色を Safari で読める形にする
+
+強調号車の点滅（`createTrain` の SMIL `<animate>`）の `values` に8桁の16進数の色（例: `#d7d7d7ff`）が入ると、Safari（WebKit）はアニメーションを無効とし、点滅しない（Chrome は読める）。
+
+- `createTrain` の点滅用の関数（塗り・線・文字）で、`values` に入れる色を変換する
+  - 8桁の16進数で末尾が `ff`（不透明）なら6桁にする（例: `#d7d7d7ff` → `#d7d7d7`）
+  - それ以外の8桁の16進数は `rgba(r,g,b,a)` にする
+  - それ以外の形の色はそのまま
+- 図形の `fill`・`stroke` 属性や、テンプレート・初期値の色は変えない
+- 入線のたびに点滅を開始し直す処理（`createTrainApproach` の `restartBlinkNow`）は、`endElement()` を呼ばずに `beginElement()` だけを呼ぶ。再生中の `<animate>` に `endElement()` と `beginElement()` を続けて呼ぶと、Safari では止まったままになるため（`beginElement()` は再生中でも先頭から開始し直す）
+
 #### 変更するファイル
 
 | ファイル | 変更内容 |
 |---|---|
 | `public/Drawer/src/main/Drawer.js` | `lcdParts="generate"` の組み立て、前回の生成部品の後始末 |
 | `public/Drawer/src/utility/TextDrawer.js` | `createByArea` で書式をコピーして使う |
+| `public/Drawer/src/generators/createTrain.js` | 点滅アニメーションの色を6桁・`rgba()` に変換 |
+| `public/Drawer/src/generators/generators.js` | 点滅の開始し直しで `endElement()` を呼ばない |
 | `public/Drawer/src/objects/GenerateObj.js` | 新規。生成部品（`genfunc-params` の展開、生成関数の呼び出し） |
 | `public/Drawer/src/generators/` | 新規。`createRail.js`・`createPlatform.js`・`createTrain.js`・`colorChanger.js`・`TransferWidget.js`（昔のものを写す）、生成関数の対応表 |
 | `public/Drawer/pageInput/tokyu/body/platform.svg` | 線路・ホーム・車両の生成部品を追加 |

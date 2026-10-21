@@ -225,9 +225,10 @@ function createTrainApproach({
     });
 
     // 同期開始/再開始ヘルパ
+    // beginElement() は再生中でも先頭から開始し直す（restart の初期値 always）。
+    // endElement() を続けて呼ぶと Safari（WebKit）では止まったままになるため呼ばない（7.74節）
     function restartBlinkNow() {
         smilAnims.forEach(a => {
-            try { a.endElement(); } catch(_) {}
             try { a.beginElement(); } catch(_) {}
         });
     }

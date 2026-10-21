@@ -412,11 +412,27 @@ function createTrain(params) {
     }
     return i === (n / 2 - 1) || i === (n / 2);
   }
+  // SMIL の values に入れる色を Safari（WebKit）でも読める形にする（7.74節）。
+  // WebKit は values の8桁の16進数（#RRGGBBAA）を読めずアニメーション全体が無効になるため、
+  // 不透明（AA=ff）なら6桁、それ以外は rgba() にする。それ以外の形の色はそのまま返す
+  function toSmilColor(color) {
+    const m = /^#([0-9a-f]{6})([0-9a-f]{2})$/i.exec(String(color).trim());
+    if (!m) return color;
+    if (m[2].toLowerCase() === "ff") return `#${m[1]}`;
+    const r = parseInt(m[1].slice(0, 2), 16), g = parseInt(m[1].slice(2, 4), 16), b = parseInt(m[1].slice(4, 6), 16);
+    const a = Math.round(parseInt(m[2], 16) / 255 * 1000) / 1000;
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  // 点滅の values（強調色 → 通常色 → 強調色）
+  function blinkValues(highlightColor, normalColor) {
+    const h = toSmilColor(highlightColor), n = toSmilColor(normalColor);
+    return `${h};${n};${h}`;
+  }
   // 瞬間点滅（塗り）
   function addBlinkFillDiscrete(target, highlightColor, normalColor, blinkMs, ns) {
     const anim = document.createElementNS(ns, "animate");
     anim.setAttribute("attributeName", "fill");
-    anim.setAttribute("values", `${highlightColor};${normalColor};${highlightColor}`);
+    anim.setAttribute("values", blinkValues(highlightColor, normalColor));
     anim.setAttribute("dur", `${(blinkMs * 2) / 1000}s`);
     anim.setAttribute("repeatCount", "indefinite");
     anim.setAttribute("calcMode", "discrete");
@@ -426,7 +442,7 @@ function createTrain(params) {
   function addBlinkStrokeDiscrete(target, highlightColor, normalColor, blinkMs, ns) {
     const anim = document.createElementNS(ns, "animate");
     anim.setAttribute("attributeName", "stroke");
-    anim.setAttribute("values", `${highlightColor};${normalColor};${highlightColor}`);
+    anim.setAttribute("values", blinkValues(highlightColor, normalColor));
     anim.setAttribute("dur", `${(blinkMs * 2) / 1000}s`);
     anim.setAttribute("repeatCount", "indefinite");
     anim.setAttribute("calcMode", "discrete");
@@ -436,7 +452,7 @@ function createTrain(params) {
   function addBlinkTextDiscrete(textEl, highlightColor, normalColor, blinkMs, ns) {
     const anim = document.createElementNS(ns, "animate");
     anim.setAttribute("attributeName", "fill");
-    anim.setAttribute("values", `${highlightColor};${normalColor};${highlightColor}`);
+    anim.setAttribute("values", blinkValues(highlightColor, normalColor));
     anim.setAttribute("dur", `${(blinkMs * 2) / 1000}s`);
     anim.setAttribute("repeatCount", "indefinite");
     anim.setAttribute("calcMode", "discrete");
