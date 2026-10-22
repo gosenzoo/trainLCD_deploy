@@ -1458,3 +1458,9 @@ button.segmented-switch-item.segmented-switch-item--active {
   stroke-width: 4;
   cursor: ew-resize;
 }
+
+/* 静止画の端に止めた操作バーの外向きの矢印（7.75節） */
+.train-car-editor-arrow {
+    fill: var(--accent);
+    pointer-events: none;
+}

@@ -42,7 +42,7 @@ const HANDLE_WIDTH = 28
 const HANDLE_HIT_WIDTH = 160
 const CENTER_HANDLE_Y = 868
 const CENTER_HANDLE_HEIGHT = 30
-const MAX_CARS = 20
+const MAX_CARS = 30
 // 全体の平行移動で、列車の中心が画面の中心からこの距離以内ならちょうど中心に置く
 const CENTER_SNAP_DISTANCE = 30
 
@@ -160,14 +160,16 @@ const TrainCarEditor: React.FC<TrainCarEditorProps> = ({ carNumberList, headOffs
         const d = dragRef.current
         if (!d) return
         const dx = Math.round(toSvgX(e.clientX) - d.startX)
-        // オフセットは 0 以上、左端が右端を越えない（列車の長さは 0 以上）
-        if (d.kind === 'head') {
-            setDragOffsets({ head: Math.max(0, Math.min(DISPLAY_WIDTH - d.back, d.head + dx)), back: d.back })
-        } else if (d.kind === 'back') {
-            setDragOffsets({ head: d.head, back: Math.max(0, Math.min(DISPLAY_WIDTH - d.head, d.back - dx)) })
+        // 左右の端は連動して逆向きに動く（列車の中心はそのまま長さだけ変わる）。オフセットは負の値も取る。
+        // 縮める量は片側につき元の長さの半分まで（左端が右端を越えない＝列車の長さは 0 以上）
+        const maxShrink = Math.floor((DISPLAY_WIDTH - d.head - d.back) / 2)
+        if (d.kind === 'head' || d.kind === 'back') {
+            // 内側（列車が縮む向き）へ動かした量。左端は右へ、右端は左へ動かすと縮む
+            const shrink = Math.min(maxShrink, d.kind === 'head' ? dx : -dx)
+            setDragOffsets({ head: d.head + shrink, back: d.back + shrink })
         } else {
-            // 全体の平行移動: 前方を増やした分だけ後方を減らす（どちらも 0 未満にしない）
-            const move = Math.max(-d.head, Math.min(d.back, dx))
+            // 全体の平行移動: 前方を増やした分だけ後方を減らす（オフセットは負の値も取る）
+            const move = dx
             const newHead = d.head + move
             const newBack = d.back - move
             // 列車の中心と画面の中心の差は (前方 - 後方) / 2。近ければ前方・後方を等しくして中心に置く（合計が奇数なら後方を 1 大きく）
@@ -190,11 +192,30 @@ const TrainCarEditor: React.FC<TrainCarEditorProps> = ({ carNumberList, headOffs
         setDragOffsets(null)
     }
 
+    // 操作バーの表示位置。静止画の外（オフセットが負）に出るときは静止画の端に止め、外向きの矢印を付ける
+    const clampX = (x: number, half: number) => Math.max(half, Math.min(DISPLAY_WIDTH - half, x))
+    const headHandleX = clampX(trainLeft, HANDLE_WIDTH / 2)
+    const backHandleX = clampX(trainRight, HANDLE_WIDTH / 2)
+    const centerHandleX = clampX((trainLeft + trainRight) / 2, 120)
+    const handleMidY = (HANDLE_TOP + HANDLE_BOTTOM) / 2
+    // 外向きの矢印（三角形）。dir は -1 で左向き、1 で右向き。操作バーの内側（静止画の中）に描く
+    const arrowPoints = (x: number, dir: number) => {
+        const tip = x - dir * (HANDLE_WIDTH / 2 + 8)
+        const base = tip - dir * 36
+        return `${tip},${handleMidY} ${base},${handleMidY - 24} ${base},${handleMidY + 24}`
+    }
+
     return (
         <div className="train-car-editor">
             <div className="form-row">
                 <label>両数</label>
-                <input type="number" min={1} max={MAX_CARS} value={cars} onChange={e => setCarCount(parseInt(e.target.value))} />
+                {/* 両数は横方向のバーと左右のボタンで 1〜30 を指定する */}
+                <button onClick={() => setCarCount(cars - 1)} disabled={cars <= 1}>◀</button>
+                <input type="range" min={1} max={MAX_CARS} value={cars} onChange={e => setCarCount(parseInt(e.target.value))} style={{ flex: 1 }} />
+                <button onClick={() => setCarCount(cars + 1)} disabled={cars >= MAX_CARS}>▶</button>
+                <span>{cars}両</span>
+            </div>
+            <div className="form-row">
                 <button onClick={reverseCars}>反転</button>
                 <button onClick={resetOffsets}>位置・大きさをデフォルトに戻す</button>
             </div>
@@ -234,25 +255,24 @@ const TrainCarEditor: React.FC<TrainCarEditorProps> = ({ carNumberList, headOffs
                     )
                 })}
                 {/* 操作バーをつかめる範囲（画面幅が狭いと操作バーが細くなるため、透明な幅広の範囲を重ねる） */}
-                <rect x={trainLeft - HANDLE_HIT_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_HIT_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} fill="transparent"
+                <rect x={headHandleX - HANDLE_HIT_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_HIT_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} fill="transparent"
                     style={{ cursor: 'ew-resize' }} onPointerDown={startDrag('head')} />
-                <rect x={trainRight - HANDLE_HIT_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_HIT_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} fill="transparent"
+                <rect x={backHandleX - HANDLE_HIT_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_HIT_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} fill="transparent"
                     style={{ cursor: 'ew-resize' }} onPointerDown={startDrag('back')} />
-                <rect x={(trainLeft + trainRight) / 2 - 160} y={CENTER_HANDLE_Y - 20} width={320} height={CENTER_HANDLE_HEIGHT + 40} fill="transparent"
+                <rect x={centerHandleX - 160} y={CENTER_HANDLE_Y - 20} width={320} height={CENTER_HANDLE_HEIGHT + 40} fill="transparent"
                     style={{ cursor: 'ew-resize' }} onPointerDown={startDrag('center')} />
                 {/* 前方・後方の操作バー（列車の左端・右端） */}
-                <rect className="train-car-editor-handle" x={trainLeft - HANDLE_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} rx={10}
+                <rect className="train-car-editor-handle" x={headHandleX - HANDLE_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} rx={10}
                     onPointerDown={startDrag('head')} />
-                <rect className="train-car-editor-handle" x={trainRight - HANDLE_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} rx={10}
+                <rect className="train-car-editor-handle" x={backHandleX - HANDLE_WIDTH / 2} y={HANDLE_TOP} width={HANDLE_WIDTH} height={HANDLE_BOTTOM - HANDLE_TOP} rx={10}
                     onPointerDown={startDrag('back')} />
                 {/* 全体を平行移動する操作バー（列車の中央の下） */}
-                <rect className="train-car-editor-handle" x={(trainLeft + trainRight) / 2 - 120} y={CENTER_HANDLE_Y} width={240} height={CENTER_HANDLE_HEIGHT} rx={12}
+                <rect className="train-car-editor-handle" x={centerHandleX - 120} y={CENTER_HANDLE_Y} width={240} height={CENTER_HANDLE_HEIGHT} rx={12}
                     onPointerDown={startDrag('center')} />
+                {/* 静止画の端に止めた操作バーの外向きの矢印 */}
+                {headHandleX !== trainLeft && <polygon className="train-car-editor-arrow" points={arrowPoints(headHandleX, trainLeft < headHandleX ? -1 : 1)} />}
+                {backHandleX !== trainRight && <polygon className="train-car-editor-arrow" points={arrowPoints(backHandleX, trainRight > backHandleX ? 1 : -1)} />}
             </svg>
-            <div className="form-row">
-                <label>前方 / 後方オフセット</label>
-                <span>{head} / {back}</span>
-            </div>
             {/* 選択中の号車の設定 */}
             {selected !== null && (<>
                 <div className="form-row">
