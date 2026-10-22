@@ -6,6 +6,7 @@ import initObjects from "../initSettingObject"
 import { numberIndexes } from "../modules/presetIndex"
 import { getOperationLabel } from "../modules/resolveDestination"
 import OperationFields from './OperationFields'
+import { TrainCarPatch } from './TrainCarEditor'
 
 type operationFormType = {
     setting: settingType,
@@ -36,12 +37,19 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
         setSetting(_setting)
     }
 
-    // 全体号車の「反転」「入力」は、表示中の運用だけに反映する（従来どおり）
-    const carNumberListUpdated = (value: string) => {
+    // 列車の編集画面（7.75節）で号車リスト・オフセットをまとめて変える。「すべての運用に適用」なら全運用に反映する
+    const valuesUpdated = (patch: TrainCarPatch) => {
         const _setting: settingType = structuredClone(setting)
-        if (_setting.operationDict[effectiveKey]) _setting.operationDict[effectiveKey].carNumberList = value
+        const targets = isAll
+            ? Object.values(_setting.operationDict)
+            : (effectiveKey && _setting.operationDict[effectiveKey] ? [_setting.operationDict[effectiveKey]] : [])
+        targets.forEach(op => Object.assign(op, patch))
         setSetting(_setting)
     }
+
+    // 列車の編集画面のプレビュー用の路線色: この運用を使う最初の区間の路線の色（7.75節）
+    const firstStation = (setting.stationList ?? []).find(s => s.operationId === effectiveKey)
+    const previewLineColor = firstStation ? setting.lineDict?.[firstStation.lineId]?.color : undefined
 
     // 運用を追加する: キー最大値+1 を新キーとして空の運用エントリを追加する
     const addOperation = () => {
@@ -104,7 +112,8 @@ const OperationForm: React.FC<operationFormType> = ({setting, setSetting}) => {
             <OperationFields
                 operation={operation}
                 onValue={valueUpdated}
-                onCarNumberListChange={carNumberListUpdated}
+                onValues={valuesUpdated}
+                previewLineColor={previewLineColor}
             />
             </>)}
             </div>{/* /tab-form-body */}

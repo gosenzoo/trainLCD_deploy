@@ -40,7 +40,7 @@ const OperationAddPopup: React.FC<OperationAddPopupProps> = ({ onAdd, onClose })
                     <OperationFields
                         operation={operation}
                         onValue={valueUpdated}
-                        onCarNumberListChange={(value) => valueUpdated('carNumberList', value)}
+                        onValues={(patch) => setOperation(prev => ({ ...prev, ...patch }))}
                     />
                 </div>
                 <div className="modal-footer">

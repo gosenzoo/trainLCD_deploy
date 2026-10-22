@@ -485,7 +485,8 @@ class ProgressController {
                 eng:  operation.destinationEng  || "",
                 numIcon: this._buildNumIconFromOperation(operation)
             },
-            carNumber: Number(operation.carNumber) || 1,
+            // ヘッダーの号車は号車リストの「*」の付いた号車の番号（無ければ carNumber。7.75節）
+            carNumber: Number(this._starCarNumber(operation)) || 1,
             direction: direction,
             headerNumberingType: displayStation.headerNumberingType || "0"
         };
@@ -1044,6 +1045,25 @@ class ProgressController {
     }
 
     /**
+     * 号車リストの「*」の付いた号車の番号を返す（7.75節）。「*」が無い古いデータは carNumber を返す
+     */
+    _starCarNumber(operation) {
+        const star = String(operation.carNumberList ?? "").split(",").find(label => label.includes("*"));
+        return star !== undefined ? star.replace(/\*/g, "").trim() : operation.carNumber;
+    }
+
+    /**
+     * 表示する駅に到着する区間の路線の色を返す（始発駅では出発する区間の路線。7.75節）。
+     * 駅の lineId は「この駅以降の区間の路線」なので、到着する区間は1つ前の駅の lineId
+     */
+    _arrivingLineColor(displayStation) {
+        const ind = this.stationList.indexOf(displayStation);
+        const station = ind > 0 ? this.stationList[ind - 1] : displayStation;
+        const line = this.lineDict ? this.lineDict[station?.lineId] : undefined;
+        return (line && line.color) || "";
+    }
+
+    /**
      * ホーム案内の自列車・向かいの列車の値を計算する（7.74節）。
      * 昔の jsMojules/body/PlatformControler.js の extractDrawParams と同じ計算。
      * @returns {{ isFar, isDrawOther, train, otherTrain, otherLine }}
@@ -1115,7 +1135,8 @@ class ProgressController {
                 baseX,
                 baseMode: leftOrRight,
                 drawLine: !!operation.isDrawLine,
-                lineColor: operation.carLineColor || "",
+                // 列車のライン色はその駅での路線の色（7.75節）
+                lineColor: this._arrivingLineColor(displayStation),
             },
             otherTrain: {
                 cars: otherCarNum,

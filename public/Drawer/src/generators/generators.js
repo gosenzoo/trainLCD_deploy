@@ -319,3 +319,7 @@ const GENERATORS = {
         return group;
     },
 };
+
+// エディタの列車の編集画面（7.75節）からも同じ生成関数を使えるよう、window に出す
+// （const の GENERATORS は別のスクリプトからは参照できても window のプロパティにならないため）
+if (typeof window !== 'undefined') window.lcdGenerators = GENERATORS;

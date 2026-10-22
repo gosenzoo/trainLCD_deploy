@@ -1434,3 +1434,27 @@ button.segmented-switch-item.segmented-switch-item--active {
   background: var(--accent);
   color: #fff;
 }
+
+/* 列車の編集画面（7.75節）。静止画は横幅いっぱいに縮小して表示する */
+.train-car-editor-view {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 4px);
+  background: #ffffff;
+  /* 操作バーのドラッグでページがスクロールしないようにする */
+  touch-action: none;
+  user-select: none;
+}
+.train-car-editor-car {
+  cursor: pointer;
+}
+.train-car-editor-handle {
+  fill: var(--accent);
+  fill-opacity: 0.85;
+  stroke: #ffffff;
+  stroke-width: 4;
+  cursor: ew-resize;
+}

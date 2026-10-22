@@ -1,24 +1,24 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 import "../type"
 import { numberIndexes } from "../modules/presetIndex"
 import ToggleSwitch from './ToggleSwitch'
+import TrainCarEditor, { TrainCarPatch } from './TrainCarEditor'
 
 type operationFieldsType = {
     operation: operationType,
     // 項目の値を変えたとき（文字列の入力欄・セレクト、トグルスイッチの boolean）
     onValue: (field: operationMembers, value: string | boolean) => void,
-    // 全体号車の「反転」「入力」ボタンで号車リストを作ったとき
-    onCarNumberListChange: (value: string) => void,
+    // 列車の編集画面（7.75節）で号車リスト・オフセットをまとめて変えたとき
+    onValues: (patch: TrainCarPatch) => void,
+    // 列車の編集画面のプレビュー用の路線色（無ければ灰色）
+    previewLineColor?: string,
 }
 
 // 運用の設定項目（表示・行先・種別・列車・表示タイプ）。
 // 運用設定（OperationForm）と、区間の運用設定から開く運用追加ポップアップ（OperationAddPopup）で共通に使う（7.61節）
-const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, onCarNumberListChange }) => {
-    // 全体号車連番入力の入力欄
-    const [sequenceText, setSequenceText] = useState<string>('')
-
+const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, onValues, previewLineColor }) => {
     return (
         <>
             <fieldset>
@@ -84,6 +84,15 @@ const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, on
                 <label>経由等</label>
                 <input type="text" onChange={(e) => onValue('direction', e.target.value)} value={operation.direction} />
             </div>
+            {/* 列車路線記号は「行先」欄の最下部に置く（7.75節） */}
+            <div className="form-row">
+                <label>列車路線記号</label>
+                <input type="text" onChange={(e) => onValue('lineLogo', e.target.value)} value={operation.lineLogo} />
+            </div>
+            <div className="form-row">
+                <label>列車路線記号（色）</label>
+                <input type="color" onChange={(e) => onValue('lineColor', e.target.value)} value={operation.lineColor} />
+            </div>
             </fieldset>
             <fieldset>
             <legend>種別</legend>
@@ -121,53 +130,19 @@ const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, on
                 <input type="color" onChange={(e) => onValue('trainTypeBackColor', e.target.value)} value={operation.trainTypeBackColor || '#000000'} />
             </div>
             </fieldset>
-            {/* 列車路線記号～列車ラインの描画を「列車」欄にまとめる（7.52節） */}
+            {/* 列車欄（7.52節）。号車・全体号車・オフセットは列車の編集画面で設定する（7.75節）。
+                号車（ヘッダー）は号車リストの「*」の値、列車のライン色はその駅での路線の色を使うため入力欄は無い */}
             <fieldset>
             <legend>列車</legend>
-            <div className="form-row">
-                <label>列車路線記号</label>
-                <input type="text" onChange={(e) => onValue('lineLogo', e.target.value)} value={operation.lineLogo} />
-            </div>
-            <div className="form-row">
-                <label>列車路線記号（色）</label>
-                <input type="color" onChange={(e) => onValue('lineColor', e.target.value)} value={operation.lineColor} />
-            </div>
-            <div className="form-row">
-                <label>号車</label>
-                <input type="text" onChange={(e) => onValue('carNumber', e.target.value)} value={operation.carNumber} />
-            </div>
-            <div className="form-row">
-                <label>全体号車</label>
-                <input type="text" onChange={(e) => onValue('carNumberList', e.target.value)} value={operation.carNumberList} />
-                <button onClick={() => onCarNumberListChange(operation.carNumberList.split(",").reverse().join(","))}>反転</button>
-            </div>
-            <div className="form-row">
-                <label>全体号車連番入力</label>
-                <input type="text" value={sequenceText} onChange={(e) => setSequenceText(e.target.value)} />
-                <button onClick={() => {
-                    // 1〜入力した数までの号車リストを作る（現在の号車には * を付ける）
-                    const maxNum = parseInt(sequenceText)
-                    let str = ""
-                    for (let i = 1; i <= maxNum; i++) {
-                        str += i.toString()
-                        if (i.toString() === operation.carNumber) str += "*"
-                        if (i !== maxNum) str += ","
-                    }
-                    onCarNumberListChange(str)
-                }}>入力</button>
-            </div>
-            <div className="form-row">
-                <label>前方オフセット</label>
-                <input type="number" onChange={(e) => onValue('headOffset', e.target.value)} value={operation.headOffset} />
-            </div>
-            <div className="form-row">
-                <label>後方オフセット</label>
-                <input type="number" onChange={(e) => onValue('backOffset', e.target.value)} value={operation.backOffset} />
-            </div>
-            <div className="form-row">
-                <label>列車ライン色</label>
-                <input type="color" onChange={(e) => onValue('carLineColor', e.target.value)} value={operation.carLineColor} />
-            </div>
+            <TrainCarEditor
+                carNumberList={operation.carNumberList}
+                headOffset={operation.headOffset}
+                backOffset={operation.backOffset}
+                leftOrRight={operation.leftOrRight}
+                isDrawLine={operation.isDrawLine}
+                lineColor={previewLineColor || '#888888'}
+                onChange={onValues}
+            />
             <div className="form-row">
                 <label>列車にラインを描画するか</label>
                 <ToggleSwitch checked={operation.isDrawLine} onChange={(v) => onValue('isDrawLine', v)} />
