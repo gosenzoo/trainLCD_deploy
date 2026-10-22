@@ -199,7 +199,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             lineNumberType: "0", transfers: [],
             isPass: false, sectionTime: "60", stopTime: "20", lineId: _lineId, operationId: _operationId, coordinate: [null, null],
             transferText: "", transferTextEng: "", doorSide: 'left',
-            headerNumberingType: "0", transferListPlatform: "", otherLineInd: "", slotNum: "0", leftSlotInd: "0",
+            headerNumberingType: "0", transferListPlatform: "", otherLineInd: "",
             otherCarNum: "0", otherLeftSlotInd: "0", transferListTransfers: ""
         })
         setSetting(_setting)

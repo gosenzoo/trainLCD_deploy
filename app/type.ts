@@ -155,8 +155,6 @@ type stationType = {
     headerNumberingType: string,
     transferListPlatform: string,
     otherLineInd: string,
-    slotNum: string,
-    leftSlotInd: string,
     otherCarNum: string,
     otherLeftSlotInd: string,
     transferListTransfers: string
@@ -179,7 +177,7 @@ type iconParamsType = {
     symbol: string
 }
 
-type stationMembers = 'name' | 'kana' | 'eng' | 'zh' | 'ko' | 'subName' | 'transfers' | 'sectionTime' | 'stopTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' | 'slotNum' | 'leftSlotInd' |
+type stationMembers = 'name' | 'kana' | 'eng' | 'zh' | 'ko' | 'subName' | 'transfers' | 'sectionTime' | 'stopTime' | 'lineId' | 'operationId' | 'transferText' | 'transferTextEng' | 'doorSide' | 'headerNumberingType' | 'lineNumberType' | 'transferListPlatform' | 'otherLineInd' |
     'otherCarNum' | 'otherLeftSlotInd' | 'transferListTransfers'
 
 type lineMembers = 'lineIconKey' | 'name' | 'kana' | 'eng' | 'color' | 'symbol' | 'numIconPresetKey'

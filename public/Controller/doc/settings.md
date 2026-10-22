@@ -137,11 +137,9 @@
 | 変数名 | 型 | 用途 |
 |---|---|---|
 | `transferCountLineP` | `string` | 乗換路線数（ホーム表示用）（現在Controller未使用） |
-| `otherLineInd` | `string` | 他路線のインデックス（ホーム表示用）（現在Controller未使用） |
-| `slotNum` | `string` | ドア位置スロット数（現在Controller未使用） |
-| `leftSlotInd` | `string` | 左端スロットインデックス（現在Controller未使用） |
-| `otherCarNum` | `string` | 他路線の編成両数（現在Controller未使用） |
-| `otherLeftSlotInd` | `string` | 他路線の左端スロットインデックス（現在Controller未使用） |
+| `otherLineInd` | `string` | ホーム案内の向かい側の列車の路線（空＝なし、`t`＋番号＝乗換案内の路線、それ以外＝lineDict のキー） |
+| `otherCarNum` | `string` | ホーム案内の向かい側の列車の両数（0 は自列車と同じ） |
+| `otherLeftSlotInd` | `string` | ホーム案内の向かい側の列車の左端スロット（自列車の1両ぶんが1スロット、自列車の左端が 0） |
 
 ---
 

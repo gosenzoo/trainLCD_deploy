@@ -11,6 +11,7 @@ import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
 import ToggleSwitch from './ToggleSwitch'
+import PlatformEditor, { PlatformPatch } from './PlatformEditor'
 import { IconArrowUp, IconArrowDown, IconTrash, IconPlus, IconTriangleRight, IconTriangleLeft } from './SvgIcons'
 
 type stationParamsSetterProps = {
@@ -113,6 +114,17 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 s[target].symbol    = s[target].manualSymbol
                 s[target].presetKey = s[target].manualPresetKey
             }
+        })
+        setSetting(_setting)
+    }
+
+    // ホームの編集画面（7.76節）で向かい側の列車の値を変える。選択中のすべての駅に反映する
+    const platformUpdated = (patch: PlatformPatch) => {
+        if (!setting) return
+        const _setting: settingType = structuredClone(setting)
+        selectedIndexes.forEach(ind => {
+            const s = _setting.stationList[ind - 1]
+            if (s) Object.assign(s, patch)
         })
         setSetting(_setting)
     }
@@ -973,6 +985,10 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
 
             {/* ===== ホーム案内タブ (platform) ===== */}
             {activeSection === 'platform' && (<>
+                {/* ホームの編集画面: 静止画の上で向かい側の列車の路線・両数・位置を設定する（7.76節） */}
+                {targetStation && (
+                    <PlatformEditor setting={setting} stationIndex={selectedIndexes[selectedIndexes.length - 1] - 1} onChange={platformUpdated} />
+                )}
                 <label>乗換一覧行分割指定</label>
                 <textarea
                     rows={4}
@@ -993,45 +1009,6 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     })
                     setSetting(_setting)
                 }}>基本設定情報を反映</button>
-                <br></br>
-                <label>スロット分割数</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'slotNum')}
-                    value={targetStation?.slotNum ?? ''}
-                ></input>
-                <br></br>
-                <label>列車左端スロット</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'leftSlotInd')}
-                    value={targetStation?.leftSlotInd ?? ''}
-                ></input>
-                <br></br>
-                <label>ホーム向側列車の路線ID</label>
-                <input id="otherTrainIDInput" type="text" onChange={(e) => formUpdated(e, 'otherLineInd')}
-                    value={targetStation?.otherLineInd ?? ''}
-                ></input>
-                <select onChange={e => {
-                    if (!e.target.value) return;
-                    let otherTrainIDInput = document.getElementById("otherTrainIDInput") as HTMLTextAreaElement;
-                    if(!otherTrainIDInput){ return; }
-                    otherTrainIDInput.value = e.target.value;
-                    targetStation.otherLineInd = otherTrainIDInput.value;
-                    // 選択をリセット（連続で同じ項目を挿入できるように）
-                    e.target.value = '接続路線を追加';
-                }}>
-                    <option>接続路線を追加</option>
-                    {Object.keys(setting.lineDict).map((key, index) => (
-                        <option key={index} value={key}>{setting.lineDict[key].name}</option>
-                    ))}
-                </select>
-                <br></br>
-                <label>向側列車両数</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'otherCarNum')}
-                    value={targetStation?.otherCarNum ?? ''}
-                ></input>
-                <br></br>
-                <label>向側列車左端スロット</label>
-                <input type="text" onChange={(e) => formUpdated(e, 'otherLeftSlotInd')}
-                    value={targetStation?.otherLeftSlotInd ?? ''}
-                ></input>
                 <br></br>
             </>)}
 

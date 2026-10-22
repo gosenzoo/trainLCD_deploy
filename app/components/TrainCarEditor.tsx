@@ -46,8 +46,8 @@ const MAX_CARS = 30
 // 全体の平行移動で、列車の中心が画面の中心からこの距離以内ならちょうど中心に置く
 const CENTER_SNAP_DISTANCE = 30
 
-// 号車リスト（"1,2*,3"）を号車番号の配列と「*」の位置に分ける
-const parseCarList = (list: string): { labels: string[], starIndex: number } => {
+// 号車リスト（"1,2*,3"）を号車番号の配列と「*」の位置に分ける（ホームの編集画面でも使う）
+export const parseCarList = (list: string): { labels: string[], starIndex: number } => {
     const raw = list.split(',')
     const starIndex = raw.findIndex(label => label.includes('*'))
     return { labels: raw.map(label => label.replace(/\*/g, '')), starIndex }

@@ -1464,3 +1464,8 @@ button.segmented-switch-item.segmented-switch-item--active {
     fill: var(--accent);
     pointer-events: none;
 }
+
+/* ホームの編集画面の向かい側の列車（ドラッグで動かす。7.76節） */
+.platform-editor-other {
+    cursor: grab;
+}

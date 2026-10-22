@@ -1037,8 +1037,6 @@ class ProgressController {
             ...this._buildPlatformTrains(displayStation, this._resolveOperation()),
             // 駅の値をそのまま入れる
             otherLineInd:     displayStation.otherLineInd     ?? "",
-            slotNum:          displayStation.slotNum          ?? "0",
-            leftSlotInd:      displayStation.leftSlotInd      ?? "0",
             otherCarNum:      displayStation.otherCarNum      ?? "0",
             otherLeftSlotInd: displayStation.otherLeftSlotInd ?? "0"
         };
@@ -1065,14 +1063,14 @@ class ProgressController {
 
     /**
      * ホーム案内の自列車・向かいの列車の値を計算する（7.74節）。
-     * 昔の jsMojules/body/PlatformControler.js の extractDrawParams と同じ計算。
+     * 昔の jsMojules/body/PlatformControler.js の extractDrawParams をもとにした計算。
+     * スロットは自列車の1両ぶん、自列車の左端（前方オフセット）がスロット 0（7.76節）。
+     * エディタの app/modules/platformLayout.ts と同じ計算にすること。
      * @returns {{ isFar, isDrawOther, train, otherTrain, otherLine }}
      */
     _buildPlatformTrains(displayStation, operation) {
         // 値が空・数値でないときは 0 とする
         const toInt = (v) => { const n = parseInt(v); return isNaN(n) ? 0 : n; };
-        let slotNum          = toInt(displayStation.slotNum);          // スロット数
-        const leftSlotInd    = toInt(displayStation.leftSlotInd);      // 自列車の左端スロット
         let otherCarNum      = toInt(displayStation.otherCarNum);      // 向かいの列車の両数
         const otherLeftSlotInd = toInt(displayStation.otherLeftSlotInd); // 向かいの列車の左端スロット
 
@@ -1090,20 +1088,20 @@ class ProgressController {
         if (highlightCarId !== -1) carLabels[highlightCarId] = carLabels[highlightCarId].replace("*", "");
 
         // 初期値（0以下）のときは自列車の両数にする
-        if (slotNum <= 0) slotNum = cars;
         if (otherCarNum <= 0) otherCarNum = cars;
 
-        const slotLength = (wholeLength - (slotNum - 1) * gap) / slotNum; // 1スロットの長さ
+        // スロットは自列車の1両ぶん（スロット分割数＝自列車の両数。7.76節）
+        const slotLength = (wholeLength - (cars - 1) * gap) / cars; // 1スロットの長さ
         const labelWidth = slotLength - 10;
-        const baseX0 = headOffset; // セクションの左端
+        const baseX0 = headOffset; // セクションの左端（自列車の左端＝スロット 0）
         // 左端スロットの番号から左端の座標を求める（負の番号は左へずらす）
-        const slotLeft = (slotInd) => slotInd !== 0
-            ? baseX0 + (Math.abs(slotInd) * slotLength + (Math.abs(slotInd) - 1) * gap) * Math.sign(slotInd)
-            : baseX0;
+        const slotLeft = (slotInd) => baseX0 + slotInd * (slotLength + gap);
+        // n 両の列車の全長（車両の間隔は n - 1 個）
+        const trainLength = (n) => slotLength * n + gap * (n - 1);
 
         // 自列車: 先頭の座標は、右向きなら右端、左向きなら左端
-        const myLeft = slotLeft(leftSlotInd);
-        const myWholeLength = slotLength * cars + gap * (slotNum - 1);
+        const myLeft = slotLeft(0);
+        const myWholeLength = trainLength(cars);
         const baseX = leftOrRight === "right" ? myLeft + myWholeLength : myLeft;
 
         // 自列車が奥か（向きとドアの側が同じなら奥）。向かいの列車は消失点を基準に縮小する
@@ -1116,11 +1114,11 @@ class ProgressController {
 
         // 向かいの列車
         const otherLeft = slotLeft(otherLeftSlotInd);
-        const otherWholeLength = slotLength * otherCarNum + gap * (slotNum - 1);
+        const otherWholeLength = trainLength(otherCarNum);
         const otherBaseX = leftOrRight === "right" ? otherLeft + otherWholeLength : otherLeft;
 
-        // 向かいの列車の路線（路線一覧にあるときだけ描く）
-        const otherLineData = this.lineDict ? this.lineDict[displayStation.otherLineInd] : undefined;
+        // 向かいの列車の路線（見つかったときだけ描く）。「t」＋番号は駅の乗換案内の路線、それ以外は路線一覧のキー（7.76節）
+        const otherLineData = this._resolveOtherLine(displayStation);
 
         return {
             isFar,
@@ -1147,11 +1145,29 @@ class ProgressController {
                 baseMode: leftOrRight,
             },
             otherLine: {
-                lineIcon: otherLineData && otherLineData.lineIconKey ? `:${otherLineData.lineIconKey}:` : "",
-                name: otherLineData ? (otherLineData.name || "") : "",
-                eng:  otherLineData ? (otherLineData.eng  || "") : "",
+                lineIcon: otherLineData ? otherLineData.lineIcon : "",
+                name: otherLineData ? otherLineData.name : "",
+                eng:  otherLineData ? otherLineData.eng  : "",
             },
         };
+    }
+
+    /**
+     * 駅の対面列車（otherLineInd）の路線を { lineIcon, name, eng } で返す。見つからなければ null（7.76節）。
+     * 「t」＋番号（例: t2）はその駅の乗換案内（transfers）の路線、それ以外は路線一覧（lineDict）のキー
+     */
+    _resolveOtherLine(displayStation) {
+        const value = String(displayStation.otherLineInd ?? "");
+        if (!value) return null;
+        const m = /^t(\d+)$/.exec(value);
+        if (m) {
+            const transfers = Array.isArray(displayStation.transfers) ? displayStation.transfers : [];
+            const item = this._transferItemToDrawItem(transfers[parseInt(m[1])]);
+            return item ? { lineIcon: item.lineIcon, name: item.name, eng: item.eng } : null;
+        }
+        const line = this.lineDict ? this.lineDict[value] : undefined;
+        if (!line) return null;
+        return { lineIcon: line.lineIconKey ? `:${line.lineIconKey}:` : "", name: line.name || "", eng: line.eng || "" };
     }
 
     // ============================================================

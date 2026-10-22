@@ -141,8 +141,6 @@ const toStationType = (station: PresetStation, lineColor: string, numberStr: str
     headerNumberingType: "0",
     transferListPlatform: "",
     otherLineInd: "",
-    slotNum: "0",
-    leftSlotInd: "0",
     otherCarNum: "0",
     otherLeftSlotInd: "0",
     transferListTransfers: "",
