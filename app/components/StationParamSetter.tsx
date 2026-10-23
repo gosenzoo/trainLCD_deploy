@@ -324,7 +324,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     value={numIcon?.manualSymbol ?? ''}
                 ></input>
                 <br></br>
-                <label>ナンバリング</label>
+                <label>駅番号</label>
                 <input type="text" id={target === 'numIcon' ? 'numberInput' : undefined}
                     onChange={(e) => numIconUpdated(e.target.value, 'number', target)}
                     value={numIcon?.number ?? ''}
@@ -340,7 +340,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     value={numIcon?.manualColor || '#000000'}
                 ></input>
                 <br></br>
-                <label>ナンバリング記号</label>
+                <label>駅アイコンの種類</label>
                 {/* 自動モード時は disabled。値は常に manualPresetKey を表示する */}
                 <select
                     disabled={isAuto}
@@ -357,7 +357,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
         if (bare) return fields
         return (
             <fieldset style={{marginBottom: '6px'}}>
-                <legend>路線記号</legend>
+                <legend>駅アイコン</legend>
                 {fields}
             </fieldset>
         )
@@ -425,7 +425,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
     // 乗換路線表示カラム定義（路線記号列でクリック選択可能、ナンバリング・駅名・駅名英語を追加）
     const transferDisplayColumns: ColumnDef<transferItemType>[] = [
         {
-            header: '路線記号',
+            header: '路線アイコン',
             isSelector: true,  // クリックで行選択
             // 4つ以上ある場合は先頭3つを表示し、残り数を "+N" で示す
             cell: (item) => {
@@ -454,7 +454,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
             cell: (item) => item.line?.name ?? '',
         },
         {
-            header: 'ナンバリング',
+            header: '駅アイコン',
             // station の type/symbol/color/number から NumIcon を生成して表示する。type 未設定時はテキストで表示
             cell: (item) => {
                 const { type, symbol, color, number } = item.station
@@ -567,21 +567,21 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         title={isNumIconNextOpen ? '折りたたむ' : '展開する'}
                     >
                         {/* 三角形は文字ではなくSVGアイコン（7.70節） */}
-                        路線記号２ {isNumIconNextOpen ? '×' : <IconTriangleRight/>}
+                        駅アイコン２ {isNumIconNextOpen ? '×' : <IconTriangleRight/>}
                     </legend>
                     {isNumIconNextOpen && renderNumIconFields('numIconNext', true)}
                 </fieldset>
                 {/* 次区間路線・次区間運用は駅一覧の路線列・運用列から設定する（7.58節） */}
-                <label>上部ナンバリング表示形式</label>
+                <label>上部の駅アイコンの形式</label>
                 <select onChange={(e) => {formUpdated(e, 'headerNumberingType')}} value={targetStation?.headerNumberingType ?? '0'}>
                     <option value="0">通常</option>
                     <option value="1">地下鉄</option>
                 </select>
                 <br></br>
-                <label>下部ナンバリング表示形式</label>
+                <label>下部の駅番号の表示形式</label>
                 <select onChange={(e) => {formUpdated(e, 'lineNumberType')}} value={targetStation?.lineNumberType ?? '0'}>
                     <option value="0">テキスト</option>
-                    <option value="1">アイコン</option>
+                    <option value="1">駅アイコン</option>
                 </select>
                 <br></br>
                 {/* ── 乗換路線グループ ── */}
@@ -628,7 +628,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         <fieldset className={isFormEnabled ? '' : 'disp-config-disabled'} style={{marginBottom: '6px'}}>
                             <legend>乗換路線設定</legend>
                             <div className="form-row" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-                                <label>路線記号</label>
+                                <label>路線アイコン</label>
                                 {/* 登録アイコンを横並びで表示するリスト（1行複数列、ヘッダーなし、セル選択可能） */}
                                 {(() => {
                                     const keys = selectedItem?.line?.lineIconKey ?? []
@@ -722,7 +722,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                             <GenericItemList
                                                 columns={[
                                                     {
-                                                        header: '路線記号',
+                                                        header: '路線アイコン',
                                                         isSelector: true,
                                                         cell: (line) => {
                                                             // 先頭キーのみ表示する
@@ -764,7 +764,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                         <fieldset className={isFormEnabled ? '' : 'disp-config-disabled'} style={{marginBottom: '6px'}}>
                             <legend>乗換駅設定</legend>
                             <div className="form-row">
-                                <label>ナンバリング記号</label>
+                                <label>駅アイコンの種類</label>
                                 {/* 駅基本設定の「ナンバリング記号」と同じ選択肢。値は station.type に保存 */}
                                 <select
                                     value={selectedItem?.station.type ?? ''}
@@ -792,7 +792,7 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                                 />
                             </div>
                             <div className="form-row">
-                                <label>ナンバリング</label>
+                                <label>駅番号</label>
                                 <input type="text"
                                     value={selectedItem?.station.number ?? ''}
                                     onChange={e => updateTransferStation('number', e.target.value)}
@@ -904,9 +904,9 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     insertAtCaret(textArea, `:${e.target.value}:`);
                     targetStation.transferText = textArea.value;
                     // 選択をリセット（連続で同じ項目を挿入できるように）
-                    e.target.value = '路線記号を追加';
+                    e.target.value = '路線アイコンを追加';
                 }}>
-                    <option>路線記号を追加</option>
+                    <option>路線アイコンを追加</option>
                     {Object.keys(setting.iconDict).map((key, index) => (
                         <option key={index} value={key}>{key}</option>
                     ))}
@@ -923,9 +923,9 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                     insertAtCaret(textAreaEng, `:${e.target.value}:`);
                     targetStation.transferTextEng = textAreaEng.value;
                     // 選択をリセット（連続で同じ項目を挿入できるように）
-                    e.target.value = '路線記号を追加';
+                    e.target.value = '路線アイコンを追加';
                 }}>
-                    <option>路線記号を追加</option>
+                    <option>路線アイコンを追加</option>
                     {Object.keys(setting.iconDict).map((key, index) => (
                         <option key={index} value={key}>{key}</option>
                     ))}

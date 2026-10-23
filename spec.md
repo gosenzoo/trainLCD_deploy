@@ -10,6 +10,17 @@
 | 言語 | TypeScript / React 18 |
 | 動作環境 | モダンブラウザ（SSR なし、クライアントサイド動作） |
 
+### 1.1 用語
+
+| 用語 | 指すもの | 例 |
+|---|---|---|
+| 路線記号 | 駅ごとのアルファベット | `JA`・`A`・`TY` |
+| 駅番号 | 駅ごとの数字 | `JK01` の `01` |
+| 路線アイコン | 路線ごとのアイコン。一般的に路線記号を含む | 路線一覧の各路線のアイコン（`lineIconKey`） |
+| 駅アイコン | 駅ごとのアイコン。一般的に路線記号と駅番号を含む | 駅の `numIcon`・`numIconNext` から作るアイコン |
+
+- アイコンの形の選択（`N_*` のプリセット）は「駅アイコンの種類」と呼ぶ（7.77節）
+
 ---
 
 ## 2. システム全体構成
@@ -212,9 +223,9 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `destination` / `destinationKana` / `destinationEng` | string | 行先（日本語・かな・英語） |
-| `destinationNum` | string | 行先ナンバリング記号（例: `JT-01`） |
+| `destinationNum` | string | 行先の駅番号（路線記号と駅番号。例: `JT-01`） |
 | `destinationColor` | string | 行先表示の文字色（HEX） |
-| `destinationNumIconKey` | string | 行先ナンバリングのアイコンキー。初期値 `N_JR_east`（7.49節） |
+| `destinationNumIconKey` | string | 行先の駅アイコンの種類（プリセットキー）。初期値 `N_JR_east`（7.49節） |
 | `isAutoDestination` | boolean | 行先を自動で設定する（7.49節）。`true` なら行先関連の6項目を使わず、末尾停車駅の値で表示する（`direction` は対象外）。初期値 `true` |
 | `direction` | string | 経由・方面表示 |
 | `trainType` / `trainTypeEng` | string | 列車種別（例: 急行 / Express） |
@@ -237,9 +248,9 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `name` / `kana` / `eng` | string | 駅名（日本語・かな・英語） |
-| `numIcon` | `stationNumIconType` | ナンバリングアイコン情報（下表）。路線をまたぐ駅では**ひとつ前の区間（今までの路線）**のナンバリングを保持する |
-| `numIconNext` | `stationNumIconType` | 2つ目のナンバリングアイコン情報（`numIcon` と同じ型）。路線をまたぐ駅で**次の区間（次の路線）**のナンバリングを保持する。使わない駅では `number` を空にしておく |
-| `lineNumberType` | string | ナンバリング表示形式（`"0"`: テキスト, `"1"`: アイコン） |
+| `numIcon` | `stationNumIconType` | 駅アイコン情報（下表）。路線をまたぐ駅では**ひとつ前の区間（今までの路線）**の駅アイコンを保持する |
+| `numIconNext` | `stationNumIconType` | 2つ目の駅アイコン情報（`numIcon` と同じ型）。路線をまたぐ駅で**次の区間（次の路線）**の駅アイコンを保持する。使わない駅では `number` を空にしておく |
+| `lineNumberType` | string | 下部の駅番号の表示形式（`"0"`: テキスト, `"1"`: 駅アイコン） |
 
 **`stationNumIconType`**（`stationType.numIcon` / `stationType.numIconNext` の型）
 
@@ -247,10 +258,10 @@ classDiagram
 |---|---|---|
 | `symbol` | string | 有効路線記号（例: `TY`）。`colorMode` が `'auto'` のとき `lineDict[lineId].symbol` が自動書き込みされる |
 | `number` | string | 駅番号部分（例: `01`）。旧形式 `TY 01` はマイグレーションで分割 |
-| `presetKey` | string | 有効ナンバリングプリセットキー。`colorMode` が `'auto'` のとき `lineDict[lineId].numIconPresetKey` が自動書き込みされる |
+| `presetKey` | string | 有効な駅アイコンの種類（プリセットキー）。`colorMode` が `'auto'` のとき `lineDict[lineId].numIconPresetKey` が自動書き込みされる |
 | `color` | string | 有効色（HEX）。`colorMode` が `'auto'` のとき `lineDict[lineId].color` が自動書き込みされる。drawParams・ProgressController はこのフィールドのみ参照する |
 | `manualSymbol` | string | 手動設定路線記号。`colorMode` に関わらず保持され、路線記号入力欄には常にこの値を表示する |
-| `manualPresetKey` | string | 手動設定プリセットキー。`colorMode` に関わらず保持され、ナンバリング記号セレクトには常にこの値を表示する |
+| `manualPresetKey` | string | 手動設定プリセットキー。`colorMode` に関わらず保持され、「駅アイコンの種類」セレクトには常にこの値を表示する |
 | `manualColor` | string | 手動設定色（HEX）。`colorMode` に関わらず保持され、カラーピッカーには常にこの値を表示する |
 | `colorMode` | `'auto'\|'manual'` | `symbol`・`presetKey`・`color` の一括取得モード。`'auto'`: colorMode 切替・lineId 変更時に3フィールドを路線設定値で自動更新 / `'manual'`: 各有効フィールド = 対応する manual* フィールド。デフォルト `'auto'`。未設定時は `'auto'` として扱う |
 | `transfers` | `transferItemType[]` | 乗換路線のリスト。各エントリに路線IDと乗換駅情報を持つ |
@@ -291,10 +302,10 @@ classDiagram
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `isDraw` | boolean | 駅描画フラグ（true のとき乗換一覧に駅名等を描画） |
-| `type` | string | ナンバリングアイコンのプリセットキー |
+| `type` | string | 駅アイコンの種類（プリセットキー） |
 | `symbol` | string | 路線記号文字（例: `TY`） |
 | `color` | string | 路線カラー（HEX） |
-| `number` | string | 乗換駅のナンバリング（例: `TY-01`） |
+| `number` | string | 乗換駅の駅番号（例: `01`） |
 | `name` | string | 乗換駅名（日本語） |
 | `eng` | string | 乗換駅名（英語） |
 
@@ -305,7 +316,7 @@ classDiagram
 | `name` / `kana` / `eng` | string | 路線名（日本語・かな・英語） |
 | `color` | string | 路線カラー（HEX） |
 | `symbol` | string | 路線記号テキスト（例: `TY`） |
-| `numIconPresetKey` | string | ナンバリングアイコンのプリセットキー（例: `N_tokyu`） |
+| `numIconPresetKey` | string | 駅アイコンの種類（プリセットキー。例: `N_tokyu`） |
 
 #### `iconParamsType` — アイコンパラメータ（プリセット型）
 | フィールド | 型 | 説明 |
@@ -693,15 +704,15 @@ type GenericItemListProps<T> = {
 - `ColumnDef.cell` 関数によるカスタムセル描画（アイコン表示、カラーセルなど）
 - 追加フォーム・詳細設定パネルの表示
 
-### 4.6 `LineIconPickerPopup` — 路線記号アイコン選択ポップアップ群
+### 4.6 `LineIconPickerPopup` — 路線アイコン選択ポップアップ群
 
-`LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームの「路線記号」欄から呼び出す、2 つの独立したポップアップコンポーネント。
+`LineList` の路線編集フォームおよび `StationParamSetter` の接続路線追加ポップアップ内フォームの「路線アイコン」欄から呼び出す、2 つの独立したポップアップコンポーネント。
 
-#### 路線記号欄の表示仕様
+#### 路線アイコン欄の表示仕様
 
-`LineList` の路線編集フォームおよび接続路線追加ポップアップ「新規追加」タブの「路線記号」欄は、テキスト入力ではなくアイコンプレビューで表示する。
+`LineList` の路線編集フォームおよび接続路線追加ポップアップ「新規追加」タブの「路線アイコン」欄は、テキスト入力ではなくアイコンプレビューで表示する。
 
-- **レイアウト（横並び）**: `路線記号` ラベル → アイコン画像エリア → `新規追加` ボタン → `リストから選択` ボタン
+- **レイアウト（横並び）**: `路線アイコン` ラベル → アイコン画像エリア → `新規追加` ボタン → `リストから選択` ボタン
 - アイコン画像エリア: 現在 `lineIconKey` に設定されているアイコンを `iconDict` から引いて描画する
   - `string`（base64）の場合: `<img>` で表示（30×30px）
   - `iconParamsType` の場合: `createNumIconFromPreset` で SVG を描画（30×30px）
@@ -710,7 +721,7 @@ type GenericItemListProps<T> = {
 
 #### トリガー
 
-路線記号欄の横に置いた 2 つのボタンから開く:
+路線アイコン欄の横に置いた 2 つのボタンから開く:
 - **「新規追加」ボタン** → `IconNewPopup` を開く
 - **「リストから選択」ボタン** → `IconListPopup` を開く
 
@@ -820,13 +831,13 @@ type GenericItemListProps<T> = {
 
 | フィールド | 内容 |
 |-----------|------|
-| 路線記号（アイコン）| アイコンプレビュー＋「新規追加」ボタン＋「リストから選択」ボタン。`IconNewPopup` / `IconListPopup` を入れ子で使用 |
+| 路線アイコン | アイコンプレビュー＋「新規追加」ボタン＋「リストから選択」ボタン。`IconNewPopup` / `IconListPopup` を入れ子で使用 |
 | 路線名 | テキスト入力 |
 | 路線名かな | テキスト入力（変更時に英語を自動生成） |
 | 路線名英語 | テキスト入力 |
 | 路線記号（symbol） | テキスト入力 |
 | 路線カラー | カラーピッカー |
-| ナンバリング記号 | セレクトボックス（`numberIndexes` 準拠） |
+| 駅アイコンの種類 | セレクトボックス（`numberIndexes` 準拠） |
 
 フッターに **「追加」ボタン**（`btn-primary`）と **「閉じる」ボタン** を配置する。
 
@@ -868,7 +879,7 @@ type GenericItemListProps<T> = {
 「乗換路線」欄のテキストボックスを廃止し、`transfers`（`transferItemType[]`）に登録済みの路線を **`GenericItemList`** で表示・操作する。
 
 - `transfers` の各エントリを行として表示
-- **路線記号列** に `isSelector: true` を付与しクリックで行選択可能にする
+- **路線アイコン列** に `isSelector: true` を付与しクリックで行選択可能にする
 - 路線カラーはカラムのセル背景で表示
 - 選択状態は `transferSelectedIndex: number | null`（選択中のインデックス）で管理
 
@@ -876,9 +887,9 @@ type GenericItemListProps<T> = {
 
 | カラムヘッダー | 内容 | 備考 |
 |---|---|---|
-| 路線記号 | `item.line.lineIconKey` の **先頭キー** のみアイコン描画 | `isSelector: true` |
+| 路線アイコン | `item.line.lineIconKey` の **先頭キー** のみアイコン描画 | `isSelector: true` |
 | 路線名 | `item.line.name` | |
-| ナンバリング | `station.type/symbol/number/color` で `createNumIconFromPreset` 描画、フォールバックでテキスト | 24px |
+| 駅アイコン | `station.type/symbol/number/color` で `createNumIconFromPreset` 描画、フォールバックでテキスト | 24px |
 | 駅名 | `station.name` | |
 | 駅名英語 | `station.eng` | |
 | 駅描画 | `station.isDraw` チェックボックス | |
@@ -895,16 +906,16 @@ type GenericItemListProps<T> = {
 
 テーブル下に入力フォームを2グループ配置する。いずれも選択中エントリの編集用であり、未選択時はグレーアウト（disabled）する。
 
-**路線情報フォーム**（テーブルと「ナンバリング記号」の間）:
+**路線情報フォーム**（テーブルと「駅アイコンの種類」の間）:
 
 | ラベル | フィールド | 入力型 | 備考 |
 |--------|-----------|--------|------|
-| 路線記号 | `item.line.lineIconKey` | アイコンリスト + 操作ボタン | 下記「複数アイコン形式」参照 |
+| 路線アイコン | `item.line.lineIconKey` | アイコンリスト + 操作ボタン | 下記「複数アイコン形式」参照 |
 | 路線名 | `item.line.name` | テキスト | |
 | 路線名かな | `item.line.kana` | テキスト | |
 | 路線名英語 | `item.line.eng` | テキスト | |
 
-##### 路線記号フォームの複数アイコン形式
+##### 路線アイコンフォームの複数アイコン形式
 
 `lineIconKey: string[]` をそのまま配列として扱い、登録済みアイコンを **1 行横並びリスト** で表示する。
 
@@ -921,14 +932,14 @@ type GenericItemListProps<T> = {
 
 **drawParams 抽出時の変換（ProgressController.js）**: `lineIconKey` 配列の各要素を `:key:` で囲んで結合した文字列として `lineIcon` フィールドに格納する（例: `["M","Y"]` → `":M::Y:"`）。旧形式（文字列）は後方互換として `:key:` に変換する。
 
-**乗換駅情報フォーム**（「ナンバリング記号」以降）:
+**乗換駅情報フォーム**（「駅アイコンの種類」以降）:
 
 | ラベル | フィールド | 入力型 |
 |--------|-----------|--------|
-| ナンバリング記号 | `station.type` | `<select>`（駅基本設定上部と同じ） |
+| 駅アイコンの種類 | `station.type` | `<select>`（駅基本設定上部と同じ） |
 | 路線カラー | `station.color` | カラーピッカー |
 | 路線記号 | `station.symbol` | テキスト |
-| ナンバリング | `station.number` | テキスト |
+| 駅番号 | `station.number` | テキスト |
 | 駅名 | `station.name` | テキスト |
 | 駅名英語 | `station.eng` | テキスト |
 
@@ -954,7 +965,7 @@ type GenericItemListProps<T> = {
   - 入力フォーム（新規路線用）:
     | ラベル | フィールド |
     |--------|-----------|
-    | 路線記号 | `lineIconKey` |
+    | 路線アイコン | `lineIconKey` |
     | 路線名 | `name` |
     | 路線名かな | `kana` |
     | 路線名英語 | `eng` |
@@ -963,7 +974,7 @@ type GenericItemListProps<T> = {
     1. フォームの値で `line: { lineIconKey, name, kana, eng }` を生成し、`{ line, station: { isDraw: false, type: "", symbol: "", color: "", number: "", name: "", eng: "" } }` として、選択中の全駅の `transfers` 配列末尾に追加する
     2. ポップアップを閉じ、フォームをリセットする
 - **「リストから選択」タブ**:
-  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線記号・路線名・路線カラー）
+  - `GenericItemList` で路線一覧を表示（LineList と同じカラム定義：路線アイコン・路線名・路線カラー）
   - ボタン行: `複数選択`（`btn-toggle`）のみ
   - **「路線追加」ボタン（`btn-primary`）**:
     1. 選択中の路線キーを `lineDict` の並び順（上から）でソートして取得する
@@ -981,7 +992,7 @@ type GenericItemListProps<T> = {
 | `popupTab` | `'new' \| 'list'` | アクティブタブ（初期値 `'new'`） |
 | `transferPopupSelectedKey` | `string[]` | 「リストから選択」タブで選択中の路線キー |
 | `isPopupMultiSelect` | `boolean` | リストタブの複数選択モードフラグ |
-| `newLineIconKey` | `string` | 「新規追加」タブの路線記号入力値 |
+| `newLineIconKey` | `string` | 「新規追加」タブの路線アイコン入力値 |
 | `newLineName` | `string` | 「新規追加」タブの路線名入力値 |
 | `newLineKana` | `string` | 「新規追加」タブの路線名かな入力値 |
 | `newLineEng` | `string` | 「新規追加」タブの路線名英語入力値 |
@@ -1012,15 +1023,15 @@ type GenericItemListProps<T> = {
 
 | タブID | タブラベル | コンテンツ |
 |--------|-----------|-----------|
-| `basic` | 駅基本設定 | 駅名・かな・英語・路線記号・ナンバリング・路線カラー・ナンバリング記号・ナンバリング表示形式・乗換路線・開くドア・次区間所要時間（次区間路線・次区間運用は 7.58節で削除し、駅一覧の路線列・運用列から設定する） |
+| `basic` | 駅基本設定 | 駅名・かな・英語・路線記号・駅番号・路線カラー・駅アイコンの種類・下部の駅番号の表示形式・乗換路線・開くドア・次区間所要時間（次区間路線・次区間運用は 7.58節で削除し、駅一覧の路線列・運用列から設定する） |
 | `defaultLine` | 詳細路線図表示 | 乗換案内（日英テキスト）・登録路線情報を反映ボタン |
 | `transfersDisp` | 乗換一覧表示 | 乗換一覧の行分割指定テキストボックス・基本設定情報を反映ボタン |
 | `platform` | ホーム案内表示 | ホームの編集画面（静止画・対面列車・対面列車両数・向かい側の列車のドラッグ。7.76節）・乗換一覧行分割指定 |
 | `map` | 座標設定 | Google マップで駅の座標を設定する（7.51節） |
 
-#### ナンバリング連番入力
+#### 駅番号連番入力
 
-駅一覧ボタン行（「ナンバリング補完降順」の右隣）に「ナンバリング連番入力」ボタンを配置する（トグルではなく通常ボタン）。
+駅一覧ボタン行（「駅番号補完降順」の右隣）に「駅番号連番入力」ボタンを配置する（トグルではなく通常ボタン）。
 
 押下するとモーダルポップアップ（`.modal-backdrop` / `.modal-dialog`）を表示する。
 
@@ -1171,7 +1182,7 @@ export function moveDictItemsDown<T>(
 | 駅名多言語（グループ） | `ColumnGroup`。`collapsible: true`、`defaultCollapsed: true`（下記参照） | 子カラム: 駅名かな・駅名英語 |
 | ├ 駅名かな | `station.kana` | 個別の折りたたみはしない |
 | ├ 駅名英語 | `station.eng` | 個別の折りたたみはしない |
-| ナンバリング | `numIcon` のアイコン描画。`numIconNext` があれば右に並べて2つ表示（下記参照） | |
+| 駅アイコン | `numIcon` のアイコン描画。`numIconNext` があれば右に並べて2つ表示（下記参照） | |
 | 次駅までの<br/>所要時間 | `station.sectionTime` | ヘッダーは `<br/>` で2行に改行表示 |
 | 乗換 | `station.transfers` のアイコン描画 | |
 | ドア | `station.doorSide` | |
@@ -1179,30 +1190,30 @@ export function moveDictItemsDown<T>(
 | ├ 緯度 | `station.coordinate[0]` | 個別の折りたたみはしない |
 | ├ 経度 | `station.coordinate[1]` | 個別の折りたたみはしない |
 
-##### 2つ目のナンバリング（`numIconNext`）
+##### 2つ目の駅アイコン（`numIconNext`）
 
 路線をまたぐ駅は、ひとつ前の区間（今までの路線）と次の区間（次の路線）の2つの駅番号を持つ。これを表現するため、`stationType` に `numIcon` と同じ型の `numIconNext` を追加する。
 
-- **意味**: `numIcon` ＝ 今までの路線のナンバリング、`numIconNext` ＝ 次の路線のナンバリング
+- **意味**: `numIcon` ＝ 今までの路線の駅アイコン、`numIconNext` ＝ 次の路線の駅アイコン
 - **既定値**: 全フィールド空文字（`presetKey` / `manualPresetKey` のみ `"N_tokyu"`）、`colorMode` は `'manual'`。2つ目は使わない駅のほうが多い任意項目のため、既定では自動補完を行わない
 - **`colorMode: 'auto'` の挙動**: `numIcon` と同じく `lineDict[station.lineId]`（次区間路線）の `symbol`・`numIconPresetKey`・`color` を参照する。`numIcon` の自動補完が働く場面（次区間路線の変更、路線カラー設定の切替、`LineList` での路線情報変更）では `numIconNext` も同じ条件で追従する
-- **駅情報表（`StationList`）の「ナンバリング」列**: `numIcon` のアイコンを描画し、その**右に並べて** `numIconNext` のアイコンを描画する。`numIconNext.number` が空の駅は2つ目を描画しない（`presetKey` だけが入っている駅で空のアイコンが並ぶのを防ぐため）（7.57節で表示規則を変更）
+- **駅情報表（`StationList`）の「駅アイコン」列**: `numIcon` のアイコンを描画し、その**右に並べて** `numIconNext` のアイコンを描画する。`numIconNext.number` が空の駅は2つ目を描画しない（`presetKey` だけが入っている駅で空のアイコンが並ぶのを防ぐため）（7.57節で表示規則を変更）
 - **LCD表示側は路線図（defaultLine）ページのみ対応する**。ヘッダー（現在駅の大きい表示）と追加路線図（overLine）は `numIcon` のみを参照する従来の動作のままとする（下記参照）
 
 ##### LCD表示側（路線図ページ）への反映
 
 路線図ページの描画は、drawParams の `defaultLine.dispStationList[i].numIconNext` を通して行う。この枠組みは既に用意されているため、エディタ側の値を流し込む変更だけで表示できる。
 
-- **既存の仕組み**: `drawParamsSpec.md` に `numIconNext`（乗換先路線のナンバリングアイコン）が定義済みで、`defaultLineSVG.svg` にもテキスト形式・アイコン形式それぞれの描画指定がある。これらは `<g lcdParts="arrange" arrange-axis="y">` の中にあるため、`numIcon` と `numIconNext` の両方が `isDraw: true` のときは自動で縦に並ぶ（座標指定は同じだが arrange が再配置する）
+- **既存の仕組み**: `drawParamsSpec.md` に `numIconNext`（乗換先路線の駅アイコン）が定義済みで、`defaultLineSVG.svg` にもテキスト形式・駅アイコン形式それぞれの描画指定がある。これらは `<g lcdParts="arrange" arrange-axis="y">` の中にあるため、`numIcon` と `numIconNext` の両方が `isDraw: true` のときは自動で縦に並ぶ（座標指定は同じだが arrange が再配置する）
 - **変更点1**: `ProgressController._buildNumIconFromStation()` に参照するフィールド名の引数を追加し、`_buildDispStationList()` の `numIconNext` を `isDraw: false` のハードコードから `station.numIconNext` 由来の値に変更する。`isDraw` は `number` が空でないかで決まるため、2つ目を使わない駅では従来どおり描画されない
-- **変更点2**: ナンバリングアイコンのSVGプリセットを事前読み込みしている箇所（`public/display.html`・`public/LcdSimulator/index.html`・`public/js/display.js`）の収集対象に `numIconNext.presetKey` を追加する。これがないとアイコン形式のとき2つ目のプリセットが読み込まれず描画できない
-- **未対応**: 追加路線図（overLine）の `numIconSub` は `ProgressController` 側が `isDraw: false` のまま、`overLineSVG.svg` 側も描画指定がコメントアウトされたままとする。ヘッダーのSVGには2つ目のナンバリング用の枠自体が無いため、対応する場合はSVGテンプレートの追加が必要
+- **変更点2**: 駅アイコンのSVGプリセットを事前読み込みしている箇所（`public/display.html`・`public/LcdSimulator/index.html`・`public/js/display.js`）の収集対象に `numIconNext.presetKey` を追加する。これがないと駅アイコン形式のとき2つ目のプリセットが読み込まれず描画できない
+- **未対応**: 追加路線図（overLine）の `numIconSub` は `ProgressController` 側が `isDraw: false` のまま、`overLineSVG.svg` 側も描画指定がコメントアウトされたままとする。ヘッダーのSVGには2つ目の駅アイコン用の枠自体が無いため、対応する場合はSVGテンプレートの追加が必要
 
-##### 「路線記号２」設定エリア（`StationParamSetter`）
+##### 「駅アイコン２」設定エリア（`StationParamSetter`）
 
-既存の「路線記号」`fieldset` の下に、`numIconNext` を編集する「路線記号２」エリアを追加する。
+既存の「駅アイコン」`fieldset` の下に、`numIconNext` を編集する「駅アイコン２」エリアを追加する。
 
-- 入力項目は「路線記号」エリアと同一（路線記号・ナンバリング・路線カラー・ナンバリング記号・路線カラー設定）で、編集対象が `numIconNext` になる
+- 入力項目は「駅アイコン」エリアと同一（路線記号・駅番号・路線カラー・駅アイコンの種類・路線カラー設定）で、編集対象が `numIconNext` になる
 - **エリアごと折りたたみ可能**とし、**初期状態は折りたたみ**。`legend` をクリックで開閉し、折りたたみ中は `▶`、展開中は `×` を見出しに付ける（テーブルの列折りたたみと同じ記号の使い分け）
 
 ##### 通過列の表示仕様
@@ -1247,7 +1258,7 @@ export function moveDictItemsDown<T>(
 
 **路線セルクリック時の吹き出し表示**: `onClick`（4.5節参照）で、クリックされたセルの `station.lineId` に対応する `lineDict` の情報を吹き出し（`LineInfoBalloon` コンポーネント）で表示する。
 
-- 表示内容: 路線名（`line.name`）・路線名かな（`line.kana`）・路線名英語（`line.eng`）・路線記号・ナンバリングフォーマット（7.50節）
+- 表示内容: 路線名（`line.name`）・路線名かな（`line.kana`）・路線名英語（`line.eng`）・路線アイコン・駅アイコンの種類（7.50節）
 - `lineId` が未設定、または `lineDict` に該当エントリが存在しない場合は吹き出しを表示しない
 - 吹き出しはクリックされた位置（`event.clientX` / `event.clientY`）を基準に `position: fixed` で表示する
 - 閉じる操作: 吹き出し右上の「×」ボタンをクリック、または吹き出し外側をクリック（`mousedown` を `document` で監視し、吹き出し自身の要素に含まれないクリックで閉じる）
@@ -1282,16 +1293,16 @@ export function moveDictItemsDown<T>(
 | 項目 | 参照するフィールド |
 |---|---|
 | 運用ID | 1行目に `運用[station.operationId]` と表示する。`operation.isAutoDestination` が `true` なら、同じ行に `行先自動` の札をハイライトして並べる（7.49節） |
-| 行先 | 実際に表示される行先（7.49節。オンなら末尾停車駅の `name`、オフなら `operation.destination`）。行先かな・行先英語・行先番号も同様 |
+| 行先 | 実際に表示される行先（7.49節。オンなら末尾停車駅の `name`、オフなら `operation.destination`）。行先かな・行先英語・行先の駅アイコンも同様 |
 | 行先かな | 同上（`kana` / `operation.destinationKana`） |
 | 行先英語 | 同上（`eng` / `operation.destinationEng`） |
 | 種別 | `operation.trainType` |
 | 種別英語 | `operation.trainTypeEng` |
 | 経由等 | `operation.direction` |
 | 号車 | `operation.carNumber` |
-| 行先番号 | `operation.destinationNum` を記号と番号に分割し、`operation.destinationNumIconKey`・`operation.destinationColor` とあわせて `createNumIconFromPreset` で生成したSVG |
+| 行先の駅アイコン | `operation.destinationNum` を路線記号と駅番号に分割し、`operation.destinationNumIconKey`・`operation.destinationColor` とあわせて `createNumIconFromPreset` で生成したSVG |
 
-`destinationNum` の分割規則は `public/Controller/src/utility/utils.js` の `parseStationNumber` と同じとする。半角スペースがあればそこで分割し（例: `"H 08"` → 記号 `H` / 番号 `08`）、なければ非数字と数字の境界で分割する（例: `"TY01"` → 記号 `TY` / 番号 `01`）。
+`destinationNum` の分割規則は `public/Controller/src/utility/utils.js` の `parseStationNumber` と同じとする。半角スペースがあればそこで分割し（例: `"H 08"` → 路線記号 `H` / 駅番号 `08`）、なければ非数字と数字の境界で分割する（例: `"TY01"` → 路線記号 `TY` / 駅番号 `01`）。
 
 #### UI（全リスト共通）
 
@@ -1516,11 +1527,11 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 | 列 | 内容 | 例 |
 |---|---|---|
 | 事業者 | 路線を運営する事業者名。路線選択UIの分類に使う | `JR東日本`、`東急電鉄` |
-| 路線記号 | 路線のナンバリング記号 | `JK` |
-| 路線アイコン | 路線記号アイコンのプリセットキー（`I_*`）。`iconDict` の `presetType` に使う | `I_JR_east` |
-| ナンバリングアイコン | 駅ナンバリングのプリセットキー（`N_*`）。`lineDict.numIconPresetKey` と各駅の `numIcon.presetKey`・`numIconNext.presetKey` に使う | `N_JR_east` |
+| 路線記号 | 路線の路線記号（駅番号の前に付くアルファベット） | `JK` |
+| 路線アイコン | 路線アイコンのプリセットキー（`I_*`）。`iconDict` の `presetType` に使う | `I_JR_east` |
+| ナンバリングアイコン | 駅アイコンの種類（`N_*` のプリセットキー）。`lineDict.numIconPresetKey` と各駅の `numIcon.presetKey`・`numIconNext.presetKey` に使う | `N_JR_east` |
 
-> 従来の `アイコン` 列は `I_*` が入っているのに `lineDict.numIconPresetKey`（本来 `N_*`）へ書き込まれ、駅のナンバリングは `N_tokyu` 固定になっていた。これを `路線アイコン`・`ナンバリングアイコン` の2列に分けて解消する。
+> 従来の `アイコン` 列は `I_*` が入っているのに `lineDict.numIconPresetKey`（本来 `N_*`）へ書き込まれ、駅アイコンの種類は `N_tokyu` 固定になっていた。これを `路線アイコン`・`ナンバリングアイコン` の2列に分けて解消する。
 
 #### 駅のグラフ構造
 
@@ -1553,10 +1564,10 @@ CSVファイルで管理された路線・駅のプリセットデータから�
 | 分岐線 | `lineConnectDB` は路線を1本の線（駅の並び）として表すため、分岐する路線は**支線ごとに別の路線ID**とする。分岐駅は本線・支線の両方に同じ駅IDで含める（例: 丸ノ内線の方南町支線は「丸ノ内線（分岐線）」として中野坂上〜方南町を登録する） |
 | 環状線 | 起点駅を末尾にもう一度並べて輪を閉じる（例: 山手線は 大崎 → … → 大崎） |
 | 6の字の路線 | 合流する駅を2回並べる（例: 大江戸線は 光が丘 → … → 都庁前 → 新宿西口 → … → 新宿 → 都庁前） |
-| 駅ナンバリング | `記号 番号` の形式（スペース区切り）。ナンバリングのない路線は空欄 |
+| 駅ナンバリング | `路線記号 駅番号` の形式（スペース区切り）。駅番号のない路線は空欄 |
 | transferDB | 1組の乗換を1行で表す（向きを持たない。`A,B` と `B,A` の両方は書かない）。同じ駅IDどうしは書かない |
 | 路線の単位 | 正式な線名ではなく**案内上の路線**（事業者の路線図・車内案内で使われる系統名）を1路線とする（例: 湘南新宿ライン、総武線快速、中央・総武線各駅停車） |
-| 他路線へ乗り入れる運行系統 | 系統として固有の駅ナンバリングを持つ区間だけを1路線とし、乗り入れ先は各路線で表す（例: 湘南新宿ラインは JS の付く逗子〜大宮）。固有の区間を持たない系統（中央線・地下鉄東西線直通など）は独立した路線にせず、乗り入れ先の路線どうしを区間選択でつないで表す。上野東京ラインは固有の区間（東京〜上野）だけを1路線とする |
+| 他路線へ乗り入れる運行系統 | 系統として固有の路線記号を持つ区間だけを1路線とし、乗り入れ先は各路線で表す（例: 湘南新宿ラインは JS の付く逗子〜大宮）。固有の区間を持たない系統（中央線・地下鉄東西線直通など）は独立した路線にせず、乗り入れ先の路線どうしを区間選択でつないで表す。上野東京ラインは固有の区間（東京〜上野）だけを1路線とする |
 
 #### ボタン配置
 
@@ -1643,14 +1654,14 @@ type PrevStationRef = {
 
 **路線をまたぐ駅（乗り換えで路線が変わる接続駅）の扱い**
 
-区間と区間で路線が変わる場合、その接続駅は「前の区間の最終駅」と「次の区間の開始駅」の両方に現れる。この駅は**1つの駅にまとめ**、2つのナンバリングを持たせる。
+区間と区間で路線が変わる場合、その接続駅は「前の区間の最終駅」と「次の区間の開始駅」の両方に現れる。この駅は**1つの駅にまとめ**、2つの駅アイコンを持たせる。
 
-- `numIcon` ＝ **前の路線**のナンバリング（接続駅として最初に登録されたときの値をそのまま残す）
-- `numIconNext` ＝ **次の路線**のナンバリング（`lineConnectDB` の次路線側の駅ナンバリングを、次路線の `color`・プリセットキーとあわせて設定する）
+- `numIcon` ＝ **前の路線**の駅アイコン（接続駅として最初に登録されたときの値をそのまま残す）
+- `numIconNext` ＝ **次の路線**の駅アイコン（`lineConnectDB` の次路線側の路線記号と駅番号を、次路線の `color`・プリセットキーとあわせて設定する）
 - `lineId` ＝ **次の路線**の解決済みキーで上書きする（`lineId` は「この駅以降の区間路線ID」のため）
 - どちらの `colorMode` も `'manual'` とする（プリセット取り込みは値を確定させて書き込むため）
 
-これにより、従来は同一駅が異なる `lineId` を持つ行として二重に登録されていた挙動を、2つのナンバリングを持つ1行に統合する。
+これにより、従来は同一駅が異なる `lineId` を持つ行として二重に登録されていた挙動を、2つの駅アイコンを持つ1行に統合する。
 
 **路線選択リストの表示範囲**:
 
@@ -1694,11 +1705,11 @@ type PrevStationRef = {
 
 各区間の路線（`PresetLine`）は、以下の手順で `lineDict`・`iconDict` のキーに解決する。同じプリセット路線が複数区間・複数駅にまたがって使われる場合（同一路線上を複数回クリックして区間を追加した場合や、別の「駅プリセットから追加」操作で同じ路線を再度使った場合）は、1つの `lineDict` エントリにまとめる（重複登録しない）。
 
-1. **路線記号アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`iconPresetKey`（路線アイコン列）が両方とも空でない場合、`{ presetType: iconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+1. **路線アイコン（`iconDict`）の解決**: `PresetLine` の `symbol`・`iconPresetKey`（路線アイコン列）が両方とも空でない場合、`{ presetType: iconPresetKey, symbol, color }` と**完全一致**するエントリを `setting.iconDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: `line_{路線ID}` をベースにした一意なキー（衝突時は `line_{路線ID}_2` のように連番を付与）で新規作成する
    - `iconPresetKey` が空の場合は作成しない（`lineIconKey` は空文字のまま）。`symbol` が空でも `iconPresetKey` があれば作成する（路線記号のない路線は `I_mono_color` で路線カラーの四角になる。7.32節）
-2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey`・`lineIconKey`（手順1で解決した路線記号アイコンのキー）の**全ての項目**が完全一致するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
+2. **路線本体（`lineDict`）の解決**: `name`・`kana`・`eng`・`color`・`symbol`・`numIconPresetKey`・`lineIconKey`（手順1で解決した路線アイコンのキー）の**全ての項目**が完全一致するエントリを `setting.lineDict`（既存）→ 今回の呼び出し内で新規作成した分、の順に探す
    - 見つかった場合: そのキーを再利用する
    - 見つからない場合: 既存キーの最大数値+1（数値キーが存在しない場合は `0`）を新しいキーとし、`lineIconKey` に手順1で解決したキーを設定して新規作成する
 3. 区間内の各駅の `lineId` に、解決した `lineDict` のキーを設定する（区間内の全ての駅に同じキーを設定する。路線が変わる接続駅は前項「路線をまたぐ駅の扱い」に従って1行に統合し、`lineId` は次の路線のキーで上書きする）
@@ -1783,7 +1794,7 @@ type ToggleSwitchProps = {
 | コンポーネント | 対象 |
 |---|---|
 | `OperationForm` | すべての運用に適用 |
-| `StationList` | 複数選択、ナンバリング補完降順 |
+| `StationList` | 複数選択、駅番号補完降順 |
 
 ---
 
@@ -1843,15 +1854,15 @@ classDiagram
     createIconFromPreset ..> loadIconPresetTexts : SVGプリセット取得
     loadIconPresetTexts ..> generateIconPresetTexts : 生成済みtsを参照
     IconList ..> presetIndex : プリセット一覧取得
-    OperationForm ..> presetIndex : ナンバリング一覧取得
-    StationParamSetter ..> presetIndex : ナンバリング一覧取得
+    OperationForm ..> presetIndex : 駅アイコンの種類の一覧取得
+    StationParamSetter ..> presetIndex : 駅アイコンの種類の一覧取得
 ```
 
 | モジュール | 説明 |
 |---|---|
 | `createIconFromPreset.client.ts` | SVGプリセットにシンボル文字・路線色を合成してSVG要素を返す（ブラウザ専用） |
 | `loadIconPresetTexts.ts` | `src/generated/iconPresetTexts.ts` から全SVGプリセット（I_* / N_*）を辞書形式で返す |
-| `presetIndex.ts` | アイコン・ナンバリングプリセットの key/name リスト定義 |
+| `presetIndex.ts` | 路線アイコン・駅アイコンのプリセットの key/name リスト定義 |
 | `KanaConverter.tsx` | ひらがな/カタカナ → ローマ字変換（駅名・路線名の英語自動補完） |
 | `presetIconMaker.tsx` | SVG DOM にカラー・シンボルを適用するユーティリティ |
 | `listOperations.ts` | リスト並び替え共通ユーティリティ（配列系・辞書系それぞれの上下移動関数） |
@@ -1874,15 +1885,15 @@ classDiagram
 | `I_train_normal1` | 地上路線汎用１ | 路線アイコン |
 | `I_train_normal2` | 地上路線汎用２ | 路線アイコン |
 | `I_train_subway1` | 地下路線汎用 | 路線アイコン |
-| `N_JR_east` | JR東日本 | ナンバリング |
-| `N_JR_west` | JR西日本 | ナンバリング |
-| `N_JR_central` | JR東海 | ナンバリング |
-| `N_JR_hokkaido` | JR北海道 | ナンバリング |
-| `N_JR_shikoku` | JR四国 | ナンバリング |
-| `N_JR_kyusyu` | JR九州 | ナンバリング |
-| `N_sapporo` | 札幌駅 | ナンバリング（記号欄なし・枠の色は黒で固定。路線カラーは反映しない） |
-| `N_tokyo_subway` | 東京地下鉄 | ナンバリング |
-| `N_tokyu` | 東急 | ナンバリング |
+| `N_JR_east` | JR東日本 | 駅アイコン |
+| `N_JR_west` | JR西日本 | 駅アイコン |
+| `N_JR_central` | JR東海 | 駅アイコン |
+| `N_JR_hokkaido` | JR北海道 | 駅アイコン |
+| `N_JR_shikoku` | JR四国 | 駅アイコン |
+| `N_JR_kyusyu` | JR九州 | 駅アイコン |
+| `N_sapporo` | 札幌駅 | 駅アイコン（記号欄なし・枠の色は黒で固定。路線カラーは反映しない） |
+| `N_tokyo_subway` | 東京地下鉄 | 駅アイコン |
+| `N_tokyu` | 東急 | 駅アイコン |
 
 ### SVG プリセットの構造
 
@@ -1892,7 +1903,7 @@ SVGファイル内の予約済みID要素に対して `createIconFromPreset` が
 |---|---|
 | `lineColor` | `fill` 属性を引数 `lineColor` で上書き |
 | `symbolArea` | 路線記号テキスト描画領域。`<rect>` の `data-style`（JSON）・`x`/`y`/`width`/`height`・`lang` 属性をもとに SVG `<text>` を生成して配置する |
-| `numberArea` | ナンバリングテキスト描画領域。`symbolArea` と同じロジックで描画 |
+| `numberArea` | 駅番号テキスト描画領域。`symbolArea` と同じロジックで描画 |
 | `outline` | アウトライン要素（`outlineWidth > 0` の時のみ追加） |
 
 ---
@@ -2481,7 +2492,7 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 
 ### 7.3 lcdParts="numbering" — NumIconObj の実装
 
-`rect` 要素の範囲内にナンバリングアイコン（路線記号＋番号）を表示する lcdParts。
+`rect` 要素の範囲内に駅アイコン（路線記号＋駅番号）を表示する lcdParts。
 
 #### 属性仕様
 
@@ -2489,7 +2500,7 @@ Generic フォントファミリー名（`sans-serif`, `serif`, `monospace`, `cu
 |---|---|
 | `lcd-numKey` | NumIconDrawer のプリセットキー。`#{...}` / `$...` テンプレート展開対応 |
 | `symbolText` | 路線記号テキスト。テンプレート展開対応 |
-| `numberText` | 番号テキスト。テンプレート展開対応 |
+| `numberText` | 駅番号テキスト。テンプレート展開対応 |
 | `lineColor` | 路線カラー。テンプレート展開対応 |
 | `lcd-minComRatio` | 最小圧縮率（0〜1）。`setSize` でアイコンサイズが `naturalSize × minComRatio` を下回らないよう保護する |
 
@@ -3302,11 +3313,11 @@ lcdController = new LCDController(settings, defsSVG, headerSVG, defaultLineSVG, 
 | `destination` | `.name` |
 | `destinationKana` | `.kana` |
 | `destinationEng` | `.eng` |
-| `destinationNum` | `.numIcon.number` が空でなければ `.numIcon.symbol` と半角スペースで連結した文字列（例: `"JY 01"`。記号が空なら番号のみ）。`parseStationNumber` で記号と番号に戻せる形にする |
+| `destinationNum` | `.numIcon.number` が空でなければ `.numIcon.symbol` と半角スペースで連結した文字列（例: `"JY 01"`。記号が空なら駅番号のみ）。`parseStationNumber` で路線記号と駅番号に戻せる形にする |
 | `destinationColor` | `.numIcon.color` |
 | `destinationNumIconKey` | `.numIcon.presetKey` |
 
-※ ナンバリングの3項目は、駅データが `numIcon` サブオブジェクトに移ったあとも旧フィールド（`.number`・`.lineColor`・`.numIconPresetKey`）を参照していて補完されていなかったため、参照先を `numIcon` に改めた。路線をまたぐ駅でも、終点に着く側の路線である `numIcon`（`numIconNext` ではない）を使う。
+※ 行先の駅アイコンの3項目は、駅データが `numIcon` サブオブジェクトに移ったあとも旧フィールド（`.number`・`.lineColor`・`.numIconPresetKey`）を参照していて補完されていなかったため、参照先を `numIcon` に改めた。路線をまたぐ駅でも、終点に着く側の路線である `numIcon`（`numIconNext` ではない）を使う。
 | `carNumber` | `"1"`（固定） |
 | `trainType` | `"普通"`（固定） |
 | `trainTypeEng` | `"Local"`（固定） |
@@ -3944,7 +3955,7 @@ H = kx·w·|sinθ| + ky·h·|cosθ|
 
 #### 既存ロジックの再利用
 
-区間の状態管理（`stagingList`・`prevStation`）、「戻る」「追加」、および `extractStationsFromSections`（路線をまたぐ接続駅を1駅に統合し2つのナンバリングを設定する処理）は既存のものをそのまま使う。路線図UIは `handleStationClick` 相当の入口を共有し、区間生成の結果は従来と同一形式（`StationSection`）とする。
+区間の状態管理（`stagingList`・`prevStation`）、「戻る」「追加」、および `extractStationsFromSections`（路線をまたぐ接続駅を1駅に統合し2つの駅アイコンを設定する処理）は既存のものをそのまま使う。路線図UIは `handleStationClick` 相当の入口を共有し、区間生成の結果は従来と同一形式（`StationSection`）とする。
 
 #### 変更ファイル
 
@@ -3966,7 +3977,7 @@ H = kx·w·|sinθ| + ky·h·|cosθ|
 3. **lineDB.csv の列変更**: `事業者` 列を追加し、`アイコン` 列を `路線アイコン`（`I_*`）と `ナンバリングアイコン`（`N_*`）の2列に分ける
    - 変更後の列順: 路線ID, 事業者, 路線名, 路線名かな, 路線名英語, 路線カラー, 路線記号, 路線アイコン, ナンバリングアイコン
    - `事業者` は今回は読み込んで保持するのみ（路線選択UIでの分類は別途対応）
-4. **ナンバリングプリセットの固定値を廃止**: 駅の `numIcon`・`numIconNext` の `presetKey`/`manualPresetKey` を `N_tokyu` 固定から、所属路線の `ナンバリングアイコン` 列の値に変更する。`lineDict.numIconPresetKey` にも同列の値を設定する
+4. **駅アイコンの種類の固定値を廃止**: 駅の `numIcon`・`numIconNext` の `presetKey`/`manualPresetKey` を `N_tokyu` 固定から、所属路線の `ナンバリングアイコン` 列の値に変更する。`lineDict.numIconPresetKey` にも同列の値を設定する
 5. **データ作成ルールの明文化**: ID の形式、CSV に使えない文字、分岐線・環状線・6の字の路線の表し方、transferDB の書き方を定める
 
 #### 型定義の変更（`app/modules/loadStationPresets.ts`）
@@ -3981,7 +3992,7 @@ export type PresetLine = {
     color: string
     symbol: string
     iconPresetKey: string     // 路線アイコンのプリセットキー I_*（追加）
-    numIconPresetKey: string  // ナンバリングアイコンのプリセットキー N_*（参照する列を変更）
+    numIconPresetKey: string  // 駅アイコンの種類のプリセットキー N_*（参照する列を変更）
 }
 
 // 乗換エッジ（追加）: 別々の駅IDを持つ駅同士の乗換。向きは持たない
@@ -4173,8 +4184,8 @@ export type PresetTransfer = {
 
 - 路線図の領域の中央に重ねて表示する。表示中は背後の路線図を操作できない（半透明の背景で覆う）
 - タイトル: 「「{始点駅名}」→「{対象駅名}」のルートを選択」
-- 候補を1行ずつボタンとして列挙する。表示形式は **`[ナンバリング記号][路線名] 次駅：[始点駅の次の駅] 中間駅数：[中間駅の数]`**
-  - ナンバリング記号は `lineDB` の路線記号。路線カラーの枠で囲んだ小さなバッジとして表示する。路線記号が空の場合はバッジを出さない
+- 候補を1行ずつボタンとして列挙する。表示形式は **`[路線記号][路線名] 次駅：[始点駅の次の駅] 中間駅数：[中間駅の数]`**
+  - 路線記号は `lineDB` の「路線記号」列の値。路線カラーの枠で囲んだ小さなバッジとして表示する。路線記号が空の場合はバッジを出さない
   - 次駅は、そのルートで始点駅の次に停まる駅（駅順で隣の駅）の駅名
   - 中間駅数は、そのルートで始点駅と対象駅の間にある駅の数（両端を含まない。環状線の継ぎ目の駅は1駅として数える）
   - 例（田端 → 品川）: `[JK]京浜東北線 次駅：西日暮里 中間駅数：13`、`[JY]山手線 次駅：西日暮里 中間駅数：13`、`[JY]山手線 次駅：駒込 中間駅数：15`
@@ -4207,7 +4218,7 @@ type StagedRoute = {
 継ぎ目をまたぐルートでは、「新宿 → 東京（位置 L）」の終点と「東京（位置 0）→ 渋谷」の始点が同じ駅になる。従来の処理ではこれを「路線が変わる接続駅」とみなして `numIconNext` を設定してしまうため、次のように変更する。
 
 - 連続する2区間の接続駅が同じ駅IDで、かつ**2区間の路線IDが同じ**場合は、1行に統合するだけとし、`numIconNext` と `lineId` は変更しない
-- 路線IDが異なる場合は従来どおり（`numIconNext` に次の路線のナンバリングを設定し、`lineId` を次の路線で上書きする）
+- 路線IDが異なる場合は従来どおり（`numIconNext` に次の路線の駅アイコンを設定し、`lineId` を次の路線で上書きする）
 
 #### コンポーネント間のインターフェース変更
 
@@ -4248,12 +4259,12 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 収録範囲 | 関東1都6県内の駅を通る JR 東日本の在来線を全線。県境を越える路線は関東内の最後の駅まで。ただし路線図に描かれている県外部分（熱海・伊東、中央線の甲府方面）は含める |
 | 対象外 | 新幹線、JR東海の路線（御殿場線など）、JR以外の路線（りんかい線・相鉄線・東京モノレールなど） |
 | 駅の同一性 | JR の駅は駅名が同じなら同じ駅（1つの駅ID）とする。JR同士で駅名が異なる駅の乗換（transferDB）は今回は登録しない |
-| 駅ナンバリング | JR東日本の駅ナンバリングがある路線・駅のみ設定し、ない場合は空欄。同じ駅でも路線ごとに番号が異なる（例: 鎌倉は横須賀線 JO 07・湘南新宿ライン JS 07） |
+| 駅ナンバリング | JR東日本の駅番号がある路線・駅のみ設定し、ない場合は空欄。同じ駅でも路線ごとに路線記号・駅番号が異なる（例: 鎌倉は横須賀線 JO 07・湘南新宿ライン JS 07） |
 | 路線アイコン・ナンバリングアイコン | 全路線 `I_JR_east`・`N_JR_east` |
 | 路線カラー | 路線図の色に近い値を設定する |
 | 緯度経度・かな・英語名 | 外部データは使わず、作成者の知識で作成する。緯度経度はおおよその値（駅の位置関係が分かる程度）で、誤りを含む可能性がある。英語名は JR東日本の表記に合わせる |
 | 既存データ | 京浜東北線・山手線の既存データ（仮の座標）は破棄し、駅ID・路線IDも振り直す。駅IDは路線の登録順に初出の駅から 0 始まりで、路線IDも表の順に 0 始まりで振る |
-| 駅順・ナンバリング・区間の確認 | 路線図と Wikipedia の各路線の記事で確認する |
+| 駅順・路線記号と駅番号・区間の確認 | 路線図と Wikipedia の各路線の記事で確認する |
 
 #### 収録路線
 
@@ -4274,17 +4285,17 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 12 | 鶴見線（大川支線） | 安善〜大川 | JI | 分岐線のため別路線 |
 | 13 | 山手線 | 東京〜（環状）〜東京 | JY | |
 | 14 | 中央線快速 | 東京〜高尾 | JC | |
-| 15 | 中央線 | 高尾〜韮崎 | CO | 山梨県部分は路線図の範囲（韮崎）まで。各駅の番号は高尾〜大月が JC 24〜32、初狩以西が CO 33〜（Wikipedia による） |
+| 15 | 中央線 | 高尾〜韮崎 | CO | 山梨県部分は路線図の範囲（韮崎）まで。各駅の駅番号は高尾〜大月が JC 24〜32、初狩以西が CO 33〜（Wikipedia による） |
 | 16 | 中央・総武線各駅停車 | 三鷹〜千葉 | JB | |
 | 17 | 青梅線 | 立川〜奥多摩 | JC | |
 | 18 | 五日市線 | 拝島〜武蔵五日市 | JC | |
 | 19 | 八高線 | 八王子〜高崎 | | 凡例は高麗川で2系統に分かれるが、同じ線名で一続きのため1路線とする |
-| 20 | 上野東京ライン | 東京〜上野 | JU | 固有の区間のみ。色・ナンバリングは高崎線と同じ |
+| 20 | 上野東京ライン | 東京〜上野 | JU | 固有の区間のみ。色・路線記号は高崎線と同じ |
 | 21 | 宇都宮線 | 上野〜黒磯 | JU | 上野〜大宮は高崎線と並走 |
 | 22 | 東北本線 | 黒磯〜豊原 | | 栃木県内の残り |
 | 23 | 高崎線 | 上野〜高崎 | JU | |
 | 24 | 埼京線 | 羽沢横浜国大〜大宮 | JA | 相鉄直通区間（羽沢横浜国大〜武蔵小杉〜西大井〜大崎）を含む |
-| 25 | 川越線 | 大宮〜高麗川 | JA | 番号は大宮（JA 26）のみ。日進以西にはナンバリングがない |
+| 25 | 川越線 | 大宮〜高麗川 | JA | 駅番号は大宮（JA 26）のみ。日進以西には駅番号がない |
 | 26 | 常磐線快速 | 上野〜取手 | JJ | 凡例「常磐線快速・成田線」の成田線部分は #29 |
 | 27 | 常磐線各駅停車 | 綾瀬〜取手 | JL | |
 | 28 | 常磐線 | 取手〜大津港 | | 取手以北。茨城県内の最後の駅まで |
@@ -4297,7 +4308,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 35 | 外房線 | 千葉〜安房鴨川 | | |
 | 36 | 久留里線 | 木更津〜上総亀山 | | 路線図には未掲載。久留里〜上総亀山は運休中・2027年4月廃止予定だが、現時点では路線として存在するため含める |
 | 37 | 京葉線 | 東京〜蘇我 | JE | |
-| 38 | 京葉線（高谷支線） | 市川塩浜〜西船橋 | JE | 武蔵野線直通。西船橋には JE の番号がないため空欄 |
+| 38 | 京葉線（高谷支線） | 市川塩浜〜西船橋 | JE | 武蔵野線直通。西船橋には JE の駅番号がないため空欄 |
 | 39 | 京葉線（二俣支線） | 西船橋〜南船橋 | JE | 武蔵野線直通。西船橋は空欄（同上） |
 | 40 | 武蔵野線 | 府中本町〜西船橋 | JM | |
 | 41 | 上越線 | 高崎〜土合 | | 群馬県内の最後の駅まで |
@@ -4311,13 +4322,13 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 49 | 水郡線（常陸太田支線） | 上菅谷〜常陸太田 | | 路線図には未掲載 |
 | 50 | 鹿島線 | 香取〜鹿島神宮 | | 路線図には未掲載。鹿島サッカースタジアムは臨時駅のため含めない |
 
-- 「要確認」の記号は、データ作成時に Wikipedia で確認して決める（ナンバリングがなければ空欄）
+- 「要確認」の路線記号は、データ作成時に Wikipedia で確認して決める（路線記号がなければ空欄）
 - 凡例の「中央線・地下鉄東西線直通」は固有の区間がないため路線を作らない（4.10節「他路線へ乗り入れる運行系統」）
 - 凡例の「東京モノレール」は JR の路線ではないため対象外
 
 #### 作成手順
 
-- 路線ごとの駅データ（駅名・かな・英語名・緯度経度・駅ナンバリング）を `scripts/presetData/sources/*.json` に作成し、`scripts/presetData/build_presets.py` で駅IDを振って `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する（7.33節）
+- 路線ごとの駅データ（駅名・かな・英語名・緯度経度・路線記号と駅番号）を `scripts/presetData/sources/*.json` に作成し、`scripts/presetData/build_presets.py` で駅IDを振って `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する（7.33節）
 - 生成後、駅順のつながり（隣の駅との距離が極端に離れていないか）と、同じ駅名の駅に同じ駅IDが振られているかを機械的に確認する
 
 #### 変更ファイル
@@ -4472,7 +4483,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 事業者 | `JR東海` |
 | 路線アイコン | `I_JR_central`（7.40節で `I_mono_color` から差し替え。路線記号のない路線は `I_mono_color`） |
 | ナンバリングアイコン | `N_JR_central` |
-| 路線記号・駅ナンバリング | JR東海の駅ナンバリング（CA〜CJ。CH は欠番）。ナンバリングはTOICAエリアを中心とした一部の駅のみのため、番号のない駅は空欄。ナンバリングが導入されていない路線（紀勢本線・参宮線・名松線・美濃赤坂線）は記号も空欄 |
+| 路線記号・駅ナンバリング | JR東海の路線記号と駅番号（CA〜CJ。CH は欠番）。駅番号はTOICAエリアを中心とした一部の駅のみのため、駅番号のない駅は空欄。駅番号が導入されていない路線（紀勢本線・参宮線・名松線・美濃赤坂線）は路線記号も空欄 |
 | 路線名 | JR東海の正式な線名を使い、「本線」は省略しない（例: 東海道本線、関西本線）。JR東日本の「東海道線」「中央線」と区別できる |
 | 路線カラー | JR東海のラインカラー（Wikipedia「日本の鉄道ラインカラー一覧」に載っている、JR東海のプレスリリース準拠の値）。ラインカラーのない路線（紀勢本線・参宮線・名松線）は作成者が決める |
 | 駅の同一性 | 7.24節と同じく、JR の駅は駅名が同じなら同じ駅ID とする。JR東日本と共用の駅（熱海・国府津・甲府）は既存の駅IDを使う。ただし、離れた場所にある別の駅が同じ駅名の場合は別の駅ID にする（両毛線の富田〔栃木県〕と関西本線の富田〔三重県〕。駅名はどちらも「富田」のまま） |
@@ -4485,18 +4496,18 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 51 | 東海道本線 | 熱海〜米原 | CA | CA 00〜83 |
 | 52 | 東海道本線（美濃赤坂支線） | 大垣〜美濃赤坂 | | 分岐線のため別路線 |
 | 53 | 御殿場線 | 国府津〜沼津 | CB | |
-| 54 | 身延線 | 富士〜甲府 | CC | 番号は富士〜西富士宮のみ |
-| 55 | 飯田線 | 豊橋〜辰野 | CD | 番号は豊橋〜豊川のみ |
+| 54 | 身延線 | 富士〜甲府 | CC | 駅番号は富士〜西富士宮のみ |
+| 55 | 飯田線 | 豊橋〜辰野 | CD | 駅番号は豊橋〜豊川のみ |
 | 56 | 武豊線 | 大府〜武豊 | CE | |
-| 57 | 中央本線 | 名古屋〜塩尻 | CF | 番号は名古屋〜中津川と一部の駅のみ |
+| 57 | 中央本線 | 名古屋〜塩尻 | CF | 駅番号は名古屋〜中津川と一部の駅のみ |
 | 58 | 関西本線 | 名古屋〜亀山 | CJ | |
-| 59 | 高山本線 | 岐阜〜猪谷 | CG | 番号は岐阜〜美濃太田と一部の駅のみ |
+| 59 | 高山本線 | 岐阜〜猪谷 | CG | 駅番号は岐阜〜美濃太田と一部の駅のみ |
 | 60 | 太多線 | 多治見〜美濃太田 | CI | |
-| 61 | 紀勢本線 | 亀山〜新宮 | | ナンバリングなし |
-| 62 | 参宮線 | 多気〜鳥羽 | | ナンバリングなし |
-| 63 | 名松線 | 松阪〜伊勢奥津 | | ナンバリングなし |
+| 61 | 紀勢本線 | 亀山〜新宮 | | 駅番号なし |
+| 62 | 参宮線 | 多気〜鳥羽 | | 駅番号なし |
+| 63 | 名松線 | 松阪〜伊勢奥津 | | 駅番号なし |
 
-- 各路線の駅順・駅ナンバリング・ラインカラーは、データ作成時に Wikipedia で確認する
+- 各路線の駅順・路線記号と駅番号・ラインカラーは、データ作成時に Wikipedia で確認する
 
 #### 作成手順
 
@@ -4524,7 +4535,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 路線アイコン・ナンバリングアイコン | `I_JR_west`・`N_JR_west` |
 | 路線の分け方・路線名 | JR西日本の**案内上の愛称**と**路線記号**の区間ごとに1路線とする（例: 東海道本線は「琵琶湖線」「JR京都線」「JR神戸線」に分ける）。愛称のない区間は JR西日本の案内どおり「本線」を省いた線名を使う（例: 山陽本線 → 山陽線、山陰本線 → 山陰線）。分岐線も案内上の名前を使う（例: 和田岬線、羽衣線）。記号・色が区間で変わる路線（山陽線・山陰線・赤穂線など）は、その区間ごとに別の路線にする（同じ路線名の路線が複数できる） |
 | 路線記号 | JR西日本の路線記号（アルファベット1文字）。地域ごとに振られているため、同じ記号が別の地域の別の路線を指すことがある（例: A は琵琶湖線などと山陰本線〔城崎温泉〜米子〕） |
-| 駅ナンバリング | 駅番号のある駅のみ。JR西日本の表記「JR-A31」は、記号「A」・番号「31」として `A 31` の形式で登録する。番号のない駅は空欄 |
+| 駅ナンバリング | 駅番号のある駅のみ。JR西日本の表記「JR-A31」は、路線記号「A」・駅番号「31」として `A 31` の形式で登録する。駅番号のない駅は空欄 |
 | 路線カラー | Wikipedia「日本の鉄道ラインカラー一覧」の JR西日本の値（色1）。ラインカラーのない路線は作成者が決める |
 | 駅の同一性 | 7.24節と同じく、JR の駅は駅名が同じなら同じ駅ID とする（JR東海との境界駅の米原・亀山・新宮・猪谷、JR東日本との境界駅の南小谷・糸魚川なども同じ駅ID）。離れた場所にある別の駅が同じ駅名の場合は別の駅ID にする |
 | 既存データ | 既存の路線ID（0〜63）・駅ID（0〜1066）は変更しない。JR西日本の路線は路線ID 64 から振る |
@@ -4603,7 +4614,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 | 131 | 美祢線 | 厚狭〜長門市 |  | 災害により運休中だが路線として存在するため含める |
 | 132 | 博多南線 | 博多〜博多南 |  |  |
 
-- 正式な線名との対応は備考に書いた。区間の端の駅・記号・番号は、データ作成時に Wikipedia で確認して必要なら修正する
+- 正式な線名との対応は備考に書いた。区間の端の駅・路線記号・駅番号は、データ作成時に Wikipedia で確認して必要なら修正する
 - 離れた場所にある同じ駅名の別の駅は、別の駅ID にした（駅名は同じまま）: 大久保（JR神戸線）、柏原（JR宝塚線・福知山線／大和路線。東海道本線の柏原とも別）、野崎（学研都市線）、滝（加古川線）、三郷（大和路線）、橋本（和歌山線）、上道（境線）、横川（山陽線・可部線）、下松（山陽線）、戸田（山陽線）
 - 駅番号は、Wikipedia で駅ごとの番号が確認できた区間のみ設定した。記号だけで駅番号のない区間（山陰エリア、加古川線・播但線・舞鶴線・姫新線・草津線・和歌山線・きのくに線など）は空欄
 - 作成グループ間で座標が食い違った境界駅（猪谷・久宝寺・伯耆大山など）は、作成者の知識で位置を決め直した。このため、JR東海のデータの猪谷（駅ID 997）の座標も修正した
@@ -4644,7 +4655,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
   - 新宿 →〔中央線快速〕→ 高尾: 始点の新宿で「中央線快速（四ツ谷方面）」を追加する
   - 中央線快速で新宿止まりのルート: 終点の新宿で「中央線快速（中野方面）」を追加する
 - ルートの途中の駅で、同じ路線のまま通過する場合は前後とも使っているため追加しない
-- その他の値（路線アイコン・ナンバリング・色・駅名など）は通常の乗換路線と同じ。並び順は、その路線の路線IDで並べる
+- その他の値（路線アイコン・駅アイコン・色・駅名など）は通常の乗換路線と同じ。並び順は、その路線の路線IDで並べる
 
 #### 並び順
 
@@ -4656,11 +4667,11 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 | フィールド | 値 |
 |---|---|
-| `line.lineIconKey` | 乗換先の路線の路線記号アイコンの `iconDict` キー（1要素の配列）。ルートの路線と同じ規則（4.10節「`lineDict`・`iconDict` への解決」の手順1）で既存の `iconDict` から探し、なければ新規作成する。路線アイコンが空の路線は空配列 |
+| `line.lineIconKey` | 乗換先の路線の路線アイコンの `iconDict` キー（1要素の配列）。ルートの路線と同じ規則（4.10節「`lineDict`・`iconDict` への解決」の手順1）で既存の `iconDict` から探し、なければ新規作成する。路線アイコンが空の路線は空配列 |
 | `line.name` / `line.kana` / `line.eng` | 乗換先の路線名（日本語・かな・英語） |
 | `station.isDraw` | 常に `false`（手動で追加する場合と同じ） |
-| `station.type` | 乗換先の路線のナンバリングアイコン（`lineDB` の「ナンバリングアイコン」列） |
-| `station.symbol` / `station.number` | 乗換先の路線での、その駅の駅ナンバリングをスペースで分けたもの（例: `JY 01` → `JY` と `01`）。ナンバリングがなければ空欄 |
+| `station.type` | 乗換先の路線の駅アイコンの種類（`lineDB` の「ナンバリングアイコン」列） |
+| `station.symbol` / `station.number` | 乗換先の路線での、その駅の「駅ナンバリング」（`lineConnectDB`）をスペースで分けたもの（例: `JY 01` → `JY` と `01`）。駅番号がなければ空欄 |
 | `station.color` | 乗換先の路線の色 |
 | `station.name` / `station.eng` | その駅の駅名（日本語・英語）。乗換エッジでつながった駅の路線の場合は、つながった先の駅の駅名 |
 
@@ -4671,11 +4682,11 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 | ファイル | 変更内容 |
 |---|---|
-| `app/components/StationPresetPopup.tsx` | 駅抽出時に各駅でルートが使う路線を記録し、乗換路線を生成して `transfers` に設定。路線記号アイコンの解決処理を、乗換路線でも使えるよう分ける |
+| `app/components/StationPresetPopup.tsx` | 駅抽出時に各駅でルートが使う路線を記録し、乗換路線を生成して `transfers` に設定。路線アイコンの解決処理を、乗換路線でも使えるよう分ける |
 
-### 7.32 駅プリセット — 路線記号のない路線のアイコンを路線カラーの四角にする
+### 7.32 駅プリセット — 路線記号のない路線の路線アイコンを路線カラーの四角にする
 
-路線記号（`lineDB` の「路線記号」列）が空の路線は、路線記号アイコンが作られず、路線の表示にアイコンが出なかった。これを、路線カラーで塗った四角のアイコンにする。
+路線記号（`lineDB` の「路線記号」列）が空の路線は、路線アイコンが作られず、路線の表示にアイコンが出なかった。これを、路線カラーで塗った四角のアイコンにする。
 
 #### データの変更（`lineDB.csv`）
 
@@ -4684,7 +4695,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 #### コードの変更（`StationPresetPopup.tsx`）
 
-- 路線記号アイコンの解決（`resolveIconKey`）で、路線記号が空でも路線アイコンがあれば `iconDict` にアイコンを作る（`{ presetType: "I_mono_color", symbol: "", color: 路線カラー }`）。同じ色の四角は1つの `iconDict` エントリにまとめる（既存の完全一致による再利用と同じ）
+- 路線アイコンの解決（`resolveIconKey`）で、路線記号が空でも路線アイコンがあれば `iconDict` にアイコンを作る（`{ presetType: "I_mono_color", symbol: "", color: 路線カラー }`）。同じ色の四角は1つの `iconDict` エントリにまとめる（既存の完全一致による再利用と同じ）
 - 路線（`lineDict`）の `lineIconKey` と、乗換路線（`transfers`）の `line.lineIconKey` の両方に適用される
 
 #### 変更ファイル
@@ -4700,7 +4711,7 @@ onSelect: (sections: StationSection[], station: PresetStation, nextStationName?:
 
 | パス | 内容 |
 |---|---|
-| `scripts/presetData/sources/*.json` | 路線ごとの元データ（事業者ごとに分割: `jr_east_*.json`・`jr_central_*.json`・`jr_west_*.json`）。各路線は路線ID（`no`）・路線名・かな・英語名・色・路線記号と、駅の並び（駅名・かな・英語名・緯度経度・駅ナンバリング）を持つ |
+| `scripts/presetData/sources/*.json` | 路線ごとの元データ（事業者ごとに分割: `jr_east_*.json`・`jr_central_*.json`・`jr_west_*.json`）。各路線は路線ID（`no`）・路線名・かな・英語名・色・路線記号と、駅の並び（駅名・かな・英語名・緯度経度・路線記号と駅番号）を持つ |
 | `scripts/presetData/build_presets.py` | 元データを統合して `public/csv/presetLines/` の `stationDB.csv`・`lineDB.csv`・`lineConnectDB.csv` を生成する |
 
 #### 使い方
@@ -4715,8 +4726,8 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 - 路線ID 順に路線を並べ、初めて現れた駅から駅IDを振る（既存の路線ID・駅IDを変えないよう、路線は末尾にのみ追加する）
 - 事業者・路線アイコン・ナンバリングアイコンは路線IDの範囲で決める。路線記号のない路線の路線アイコンは `I_mono_color`
 - 事業者ごとのプリセットがない場合の代用: 路線アイコンは `I_mono_color`（路線カラーの四角）、ナンバリングアイコンは `N_JR_east`。例: JR東海は路線アイコン `I_JR_central`・ナンバリングアイコン `N_JR_central`（7.40節）。事業者ごとのプリセットができたら差し替える
-- 手動の補正（ユーザー指定のナンバリング・色、同名の別駅の区別、作成時に食い違った駅の座標の統一など）はスクリプト内に記述する
-- 次の点を機械的に確認して警告を出す: 同名駅の座標・かな・英語名の食い違い、駅ナンバリングの書式、隣駅との距離（0.2km 未満・12km 超）、大きな遠回り
+- 手動の補正（ユーザー指定の駅番号・色、同名の別駅の区別、作成時に食い違った駅の座標の統一など）はスクリプト内に記述する
+- 次の点を機械的に確認して警告を出す: 同名駅の座標・かな・英語名の食い違い、駅番号の書式、隣駅との距離（0.2km 未満・12km 超）、大きな遠回り
 - 生成前の CSV と比べ、既存の行が変わっていないか（追加のみか）を報告する
 - 改行コードは OS 標準（Windows では git の改行変換に合わせて CRLF）
 
@@ -4868,7 +4879,7 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 | 146 | 都営新宿線 | 新宿〜本八幡 | S | #6CBB5A |
 | 147 | 都営大江戸線 | 光が丘〜都庁前〜（環状部）〜都庁前 | E | #B6007A |
 
-- 路線名は、東京メトロは案内上の名前（「東京メトロ」は付けない）、都営地下鉄は「都営○○線」。区間の向きは駅ナンバリングの番号順を基本とする
+- 路線名は、東京メトロは案内上の名前（「東京メトロ」は付けない）、都営地下鉄は「都営○○線」。区間の向きは駅番号順を基本とする
 - 都営大江戸線は「6の字」の路線として、光が丘から都庁前を経て環状部を一周し、都庁前に戻る駅順で表す（都庁前が2回現れる）
 - 日暮里・舎人ライナーと都電荒川線は地下鉄ではないため含めない
 - 分岐線（方南町支線・北綾瀬支線）は別の路線とする
@@ -4880,7 +4891,7 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 |---|---|
 | 事業者 | 東京メトロ・都営地下鉄とも **`東京地下鉄`**（同一事業者として扱う）。そのため、東京メトロと都営地下鉄の同じ駅名の駅（九段下・大手町など）は同じ駅ID になり、乗換路線の自動登録でも「自社」として扱う |
 | 路線アイコン・ナンバリングアイコン | `I_tokyo_subway`・`N_tokyo_subway`（東京メトロ・都営地下鉄とも） |
-| 駅ナンバリング | 東京メトロの駅番号（例: `G 01`、方南町支線は `Mb 03`）。生成スクリプトのナンバリング書式チェックを、小文字を含む記号（`Mb`）も通すよう直す |
+| 駅ナンバリング | 東京メトロの駅番号（例: `G 01`、方南町支線は `Mb 03`）。生成スクリプトの駅番号の書式チェックを、小文字を含む記号（`Mb`）も通すよう直す |
 | 座標 | 元データは作成者の知識によるおおよその値とし、生成時に Wikidata の座標で差し替える（7.36節。事業者名 `東京地下鉄` → Wikidata の `東京地下鉄`・`東京都交通局` のどちらでも一致とみなす） |
 | 駅順・駅番号・色の確認 | Wikipedia で確認する |
 | 元データ | `scripts/presetData/sources/tokyo_metro_*.json`・`toei_subway.json` |
@@ -4927,7 +4938,7 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 | `scripts/presetData/sources/tokyo_metro_*.json`・`toei_subway.json` | 新規。東京メトロ・都営地下鉄の路線データ |
 | `scripts/presetData/sources/shared_stations.json` | JR との共同使用駅を追加 |
 | `scripts/presetData/sources/transfer_groups.json` | JR・東京メトロの乗換グループを追加 |
-| `scripts/presetData/build_presets.py` | 東京メトロ（133〜143）・都営地下鉄（144〜147）の路線ID範囲とアイコン・Wikidata の事業者名を追加、ナンバリング書式チェックの修正 |
+| `scripts/presetData/build_presets.py` | 東京メトロ（133〜143）・都営地下鉄（144〜147）の路線ID範囲とアイコン・Wikidata の事業者名を追加、駅番号の書式チェックの修正 |
 | `public/csv/presetLines/*.csv` | 東京メトロ・都営地下鉄のデータを追加 |
 
 ### 7.38 駅プリセット — 京浜東北線と根岸線の分割・駅ID の固定
@@ -4944,12 +4955,12 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 - 京浜東北線は既存の路線ID 5 を使い、根岸線は末尾に路線ID 148 で追加する（既存の路線ID は変えない）
 - 横浜は両路線の駅（同じ駅ID）。区間選択で京浜東北線から根岸線へ続けて選べる
 
-#### 境界駅の2つ目のナンバリング（`numIconNext`）
+#### 境界駅の2つ目の駅アイコン（`numIconNext`）
 
-「路線図から追加」で路線をまたぐ接続駅を1行にまとめるとき（4.10節「路線をまたぐ駅の扱い」）、次の路線のナンバリングが1つ目のナンバリング（`numIcon`）と**すべての値が同じ**場合は、2つ目のナンバリングを設定しない（空のまま）。
+「路線図から追加」で路線をまたぐ接続駅を1行にまとめるとき（4.10節「路線をまたぐ駅の扱い」）、次の路線の駅アイコンが1つ目の駅アイコン（`numIcon`）と**すべての値が同じ**場合は、2つ目の駅アイコンを設定しない（空のまま）。
 
 - 比べる値: `symbol`・`number`・`presetKey`・`color`・`manualSymbol`・`manualPresetKey`・`manualColor`・`colorMode`
-- 例: 京浜東北線 → 根岸線 の横浜は、どちらも JK 12・同じ色・同じアイコンのため、2つ目のナンバリングは設定しない
+- 例: 京浜東北線 → 根岸線 の横浜は、どちらも JK 12・同じ色・同じアイコンのため、2つ目の駅アイコンは設定しない
 - 次の区間の路線（`lineId`）の切り替えは従来どおり行う
 
 #### 駅ID の固定（`scripts/presetData/station_ids.json`）
@@ -4970,7 +4981,7 @@ python scripts/presetData/build_presets.py <出力先>   # 別の場所に出力
 | `scripts/presetData/station_ids.json` | 新規。駅の識別キーと駅ID の対応表 |
 | `scripts/presetData/build_presets.py` | 駅ID を対応表から振る。路線ID 148 を JR東日本として扱う |
 | `public/csv/presetLines/lineDB.csv`・`lineConnectDB.csv` | 京浜東北線の短縮と根岸線の追加 |
-| `app/components/StationPresetPopup.tsx` | 境界駅で、1つ目と同じナンバリングは2つ目に設定しない |
+| `app/components/StationPresetPopup.tsx` | 境界駅で、1つ目と同じ駅アイコンは2つ目に設定しない |
 
 ### 7.39 アプリ名・バージョン表示と設定データのバージョン情報
 
@@ -5043,16 +5054,16 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `public/csv/presetLines/lineDB.csv` | JR東海の路線アイコン列を更新 |
 | `app/components/StationPresetPopup.tsx` | 既存の路線の流用を、全ての項目（`lineIconKey` を含む）が一致する場合に限る |
 
-### 7.41 JR北海道・JR四国・JR九州・札幌駅のナンバリングのプリセット
+### 7.41 JR北海道・JR四国・JR九州・札幌駅の駅アイコンのプリセット
 
-ナンバリングのプリセット `N_JR_hokkaido`（JR北海道）・`N_JR_shikoku`（JR四国）・`N_JR_kyusyu`（JR九州）・`N_sapporo`（札幌駅）を追加する。
+駅アイコンのプリセット `N_JR_hokkaido`（JR北海道）・`N_JR_shikoku`（JR四国）・`N_JR_kyusyu`（JR九州）・`N_sapporo`（札幌駅）を追加する。
 
 - プリセットの SVG を `public/iconPresets/`（表示画面用。作成いただいたもの）から `assets/iconPresets/`（エディタ用）に複製し、`node scripts/generateIconPresetTexts.js` で `src/generated/iconPresetTexts.ts` を再生成する
-- ナンバリング選択の一覧（`app/modules/presetIndex.ts` の `numberIndexes`）に「JR北海道」「JR四国」「JR九州」「札幌駅」を追加する
+- 駅アイコンの種類の選択の一覧（`app/modules/presetIndex.ts` の `numberIndexes`）に「JR北海道」「JR四国」「JR九州」「札幌駅」を追加する
 - 選択の一覧の並び順を事業者順にそろえる（プリセット種別一覧の表の順）
-  - ナンバリング（`numberIndexes`）: JR東日本、JR西日本、JR東海、JR北海道、JR四国、JR九州、札幌駅、東京地下鉄、東急
+  - 駅アイコンの種類（`numberIndexes`）: JR東日本、JR西日本、JR東海、JR北海道、JR四国、JR九州、札幌駅、東京地下鉄、東急
   - 路線アイコン（`iconIndexes`）: 上の順のうちプリセットがあるもの（JR東日本、JR西日本、JR東海、東京地下鉄、東急）、続けて単色、地上路線汎用１、地上路線汎用２、地下路線汎用
-- `N_sapporo` は記号欄（`symbolArea`）がなく番号だけを描く。枠の色は黒で固定（`lineColor` の要素がない）なので、路線カラーは反映されない
+- `N_sapporo` は記号欄（`symbolArea`）がなく駅番号だけを描く。枠の色は黒で固定（`lineColor` の要素がない）なので、路線カラーは反映されない
 - 参考画像は `public/iconPresets/` で `O_〜.png` の名前に変わったため、`assets/iconPresets/` も同じにそろえる（旧名の `〜-original.png`・`JRC_I_original.png` を `O_〜.png` に置き換える）
 - 駅プリセット（路線図）のデータは変えない。これらの事業者の路線を追加するときに使う
 
@@ -5236,7 +5247,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | ナンバリングアイコン | JR九州は `N_JR_kyusyu`、JR四国は `N_JR_shikoku` |
 | 路線名 | JR九州は「〇〇本線」の本線を省かない（JR九州の案内どおり）。案内で愛称が使われる区間は愛称（福北ゆたか線・若松線・原田線）。JR四国は正式名（予讃線・土讃線など。「よしの川ブルーライン」などの愛称は使わない） |
 | 路線の分け方 | 7.30節と同じく、路線記号の区間ごとに1路線とする（記号のない区間も別の路線にする） |
-| 駅ナンバリング | 駅番号のある駅のみ。JR九州の「JA01」は記号 `JA`・番号 `01` として `JA 01`、JR四国の「Y12」は `Y 12` の形式で登録する。博多など「00」の駅は `JA 00` とする。番号のない駅は空欄 |
+| 駅ナンバリング | 駅番号のある駅のみ。JR九州の「JA01」は路線記号 `JA`・駅番号 `01` として `JA 01`、JR四国の「Y12」は `Y 12` の形式で登録する。博多など「00」の駅は `JA 00` とする。駅番号のない駅は空欄 |
 | 路線カラー | Wikipedia「日本の鉄道ラインカラー一覧」の値。ラインカラーのない路線は会社のコーポレートカラー（JR九州 `#E60012`〔赤〕、JR四国 `#00A7E3`〔水色〕。結果的に使った路線はない） |
 | 駅の同一性 | 7.35節のとおり「事業者:駅名」で同じ駅とする。JR西日本との境界駅の下関（山陽本線）・児島（瀬戸大橋線）・博多（博多南線）は共同使用駅として同じ駅ID にする（`shared_stations.json` に登録）。同じ事業者内で離れた場所にある同名の別の駅は別の駅ID にする |
 | 座標 | 作成者の知識で作り、Wikidata で補正する（7.36節） |
@@ -5289,19 +5300,19 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | 予土線 | 若井〜宇和島 | G | 若井〜北宇和島が予土線。北宇和島〜宇和島は予讃線だが予土線の列車が走る区間として含める |
 | 高徳線 | 高松〜徳島 | T |  |
 | 鳴門線 | 池谷〜鳴門 | N |  |
-| 徳島線 | 佐古〜阿波池田 | B | 正式な区間は佐古〜佃。佃〜阿波池田は土讃線だが、徳島線の番号（B）が振られているため含める。徳島〜佐古は高徳線と重なるため含めない |
+| 徳島線 | 佐古〜阿波池田 | B | 正式な区間は佐古〜佃。佃〜阿波池田は土讃線だが、徳島線の路線記号（B）が振られているため含める。徳島〜佐古は高徳線と重なるため含めない |
 | 牟岐線 | 徳島〜阿波海南 | M |  |
 | 瀬戸大橋線 | 児島〜宇多津 |  | 本四備讃線の JR四国の区間。児島は JR西日本と共同使用 |
 
-- 区間の端の駅・記号・番号・ラインカラーは、データ作成時に Wikipedia で確認して必要なら修正する（修正した場合はこの表も直す）
+- 区間の端の駅・路線記号・駅番号・ラインカラーは、データ作成時に Wikipedia で確認して必要なら修正する（修正した場合はこの表も直す）
 - 同じ事業者内で離れた場所にある同名の別の駅は、データ作成時に確認して別の駅ID にし、ここに書き足す
 
 #### データ作成時に決めたこと
 
 - 路線カラー: Wikipedia「日本の鉄道ラインカラー一覧」の JR九州・JR四国の表の値を使った（JR九州は記号のない路線・区間にも色があるため、コーポレートカラーは使わなかった）。日田彦山線（田川後藤寺〜添田）は JI と同じ色
 - 駅数: JR九州 30 路線・JR四国 11 路線、新しい駅 815 駅
-- 山陽本線（下関〜門司）の番号は、下関 JA 53・門司 JA 52（門司は鹿児島本線では JA 29）
-- 番号が2桁の形式でない駅は Wikipedia の表記のまま登録した: 予讃線 南伊予 `U 02-1`、土讃線 小村神社前 `K 08-1`
+- 山陽本線（下関〜門司）の駅番号は、下関 JA 53・門司 JA 52（門司は鹿児島本線では JA 29）
+- 駅番号が2桁の形式でない駅は Wikipedia の表記のまま登録した: 予讃線 南伊予 `U 02-1`、土讃線 小村神社前 `K 08-1`
 - 含めなかった駅: 開業前の JR貝塚（鹿児島本線、2027年開業予定）、臨時駅のバルーンさが（長崎本線）・田井ノ浜（牟岐線）、信号場
 - 同じ事業者内で離れた場所にある同名の別の駅はなかった（国分は JR九州〔日豊本線〕と JR四国〔予讃線〕にあるが、事業者が違うため別の駅ID になる）
 - Wikidata の大野城駅（JR九州）は隣の春日駅とほぼ同じ座標になっている誤りがあるため、生成スクリプトの `WIKIDATA_EXCLUDE` に登録して使わない（元データの座標を使う）
@@ -5333,9 +5344,9 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `scripts/presetData/sources/jr_east_3.json`・`jr_central_*.json`・`jr_kyushu_*.json` | 路線の英語名の Main を削除 |
 | `public/csv/presetLines/lineDB.csv` | 再生成 |
 
-### 7.47 駅プリセットデータ — JR東日本の残りの在来線・JR北海道の在来線、駅ごとのナンバリングアイコン
+### 7.47 駅プリセットデータ — JR東日本の残りの在来線・JR北海道の在来線、駅ごとの駅アイコンの種類
 
-駅プリセットに、JR東日本の在来線のうち未収録の路線（関東以外）と、JR北海道（北海道旅客鉄道）の在来線を全線登録する。あわせて、駅ごとにナンバリングアイコンのプリセットを指定できるようにする（札幌駅の `N_sapporo` に使う）。作り方は 7.45節と同じで、以下の点が異なる。
+駅プリセットに、JR東日本の在来線のうち未収録の路線（関東以外）と、JR北海道（北海道旅客鉄道）の在来線を全線登録する。あわせて、駅ごとに駅アイコンの種類を指定できるようにする（札幌駅の `N_sapporo` に使う）。作り方は 7.45節と同じで、以下の点が異なる。
 
 #### 収録方針
 
@@ -5347,10 +5358,10 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | 路線アイコン | JR東日本は従来どおり（路線記号のある路線は `I_JR_east`、ない路線は `I_mono_color`）。JR北海道はすべて `I_mono_color` |
 | ナンバリングアイコン | JR東日本は `N_JR_east`、JR北海道は `N_JR_hokkaido`。札幌駅だけは駅ごとの指定で `N_sapporo`（下記） |
 | 既存の路線の延長 | 関東の範囲で切れている JR東日本の路線は、新しい路線を作らずに既存の路線の駅の並びを延ばす（路線ID・駅ID は変えない）: 中央線（韮崎→塩尻）、東北本線（豊原→盛岡）、常磐線（大津港→岩沼）、上越線（土合→宮内）、水郡線（下野宮→安積永盛） |
-| 路線名（JR東日本） | 案内上の名前。「本線」は付けたまま（奥羽本線・羽越本線など）。案内で愛称が使われる区間は別の路線にして愛称を使う（奥羽本線 福島〜新庄 → 山形線）。関東以外はナンバリングのない区間が多いため、それ以外は正式な路線（区間）ごとに1路線 |
+| 路線名（JR東日本） | 案内上の名前。「本線」は付けたまま（奥羽本線・羽越本線など）。案内で愛称が使われる区間は別の路線にして愛称を使う（奥羽本線 福島〜新庄 → 山形線）。関東以外は駅番号のない区間が多いため、それ以外は正式な路線（区間）ごとに1路線 |
 | 路線名（JR北海道） | 案内上の名前。「本線」は付けたまま（函館本線など）。愛称が案内で使われる路線は愛称（札沼線 → 学園都市線、根室本線 釧路〜根室 → 花咲線） |
 | 路線の分け方（JR北海道） | 区間記号の区間ごと・正式な路線ごとに1路線 |
-| 駅ナンバリング | JR東日本は Wikipedia で駅番号が確認できる区間のみ（中央線 CO・篠ノ井線 SN・信越本線 SE・大糸線など）。JR北海道は全駅に付番された番号（例 `H 02`、`AP 15`）。JR北海道は1つの駅に番号が1つだけで、分岐駅では優先されるルートの番号になる（例: 函館本線〔A〕の苗穂は `H 02`）。枝番は Wikipedia の表記のまま（例 `G 11-1`）。札幌駅は記号なしの `01` |
+| 駅ナンバリング | JR東日本は Wikipedia で駅番号が確認できる区間のみ（中央線 CO・篠ノ井線 SN・信越本線 SE・大糸線など）。JR北海道は全駅に付番された駅番号（例 `H 02`、`AP 15`）。JR北海道は1つの駅に駅番号が1つだけで、分岐駅では優先されるルートの駅番号になる（例: 函館本線〔A〕の苗穂は `H 02`）。枝番は Wikipedia の表記のまま（例 `G 11-1`）。札幌駅は記号なしの `01` |
 | 路線カラー | 路線ごとの色を使う（Wikipedia「日本の鉄道ラインカラー一覧」、JR北海道は「北海道旅客鉄道の駅ナンバリング・区間カラー」の区間カラー）。色の決まっていない路線のみ、JR東日本 `#008000`（緑）、JR北海道 `#00A73C`（萌黄） |
 | 駅の同一性 | JR東日本と JR東海の境界駅の塩尻・辰野は共同使用駅として同じ駅ID にする（`shared_stations.json`）。同じ事業者内で離れた場所にある同名の別の駅は別の駅ID にする（`DISTINCT`） |
 | 既存データ | 既存の路線ID・駅ID は変更しない。延長する5路線は駅の並び（lineConnectDB）が後ろに伸びる。新しい路線は路線ID 190 から振る（JR東日本 → JR北海道の順） |
@@ -5359,7 +5370,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 
 | 路線ID | 路線名 | 現在 | 延長後 | 路線カラー | 備考 |
 |---|---|---|---|---|---|
-| 15 | 中央線 | 高尾〜韮崎 | 高尾〜塩尻（みどり湖経由） | #1D6FB8 → #0074BE | CO の番号を付ける |
+| 15 | 中央線 | 高尾〜韮崎 | 高尾〜塩尻（みどり湖経由） | #1D6FB8 → #0074BE | CO の駅番号を付ける |
 | 22 | 東北本線 | 黒磯〜豊原 | 黒磯〜盛岡 | #F68B1E → #3CB371 |  |
 | 28 | 常磐線 | 取手〜大津港 | 取手〜岩沼 | #0072BC → #3333FF |  |
 | 41 | 上越線 | 高崎〜土合 | 高崎〜宮内 | #EE7B1A → #00B3E6 |  |
@@ -5375,7 +5386,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | 篠ノ井線 | 塩尻〜篠ノ井 | SN | #D56A29 |
 | 信越本線 | 篠ノ井〜長野 | SE | #00B1DD |
 | 信越本線 | 直江津〜新潟 |  | #00B3E6 |
-| 大糸線 | 松本〜南小谷 | （なし。番号のみ） | #A583A1 |
+| 大糸線 | 松本〜南小谷 | （なし。駅番号のみ） | #A583A1 |
 | 小海線 | 小淵沢〜小諸 |  | #41934C |
 | 飯山線 | 豊野〜越後川口 |  | #7BC24B |
 | 越後線 | 柏崎〜新潟 |  | #40934D |
@@ -5436,26 +5447,26 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | 日高本線 | 苫小牧〜鵡川 |  | #00A73C |
 
 - 区間記号・色は Wikipedia「北海道旅客鉄道の駅ナンバリング・区間カラー」による
-- 区間の端の駅・記号・番号・色は、データ作成時に Wikipedia で確認して必要なら修正する（修正した場合はこの表も直す）
+- 区間の端の駅・路線記号・駅番号・色は、データ作成時に Wikipedia で確認して必要なら修正する（修正した場合はこの表も直す）
 
 #### データ作成時に決めたこと
 
 - 駅数: 新しい駅 1,246 駅（JR東日本の延長・新しい路線、JR北海道）。路線は JR東日本 36 路線・JR北海道 19 路線を追加
-- 大糸線の駅番号は記号のない数字のみ（例: 松本 `42`、南小谷 `09`）のため、記号なしで登録した。生成スクリプトのナンバリング形式のチェックも記号のない番号を正しい形式として扱う
+- 大糸線の駅番号は記号のない数字のみ（例: 松本 `42`、南小谷 `09`）のため、記号なしで登録した。生成スクリプトの駅番号の形式のチェックも路線記号のない駅番号を正しい形式として扱う
 - 津軽線は蟹田〜三厩が運休中だが、廃止は 2027年4月1日のため、三厩まで含めた
 - 陸羽西線はトンネル工事による運休中（バス代行）だが含めた
 - 含めなかった駅: 信号場、貨物駅、季節営業の臨時駅（ラベンダー畑・細岡・原生花園・猪苗代湖畔など）、開業前の駅（Fビレッジ）、2025〜2026年に廃止された駅（仁山・二股・東滝川・東根室など）
 - JR東日本で離れた場所にある同名の別の駅を別の駅ID にした（`DISTINCT`）: 根岸（只見線）、大沢（山形線。上越線の大沢とは別）、大久保（奥羽本線）
 
-#### 駅ごとのナンバリングアイコン（stationDB.csv の「ナンバリングアイコン」列）
+#### 駅ごとの駅アイコンの種類（stationDB.csv の「ナンバリングアイコン」列）
 
-- `stationDB.csv` の末尾に列「ナンバリングアイコン」を追加する（列順: `駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度, ナンバリングアイコン`）。値はナンバリングアイコンのプリセットキー（`N_*`）または空欄
+- `stationDB.csv` の末尾に列「ナンバリングアイコン」を追加する（列順: `駅ID, 駅名, 駅名かな, 駅名英語, 緯度, 経度, ナンバリングアイコン`）。値は駅アイコンの種類のプリセットキー（`N_*`）または空欄
 - 生成スクリプトでは、駅の識別キーごとの指定（`STATION_NUM_ICON`。現在は `JR北海道:札幌` → `N_sapporo` のみ）から出力する
 - 読み込み（`loadStationDB`）では `PresetStation.numIconPresetKey` に入れる（列がない・空欄なら空文字）
-- 「路線図から追加」で駅を登録するとき（4.10節・`extractStationsFromSections`）、駅のナンバリング（`numIcon`・境界駅の `numIconNext`）のプリセットキーは、駅の指定があればそれを、なければ従来どおり路線のナンバリングアイコンを使う
-  - 2つ目のナンバリング（`numIconNext`）の空の初期値のプリセットキーは従来どおり路線のもの
-  - 境界駅で、前後の路線のナンバリングがどちらも駅の指定のプリセットで記号・番号が同じ場合（例: 札幌で函館本線〔S〕から函館本線〔A〕へ）は、路線カラーが違っても2つ目のナンバリングを設定しない（駅の指定のプリセットは路線カラーを使わないため）
-- 生成スクリプトのナンバリング形式・記号の一致のチェックは、駅の指定がある駅では行わない
+- 「路線図から追加」で駅を登録するとき（4.10節・`extractStationsFromSections`）、駅の駅アイコン（`numIcon`・境界駅の `numIconNext`）のプリセットキーは、駅の指定があればそれを、なければ従来どおり路線の駅アイコンの種類を使う
+  - 2つ目の駅アイコン（`numIconNext`）の空の初期値のプリセットキーは従来どおり路線のもの
+  - 境界駅で、前後の路線の駅アイコンがどちらも駅の指定のプリセットで路線記号・駅番号が同じ場合（例: 札幌で函館本線〔S〕から函館本線〔A〕へ）は、路線カラーが違っても2つ目の駅アイコンを設定しない（駅の指定のプリセットは路線カラーを使わないため）
+- 生成スクリプトの駅番号の形式・路線記号の一致のチェックは、駅の指定がある駅では行わない
 - あわせて、生成スクリプトのチェックを次のように変える: 枝番（`U 02-1`・`G 11-1` など）は正しい形式として扱う。JR北海道の路線は、分岐駅で優先されるルートの記号が付くため、路線の記号との一致を調べない
 
 #### 変更ファイル
@@ -5468,7 +5479,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `scripts/presetData/build_presets.py` | 事業者の路線ID の範囲・Wikidata の事業者名の追加。`STATION_NUM_ICON` と stationDB.csv の「ナンバリングアイコン」列。チェックの除外 |
 | `public/csv/presetLines/*.csv` | 再生成 |
 | `app/modules/loadStationPresets.ts` | `PresetStation.numIconPresetKey` の追加と読み込み |
-| `app/components/StationPresetPopup.tsx` | 駅のナンバリングに駅ごとのプリセットを使う。境界駅の2つ目のナンバリングの判定 |
+| `app/components/StationPresetPopup.tsx` | 駅の駅アイコンに駅ごとのプリセットを使う。境界駅の2つ目の駅アイコンの判定 |
 
 ### 7.48 駅プリセットデータ — 新幹線
 
@@ -5484,7 +5495,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | 区間 | 実際の運行どおりとする。上越新幹線・北陸新幹線・山形新幹線・秋田新幹線は東京から（東京〜大宮〜高崎などは東北新幹線と重なり、路線図では平行線として並ぶ） |
 | 駅 | フル規格の新幹線は全駅。ミニ新幹線は列車の停車駅のみ（在来線の区間で通過する駅は含めない。東北新幹線の区間もその列車の停車駅のみ） |
 | 路線アイコン | すべて `I_mono_color`（路線カラーの無地の四角） |
-| 路線記号・駅ナンバリング | なし（空欄）。ナンバリングアイコンは使われないが、事業者のもの（`N_JR_central` など）を入れておく |
+| 路線記号・駅ナンバリング | なし（空欄）。駅アイコンの種類は使われないが、事業者のもの（`N_JR_central` など）を入れておく |
 | 路線カラー | 下表。Wikipedia「日本の鉄道ラインカラー一覧」の新幹線の路線の色を基本とし、同じ色になる JR東日本の新幹線は、JR東日本の案内に使われる新幹線ごとの色（同ページの表）を使う。色の記載のない JR九州・JR北海道は事業者の色 |
 | 駅の同一性 | 同じ事業者の在来線に同名の駅があれば同じ駅（例: 仙台、静岡）。別の事業者の同名の駅が 1km 以内にあれば自動的に同じ駅にまとめる（7.37節。例: 新大阪、京都、品川、小倉）。名前が違うが乗り換えられる駅は乗換エッジでつなぐ（`transfer_groups.json`。例: 奥津軽いまべつ〜津軽二股）。対象はデータ作成時に確認してここに書き足す |
 | 既存データ | 既存の路線ID・駅ID は変更しない。新しい路線は路線ID 245 から振る |
@@ -5541,7 +5552,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | オン（初期値） | グレーアウトして編集不可（`.form-disabled`）。入力済みの値は消さずに残す | 末尾停車駅（下記）の値 |
 | オフ | グレーアウトを解除 | 行先欄に入力した値 |
 
-グレーアウトするのは、行き先・行き先かな・行き先(英語)・行き先ナンバリング・行き先色・行先ナンバリング記号の6項目。経由等はオン・オフにかかわらず入力でき、表示にも使う。「すべての運用に適用」がオンのときは、他のトグルと同じく全運用に反映する。
+グレーアウトするのは、行き先・行き先かな・行き先(英語)・行先の駅番号・行き先色・行先の駅アイコンの種類の6項目。経由等はオン・オフにかかわらず入力でき、表示にも使う。「すべての運用に適用」がオンのときは、他のトグルと同じく全運用に反映する。
 
 #### 表示（`applyOperationFallbacks`）
 
@@ -5568,7 +5579,7 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 |---|---|---|
 | 運用タブのラベル（`OperationForm`） | `運用0: (行先自動)急行 渋谷行` | `運用0: 急行 元町・中華街行` |
 | 次区間運用の選択肢（`StationParamSetter`） | 同上 | 同上 |
-| 運用情報の吹き出し（`OperationInfoBalloon`） | 1行目に `運用0` と並べて `行先自動` の札をハイライト（`--accent` の背景・白文字の小さな札）して出す。行先・行先かな・行先英語・行先番号は末尾停車駅の値 | 1行目は `運用0` のみ。値は運用のもの |
+| 運用情報の吹き出し（`OperationInfoBalloon`） | 1行目に `運用0` と並べて `行先自動` の札をハイライト（`--accent` の背景・白文字の小さな札）して出す。行先・行先かな・行先英語・行先の駅アイコンは末尾停車駅の値 | 1行目は `運用0` のみ。値は運用のもの |
 
 末尾停車駅がない（駅一覧が空）場合の行先は空文字とし、ラベルは従来どおり「行先未設定」を使う。
 
@@ -5591,23 +5602,23 @@ JR東海用の路線アイコンのプリセット `I_JR_central` を追加し�
 | `app/components/Editor.tsx`・`EditorHead.tsx` | 読み込み時のマイグレーション |
 | `public/Controller/src/utility/utils.js` | `applyOperationFallbacks` をオン/オフで切り替える |
 
-### 7.50 路線情報の吹き出し — 路線記号とナンバリングフォーマット
+### 7.50 路線情報の吹き出し — 路線アイコンと駅アイコンの種類
 
-駅一覧の「路線」列をクリックしたときの吹き出し（`LineInfoBalloon`）で、「路線記号」欄にナンバリングの画像が出ていたのを改め、路線記号（路線アイコン）を出す。ナンバリングの画像は新しい「ナンバリングフォーマット」欄に移す。
+駅一覧の「路線」列をクリックしたときの吹き出し（`LineInfoBalloon`）で、「路線アイコン」欄に駅アイコンの画像が出ていたのを改め、路線アイコンを出す。駅アイコンの画像は新しい「駅アイコンの種類」欄に移す。
 
 | 欄 | 表示内容 |
 |---|---|
-| 路線記号 | その路線の路線アイコンと、その右隣に `[プリセット名]`（例: `[JR東日本]`）。`line.lineIconKey` で `iconDict` を引き、路線設定の一覧（`LineList` の「路線記号」列）と同じ方法で描く（画像ならその画像、プリセットなら `createNumIconFromPreset` に `presetType`・`symbol`・`color` を渡して生成したSVG）。プリセット名は `iconIndexes` の `name`、画像なら `[画像]` |
-| ナンバリングフォーマット | これまで「路線記号」欄に出していた画像（`line.numIconPresetKey` の `createNumIconFromPreset` に `line.symbol`・`line.color` を渡して生成したSVG）と、その右隣に `[プリセット名]`（例: `[JR東日本]`）。プリセット名は `numberIndexes` の `name` |
+| 路線アイコン | その路線の路線アイコンと、その右隣に `[プリセット名]`（例: `[JR東日本]`）。`line.lineIconKey` で `iconDict` を引き、路線設定の一覧（`LineList` の「路線アイコン」列）と同じ方法で描く（画像ならその画像、プリセットなら `createNumIconFromPreset` に `presetType`・`symbol`・`color` を渡して生成したSVG）。プリセット名は `iconIndexes` の `name`、画像なら `[画像]` |
+| 駅アイコンの種類 | これまで「路線アイコン」欄に出していた画像（`line.numIconPresetKey` の `createNumIconFromPreset` に `line.symbol`・`line.color` を渡して生成したSVG）と、その右隣に `[プリセット名]`（例: `[JR東日本]`）。プリセット名は `numberIndexes` の `name` |
 
 - プリセットのキーが一覧（`iconIndexes`・`numberIndexes`）にない場合はアイコンを描けないため、アイコンの代わりに `キー:[キー](未登録)` の文字（例: `キー:N_foo(未登録)`）を出す。
-- 路線アイコンが未設定（`lineIconKey` が空、または `iconDict` にない）、ナンバリングのキーが空の場合は空欄にする。
+- 路線アイコンが未設定（`lineIconKey` が空、または `iconDict` にない）、駅アイコンの種類のキーが空の場合は空欄にする。
 
 #### 変更するファイル
 
 | ファイル | 変更内容 |
 |---|---|
-| `app/components/LineInfoBalloon.tsx` | 路線記号・ナンバリングフォーマットの欄 |
+| `app/components/LineInfoBalloon.tsx` | 路線アイコン・駅アイコンの種類の欄 |
 | `app/components/StationList.tsx` | 吹き出しに `iconDict` を渡す |
 
 ### 7.51 所要時間表示の初期値、路線図から追加する駅の座標、駅設定の「座標設定」タブ
@@ -5959,13 +5970,13 @@ LCD表示（`display.html`）の表示中に、エディタの「表示設定」
 | `public/Controller/src/obj/AutoAdvanceController.js` | 自動送りを止める |
 | `public/Controller/src/main/Controller.js`・`public/Controller/src/obj/PageController.js` | ページ自動切換えの切り替え |
 
-### 7.57 駅一覧の「ナンバリング」欄を LCD 上部の表示に合わせる
+### 7.57 駅一覧の「駅アイコン」欄を LCD 上部の表示に合わせる
 
-駅一覧の表の「ナンバリング」欄は、「その駅を LCD の上部（ヘッダー）に表示するとしたら、どう描画されるか」を表示する。通過駅も同じ規則で表示する。
+駅一覧の表の「駅アイコン」欄は、「その駅を LCD の上部（ヘッダー）に表示するとしたら、どう描画されるか」を表示する。通過駅も同じ規則で表示する。
 
 #### 1つ目（`numIcon`）
 
-| 番号 | 上部ナンバリング表示形式 | プリセット | 表示 |
+| 駅番号 | 上部の駅アイコンの形式 | プリセット | 表示 |
 |---|---|---|---|
 | 空 | （問わない） | （問わない） | `-` |
 | あり | 通常 | 空・未登録 | `-` |
@@ -5974,17 +5985,17 @@ LCD表示（`display.html`）の表示中に、エディタの「表示設定」
 
 #### 2つ目（`numIconNext`）
 
-1つ目と同じ規則（表示形式は駅の「上部ナンバリング表示形式」）で描画できる場合だけ、1つ目の右に並べる。描画できない場合は何も出さない（`-` も出さない）。1つ目が `-` で2つ目が描画できる場合は、`-` の右に2つ目を並べる。
+1つ目と同じ規則（表示形式は駅の「上部の駅アイコンの形式」）で描画できる場合だけ、1つ目の右に並べる。描画できない場合は何も出さない（`-` も出さない）。1つ目が `-` で2つ目が描画できる場合は、`-` の右に2つ目を並べる。
 
 #### 地下鉄形式の記号
 
-LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIcon.color`）の円の下側を水平に切り落とした形の中に白い円を置き、上に記号、下に番号を書く。
+LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIcon.color`）の円の下側を水平に切り落とした形の中に白い円を置き、上に路線記号、下に駅番号を書く。
 
 #### 変更するファイル
 
 | ファイル | 変更内容 |
 |---|---|
-| `app/components/StationList.tsx` | 「ナンバリング」欄の描画 |
+| `app/components/StationList.tsx` | 「駅アイコン」欄の描画 |
 
 ### 7.58 駅一覧の路線列・運用列から区間の路線・運用を設定する
 
@@ -6028,31 +6039,31 @@ LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIco
 | `app/components/StationList.tsx` | 路線列・運用列のハイライト、範囲内のクリックでポップアップ |
 | `app/components/StationParamSetter.tsx` | 「次区間路線」「次区間運用」の削除 |
 
-### 7.59 路線図から追加する駅のナンバリングを「所属路線の設定を使う」にする、駅設定の並べ替え
+### 7.59 路線図から追加する駅の駅アイコンを「所属路線の設定を使う」にする、駅設定の並べ替え
 
-#### 1. 路線図から追加する駅のナンバリング
+#### 1. 路線図から追加する駅の駅アイコン
 
-「路線図から追加」で追加する駅のナンバリング（`numIcon`・`numIconNext`）は、`colorMode` を自動（`'auto'`、所属路線の設定を使う）で入れる。路線記号・色・プリセットは一緒に追加する路線（`lineDict[lineId]`）の値になり、ナンバリングの番号は駅ごとの値（`lineConnectDB` の駅ナンバリング）を使う。
+「路線図から追加」で追加する駅の駅アイコン（`numIcon`・`numIconNext`）は、`colorMode` を自動（`'auto'`、所属路線の設定を使う）で入れる。路線記号・色・プリセットは一緒に追加する路線（`lineDict[lineId]`）の値になり、駅番号は駅ごとの値（`lineConnectDB` の駅ナンバリング）を使う。
 
-ただし、自動にすると表示が変わってしまう次の場合は、従来どおり手動（`'manual'`）で入れる。判定は、ナンバリングの路線記号・プリセット・色が `lineDict[lineId]` の値とすべて一致するかどうかで行い、一致すれば自動、しなければ手動にする。
+ただし、自動にすると表示が変わってしまう次の場合は、従来どおり手動（`'manual'`）で入れる。判定は、駅アイコンの路線記号・プリセット・色が `lineDict[lineId]` の値とすべて一致するかどうかで行い、一致すれば自動、しなければ手動にする。
 
 | 手動のままにする例 | 理由 |
 |---|---|
-| 路線をまたぐ駅の1つ目（`numIcon`） | `lineId` は次の路線を指すため、自動にすると前の路線のナンバリングが次の路線の記号・色に変わる |
+| 路線をまたぐ駅の1つ目（`numIcon`） | `lineId` は次の路線を指すため、自動にすると前の路線の駅アイコンが次の路線の記号・色に変わる |
 | 駅ごとのプリセットを使う駅（札幌の `N_sapporo` など。7.47節） | 自動にすると路線のプリセットに変わる |
-| 路線記号と駅のナンバリングの記号が違う駅（JR北海道の一部など） | 自動にすると記号が路線記号に変わる |
-| 番号の無い2つ目（`numIconNext`） | 記号が空で一致しない（番号が無いので表示もされない） |
+| 路線の路線記号と駅アイコンの路線記号が違う駅（JR北海道の一部など） | 自動にすると記号が路線記号に変わる |
+| 駅番号の無い2つ目（`numIconNext`） | 記号が空で一致しない（駅番号が無いので表示もされない） |
 
 #### 2. 駅設定（`StationParamSetter`）の並べ替え
 
-- ナンバリング欄（路線記号・路線記号２）の「路線カラー設定」（自動／手動のセレクト）を、トグルスイッチ「所属路線の設定を使う」（オン＝自動、オフ＝手動）に改め、欄の最上段に移す
+- 駅アイコンの欄（駅アイコン・駅アイコン２）の「路線カラー設定」（自動／手動のセレクト）を、トグルスイッチ「所属路線の設定を使う」（オン＝自動、オフ＝手動）に改め、欄の最上段に移す
 - 「開くドア」「次駅までの走行時間(秒)」「停車時間(秒)」を「その他設定」の欄（`fieldset`）でくくり、駅基本設定タブの最下部に移す
 
 #### 変更するファイル
 
 | ファイル | 変更内容 |
 |---|---|
-| `app/components/StationPresetPopup.tsx` | 追加する駅のナンバリングの `colorMode` |
+| `app/components/StationPresetPopup.tsx` | 追加する駅の駅アイコンの `colorMode` |
 | `app/components/StationParamSetter.tsx` | 「所属路線の設定を使う」トグル、「その他設定」欄 |
 
 ### 7.60 路線・運用が未設定の区間の吹き出し
@@ -6081,7 +6092,7 @@ LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIco
 | `app/components/OperationAddPopup.tsx` | 新規。運用追加ポップアップ |
 | `app/components/SectionSettingPopup.tsx` | 「新規追加」ボタン |
 
-### 7.62 駅プリセットデータ — 九州・中国・四国の私鉄、事業者略称、ナンバリングプリセット「丸形汎用」
+### 7.62 駅プリセットデータ — 九州・中国・四国の私鉄、事業者略称、駅アイコンのプリセット「丸形汎用」
 
 #### 1. 収録する私鉄
 
@@ -6101,7 +6112,7 @@ LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIco
 | 事業者種別 | 私鉄 |
 | 路線アイコン | 地上路線汎用１（`I_train_normal1`）。福岡市地下鉄は地下路線汎用（`I_train_subway1`）。路線記号のない路線は従来どおり路線カラーの四角（`I_mono_color`） |
 | ナンバリングアイコン | 丸形汎用（`N_round_normal`。下記） |
-| 路線カラー・路線記号・駅ナンバリング | 各路線・各駅のもの（駅ナンバリングのない路線は空） |
+| 路線カラー・路線記号・駅ナンバリング | 各路線・各駅のもの（駅番号のない路線は空） |
 | 英語名 | 従来どおり（「〇〇本線」は Main を付けない） |
 
 元データは事業者のまとまりごとに `scripts/presetData/sources/` に置き、生成スクリプトは元データの路線の `"operator"`・`"lineIcon"` を使う（JR・東京の地下鉄は従来どおり `COMPANIES` の路線IDの範囲で決める）。
@@ -6121,9 +6132,9 @@ LCD 上部の地下鉄形式と同じ形を小さく描く。路線色（`numIco
 
 **「路線図から追加」での使い方**: 駅の乗換路線（7.31節）を作るとき、その駅でルートが使っている事業者以外の路線（他社線）は、路線名の前に事業者略称を付ける（例: 「西鉄天神大牟田線」「にしてつてんじんおおむたせん」「Nishitetsu Tenjin Omuta Line」）。自社の路線には付けない。
 
-#### 3. ナンバリングプリセット「丸形汎用」
+#### 3. 駅アイコンのプリセット「丸形汎用」
 
-JR四国のナンバリングプリセット（`N_JR_shikoku.svg`）を複製し、`N_round_normal`（表示名「丸形汎用」）を作る。`assets/iconPresets/`（エディタ用）と `public/iconPresets/`（LCD表示用）の両方に置き、ナンバリング記号の選択リストでは東急の後ろに置く。
+JR四国の駅アイコンのプリセット（`N_JR_shikoku.svg`）を複製し、`N_round_normal`（表示名「丸形汎用」）を作る。`assets/iconPresets/`（エディタ用）と `public/iconPresets/`（LCD表示用）の両方に置き、駅アイコンの種類の選択リストでは東急の後ろに置く。
 
 #### 変更するファイル
 
@@ -6139,7 +6150,7 @@ JR四国のナンバリングプリセット（`N_JR_shikoku.svg`）を複製し
 | `scripts/presetData/sources/shared_stations.json`・`transfer_groups.json` | 共同使用駅・乗換駅の追加 |
 | `public/csv/presetLines/*.csv` | 再生成 |
 
-### 7.63 駅プリセットデータ — 近畿・三重の私鉄、路面電車の運行系統化、私鉄の路線記号、「他社線を汎用記号にする」
+### 7.63 駅プリセットデータ — 近畿・三重の私鉄、路面電車の運行系統化、私鉄の路線アイコン、「他社線を汎用記号にする」
 
 #### 1. 近畿・三重の私鉄
 
@@ -6166,7 +6177,7 @@ JR四国のナンバリングプリセット（`N_JR_shikoku.svg`）を複製し
 - とさでん交通は「後免線」（後免町〜はりまや橋）・「伊野線」（はりまや橋〜伊野）・「桟橋線」（高知駅前〜桟橋通五丁目）の3路線とする（ユーザー指定）
 - 系統の路線ID は、各まとまりの範囲の空き番号と 580〜639 を使う
 
-#### 3. 私鉄の路線記号
+#### 3. 私鉄の路線アイコン
 
 私鉄の路線のうち、路線アイコンが汎用記号（地上路線汎用１ `I_train_normal1`・地下路線汎用 `I_train_subway1`）の路線は、すべて単色（`I_mono_color`）にする。東京メトロ・都営（`I_tokyo_subway`）は変えない。
 
@@ -6178,7 +6189,7 @@ JR四国のナンバリングプリセット（`N_JR_shikoku.svg`）を複製し
 
 - 「路線図から追加」の「追加一覧」の「1つ戻る」の左に「追加設定」ボタンを置く。押すと「追加設定」ポップアップを開く
 - ポップアップには「他社線を汎用記号にする」トグルスイッチを置く。初期値はオフ。見た目・閉じ方はこれまでのポップアップと同じ（「×」・「閉じる」・外側のクリック・`Esc`）
-- オンのとき、追加する駅の乗換路線（7.31節）の路線記号を、自社線（その駅でルートが使っている事業者の路線）ならその路線の路線アイコン、他社線ならその路線の汎用記号（「汎用記号」列のプリセットに、その路線の路線記号・路線カラーを入れたもの）にする。オフなら従来どおり
+- オンのとき、追加する駅の乗換路線（7.31節）の路線アイコンを、自社線（その駅でルートが使っている事業者の路線）ならその路線の路線アイコン、他社線ならその路線の汎用記号（「汎用記号」列のプリセットに、その路線の路線記号・路線カラーを入れたもの）にする。オフなら従来どおり
 - トグルの値はブラウザの `localStorage`（キー `presetAddOptions`）に保存し、次回も使う。設定データ（設定ファイル）には含めない。保存・読み込みできない場合はオフとして扱う
 
 #### 6. 他社線の事業者略称を付けない場合
@@ -6198,7 +6209,7 @@ JR四国のナンバリングプリセット（`N_JR_shikoku.svg`）を複製し
 
 ### 7.64 駅プリセットデータ — 中部・東北・北海道の私鉄
 
-中部（新潟・富山・石川・福井・山梨・長野・岐阜・静岡・愛知）・東北（青森・岩手・宮城・秋田・山形・福島）・北海道の旅客鉄道・軌道（大手私鉄・地下鉄・モノレール・新交通・第三セクター・路面電車）を駅プリセットに登録する。作り方は 7.62節・7.63節と同じ（事業者・事業者略称・汎用記号を元データに書く。路線アイコンは単色。ナンバリングアイコンは丸形汎用。路面電車は運行系統ごと）。
+中部（新潟・富山・石川・福井・山梨・長野・岐阜・静岡・愛知）・東北（青森・岩手・宮城・秋田・山形・福島）・北海道の旅客鉄道・軌道（大手私鉄・地下鉄・モノレール・新交通・第三セクター・路面電車）を駅プリセットに登録する。作り方は 7.62節・7.63節と同じ（事業者・事業者略称・汎用記号を元データに書く。路線アイコンは単色。駅アイコンの種類は丸形汎用。路面電車は運行系統ごと）。
 
 含めないもの: ケーブルカー・ロープウェイ、ガイドウェイバス（名古屋ガイドウェイバス）、廃止された路線、関東の県にある路線（野岩鉄道・伊豆箱根鉄道大雄山線など）。
 
@@ -6300,7 +6311,7 @@ LCD の路線図（詳細路線図 `defaultLine`・全体路線図 `overLine`）
 - エディタのポップアップ（`.modal-dialog`）: 中身が入らないときは枠の中を縦スクロールする。最大の高さは画面の高さの70%。iPhoneでアドレスバーなどを除いた、実際に見えている高さ（`dvh`）で計算する。`dvh` が使えないブラウザでは今までどおり `vh` で計算する
 - 縦いっぱいのポップアップ（`.modal-dialog--tall`、駅の「追加設定」）: 高さを「見えている高さ − 80px」にする（`dvh`）。中のタブ本体は今までどおり、そこだけがスクロールする
 - LCD表示中のポップアップ（`.dsp-dialog`。表示設定・画像保存のプレビュー）: 最大の高さを「見えている高さ − 32px」にして、入らないときは枠の中を縦スクロールする。スマホ（is-phone）で2倍にしているときは、横幅と同じように半分の値にする
-- 対象: 路線追加、運用追加、運用を設定（区間）、アイコン、アイコン追加、表示設定、ナンバリング連番入力、駅の追加設定、LCDの表示設定、LCDの画像保存。「路線図から追加」のルート選択はすでにスクロールするので変えない
+- 対象: 路線追加、運用追加、運用を設定（区間）、アイコン、アイコン追加、表示設定、駅番号連番入力、駅の追加設定、LCDの表示設定、LCDの画像保存。「路線図から追加」のルート選択はすでにスクロールするので変えない
 
 | ファイル | 変更内容 |
 |---|---|
@@ -6316,15 +6327,15 @@ iOSでは「▶」などの三角形の文字が絵文字（色付きの四角�
 | 場所 | 今の文字 | 変更後 |
 |---|---|---|
 | 駅一覧などの表で、折りたたんだ列の縦書き見出し（`GenericItemList`） | ▶ | 右向きの三角形アイコン。3文字ごとの改行では、今までどおりアイコンを1文字として数える |
-| 駅の「路線記号２」の見出し（閉じているとき） | ▶ | 右向きの三角形アイコン |
-| 路線の「路線記号」の並べ替えボタン | ◀ ▶ | 左向き・右向きの三角形アイコン |
+| 駅の「駅アイコン２」の見出し（閉じているとき） | ▶ | 右向きの三角形アイコン |
+| 路線の「路線アイコン」の並べ替えボタン | ◀ ▶ | 左向き・右向きの三角形アイコン |
 | 「路線図から追加」の「追加一覧」の見出し | ▼ ▲ | 下向き・上向きの三角形アイコン |
 
 | ファイル | 変更内容 |
 |---|---|
 | `app/components/SvgIcons.tsx` | 三角形アイコン4種を追加 |
 | `app/components/GenericItemList.tsx` | 折りたたみ見出しの ▶ をアイコンに |
-| `app/components/StationParamSetter.tsx` | 路線記号２の ▶、路線記号の ◀ ▶ をアイコンに |
+| `app/components/StationParamSetter.tsx` | 駅アイコン２の ▶、路線アイコンの ◀ ▶ をアイコンに |
 | `app/components/StationPresetPopup.tsx` | 追加一覧の ▼ ▲ をアイコンに |
 
 ### 7.71 iOSで入れ子ヘッダーを開いたときの上段の幅
@@ -6339,9 +6350,9 @@ iOSでは「▶」などの三角形の文字が絵文字（色付きの四角�
 |---|---|
 | `app/components/GenericItemList.tsx` | ヘッダー上段のセルの `key` に開閉の状態を含める |
 
-### 7.72 駅プリセットデータ — 関東の私鉄、東急の専用の路線記号・ナンバリング
+### 7.72 駅プリセットデータ — 関東の私鉄、東急の専用の路線アイコン・駅アイコン
 
-関東（東京・神奈川・埼玉・千葉・茨城・栃木・群馬）の旅客鉄道・軌道（大手私鉄・地下鉄・モノレール・新交通・第三セクター・路面電車）を駅プリセットに登録する。作り方は 7.62節〜7.64節と同じ（事業者・事業者略称・汎用記号を元データに書く。路線アイコンは単色。ナンバリングアイコンは丸形汎用。路面電車は運行系統ごと。英語名に Main を付けない。駅ナンバリングは実際の表記どおり）。ただし東急電鉄の路線だけは、路線アイコンを東急（`I_tokyu`）、ナンバリングアイコンを東急（`N_tokyu`）にする。
+関東（東京・神奈川・埼玉・千葉・茨城・栃木・群馬）の旅客鉄道・軌道（大手私鉄・地下鉄・モノレール・新交通・第三セクター・路面電車）を駅プリセットに登録する。作り方は 7.62節〜7.64節と同じ（事業者・事業者略称・汎用記号を元データに書く。路線アイコンは単色。駅アイコンの種類は丸形汎用。路面電車は運行系統ごと。英語名に Main を付けない。路線記号と駅番号は実際の表記どおり）。ただし東急電鉄の路線だけは、路線アイコンを東急（`I_tokyu`）、駅アイコンの種類を東急（`N_tokyu`）にする。
 
 含めないもの: ケーブルカー・ロープウェイ、廃止された路線、すでに登録済みの路線（東京メトロ全線、都営地下鉄4路線、富士急・会津鉄道など関東の外の事業者）。
 
@@ -6355,7 +6366,7 @@ iOSでは「▶」などの三角形の文字が絵文字（色付きの四角�
 | 京成・千葉 | 京成電鉄（松戸線を含む）、北総鉄道、芝山鉄道、東葉高速鉄道、千葉都市モノレール、小湊鐵道、いすみ鉄道、銚子電気鉄道、流鉄、山万（ユーカリが丘線）、舞浜リゾートライン | 1000〜1029 |
 | 東京・茨城 | 首都圏新都市鉄道（つくばエクスプレス）、東京臨海高速鉄道（りんかい線）、ゆりかもめ、東京モノレール、多摩都市モノレール、東京都交通局（都電荒川線・日暮里・舎人ライナー）、関東鉄道、ひたちなか海浜鉄道、鹿島臨海鉄道 | 1030〜1049 |
 
-- 東急の路線は、元データの路線に `"lineIcon": "I_tokyu"`・`"numIcon": "N_tokyu"` を書く。生成スクリプトは、元データの路線に汎用記号以外の `lineIcon` があればその路線アイコンを、`numIcon` があればそのナンバリングアイコンを使う（無ければ従来どおり単色・丸形汎用）。路線記号のない路線は従来どおり路線カラーの四角
+- 東急の路線は、元データの路線に `"lineIcon": "I_tokyu"`・`"numIcon": "N_tokyu"` を書く。生成スクリプトは、元データの路線に汎用記号以外の `lineIcon` があればその路線アイコンを、`numIcon` があればその駅アイコンの種類を使う（無ければ従来どおり単色・丸形汎用）。路線記号のない路線は従来どおり路線カラーの四角
 - こどもの国線は東急電鉄が運行しているため東急として扱う。みなとみらい線（横浜高速鉄道）は東急ではない（単色・丸形汎用）
 - 都電荒川線・日暮里・舎人ライナーは事業者「東京都交通局」、事業者略称「都営」。都営地下鉄4路線（事業者「東京地下鉄」としてまとめている。7.37節）は変えない
 - 地下鉄（横浜市営地下鉄）の汎用記号は地下路線汎用、それ以外は地上路線汎用１
@@ -6464,7 +6475,7 @@ iOSでは「▶」などの三角形の文字が絵文字（色付きの四角�
 |---|---|
 | `line.name` / `line.kana` / `line.eng` | 新幹線以外: 事業者略称 + 「線」・「せん」・「 Line」（例: 「JR線」「じぇいあーるせん」「JR Line」、「東急線」）。略称が既に「線」で終わる（英語は「Line」で終わる）場合は付けない（例: 「りんかい線」）。新幹線: 「新幹線」「しんかんせん」「Shinkansen」 |
 | `line.lineIconKey` | 地上路線汎用１（`I_train_normal1`、路線記号・色は空）のアイコン。既存の `iconDict` に同じものがあれば使い、なければ新規作成する |
-| `station.type` / `symbol` / `number` / `color` | 空（ナンバリング・色なし） |
+| `station.type` / `symbol` / `number` / `color` | 空（駅アイコン・色なし） |
 | `station.name` / `station.eng` | まとめた路線のうち、並び順で先頭の路線の駅名 |
 
 - まとめた乗換路線の並び位置は、まとめた路線のうち並び順で先頭の路線の位置
@@ -6681,7 +6692,7 @@ LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platfo
   - 線路・ホーム・自列車・向かい側の列車の位置と描く順番は `platform.svg` と同じ。向かい側の列車が無いときは、ホームの向かい側の縁と線路を描かない（`platform.svg` と同じ）
   - 向かい側の列車は、`platform.svg` と同じ色（灰色）・ラインなしで、消失点を基準に縮小して描く
 - 自列車: その駅の運用（駅の `operationId` の運用。無ければ新しい運用の初期値）の号車リスト・前方/後方オフセット・進行方向・「列車にラインを描画するか」で描く。ラインの色は表示ページと同じく、その駅に到着する区間の路線の色。「*」の号車は 7.75節と同じく強調の形で点滅させずに描き、号車番号は静止画の上に重ねて描く。自列車は操作できない
-- 向かい側の列車の路線名: 表示ページの路線名ラベル（路線記号付き）は文字描画の部品が要るため、エディタでは向かい側の列車の上に路線名を文字だけで重ねて描く
+- 向かい側の列車の路線名: 表示ページの路線名ラベル（路線アイコン付き）は文字描画の部品が要るため、エディタでは向かい側の列車の上に路線名を文字だけで重ねて描く
 - 静止画は横 1920 の座標系を画面の横幅に合わせて縮小し、縦は線路・ホーム・列車（向かい側を含む）の範囲を切り出す
 - 駅を複数選択しているときは、ほかの項目と同じく最後に選んだ駅の静止画を描き、操作は選択中のすべての駅に反映する
 
@@ -6721,7 +6732,7 @@ LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platfo
 - スロットの長さ＝自列車の1両の長さ（スロット分割数＝自列車の両数）。自列車の左端＝前方オフセット
 - スロットの左端の位置は `前方オフセット + スロット番号 × (1両の長さ + 車両の間隔)` とする（これまでは番号が 0 以外のとき車両の間隔 1 つ分ずれていた）
 - 列車の全長は `1両の長さ × 両数 + 車両の間隔 × (両数 - 1)` とする（これまでは向かい側の列車の全長の間隔の数にスロット分割数を使っていた）
-- 向かい側の列車の路線: `otherLineInd` が `t` ＋ 番号なら、その駅の乗換案内の路線（路線記号は乗換案内の `line.lineIconKey`、名前は `line.name`・`line.eng`。乗換一覧と同じ `_transferItemToDrawItem` で求める）。それ以外は路線一覧のキーとして扱う（これまでと同じ）。路線が見つからないときは向かい側の列車を描かない
+- 向かい側の列車の路線: `otherLineInd` が `t` ＋ 番号なら、その駅の乗換案内の路線（路線アイコンは乗換案内の `line.lineIconKey`、名前は `line.name`・`line.eng`。乗換一覧と同じ `_transferItemToDrawItem` で求める）。それ以外は路線一覧のキーとして扱う（これまでと同じ）。路線が見つからないときは向かい側の列車を描かない
 - `drawParams.platform` の `slotNum`・`leftSlotInd` を削除する
 
 #### 変更するファイル
@@ -6735,3 +6746,61 @@ LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platfo
 | `app/globals.css` | ホームの編集画面のスタイル |
 | `public/Controller/src/obj/ProgressController.js` | 上記 4 |
 | `public/Controller/doc/settings.md` | 駅の項目の説明 |
+
+### 7.77 用語の統一（路線記号・駅番号・路線アイコン・駅アイコン）
+
+あいまいだった用語を、次の4つに統一する（定義は「1.1 用語」）。仕様書と画面の表示（ラベル・表の見出し・選択肢）をこれに合わせる。データの項目名（`symbol`・`number`・`numIcon`・`lineIconKey`・`numIconPresetKey` など）とソースコードのコメントは変えない。
+
+| 用語 | 指すもの | 例 |
+|---|---|---|
+| 路線記号 | 駅ごとのアルファベット | `JA`・`A`・`TY` |
+| 駅番号 | 駅ごとの数字 | `JK01` の `01` |
+| 路線アイコン | 路線ごとのアイコン。一般的に路線記号を含む | 路線一覧の各路線のアイコン（`lineIconKey`） |
+| 駅アイコン | 駅ごとのアイコン。一般的に路線記号と駅番号を含む | 駅の `numIcon`・`numIconNext` から作るアイコン |
+
+これまでの「ナンバリング」は、指すものに合わせて「駅番号」か「駅アイコン」に言い換える。アイコンの形の選択（`N_*` のプリセット。これまでの「ナンバリング記号」）は「駅アイコンの種類」と呼ぶ。
+
+#### 画面の表示の変更
+
+| 画面 | これまで | これから | 指すもの |
+|---|---|---|---|
+| 駅基本設定 | 「路線記号」欄（枠の見出し） | 駅アイコン | `numIcon` の欄全体 |
+| 駅基本設定 | 「路線記号２」欄（枠の見出し） | 駅アイコン２ | `numIconNext` の欄全体 |
+| 駅基本設定（駅アイコン・駅アイコン２の中） | ナンバリング | 駅番号 | `number` |
+| 駅基本設定（駅アイコン・駅アイコン２の中） | ナンバリング記号 | 駅アイコンの種類 | `manualPresetKey` |
+| 駅基本設定（駅アイコン・駅アイコン２の中） | 路線記号・路線カラー | 変えない | `symbol`・`color` |
+| 駅基本設定 | 上部ナンバリング表示形式 | 上部の駅アイコンの形式 | `headerNumberingType` |
+| 駅基本設定 | 下部ナンバリング表示形式（選択肢「テキスト」「アイコン」） | 下部の駅番号の表示形式（選択肢「テキスト」「駅アイコン」） | `lineNumberType` |
+| 駅基本設定の乗換路線の表 | 見出し「路線記号」 | 路線アイコン | `line.lineIconKey` |
+| 駅基本設定の乗換路線の表 | 見出し「ナンバリング」 | 駅アイコン | `station` から作るアイコン |
+| 乗換路線設定 | 路線記号（アイコンの並び） | 路線アイコン | `line.lineIconKey` |
+| 乗換路線設定の「リストから追加」 | 見出し「路線記号」 | 路線アイコン | 路線の `lineIconKey` |
+| 乗換駅設定 | ナンバリング記号 | 駅アイコンの種類 | `station.type` |
+| 乗換駅設定 | ナンバリング | 駅番号 | `station.number` |
+| 乗換駅設定 | 路線記号・路線カラー | 変えない | `station.symbol`・`station.color` |
+| 詳細路線図表示 | 選択リスト「路線記号を追加」 | 路線アイコンを追加 | 乗換案内の文に `:アイコンキー:` を入れる |
+| 駅一覧 | 見出し「ナンバリング」 | 駅アイコン | 駅アイコン・駅アイコン２ |
+| 駅一覧 | 「ナンバリング連番入力」ボタン・ポップアップの見出し | 駅番号連番入力 | 駅番号を連番で入れる |
+| 路線一覧 | 見出し「路線記号」 | 路線アイコン | `lineIconKey` |
+| 路線設定・路線追加 | 路線記号（アイコンのプレビューと「新規追加」「リストから選択」） | 路線アイコン | `lineIconKey` |
+| 路線設定・路線追加 | 路線記号（文字入力） | 変えない | `symbol` |
+| 路線設定・路線追加 | ナンバリング記号 | 駅アイコンの種類 | `numIconPresetKey` |
+| 路線の吹き出し | 路線記号 | 路線アイコン | `lineIconKey` |
+| 路線の吹き出し | ナンバリングフォーマット | 駅アイコンの種類 | `numIconPresetKey` |
+| 運用設定（行先） | 行き先ナンバリング | 行先の駅番号（路線記号と駅番号。例: `TY21`） | `destinationNum` |
+| 運用設定（行先） | 行先ナンバリング記号 | 行先の駅アイコンの種類 | `destinationNumIconKey` |
+| 運用設定（行先） | 列車路線記号・列車路線記号（色） | 変えない | `lineLogo`・`lineColor`（文字の路線記号とその色） |
+| 運用の吹き出し | 行先番号 | 行先の駅アイコン | `destinationNum` から作るアイコン |
+| アイコン | アイコンの路線記号 | 変えない | プリセットのアイコンに入れる路線記号 |
+
+#### 仕様書の変更
+
+- 「1. 概要」の後に「1.1 用語」を設け、上の4つの用語を定義する
+- 仕様書の全体で、「路線記号」「ナンバリング」「番号」「アイコン」などを、指すものに合わせて上の用語に言い換える（これまでの節の画面のラベル名も、今の画面の表示に合わせて書き換える）。データの項目名・ファイル名・関数名は変えない
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `spec.md` | 用語の定義と全体の言い換え |
+| `app/components/StationParamSetter.tsx`・`StationList.tsx`・`LineList.tsx`・`LineAddPopup.tsx`・`LineInfoBalloon.tsx`・`OperationFields.tsx`・`OperationInfoBalloon.tsx` | 画面の表示（上の表） |

@@ -97,11 +97,11 @@ const LineInfoBalloon: React.FC<LineInfoBalloonProps> = ({ line, iconDict, x, y,
                 <span>{line.eng}</span>
             </div>
             <div className="line-info-balloon-row">
-                <span className="line-info-balloon-label">路線記号</span>
+                <span className="line-info-balloon-label">路線アイコン</span>
                 {lineIcon}
             </div>
             <div className="line-info-balloon-row">
-                <span className="line-info-balloon-label">ナンバリングフォーマット</span>
+                <span className="line-info-balloon-label">駅アイコンの種類</span>
                 {numFormat}
             </div>
         </div>

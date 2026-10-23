@@ -64,7 +64,7 @@ const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, on
                 <input type="text" onChange={(e) => onValue('destinationEng', e.target.value)} value={operation.destinationEng} />
             </div>
             <div className="form-row">
-                <label>行き先ナンバリング</label>
+                <label>行先の駅番号</label>
                 <input type="text" onChange={(e) => onValue('destinationNum', e.target.value)} value={operation.destinationNum} />
             </div>
             <div className="form-row">
@@ -72,7 +72,7 @@ const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, on
                 <input type="color" onChange={(e) => onValue('destinationColor', e.target.value)} value={operation.destinationColor} />
             </div>
             <div className="form-row">
-                <label>行先ナンバリング記号</label>
+                <label>行先の駅アイコンの種類</label>
                 <select onChange={(e) => onValue('destinationNumIconKey', e.target.value)} value={operation.destinationNumIconKey}>
                     {numberIndexes.map(num => (
                         <option key={num.key} value={num.key}>{num.name}</option>

@@ -57,7 +57,7 @@ const LineAddPopup: React.FC<Props> = ({ setting, setSetting, onAdd, onClose }) 
                         <button className="modal-close-btn" onClick={onClose} title="閉じる">×</button>
                     </div>
                     <div className="form-row">
-                        <label>路線記号</label>
+                        <label>路線アイコン</label>
                         {/* アイコンプレビュー（LineList の表示と同一ロジック） */}
                         {(() => {
                             if (typeof iconParams === 'string') {
@@ -96,7 +96,7 @@ const LineAddPopup: React.FC<Props> = ({ setting, setSetting, onAdd, onClose }) 
                         <input type="color" value={color || '#000000'} onChange={e => setColor(e.target.value)} />
                     </div>
                     <div className="form-row">
-                        <label>ナンバリング記号</label>
+                        <label>駅アイコンの種類</label>
                         <select value={numIconPresetKey} onChange={e => setNumIconPresetKey(e.target.value)}>
                             <option value="">（なし）</option>
                             {numberIndexes.map(num => (

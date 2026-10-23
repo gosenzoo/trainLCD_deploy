@@ -132,7 +132,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
     // 路線一覧テーブルのカラム定義（ID列は非表示・路線記号列でクリック選択）
     const lineColumns: ColumnDef<lineType>[] = [
         {
-            header: '路線記号',
+            header: '路線アイコン',
             isSelector: true,  // クリックで行選択
             // iconDict から lineIconKey に対応するアイコンを描画する
             cell: (line) => {
@@ -205,7 +205,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 >複数選択</button>
             </div>
             <div className="form-row">
-                <label>路線記号</label>
+                <label>路線アイコン</label>
                 {/* テキストボックスの代わりに現在設定中のアイコンをプレビュー表示する */}
                 {(() => {
                     const iconKey = selectedLine?.lineIconKey ?? ''
@@ -275,7 +275,7 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
                 />
             </div>
             <div className="form-row">
-                <label>ナンバリング記号</label>
+                <label>駅アイコンの種類</label>
                 <select id="lineNumIconPresetKeyInput" onChange={(e) => formUpdated(e, 'numIconPresetKey')}
                     value={selectedLine?.numIconPresetKey ?? ''}
                 >

@@ -117,7 +117,7 @@ const OperationInfoBalloon: React.FC<OperationInfoBalloonProps> = ({ operationId
                 <span>{operation.carNumber}</span>
             </div>
             <div className="line-info-balloon-row">
-                <span className="line-info-balloon-label">行先番号</span>
+                <span className="line-info-balloon-label">行先の駅アイコン</span>
                 {destNumHtml
                     ? <svg viewBox='0 0 225 225' width="30px" height="30px" dangerouslySetInnerHTML={{ __html: destNumHtml }} />
                     : null}

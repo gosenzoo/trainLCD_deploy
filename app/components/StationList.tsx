@@ -428,7 +428,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
             ],
         },
         {
-            header: 'ナンバリング',
+            header: '駅アイコン',
             // numIcon（今までの路線）と numIconNext（次の路線）を横に並べて表示する（7.57節）。
             // 1つ目が上部に描画されない場合は「-」、2つ目は描画される場合だけ並べる（描画されなければ何も出さない）
             cell: (station) => {
@@ -604,7 +604,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 >複数選択</button>
                 <button onClick={allSelectButtonClicked}>全選択/解除</button>
                 <button onClick={reverseButtonClilcked}>反転</button>
-                <button onClick={() => setIsSeqInputOpen(true)}>ナンバリング連番入力</button>
+                <button onClick={() => setIsSeqInputOpen(true)}>駅番号連番入力</button>
             </div>
 
             {/* ナンバリング連番入力ポップアップ */}
@@ -612,7 +612,7 @@ const StationList: React.FC<stationListProps> = ({setting, setSetting}) => {
                 <div className="modal-backdrop" onClick={() => setIsSeqInputOpen(false)}>
                     <div className="modal-dialog" onClick={e => e.stopPropagation()}>
                         <div className="modal-title-row">
-                            <p className="modal-title">ナンバリング連番入力</p>
+                            <p className="modal-title">駅番号連番入力</p>
                             <button className="modal-close-btn" onClick={() => setIsSeqInputOpen(false)} title="閉じる">×</button>
                         </div>
                         <div className="form-row">
