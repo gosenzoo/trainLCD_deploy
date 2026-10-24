@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="225" height="225" viewBox="0 0 225 225">
+    <rect x="0" y="0" width="225" height="225" rx="4" fill="#07328f"/>
+    <g fill="#fff">
+        <path d="M5 126C6 110 31 104 64 97C96 90 117 73 142 69C147 68 152 69 158 69H219V126Z"/>
+        <path d="M64 93C82 78 105 69 126 69C108 80 86 88 64 93Z"/>
+        <path d="M0 153H219V164H0Z"/>
+    </g>
+    <path fill="#b7b8b6" d="M6 132H219V144H38C23 144 11 139 6 132Z"/>
+    <g fill="#07328f">
+        <rect x="146" y="91" width="15" height="18" rx="4"/>
+        <rect x="172" y="91" width="15" height="18" rx="4"/>
+        <rect x="197" y="91" width="15" height="18" rx="4"/>
+    </g>
+    <!-- <image href="./shinkansen-side.png" x="0" y="0" width="225" height="225" opacity="0.5" /> -->
+</svg>

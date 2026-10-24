@@ -6916,3 +6916,26 @@ LCD表示の「ホーム案内」ページ（`Drawer/pageInput/tokyu/body/platfo
 | `src/generated/iconPresetTexts.ts` | 作り直す |
 | `app/components/IconList.tsx`・`IconNewPopup.tsx`・`LineList.tsx`・`LineAddPopup.tsx`・`StationParamSetter.tsx`・`OperationFields.tsx` | 選択リストをボタンとポップアップに置き換える |
 | `app/globals.css` | ボタン・ポップアップ・一覧・札の見た目、最前面の重なり順 |
+
+### 7.79 新幹線の路線アイコンのプリセット
+
+新幹線の路線アイコンのプリセットを3つ追加する。路線記号・路線カラーを入れる欄はなく、絵柄と色は固定（7.78節の「表現できる要素」はどれもなし。初期値の `<data>` も置かない）。
+
+| キー | 表示名 | 絵柄 |
+|---|---|---|
+| `I_shinkansen-front1` | 新幹線1 | 正面から見た新幹線（青地） |
+| `I_shinkansen-front2` | 新幹線2 | 正面から見た新幹線（緑地） |
+| `I_shinkansen-side` | 新幹線3 | 横から見た新幹線（紺地） |
+
+- SVG は `public/iconPresets/`（LCD表示用。作成いただいたもの）に置いてあるものを `assets/iconPresets/`（エディタ用）に複製し、`node scripts/generateIconPresetTexts.js` で `src/generated/iconPresetTexts.ts` を作り直す
+- 路線アイコンの種類のポップアップ（7.78節）では大項目「汎用」の末尾（地下路線汎用の後ろ）に置く
+- 路線アイコンの大項目「JR・新幹線」を「JR」に改名する。大項目は「JR」「私鉄」「地下鉄」「汎用」の順になる
+
+#### 変更するファイル
+
+| ファイル | 変更内容 |
+|---|---|
+| `assets/iconPresets/I_shinkansen-front1.svg`・`I_shinkansen-front2.svg`・`I_shinkansen-side.svg` | 新規（`public/iconPresets/` から複製） |
+| `public/iconPresets/I_shinkansen-front1.svg`・`I_shinkansen-front2.svg`・`I_shinkansen-side.svg` | 新規（作成いただいたもの） |
+| `src/generated/iconPresetTexts.ts` | 作り直す |
+| `app/modules/presetIndex.ts` | `iconIndexes` の汎用の末尾に3つを追加、`iconCategories` の「JR・新幹線」を「JR」に改名 |

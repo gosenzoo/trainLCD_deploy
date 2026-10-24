@@ -6,14 +6,14 @@ type presetIndexType = {
 }
 
 // 種類を選ぶポップアップの大項目（タブの並び順。7.78節）
-const iconCategories: string[] = ["JR・新幹線", "私鉄", "地下鉄", "汎用"]
+const iconCategories: string[] = ["JR", "私鉄", "地下鉄", "汎用"]
 const numberCategories: string[] = ["JR", "私鉄", "地下鉄", "汎用"]
 
 // 選択の一覧に出る順（7.41節）。事業者ごとのプリセットを事業者順に並べ、そのあとに汎用のものを並べる
 const iconIndexes: presetIndexType[] = [
-    {key: "I_JR_east", name: "JR東日本", category: "JR・新幹線" },
-    {key: "I_JR_west", name: "JR西日本", category: "JR・新幹線" },
-    {key: "I_JR_central", name: "JR東海", category: "JR・新幹線" },
+    {key: "I_JR_east", name: "JR東日本", category: "JR" },
+    {key: "I_JR_west", name: "JR西日本", category: "JR" },
+    {key: "I_JR_central", name: "JR東海", category: "JR" },
     {key: "I_tokyo_subway", name: "東京地下鉄", category: "地下鉄" },
     {key: "I_tokyu", name: "東急", category: "私鉄" },
     // 以下は事業者によらない汎用のプリセット
@@ -21,6 +21,10 @@ const iconIndexes: presetIndexType[] = [
     {key: "I_train_normal1", name: "地上路線汎用１", category: "汎用" },
     {key: "I_train_normal2", name: "地上路線汎用２", category: "汎用" },
     {key: "I_train_subway1", name: "地下路線汎用", category: "汎用" },
+    // 新幹線（7.79節。絵柄と色は固定）
+    {key: "I_shinkansen-front1", name: "新幹線1", category: "汎用" },
+    {key: "I_shinkansen-front2", name: "新幹線2", category: "汎用" },
+    {key: "I_shinkansen-side", name: "新幹線3", category: "汎用" },
 ]
 
 // 選択の一覧に出る順（7.41節）。JR各社 → 札幌駅 → 東京地下鉄 → 東急 → 汎用（丸形汎用。7.62節）
