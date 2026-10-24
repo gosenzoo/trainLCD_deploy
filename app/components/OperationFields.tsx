@@ -2,7 +2,7 @@
 
 import React from "react"
 import "../type"
-import { numberIndexes } from "../modules/presetIndex"
+import PresetPickerButton from "./PresetPickerButton"
 import ToggleSwitch from './ToggleSwitch'
 import TrainCarEditor, { TrainCarPatch } from './TrainCarEditor'
 
@@ -73,11 +73,10 @@ const OperationFields: React.FC<operationFieldsType> = ({ operation, onValue, on
             </div>
             <div className="form-row">
                 <label>行先の駅アイコンの種類</label>
-                <select onChange={(e) => onValue('destinationNumIconKey', e.target.value)} value={operation.destinationNumIconKey}>
-                    {numberIndexes.map(num => (
-                        <option key={num.key} value={num.key}>{num.name}</option>
-                    ))}
-                </select>
+                {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                <PresetPickerButton kind="number" value={operation.destinationNumIconKey ?? ''}
+                    onChange={key => onValue('destinationNumIconKey', key)}
+                />
             </div>
             </div>{/* /行先の自動設定でグレーアウトする範囲 */}
             <div className="form-row">

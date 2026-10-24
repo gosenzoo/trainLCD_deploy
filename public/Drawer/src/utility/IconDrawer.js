@@ -27,6 +27,9 @@ class IconDrawer {
      * @returns {SVGGElement|null}
      */
     createIcon(presetType, symbol, color, geometry = { x: 0, y: 0, width: 0, height: 0 }) {
+        // 種類が空のときはエラーを出さずに何も描かない（7.78節）
+        if (!presetType) return null;
+
         const presetSVG = this._iconPresets[presetType];
         if (!presetSVG) {
             console.warn(`アイコンプリセットが見つかりません: ${presetType}`);
@@ -49,7 +52,9 @@ class IconDrawer {
         let symbolArea = null;
         for (const child of Array.from(svgClone.children)) {
             const id = child.getAttribute("id");
-            if (id === "symbolArea") {
+            if (child.tagName === "data") {
+                // 一覧の画像用の初期値（<data>。7.78節）は描画に含めない
+            } else if (id === "symbolArea") {
                 symbolArea = child;
             } else {
                 group.appendChild(child);

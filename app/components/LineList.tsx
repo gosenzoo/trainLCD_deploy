@@ -6,7 +6,7 @@ import kanaToAlphabet from '../modules/KanaConverter'
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
-import { numberIndexes } from '../modules/presetIndex'
+import PresetPickerButton from './PresetPickerButton'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
@@ -276,14 +276,10 @@ const LineList: React.FC<lineListProps> = ({ setting, setSetting }) => {
             </div>
             <div className="form-row">
                 <label>駅アイコンの種類</label>
-                <select id="lineNumIconPresetKeyInput" onChange={(e) => formUpdated(e, 'numIconPresetKey')}
-                    value={selectedLine?.numIconPresetKey ?? ''}
-                >
-                    <option value="">（なし）</option>
-                    {numberIndexes.map(num => (
-                        <option key={num.key} value={num.key}>{num.name}</option>
-                    ))}
-                </select>
+                {/* 画像付きの一覧のポップアップで選ぶ（7.78節）。formUpdated はイベントの形で値を受け取る */}
+                <PresetPickerButton kind="number" value={selectedLine?.numIconPresetKey ?? ''}
+                    onChange={key => formUpdated({ target: { value: key } }, 'numIconPresetKey')}
+                />
             </div>
         </div>
     )

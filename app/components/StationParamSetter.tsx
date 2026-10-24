@@ -10,6 +10,7 @@ import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveArrayItemsUp, moveArrayItemsDown } from '../modules/listOperations'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
+import PresetPickerButton from './PresetPickerButton'
 import ToggleSwitch from './ToggleSwitch'
 import PlatformEditor, { PlatformPatch } from './PlatformEditor'
 import { IconArrowUp, IconArrowDown, IconTrash, IconPlus, IconTriangleRight, IconTriangleLeft } from './SvgIcons'
@@ -342,15 +343,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                 <br></br>
                 <label>駅アイコンの種類</label>
                 {/* 自動モード時は disabled。値は常に manualPresetKey を表示する */}
-                <select
-                    disabled={isAuto}
-                    onChange={(e) => manualPresetKeyUpdated(e.target.value, target)}
+                {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                <PresetPickerButton kind="number" disabled={isAuto}
+                    onChange={key => manualPresetKeyUpdated(key, target)}
                     value={numIcon?.manualPresetKey ?? ''}
-                >
-                    {numberIndexes.map(num => (
-                        <option key={num.key} value={num.key}>{num.name}</option>
-                    ))}
-                </select>
+                />
                 <br></br>
             </>
         )
@@ -766,14 +763,11 @@ const StationParamSetter: React.FC<stationParamsSetterProps> = ({setting, setSet
                             <div className="form-row">
                                 <label>駅アイコンの種類</label>
                                 {/* 駅基本設定の「ナンバリング記号」と同じ選択肢。値は station.type に保存 */}
-                                <select
+                                {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                                <PresetPickerButton kind="number"
                                     value={selectedItem?.station.type ?? ''}
-                                    onChange={e => updateTransferStation('type', e.target.value)}
-                                >
-                                    {numberIndexes.map(num => (
-                                        <option key={num.key} value={num.key}>{num.name}</option>
-                                    ))}
-                                </select>
+                                    onChange={key => updateTransferStation('type', key)}
+                                />
                             </div>
                             <div className="form-row">
                                 <label>路線カラー</label>

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import "../type"
 import kanaToAlphabet from '../modules/KanaConverter'
 import { loadIconPresetTexts } from '../modules/loadIconPresetTexts'
-import { numberIndexes } from '../modules/presetIndex'
+import PresetPickerButton from './PresetPickerButton'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import IconNewPopup from './IconNewPopup'
 import IconListPopup from './IconListPopup'
@@ -97,12 +97,8 @@ const LineAddPopup: React.FC<Props> = ({ setting, setSetting, onAdd, onClose }) 
                     </div>
                     <div className="form-row">
                         <label>駅アイコンの種類</label>
-                        <select value={numIconPresetKey} onChange={e => setNumIconPresetKey(e.target.value)}>
-                            <option value="">（なし）</option>
-                            {numberIndexes.map(num => (
-                                <option key={num.key} value={num.key}>{num.name}</option>
-                            ))}
-                        </select>
+                        {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                        <PresetPickerButton kind="number" value={numIconPresetKey} onChange={setNumIconPresetKey} />
                     </div>
                     <div className="modal-footer">
                         <button className="btn-primary" onClick={handleAdd}>追加</button>

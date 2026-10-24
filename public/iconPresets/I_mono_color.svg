@@ -1,3 +1,4 @@
 <svg viewBox="0 0 225 225" xmlns="http://www.w3.org/2000/svg">
+    <data id="defaultValue" color="#0079c2" />
     <rect id="lineColor" x="0" y="0" width="225" height="225" fill="#ff0000"/>
 </svg>

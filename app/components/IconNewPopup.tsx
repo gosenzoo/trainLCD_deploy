@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import "../type"
 import { iconIndexes } from '../modules/presetIndex'
+import PresetPickerButton from './PresetPickerButton'
 
 type IconNewPopupProps = {
     setting: settingType
@@ -97,11 +98,8 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
                     <div style={{gridRow: 1, gridColumn: 1, visibility: newTab === 'preset' ? 'visible' : 'hidden'}}>
                         <div className="form-row">
                             <label>プリセットから登録</label>
-                            <select value={presetType} onChange={e => { setPresetType(e.target.value); _savedPresetType = e.target.value }}>
-                                {iconIndexes.map(idx => (
-                                    <option key={idx.key} value={idx.key}>{idx.name}</option>
-                                ))}
-                            </select>
+                            {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                            <PresetPickerButton kind="icon" value={presetType} onChange={key => { setPresetType(key); _savedPresetType = key }} />
                         </div>
                         <div className="form-row">
                             <label>アイコンの路線記号</label>
@@ -117,7 +115,7 @@ const IconNewPopup: React.FC<IconNewPopupProps> = ({
                             <input type="color" value={presetColor} onChange={e => setPresetColor(e.target.value)} />
                         </div>
                         <div className="btn-group" style={{marginTop: '8px'}}>
-                            <button onClick={addPresetIcon} className="btn-primary">アイコン追加</button>
+                            <button onClick={addPresetIcon} className="btn-primary" disabled={!presetType}>アイコン追加</button>
                         </div>
                     </div>
                     {/* 画像で追加サブタブ: 常にレンダリング、非アクティブ時は不可視 */}

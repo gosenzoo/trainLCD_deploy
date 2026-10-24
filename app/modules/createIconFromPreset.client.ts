@@ -101,6 +101,9 @@ export default function createIconFromPreset(
         return null;
     }
 
+    // 種類が空のときはエラーを出さずに何も描かない（7.78節）
+    if (!key) return null;
+
     let presetSVGText = numIconPresets[key];
     if (!presetSVGText) {
         console.error(`ナンバリング記号プリセットが見つかりません: ${key}`);
@@ -125,7 +128,9 @@ export default function createIconFromPreset(
     const children = Array.from(numIconSVG.children);
     for (const child of children) {
         const id = child.getAttribute("id");
-        if (id === "symbolArea") {
+        if (child.tagName === "data") {
+            // 一覧の画像用の初期値（<data>。7.78節）は描画に含めない
+        } else if (id === "symbolArea") {
             symbolArea = child;
         } else if (id === "numberArea") {
             numberArea = child;

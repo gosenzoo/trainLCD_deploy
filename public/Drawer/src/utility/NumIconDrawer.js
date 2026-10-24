@@ -6,6 +6,9 @@ class NumIconDrawer {
     }
 
     createNumIconFromPreset(key, symbolText, numberText, lineColor, geometory = { x: 0, y: 0, width: 0, height: 0 }, outlineWidth = 0) {
+        // 種類が空のときはエラーを出さずに何も描かない（7.78節）
+        if (!key) return null;
+
         let presetSVG = this.numIconPresets[key];
         if (!presetSVG) {
             console.error(`ナンバリング記号プリセットが見つかりません: ${key}`);
@@ -31,7 +34,9 @@ class NumIconDrawer {
         const children = Array.from(numIconSVG.children);
         for (const child of children) {
             const id = child.getAttribute("id");
-            if (id === "symbolArea") {
+            if (child.tagName === "data") {
+                // 一覧の画像用の初期値（<data>。7.78節）は描画に含めない
+            } else if (id === "symbolArea") {
                 symbolArea = child;
             } else if (id === "numberArea") {
                 numberArea = child;

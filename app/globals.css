@@ -1469,3 +1469,103 @@ button.segmented-switch-item.segmented-switch-item--active {
 .platform-editor-other {
     cursor: grab;
 }
+
+/* ============================================
+   路線アイコン・駅アイコンの種類を選ぶポップアップ（7.78節）
+   ============================================ */
+
+/* 入れ子のポップアップ（路線追加・アイコン新規追加）より前に出す */
+.modal-backdrop-picker {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 枠はスクロールさせず、一覧だけを縦にスクロールする */
+.modal-dialog.preset-picker {
+  overflow-y: hidden;
+  gap: 0;
+}
+
+.preset-picker-list {
+  flex: 1 1 auto;
+  flex-shrink: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+/* 一覧の1行: 画像・種類名・表現できる要素の札 */
+.preset-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.preset-picker-row:last-child {
+  border-bottom: none;
+}
+.preset-picker-row:hover {
+  background: var(--bg-overlay);
+}
+.preset-picker-row.selected {
+  background: var(--accent-dim);
+}
+
+.preset-picker-image {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.preset-picker-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+}
+
+.preset-picker-tags {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* 表現できる要素の札（できないものは薄い灰色） */
+.preset-picker-tag {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: #4a525c;
+  white-space: nowrap;
+}
+.preset-picker-tag.on {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent-hover);
+}
+
+/* スマホの幅では札を縦に積み、1行に収める */
+@media (max-width: 480px) {
+  .preset-picker-tags {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+/* 選択欄のボタン（今の種類の画像と名前） */
+button.preset-picker-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 4px;
+  min-height: 34px;
+}

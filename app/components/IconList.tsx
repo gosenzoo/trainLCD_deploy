@@ -3,13 +3,13 @@
 import React, { useState } from 'react'
 import { presetIconMaker } from "../modules/presetIconMaker";
 import "../type"
-import { iconIndexes, numberIndexes } from "../modules/presetIndex"
 import GenericItemList, { ColumnDef } from './GenericItemList'
 
 import {loadIconPresetTexts} from '../modules/loadIconPresetTexts'
 import createNumIconFromPreset from '../modules/createIconFromPreset.client'
 import { moveDictItemsUp, moveDictItemsDown } from '../modules/listOperations'
 import { IconArrowUp, IconArrowDown, IconTrash } from './SvgIcons'
+import PresetPickerButton from './PresetPickerButton'
 
 type iconListProps = {
     setting: settingType,
@@ -188,11 +188,8 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
             </div>
             <div className="form-row">
                 <label>プリセットから登録</label>
-                <select id="iconPresetSelect" value={iconPresetType} onChange={(e) => setIconPresetType(e.target.value)}>
-                    {iconIndexes.map(num => (
-                        <option key={num.key} value={num.key}>{num.name}</option>
-                    ))}
-                </select>
+                {/* 画像付きの一覧のポップアップで選ぶ（7.78節） */}
+                <PresetPickerButton kind="icon" value={iconPresetType} onChange={setIconPresetType} />
             </div>
             <div className="form-row">
                 <label>アイコンの路線記号</label>
@@ -203,7 +200,8 @@ const IconList: React.FC<iconListProps> = ({ setting, setSetting }) => {
                 <input type="color" id="iconPresetLineColorInput" onChange={(e) => setIconPresetColor(e.target.value)} />
             </div>
             <div className="btn-group">
-                <button onClick={() => iconAddButtonClicked('preset')}>アイコン追加（プリセット）</button>
+                {/* 種類が空のときは追加できない（7.78節） */}
+                <button onClick={() => iconAddButtonClicked('preset')} disabled={!iconPresetType}>アイコン追加（プリセット）</button>
             </div>
         </div>
     )
